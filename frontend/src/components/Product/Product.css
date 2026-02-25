@@ -1,0 +1,49 @@
+.product-section {
+  width: 90%;
+  margin: 40px auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.card {
+  transition: 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.card button {
+  transition: 0.2s ease;
+  cursor: pointer;
+}
+
+.card button:hover {
+  background: #1d4ed8;
+}
+.image {
+  height: 150px;
+  background: #e5e7eb;
+  margin-bottom: 10px;
+}
+
+.badge-card {
+  background: red;
+  color: white;
+  padding: 3px 8px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+.stars {
+  color: gold;
+}
+
+.price {
+  font-weight: 600;
+}

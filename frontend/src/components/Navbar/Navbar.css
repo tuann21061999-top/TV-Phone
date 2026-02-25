@@ -1,0 +1,50 @@
+.navbar {
+  background: white;
+  border-top: 1px solid #eee;
+}
+
+.navbar-content {
+  display: flex;
+  gap: 30px;
+  padding: 12px 0;
+}
+
+.navbar a {
+  position: relative;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+/* Hover */
+.navbar a:hover {
+  color: #111827;
+}
+
+/* Active link */
+.navbar a.active {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* Gạch chân animation */
+.navbar a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background: #2563eb;
+  transition: width 0.3s ease;
+}
+
+/* Khi hover */
+.navbar a:hover::after {
+  width: 100%;
+}
+
+/* Khi active */
+.navbar a.active::after {
+  width: 100%;
+}

@@ -1,0 +1,11 @@
+.promotion {
+  width: 90%;
+  margin: 40px auto;
+  background: #1e40af;
+  color: white;
+  padding: 30px;
+  border-radius: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

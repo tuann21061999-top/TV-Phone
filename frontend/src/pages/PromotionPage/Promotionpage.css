@@ -1,0 +1,28 @@
+.promotion-page {
+  width: 90%;
+  margin: 40px auto;
+}
+
+.promo-banner {
+  background: #1e40af;
+  color: white;
+  padding: 60px;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.promo-banner h1 {
+  font-size: 40px;
+  margin: 15px 0;
+}
+
+.view-btn {
+  margin-top: 20px;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 10px;
+  background: white;
+  color: #1e40af;
+  font-weight: 600;
+  cursor: pointer;
+}
