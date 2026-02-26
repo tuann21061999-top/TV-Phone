@@ -1,0 +1,148 @@
+.phone-page {
+  background: #f8fafc;
+}
+
+.phone-container {
+  width: 90%;
+  margin: auto;
+}
+
+.phone-header h1 {
+  font-size: 28px;
+  margin-bottom: 5px;
+}
+
+.phone-header p {
+  color: #6b7280;
+  margin-bottom: 30px;
+}
+
+.phone-content {
+  display: flex;
+  gap: 40px;
+}
+
+.phone-sidebar {
+  width: 250px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  height: fit-content;
+}
+
+.filter-group {
+  margin-bottom: 25px;
+}
+
+.filter-group h4 {
+  margin-bottom: 10px;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.phone-products {
+  flex: 1;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.product-card {
+  position: relative;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.product-image {
+  height: 150px;
+  background: #e5e7eb;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+.product-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: red;
+  color: white;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+.product-rating {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  margin: 5px 0;
+}
+
+.product-price {
+  margin: 10px 0;
+}
+
+.product-price .new {
+  color: #2563eb;
+  font-weight: bold;
+  display: block;
+}
+
+.product-price .old {
+  text-decoration: line-through;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.add-cart {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.add-cart:hover {
+  background: #2563eb;
+  color: white;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 30px;
+}
+
+.pagination button {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+}
+
+.pagination .active {
+  background: #2563eb;
+  color: white;
+}

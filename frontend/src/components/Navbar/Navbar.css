@@ -1,50 +1,75 @@
 .navbar {
-  background: white;
-  border-top: 1px solid #eee;
+  background: #111827;
+  padding: 14px 0;
 }
 
 .navbar-content {
+  max-width: 1200px;
+  margin: 0 auto;      /* 🔥 Căn giữa */
   display: flex;
+  justify-content: center; /* 🔥 Căn giữa menu */
   gap: 30px;
-  padding: 12px 0;
+  align-items: center;
 }
 
-.navbar a {
-  position: relative;
-  color: #6b7280;
+.navbar a,
+.dropdown-title {
+  color: white;
   text-decoration: none;
-  transition: color 0.3s ease;
+  font-weight: 500;
+  position: relative;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-/* Hover */
-.navbar a:hover {
+.navbar a:hover,
+.dropdown-title:hover {
+  color: #facc15;
+}
+
+/* 🔥 DROPDOWN */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 120%;
+  left: 0;
+  background: white;
+  min-width: 200px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  padding: 10px 0;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: 0.3s ease;
+  z-index: 1000;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 15px;
   color: #111827;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.dropdown-menu a:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* 🔥 Hover show menu */
+.dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 /* Active link */
 .navbar a.active {
-  color: #2563eb;
-  font-weight: 600;
-}
-
-/* Gạch chân animation */
-.navbar a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -4px;
-  width: 0;
-  height: 2px;
-  background: #2563eb;
-  transition: width 0.3s ease;
-}
-
-/* Khi hover */
-.navbar a:hover::after {
-  width: 100%;
-}
-
-/* Khi active */
-.navbar a.active::after {
-  width: 100%;
+  color: #facc15;
 }

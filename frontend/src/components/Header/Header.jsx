@@ -31,7 +31,7 @@ function Header() {
               <ShoppingCart size={20} />
             </Link>
 
-            <Link to="/login" className="icon-btn">
+            <Link to="/profile" className="icon-btn">
               <User size={20} />
             </Link>
           </div>

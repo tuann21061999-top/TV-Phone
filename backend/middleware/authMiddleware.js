@@ -1,25 +1,30 @@
 const jwt = require("jsonwebtoken");
 
-exports.protect = (req, res, next) => {
-  let token = req.headers.authorization;
-
-  if (!token) {
-    return res.status(401).json({ message: "Not authorized" });
-  }
-
+const protect = (req, res, next) => {
   try {
-    token = token.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        message: "Bạn chưa đăng nhập!"
+      });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "bi_mat_quan_su"
+    );
+
     req.user = decoded;
     next();
+
   } catch (error) {
-    res.status(401).json({ message: "Token invalid" });
+    return res.status(401).json({
+      message: "Token không hợp lệ hoặc đã hết hạn!"
+    });
   }
 };
 
-exports.admin = (req, res, next) => {
-  if (req.user.role !== "admin") {
-    return res.status(403).json({ message: "Admin only" });
-  }
-  next();
-};
+module.exports = { protect };

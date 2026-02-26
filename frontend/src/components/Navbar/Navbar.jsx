@@ -10,16 +10,25 @@ function Navbar() {
           Trang chủ
         </NavLink>
 
-        <NavLink to="/phones">
-          Điện thoại
-        </NavLink>
+        {/* 🔥 DROPDOWN DANH MỤC */}
+        <div className="dropdown">
+          <span className="dropdown-title">
+            Danh mục
+          </span>
 
-        <NavLink to="/accessories">
-          Phụ kiện
-        </NavLink>
+          <div className="dropdown-menu">
+            <NavLink to="/phones">Điện thoại, Máy tính bảng</NavLink>
+            <NavLink to="/electronics">Đồ điện tử</NavLink>
+            <NavLink to="/accessories">Phụ kiện</NavLink>
+          </div>
+        </div>
 
         <NavLink to="/promotions">
           Khuyến mãi
+        </NavLink>
+
+        <NavLink to="/news">
+          Tin tức
         </NavLink>
 
         <NavLink to="/contact">

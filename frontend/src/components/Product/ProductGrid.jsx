@@ -1,20 +1,32 @@
+import { useEffect, useState } from "react";
 import "./Product.css";
 import ProductCard from "./ProductCard";
+import axios from "axios";
 
-const products = [
-  { name: "Nova X14 Pro", price: "23.790.000đ" },
-  { name: "SonicBlast Headphones", price: "5.990.000đ" },
-  { name: "Turbo Charge 65W", price: "850.000đ" },
-  { name: "Silicone Case Matte", price: "450.000đ" },
-];
+function ProductGrid({ type }) {
+  const [products, setProducts] = useState([]);
 
-function ProductGrid() {
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/products?type=${type}`
+        );
+        setProducts(res.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchProducts();
+  }, [type]);
+
   return (
     <section className="product-section">
-      <h2>Sản phẩm nổi bật</h2>
+      <h2>Sản phẩm</h2>
       <div className="grid">
-        {products.map((p, i) => (
-          <ProductCard key={i} product={p} />
+        {products.map((p) => (
+          <ProductCard key={p._id} product={p} />
         ))}
       </div>
     </section>

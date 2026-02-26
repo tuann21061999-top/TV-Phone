@@ -9,7 +9,10 @@ function ProductCard({ product }) {
       )}
 
       <div className="image">
-        <img src={product.image} alt={product.name} />
+          <img
+            src={product.images?.[0] || "/no-image.png"}
+            alt={product.name}
+        />
       </div>
 
       <h4 className="product-name">{product.name}</h4>
@@ -20,7 +23,9 @@ function ProductCard({ product }) {
         ))}
       </div>
 
-      <p className="price">{product.price}</p>
+      <p className="price">
+        {product.variants[0]?.price?.toLocaleString()}đ
+      </p>
 
       <button className="cart-btn">
         <ShoppingCart size={18} />

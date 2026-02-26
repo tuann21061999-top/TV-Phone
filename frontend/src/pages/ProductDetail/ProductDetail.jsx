@@ -1,153 +1,121 @@
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import "./ProductDetail.css";
+import React, { useState } from "react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import {
+  Star,
+  ShoppingCart,
+  Heart,
+  Share2,
+  CheckCircle2,
+  ShieldCheck,
+  Truck,
+  ChevronRight
+} from "lucide-react";
+import "./ProductDetail.css";
 
 function ProductDetail() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  
-  // Sample product data - In real app, fetch from API
+  const [selectedColor, setSelectedColor] = useState("Midnight Blue");
+  const [selectedStorage, setSelectedStorage] = useState("256GB");
+  const [mainImage, setMainImage] = useState(
+    "https://api.dicebear.com/7.x/shapes/svg?seed=1"
+  );
+
   const product = {
-    id: id || 1,
     name: "Flagship Pro Max 5G",
-    badge: "HÀNG MỚI VỀ",
-    price: "30.990.000đ",
-    originalPrice: "35.990.000đ",
+    price: "30.990.000₫",
     rating: 4.9,
     reviews: 245,
     colors: [
-      { name: "Xanh Đêm (Midnight Blue)", hex: "#1a2332" },
-      { name: "Xám Đen", hex: "#3d3d3d" },
+      { name: "Midnight Blue", hex: "#1e293b" },
+      { name: "Silver", hex: "#e2e8f0" },
+      { name: "Space Gray", hex: "#475569" }
     ],
-    storage: ["128GB", "256GB", "512GB"],
-    specs: [
-      { icon: "📱", name: "Màn hình 6.8\"", desc: "OLED 120Hz LTPO" },
-      { icon: "📷", name: "Camera 200MP", desc: "Cảm biến chuyên nghiệp" },
-      { icon: "🔋", name: "Pin 5000mAh", desc: "Sử dụng cả ngày dài" },
-      { icon: "⚡", name: "Vi Xử Lý Snap 8 Gen 3", desc: "Thế hệ Cam 3" },
-    ],
-    description: "Flagship Pro Max 5G mang đến một trải nghiệm điện thoại cao cấp với màn hình OLED 120Hz, camera 200MP và pin 5000mAh. Chip xử lý mạnh mẽ cho mọi tác vụ.",
-    images: [
-      "https://via.placeholder.com/400x500?text=Phone+1",
-      "https://via.placeholder.com/400x500?text=Phone+2",
-      "https://via.placeholder.com/400x500?text=Phone+3",
-      "https://via.placeholder.com/400x500?text=Phone+Gallery",
-    ],
+    storages: ["128GB", "256GB", "512GB"]
   };
-
-  const [selectedColor, setSelectedColor] = useState(0);
-  const [selectedStorage, setSelectedStorage] = useState("256GB");
-  const [mainImage, setMainImage] = useState(0);
-
-  const handleAddToCart = () => {
-    console.log({
-      product: product.name,
-      color: product.colors[selectedColor].name,
-      storage: selectedStorage,
-    });
-    // TODO: Add to cart logic
-  };
-
-  const relatedProducts = [
-    {
-      name: "Tai nghe Wireless Pro",
-      price: "3.490.000đ",
-      image: "https://via.placeholder.com/200x200?text=Headphones",
-    },
-    {
-      name: "Ốp lưng ClearGuard",
-      price: "690.000đ",
-      image: "https://via.placeholder.com/200x200?text=Case",
-    },
-    {
-      name: "Bộ sạc nhanh 48W",
-      price: "850.000đ",
-      image: "https://via.placeholder.com/200x200?text=Charger",
-    },
-    {
-      name: "Dán cường lưỡng (3 cái)",
-      price: "450.000đ",
-      image: "https://via.placeholder.com/200x200?text=Screen+Protector",
-    },
-  ];
 
   return (
     <div className="product-detail-page">
       <Header />
 
-      {/* Main Product Section */}
-      <div className="product-detail-container">
+      <div className="container">
+        {/* Breadcrumb */}
         <div className="breadcrumb">
-          <span onClick={() => navigate("/")}>Trang chủ</span>
-          <span> / </span>
-          <span onClick={() => navigate("/phones")}>Điện thoại</span>
-          <span> / </span>
+          Trang chủ <ChevronRight size={14} />
+          Điện thoại <ChevronRight size={14} />
           <span>{product.name}</span>
         </div>
 
-        <div className="product-main">
-          {/* Images Gallery */}
-          <div className="gallery-section">
-            <div className="main-image-container">
-              {product.badge && <span className="badge">{product.badge}</span>}
-              <div className="heart-icon">❤️</div>
-              <img src={product.images[mainImage]} alt={product.name} className="main-image" />
+        {/* Main Section */}
+        <div className="product-layout">
+          {/* Left Gallery */}
+          <div className="gallery">
+            <div className="main-image">
+              <button className="wishlist-btn">
+                <Heart size={18} />
+              </button>
+              <img src={mainImage} alt={product.name} />
             </div>
 
-            <div className="thumbnail-gallery">
-              {product.images.map((img, idx) => (
+            <div className="thumbnails">
+              {[1, 2, 3, 4].map((item) => (
                 <img
-                  key={idx}
-                  src={img}
-                  alt={`Thumbnail ${idx}`}
-                  className={`thumbnail ${idx === mainImage ? "active" : ""}`}
-                  onClick={() => setMainImage(idx)}
+                  key={item}
+                  src={`https://api.dicebear.com/7.x/shapes/svg?seed=${item}`}
+                  alt="thumb"
+                  onClick={() =>
+                    setMainImage(
+                      `https://api.dicebear.com/7.x/shapes/svg?seed=${item}`
+                    )
+                  }
                 />
               ))}
             </div>
           </div>
 
-          {/* Product Info */}
-          <div className="info-section">
+          {/* Right Info */}
+          <div className="product-info">
+            <span className="badge">HÀNG MỚI</span>
+
             <h1>{product.name}</h1>
 
             <div className="rating">
-              <span className="stars">⭐⭐⭐⭐⭐</span>
-              <span className="rating-text">{product.rating} ({product.reviews} đánh giá)</span>
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} size={16} fill="#fbbf24" stroke="#fbbf24" />
+              ))}
+              <span>{product.rating} ({product.reviews} đánh giá)</span>
             </div>
 
-            <div className="price-section">
-              <span className="price">{product.price}</span>
-              <span className="original-price">{product.originalPrice}</span>
-            </div>
+            <div className="price">{product.price}</div>
 
-            {/* Color Selection */}
-            <div className="selection-group">
-              <label>Chọn màu:</label>
-              <div className="options">
-                {product.colors.map((color, idx) => (
-                  <div
-                    key={idx}
-                    className={`color-option ${selectedColor === idx ? "selected" : ""}`}
-                    onClick={() => setSelectedColor(idx)}
-                  >
-                    <span className="color-swatch" style={{ backgroundColor: color.hex }}></span>
-                    <span className="color-name">{color.name}</span>
-                  </div>
+            {/* Color */}
+            <div className="option-group">
+              <p>
+                Màu: <strong>{selectedColor}</strong>
+              </p>
+              <div className="color-list">
+                {product.colors.map((color) => (
+                  <button
+                    key={color.name}
+                    className={`color-dot ${
+                      selectedColor === color.name ? "active" : ""
+                    }`}
+                    style={{ background: color.hex }}
+                    onClick={() => setSelectedColor(color.name)}
+                  />
                 ))}
               </div>
             </div>
 
-            {/* Storage Selection */}
-            <div className="selection-group">
-              <label>Chọn dung lượng:</label>
-              <div className="options">
-                {product.storage.map((size) => (
+            {/* Storage */}
+            <div className="option-group">
+              <p>Dung lượng:</p>
+              <div className="storage-list">
+                {product.storages.map((size) => (
                   <button
                     key={size}
-                    className={`storage-option ${selectedStorage === size ? "selected" : ""}`}
+                    className={`storage-btn ${
+                      selectedStorage === size ? "active" : ""
+                    }`}
                     onClick={() => setSelectedStorage(size)}
                   >
                     {size}
@@ -156,79 +124,50 @@ function ProductDetail() {
               </div>
             </div>
 
-            {/* Availability */}
-            <div className="availability">
-              <div className="status">
-                <span>🟢 Còn hàng</span>
-                <span>📦 Miễn phí giao hàng</span>
-                <span>✓ Bảo hành 2 năm</span>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="action-buttons">
-              <button className="add-to-cart-btn" onClick={handleAddToCart}>
-                🛒 Thêm vào giỏ
+            {/* Actions */}
+            <div className="actions">
+              <button className="add-cart">
+                <ShoppingCart size={18} />
+                Thêm vào giỏ
               </button>
-              <button className="buy-now-btn">Mua ngay</button>
+              <button className="share-btn">
+                <Share2 size={18} />
+              </button>
             </div>
 
-            {/* Description */}
-            <div className="description-box">
-              <h3>Mô tả chi tiết</h3>
-              <p>{product.description}</p>
+            <button className="buy-now">Mua ngay</button>
+
+            {/* Policies */}
+            <div className="policies">
+              <div><CheckCircle2 size={16} /> Còn hàng</div>
+              <div><Truck size={16} /> Giao hàng miễn phí</div>
+              <div><ShieldCheck size={16} /> Bảo hành 2 năm</div>
             </div>
           </div>
         </div>
 
-        {/* Specs Section */}
-        <section className="specs-section">
-          <h2>Thông số kỹ thuật nổi bật</h2>
-          <div className="specs-grid">
-            {product.specs.map((spec, idx) => (
-              <div key={idx} className="spec-card">
-                <span className="spec-icon">{spec.icon}</span>
-                <h4>{spec.name}</h4>
-                <p>{spec.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Description Detail */}
-        <section className="description-detail">
-          <h2>Ghi lại thực tại hơn bao giờ hết.</h2>
-          <div className="description-content">
-            <p>
-              Ghi lại những khoảnh khắc đẹp nhất và chia sẻ chúng trên mọi thiết bị. Tất cả các tính năng chuyên nghiệp của máy quay phim ngắn lên đến 60fps với độ phân dải động, ổn định hình ảnh và xử lý chuyển động chậm hoàn hảo.
-            </p>
-            <div className="feature-list">
-              <div>✅ Quay video 8K tại 60fps</div>
-              <div>✅ Chế độ Chup đêm chuyên sâu</div>
-              <div>✅ Xoá vật thể bằng AI</div>
+        {/* Highlight Section */}
+        <div className="highlights">
+          <h2>Thông số nổi bật</h2>
+          <div className="highlight-grid">
+            <div className="highlight-card">
+              <h4>Màn hình 6.8"</h4>
+              <p>OLED 120Hz LTPO</p>
+            </div>
+            <div className="highlight-card">
+              <h4>Camera 200MP</h4>
+              <p>Cảm biến chuyên nghiệp</p>
+            </div>
+            <div className="highlight-card">
+              <h4>Pin 5000mAh</h4>
+              <p>Sử dụng cả ngày</p>
+            </div>
+            <div className="highlight-card">
+              <h4>Snap 8 Gen 3</h4>
+              <p>Hiệu năng vượt trội</p>
             </div>
           </div>
-          <img
-            src="https://via.placeholder.com/800x400?text=Camera+Demo"
-            alt="Camera demo"
-            className="feature-image"
-          />
-        </section>
-
-        {/* Related Products */}
-        <section className="related-products">
-          <h2>Khách hàng cùng mua</h2>
-          <div className="products-slider">
-            {relatedProducts.map((prod, idx) => (
-              <div key={idx} className="related-product-card">
-                <img src={prod.image} alt={prod.name} />
-                <h4>{prod.name}</h4>
-                <p className="price">{prod.price}</p>
-                <button className="btn-add">🛒 Thêm vào giỏ</button>
-              </div>
-            ))}
-          </div>
-        </section>
+        </div>
       </div>
 
       <Footer />
