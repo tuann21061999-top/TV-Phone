@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import axios from "axios";
@@ -6,8 +7,6 @@ import "./ElectronicPage.css";
 import {
   Star,
   ShoppingCart,
-  ChevronLeft,
-  ChevronRight,
   Filter,
   Tv,
   Speaker,
@@ -29,16 +28,16 @@ function ElectronicPage() {
     { name: "Linh kiện", icon: <Cpu size={16} /> }
   ];
 
-  // 🔥 CALL API
+  // ===============================
+  // Fetch products
+  // ===============================
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-
         const { data } = await axios.get(
           "http://localhost:5000/api/products?type=electronic"
         );
-
         setProducts(data);
         setLoading(false);
       // eslint-disable-next-line no-unused-vars
@@ -51,12 +50,68 @@ function ElectronicPage() {
     fetchProducts();
   }, []);
 
-  // 🔥 FILTER CATEGORY
+  // ===============================
+  // Format price
+  // ===============================
+  const formatPrice = (price) =>
+    price?.toLocaleString("vi-VN") + "₫";
+
+  // ===============================
+  // Promotion logic
+  // ===============================
+  const getPriceInfo = (product) => {
+    const basePrice = product.variants?.[0]?.price || 0;
+    let finalPrice = basePrice;
+
+    const isPromoActive =
+      product.promotion?.discountPercent > 0 &&
+      new Date(product.promotion.startDate) <= new Date() &&
+      new Date(product.promotion.endDate) >= new Date();
+
+    if (isPromoActive) {
+      finalPrice =
+        basePrice -
+        (basePrice * product.promotion.discountPercent) / 100;
+    }
+
+    return {
+      basePrice,
+      finalPrice,
+      hasDiscount: finalPrice < basePrice
+    };
+  };
+
+  // ===============================
+  // Save view history
+  // ===============================
+  const handleProductClick = async (productId) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) return; // chưa đăng nhập thì bỏ qua
+
+    try {
+      await axios.post(
+        "http://localhost:5000/api/history/view",
+        { productId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Lỗi lưu lịch sử xem:", error);
+    }
+  };
+
+  // ===============================
+  // Filter products
+  // ===============================
   const filteredProducts =
     activeCategory === "Tất cả"
       ? products
       : products.filter(
-          (item) => item.category === activeCategory
+          (item) => item.categoryId?.name === activeCategory
         );
 
   return (
@@ -64,21 +119,21 @@ function ElectronicPage() {
       <Header />
 
       <div className="electronics-container">
-
-        {/* Title */}
         <div className="electronics-header">
-          <h1>Đồ điện tử</h1>
+          <h1>Đồ điện tử & Gia dụng</h1>
           <p>Tìm thấy {filteredProducts.length} sản phẩm</p>
         </div>
 
         <div className="electronics-content">
-
           {/* Sidebar */}
           <aside className="electronics-sidebar">
-            <h3><Filter size={18} /> Bộ lọc</h3>
+            <h3>
+              <Filter size={18} /> Bộ lọc
+            </h3>
 
             <div className="filter-group">
               <h4>Danh mục</h4>
+
               {categories.map((cat) => (
                 <button
                   key={cat.name}
@@ -93,83 +148,98 @@ function ElectronicPage() {
                 </button>
               ))}
             </div>
-
-            <div className="filter-group">
-              <h4>Mức giá</h4>
-              <label><input type="radio" name="price" /> Dưới 5 triệu</label>
-              <label><input type="radio" name="price" /> 5 - 20 triệu</label>
-              <label><input type="radio" name="price" /> Trên 20 triệu</label>
-            </div>
           </aside>
 
-          {/* Product Grid */}
+          {/* Product Section */}
           <section className="electronics-products">
-
             {loading && <p>Đang tải sản phẩm...</p>}
             {error && <p>{error}</p>}
 
             {!loading && !error && (
-              <>
-                <div className="product-grid">
-                  {filteredProducts.map((product) => (
-                    <div key={product._id} className="product-card">
+              <div className="product-grid">
+                {filteredProducts.map((product) => {
+                  const {
+                    basePrice,
+                    finalPrice,
+                    hasDiscount
+                  } = getPriceInfo(product);
 
-                      {product.tag && (
-                        <span className="product-tag">{product.tag}</span>
-                      )}
-
-                      <div className="product-image">
-                        <img
-                          src={
-                            product.image ||
-                            "https://via.placeholder.com/200"
-                          }
-                          alt={product.name}
-                        />
-                      </div>
-
-                      <h3>{product.name}</h3>
-
-                      <div className="product-rating">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} size={14} fill="gold" stroke="gold" />
-                        ))}
-                        <span>({product.reviews || 0})</span>
-                      </div>
-
-                      <div className="product-price">
-                        <span className="new">
-                          {product.price?.toLocaleString("vi-VN")}₫
-                        </span>
-
-                        {product.oldPrice && (
-                          <span className="old">
-                            {product.oldPrice.toLocaleString("vi-VN")}₫
+                  return (
+                    <div
+                      key={product._id}
+                      className="product-card"
+                    >
+                      <Link
+                        to={`/product/${product.slug}`}
+                        className="product-link"
+                        onClick={() =>
+                          handleProductClick(product._id)
+                        }
+                      >
+                        {(product.isFeatured ||
+                          hasDiscount) && (
+                          <span className="product-tag">
+                            {hasDiscount
+                              ? `-${product.promotion.discountPercent}%`
+                              : "HOT"}
                           </span>
                         )}
-                      </div>
+
+                        <div className="product-image">
+                          <img
+                            src={
+                              product.images?.[0] ||
+                              "/no-image.png"
+                            }
+                            alt={product.name}
+                          />
+                        </div>
+
+                        <h3>{product.name}</h3>
+
+                        <div className="product-rating">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={14}
+                              fill={
+                                i <
+                                Math.round(
+                                  product.averageRating || 0
+                                )
+                                  ? "gold"
+                                  : "none"
+                              }
+                              stroke="gold"
+                            />
+                          ))}
+                          <span>
+                            ({product.averageRating || 0})
+                          </span>
+                        </div>
+
+                        <div className="product-price">
+                          <span className="new">
+                            {formatPrice(finalPrice)}
+                          </span>
+
+                          {hasDiscount && (
+                            <span className="old">
+                              {formatPrice(basePrice)}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
 
                       <button className="add-cart">
                         <ShoppingCart size={16} /> Thêm vào giỏ
                       </button>
-
                     </div>
-                  ))}
-                </div>
-
-                {/* Pagination */}
-                <div className="pagination">
-                  <button><ChevronLeft size={18} /></button>
-                  <button className="active">1</button>
-                  <button>2</button>
-                  <button>3</button>
-                  <button><ChevronRight size={18} /></button>
-                </div>
-              </>
+                  );
+                })}
+              </div>
             )}
-
           </section>
-
         </div>
       </div>
 

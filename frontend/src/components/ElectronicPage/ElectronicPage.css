@@ -4,7 +4,10 @@
 }
 
 .electronics-container {
-  padding: 40px 80px;
+  width: 90%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 30px 40px;
 }
 
 .electronics-header {

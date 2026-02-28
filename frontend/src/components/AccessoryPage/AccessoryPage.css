@@ -4,9 +4,10 @@
 }
 
 .accessories-container {
-  width: 1200px;
+  width: 1600px;
+  width: 90%;
   margin: auto;
-  padding: 40px 0;
+  padding: 30px 40px;
 }
 
 .accessories-header h1 {

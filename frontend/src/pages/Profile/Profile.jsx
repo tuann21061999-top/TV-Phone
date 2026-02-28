@@ -17,17 +17,25 @@ const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    // Lấy dữ liệu từ localStorage
-    const savedUser = localStorage.getItem("user");
-    if (!savedUser) {
-      // Nếu chưa đăng nhập, bắt quay xe về trang login
-      navigate("/login");
-    } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setUser(JSON.parse(savedUser));
-    }
-  }, [navigate]);
+useEffect(() => {
+  const savedUser = localStorage.getItem("user");
+
+  if (!savedUser) {
+    navigate("/login");
+    return;
+  }
+
+  const parsedUser = JSON.parse(savedUser);
+
+  // 👉 Nếu là admin thì chuyển sang trang Admin
+  if (parsedUser.role === "admin") {
+    navigate("/admin");
+    return;
+  }
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  setUser(parsedUser);
+}, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

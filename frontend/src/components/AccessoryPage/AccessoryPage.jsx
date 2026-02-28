@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import axios from "axios";
@@ -6,8 +7,6 @@ import "./AccessoryPage.css";
 import {
   Star,
   ShoppingCart,
-  ChevronLeft,
-  ChevronRight,
   Filter,
   Headphones,
   Zap,
@@ -29,21 +28,24 @@ function AccessoriesPage() {
     { name: "Pin dự phòng", icon: <Battery size={16} /> }
   ];
 
-  // 🔥 CALL API
+  /* ================= FETCH PRODUCTS ================= */
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-
+        // Gọi API với query filter accessory từ server
         const { data } = await axios.get(
-          "http://localhost:5000/api/products?type=accessory"
+          "http://localhost:5000/api/products?productType=accessory"
         );
 
-        setProducts(data);
-        setLoading(false);
+        // Lọc lại một lần nữa ở client để đảm bảo dữ liệu sạch
+        const accessories = data.filter(p => p.productType === "accessory");
+        setProducts(accessories);
       // eslint-disable-next-line no-unused-vars
       } catch (err) {
-        setError("Không thể tải sản phẩm");
+        setError("Không thể tải sản phẩm phụ kiện");
+      } finally {
         setLoading(false);
       }
     };
@@ -51,29 +53,66 @@ function AccessoriesPage() {
     fetchProducts();
   }, []);
 
-  // 🔥 FILTER CATEGORY
-  const filteredProducts =
-    activeCategory === "Tất cả"
-      ? products
-      : products.filter(
-          (item) => item.category === activeCategory
-        );
+  /* ================= HELPERS ================= */
+
+  const formatPrice = (price) =>
+    price?.toLocaleString("vi-VN") + "₫";
+
+  const getLowestPrice = (product) => {
+    if (!product.variants?.length) return 0;
+    return Math.min(...product.variants.map(v => v.price));
+  };
+
+  const getFinalPrice = (product) => {
+    const basePrice = getLowestPrice(product);
+
+    if (!product.promotion?.discountPercent)
+      return basePrice;
+
+    const now = new Date();
+    const start = new Date(product.promotion.startDate);
+    const end = new Date(product.promotion.endDate);
+
+    if (now >= start && now <= end) {
+      return (
+        basePrice -
+        (basePrice * product.promotion.discountPercent) / 100
+      );
+    }
+
+    return basePrice;
+  };
+
+  /* ================= FILTER ================= */
+
+  const filteredProducts = useMemo(() => {
+    if (activeCategory === "Tất cả") return products;
+
+    return products.filter((item) => {
+      // Logic kiểm tra category dựa trên populate hoặc ID
+      const categoryName = item.categoryId?.name || item.categoryId;
+      return categoryName === activeCategory;
+    });
+  }, [products, activeCategory]);
+
+  /* ================= UI ================= */
 
   return (
     <div className="accessories-page">
       <Header />
 
       <div className="accessories-container">
-        {/* Title */}
         <div className="accessories-header">
-          <h1>Phụ kiện</h1>
+          <h1>Phụ kiện Công nghệ</h1>
           <p>Tìm thấy {filteredProducts.length} sản phẩm</p>
         </div>
 
         <div className="accessories-content">
-          {/* Sidebar */}
+          {/* SIDEBAR */}
           <aside className="accessories-sidebar">
-            <h3><Filter size={18} /> Bộ lọc</h3>
+            <h3>
+              <Filter size={18} /> Bộ lọc
+            </h3>
 
             <div className="filter-group">
               <h4>Danh mục</h4>
@@ -91,86 +130,99 @@ function AccessoriesPage() {
                 </button>
               ))}
             </div>
-
-            <div className="filter-group">
-              <h4>Mức giá</h4>
-              <label><input type="radio" name="price" /> Dưới 1 triệu</label>
-              <label><input type="radio" name="price" /> 1 - 5 triệu</label>
-              <label><input type="radio" name="price" /> Trên 5 triệu</label>
-            </div>
           </aside>
 
-          {/* Product Grid */}
+          {/* PRODUCT GRID */}
           <section className="accessories-products">
-
-            {loading && <p>Đang tải sản phẩm...</p>}
-            {error && <p>{error}</p>}
+            {loading && <div className="loading">Đang tải phụ kiện...</div>}
+            {error && <div className="error-msg">{error}</div>}
 
             {!loading && !error && (
-              <>
-                <div className="product-grid">
-                  {filteredProducts.map((product) => (
-                    <div key={product._id} className="product-card">
+              <div className="product-grid">
+                {filteredProducts.map((product) => {
+                  const basePrice = getLowestPrice(product);
+                  const finalPrice = getFinalPrice(product);
+                  const hasDiscount = finalPrice < basePrice;
 
-                      {product.tag && (
-                        <span className="product-tag">{product.tag}</span>
-                      )}
+                  // Lấy ảnh mặc định từ colorImages hoặc fallback
+                  const displayImage = product.colorImages?.find(img => img.isDefault)?.imageUrl 
+                                      || product.colorImages?.[0]?.imageUrl 
+                                      || "/no-image.png";
 
-                      <div className="product-image">
-                        <img
-                          src={
-                            product.image ||
-                            "https://via.placeholder.com/200"
-                          }
-                          alt={product.name}
-                        />
-                      </div>
-
-                      <h3>{product.name}</h3>
-
-                      <div className="product-rating">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            size={14}
-                            fill="gold"
-                            stroke="gold"
-                          />
-                        ))}
-                        <span>({product.reviews || 0})</span>
-                      </div>
-
-                      <div className="product-price">
-                        <span className="new">
-                          {product.price?.toLocaleString("vi-VN")}₫
-                        </span>
-
-                        {product.oldPrice && (
-                          <span className="old">
-                            {product.oldPrice.toLocaleString("vi-VN")}₫
+                  return (
+                    <div
+                      key={product._id}
+                      className="product-card"
+                    >
+                      <Link
+                        to={`/product/${product.slug || product._id}`}
+                        className="product-link"
+                      >
+                        {(product.isFeatured || hasDiscount) && (
+                          <span className="product-tag">
+                            {hasDiscount
+                              ? `-${product.promotion.discountPercent}%`
+                              : "HOT"}
                           </span>
                         )}
-                      </div>
+
+                        <div className="product-image">
+                          <img
+                            src={displayImage}
+                            alt={product.name}
+                          />
+                        </div>
+
+                        <h3>{product.name}</h3>
+
+                        {/* Rating */}
+                        <div className="product-rating">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={14}
+                              fill={
+                                i < Math.round(product.averageRating || 0)
+                                  ? "gold"
+                                  : "none"
+                              }
+                              stroke="gold"
+                            />
+                          ))}
+                          <span>
+                            ({product.averageRating || 0})
+                          </span>
+                        </div>
+
+                        {/* Price */}
+                        <div className="product-price">
+                          <span className="new">
+                            {formatPrice(finalPrice)}
+                          </span>
+
+                          {hasDiscount && (
+                            <span className="old">
+                              {formatPrice(basePrice)}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
 
                       <button className="add-cart">
-                        <ShoppingCart size={16} /> Thêm vào giỏ
+                        <ShoppingCart size={16} />
+                        Thêm vào giỏ
                       </button>
-
                     </div>
-                  ))}
-                </div>
-
-                {/* Pagination */}
-                <div className="pagination">
-                  <button><ChevronLeft size={18} /></button>
-                  <button className="active">1</button>
-                  <button>2</button>
-                  <button>3</button>
-                  <button><ChevronRight size={18} /></button>
-                </div>
-              </>
+                  );
+                })}
+              </div>
             )}
-
+            
+            {!loading && filteredProducts.length === 0 && (
+              <div className="no-products">
+                Không tìm thấy sản phẩm nào trong danh mục này.
+              </div>
+            )}
           </section>
         </div>
       </div>

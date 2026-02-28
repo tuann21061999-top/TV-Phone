@@ -1,172 +1,321 @@
-import React, { useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useEffect, useState, useMemo } from "react";
+import axios from "axios";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import {
-  Star,
-  ShoppingCart,
-  Heart,
-  Share2,
-  CheckCircle2,
-  ShieldCheck,
-  Truck,
-  ChevronRight
+  Cpu,
+  ChevronRight,
+  ShoppingCart
 } from "lucide-react";
 import "./ProductDetail.css";
 
 function ProductDetail() {
-  const [selectedColor, setSelectedColor] = useState("Midnight Blue");
-  const [selectedStorage, setSelectedStorage] = useState("256GB");
-  const [mainImage, setMainImage] = useState(
-    "https://api.dicebear.com/7.x/shapes/svg?seed=1"
-  );
+  const { slug } = useParams();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const product = {
-    name: "Flagship Pro Max 5G",
-    price: "30.990.000₫",
-    rating: 4.9,
-    reviews: 245,
-    colors: [
-      { name: "Midnight Blue", hex: "#1e293b" },
-      { name: "Silver", hex: "#e2e8f0" },
-      { name: "Space Gray", hex: "#475569" }
-    ],
-    storages: ["128GB", "256GB", "512GB"]
-  };
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedMem, setSelectedMem] = useState("");
+  const [selectedCondition, setSelectedCondition] = useState(""); // ✅ thêm
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `http://localhost:5000/api/products/${slug}`
+        );
+        const data = res.data.data || res.data;
+        setProduct(data);
+
+        // reset lựa chọn
+        setSelectedColor("");
+        setSelectedMem("");
+        setSelectedCondition("");
+      } catch (error) {
+        console.error("Lỗi lấy sản phẩm:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [slug]);
+
+  /* ==============================
+     1️⃣ Ảnh chính
+  ============================== */
+  const mainImage = useMemo(() => {
+    if (!product) return "";
+
+    if (selectedColor) {
+      const colorObj = product.colorImages.find(
+        c => c.colorName === selectedColor
+      );
+      return colorObj?.imageUrl || "";
+    }
+
+    const defaultColor = product.colorImages.find(c => c.isDefault);
+    return defaultColor?.imageUrl || product.colorImages[0]?.imageUrl;
+  }, [product, selectedColor]);
+
+  /* ==============================
+     2️⃣ Variant hiện tại
+  ============================== */
+  const currentVariant = useMemo(() => {
+    if (!product || !selectedColor || !selectedMem) return null;
+
+    const [size, storage] = selectedMem.split("/");
+
+    return product.variants.find(
+      v =>
+        v.colorName === selectedColor &&
+        v.size === size &&
+        v.storage === storage &&
+        v.isActive &&
+        v.quantity > 0
+    );
+  }, [product, selectedColor, selectedMem]);
+
+  /* ==============================
+     3️⃣ Filter 2 chiều
+  ============================== */
+  const filterOptions = useMemo(() => {
+    if (!product)
+      return {
+        allColors: [],
+        allMemories: [],
+        validColors: [],
+        validMemories: []
+      };
+
+    const validVariants = product.variants.filter(
+      v => v.isActive && v.quantity > 0
+    );
+
+    const allColors = product.colorImages.map(c => c.colorName);
+
+    const allMemories = [
+      ...new Set(validVariants.map(v => `${v.size}/${v.storage}`))
+    ];
+
+    if (!selectedColor && !selectedMem) {
+      return {
+        allColors,
+        allMemories,
+        validColors: allColors,
+        validMemories: allMemories
+      };
+    }
+
+    if (selectedColor && !selectedMem) {
+      const validMemories = validVariants
+        .filter(v => v.colorName === selectedColor)
+        .map(v => `${v.size}/${v.storage}`);
+
+      return {
+        allColors,
+        allMemories,
+        validColors: allColors,
+        validMemories
+      };
+    }
+
+    if (!selectedColor && selectedMem) {
+      const validColors = validVariants
+        .filter(v => `${v.size}/${v.storage}` === selectedMem)
+        .map(v => v.colorName);
+
+      return {
+        allColors,
+        allMemories,
+        validColors,
+        validMemories: allMemories
+      };
+    }
+
+    const validMemories = validVariants
+      .filter(v => v.colorName === selectedColor)
+      .map(v => `${v.size}/${v.storage}`);
+
+    const validColors = validVariants
+      .filter(v => `${v.size}/${v.storage}` === selectedMem)
+      .map(v => v.colorName);
+
+    return {
+      allColors,
+      allMemories,
+      validColors,
+      validMemories
+    };
+  }, [product, selectedColor, selectedMem]);
+
+  if (loading) return <div className="loading-state">Đang tải...</div>;
+  if (!product)
+    return <div className="error-state">Không tìm thấy sản phẩm</div>;
+
+  const canBuy =
+    currentVariant &&
+    (product.condition !== "used" || selectedCondition);
 
   return (
     <div className="product-detail-page">
       <Header />
 
-      <div className="container">
-        {/* Breadcrumb */}
-        <div className="breadcrumb">
-          Trang chủ <ChevronRight size={14} />
-          Điện thoại <ChevronRight size={14} />
-          <span>{product.name}</span>
-        </div>
+      <div className="product-detail-container">
+        <nav className="breadcrumb">
+          <Link to="/">Trang chủ</Link> <ChevronRight size={14} />
+          <span>{product.brand}</span> <ChevronRight size={14} />
+          <span className="current">{product.name}</span>
+        </nav>
 
-        {/* Main Section */}
-        <div className="product-layout">
-          {/* Left Gallery */}
-          <div className="gallery">
-            <div className="main-image">
-              <button className="wishlist-btn">
-                <Heart size={18} />
-              </button>
-              <img src={mainImage} alt={product.name} />
-            </div>
-
-            <div className="thumbnails">
-              {[1, 2, 3, 4].map((item) => (
-                <img
-                  key={item}
-                  src={`https://api.dicebear.com/7.x/shapes/svg?seed=${item}`}
-                  alt="thumb"
-                  onClick={() =>
-                    setMainImage(
-                      `https://api.dicebear.com/7.x/shapes/svg?seed=${item}`
-                    )
-                  }
-                />
-              ))}
+        <div className="product-top">
+          {/* IMAGE */}
+          <div className="product-images-gallery">
+            <div className="main-image-container">
+              <img
+                src={mainImage}
+                alt={product.name}
+                className="main-image"
+              />
             </div>
           </div>
 
-          {/* Right Info */}
-          <div className="product-info">
-            <span className="badge">HÀNG MỚI</span>
-
+          {/* INFO */}
+          <div className="product-info-panel">
             <h1>{product.name}</h1>
 
-            <div className="rating">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} size={16} fill="#fbbf24" stroke="#fbbf24" />
-              ))}
-              <span>{product.rating} ({product.reviews} đánh giá)</span>
+            <div className="price-display">
+              <span className="current-price">
+                {selectedColor && selectedMem &&
+                (product.condition !== "used" || selectedCondition)
+                  ? currentVariant
+                    ? currentVariant.price.toLocaleString() + "đ"
+                    : "Hết hàng"
+                  : "Vui lòng chọn cấu hình"}
+              </span>
             </div>
 
-            <div className="price">{product.price}</div>
+            {/* RAM/ROM */}
+            <div className="selection-group">
+              <label>RAM/ROM:</label>
+              <div className="options-grid">
+                {filterOptions.allMemories.map(mem => {
+                  const isValid =
+                    filterOptions.validMemories.includes(mem);
 
-            {/* Color */}
-            <div className="option-group">
-              <p>
-                Màu: <strong>{selectedColor}</strong>
-              </p>
-              <div className="color-list">
-                {product.colors.map((color) => (
-                  <button
-                    key={color.name}
-                    className={`color-dot ${
-                      selectedColor === color.name ? "active" : ""
-                    }`}
-                    style={{ background: color.hex }}
-                    onClick={() => setSelectedColor(color.name)}
-                  />
-                ))}
+                  return (
+                    <button
+                      key={mem}
+                      className={`opt-btn
+                        ${selectedMem === mem ? "active" : ""}
+                        ${!isValid ? "disabled" : ""}
+                      `}
+                      onClick={() =>
+                        setSelectedMem(
+                          selectedMem === mem ? "" : mem
+                        )
+                      }
+                    >
+                      {mem}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Storage */}
-            <div className="option-group">
-              <p>Dung lượng:</p>
-              <div className="storage-list">
-                {product.storages.map((size) => (
-                  <button
-                    key={size}
-                    className={`storage-btn ${
-                      selectedStorage === size ? "active" : ""
-                    }`}
-                    onClick={() => setSelectedStorage(size)}
-                  >
-                    {size}
-                  </button>
-                ))}
+            {/* COLOR */}
+            <div className="selection-group">
+              <label>Màu sắc:</label>
+              <div className="options-grid">
+                {filterOptions.allColors.map(color => {
+                  const isValid =
+                    filterOptions.validColors.includes(color);
+
+                  return (
+                    <button
+                      key={color}
+                      className={`opt-btn
+                        ${selectedColor === color ? "active" : ""}
+                        ${!isValid ? "disabled" : ""}
+                      `}
+                      onClick={() =>
+                        setSelectedColor(
+                          selectedColor === color ? "" : color
+                        )
+                      }
+                    >
+                      {color}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="actions">
-              <button className="add-cart">
-                <ShoppingCart size={18} />
-                Thêm vào giỏ
-              </button>
-              <button className="share-btn">
-                <Share2 size={18} />
-              </button>
-            </div>
+            {/* ✅ CONDITION LEVEL (Máy cũ) */}
+            {product.condition === "used" &&
+              product.conditionLevel &&
+              product.conditionLevel.length > 0 && (
+                <div className="selection-group">
+                  <label>Tình trạng:</label>
+                  <div className="options-grid">
+                    {product.conditionLevel.map(level => (
+                      <button
+                        key={level}
+                        className={`opt-btn
+                          ${selectedCondition === level ? "active" : ""}
+                        `}
+                        onClick={() =>
+                          setSelectedCondition(
+                            selectedCondition === level ? "" : level
+                          )
+                        }
+                      >
+                        {level}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-            <button className="buy-now">Mua ngay</button>
-
-            {/* Policies */}
-            <div className="policies">
-              <div><CheckCircle2 size={16} /> Còn hàng</div>
-              <div><Truck size={16} /> Giao hàng miễn phí</div>
-              <div><ShieldCheck size={16} /> Bảo hành 2 năm</div>
+            <div className="action-buttons">
+              <button
+                className="buy-now"
+                disabled={!canBuy}
+              >
+                MUA NGAY
+              </button>
+              <button
+                className="add-to-cart"
+                disabled={!canBuy}
+              >
+                <ShoppingCart size={20} /> Thêm vào giỏ
+              </button>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Highlight Section */}
-        <div className="highlights">
-          <h2>Thông số nổi bật</h2>
-          <div className="highlight-grid">
-            <div className="highlight-card">
-              <h4>Màn hình 6.8"</h4>
-              <p>OLED 120Hz LTPO</p>
+      {/* THÔNG SỐ KỸ THUẬT */}
+      <div className="specs-section">
+        <h3 className="specs-title">
+          <Cpu size={18} /> Thông số kỹ thuật
+        </h3>
+
+        <div className="specs-table">
+          {product.specs && Object.keys(product.specs).length > 0 ? (
+            Object.entries(product.specs).map(([key, value]) => (
+              <div className="spec-row" key={key}>
+                <span className="spec-key">{key}</span>
+                <span className="spec-value">{value}</span>
+              </div>
+            ))
+          ) : (
+            <div className="no-specs">
+              Chưa có thông số kỹ thuật
             </div>
-            <div className="highlight-card">
-              <h4>Camera 200MP</h4>
-              <p>Cảm biến chuyên nghiệp</p>
-            </div>
-            <div className="highlight-card">
-              <h4>Pin 5000mAh</h4>
-              <p>Sử dụng cả ngày</p>
-            </div>
-            <div className="highlight-card">
-              <h4>Snap 8 Gen 3</h4>
-              <p>Hiệu năng vượt trội</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 

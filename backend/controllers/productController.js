@@ -1,6 +1,10 @@
 const Product = require("../models/Product");
+const mongoose = require("mongoose");
 
-// CREATE PRODUCT
+/* =====================================
+   CREATE PRODUCT
+===================================== */
+
 exports.createProduct = async (req, res) => {
   try {
     const product = await Product.create(req.body);
@@ -10,14 +14,32 @@ exports.createProduct = async (req, res) => {
   }
 };
 
-// GET ALL PRODUCTS
+/* =====================================
+   GET ALL PRODUCTS (FILTER + SEARCH)
+===================================== */
+
 exports.getAllProducts = async (req, res) => {
   try {
-    const { type } = req.query;
+    const { type, brand, search, condition } = req.query;
 
-    const filter = type ? { productType: type } : {};
+    let filter = { isActive: true };
 
-    const products = await Product.find(filter);
+    if (type) filter.productType = type;
+    if (brand) filter.brand = brand;
+    if (condition) filter.condition = condition;
+
+    // SEARCH name, brand, highlights
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { brand: { $regex: search, $options: "i" } },
+        { highlights: { $elemMatch: { $regex: search, $options: "i" } } },
+      ];
+    }
+
+    const products = await Product.find(filter)
+      .populate("categoryId", "name")
+      .sort({ createdAt: -1 });
 
     res.json(products);
   } catch (error) {
@@ -25,16 +47,35 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
-// GET PRODUCT BY ID
+/* =====================================
+   GET PRODUCT BY ID OR SLUG
+===================================== */
+
 exports.getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id)
-      .populate("categoryId")
-      .populate("compatibleWith");
+    const { id } = req.params;
+    let product;
 
+    // Nếu là ObjectId
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      product = await Product.findById(id)
+        .populate("categoryId")
+        .populate("compatibleWith", "name slug colorImages");
+    }
+
+    // Nếu không tìm thấy → tìm theo slug
     if (!product) {
+      product = await Product.findOne({ slug: id })
+        .populate("categoryId")
+        .populate("compatibleWith", "name slug colorImages");
+    }
+
+    if (!product || !product.isActive) {
       return res.status(404).json({ message: "Product not found" });
     }
+
+    // 🔥 Chỉ trả về variant đang active
+    product.variants = product.variants.filter(v => v.isActive);
 
     res.json(product);
   } catch (error) {
@@ -42,13 +83,19 @@ exports.getProductById = async (req, res) => {
   }
 };
 
-// UPDATE PRODUCT
+/* =====================================
+   UPDATE PRODUCT
+===================================== */
+
 exports.updateProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true }
+      {
+        new: true,
+        runValidators: true,
+      }
     );
 
     if (!product) {
@@ -61,7 +108,10 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-// DELETE PRODUCT
+/* =====================================
+   DELETE PRODUCT
+===================================== */
+
 exports.deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);

@@ -1,0 +1,250 @@
+/* ==========================================================================
+   MANAGEMENT PAGE & TABLE
+   ========================================================================== */
+.manage-product { 
+    padding: clamp(15px, 2vw, 30px); 
+    background: #f8fafc; 
+    min-height: 100vh;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.admin-header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    margin-bottom: 30px; flex-wrap: wrap; gap: 15px;
+}
+
+.header-left h2 { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+
+.search-box {
+    display: flex; align-items: center; background: white;
+    border: 1px solid #e2e8f0; padding: 10px 16px; border-radius: 12px;
+    width: 340px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.search-box:focus-within { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+.search-box input { border: none; outline: none; margin-left: 10px; width: 100%; font-size: 14px; color: #1e293b; }
+
+/* ==========================================================================
+   MODAL CORE - FIX SCROLL 
+   ========================================================================== */
+.modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(6px);
+    display: flex; justify-content: center;
+    align-items: flex-start; 
+    padding: 40px 20px;
+    z-index: 9999;
+    overflow-y: auto;   /* Cơ chế cuộn toàn trang modal */
+}
+
+.modal-window {
+    background: #fff; width: 100%;
+    max-width: 1100px;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    display: flex; flex-direction: column;
+    margin: auto;
+    animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPop {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fff;
+    display: flex; justify-content: space-between; align-items: center;
+    border-radius: 24px 24px 0 0;
+}
+
+.modal-scroll-body {
+    padding: 32px;
+    background: #fbfcfd;
+}
+
+.modal-footer-sticky {
+    padding: 20px 32px;
+    border-top: 1px solid #f1f5f9;
+    background: #fff;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 15px;
+    border-radius: 0 0 24px 24px;
+}
+
+/* ==========================================================================
+   FORM COMPONENTS - INPUTS & BUTTONS
+   ========================================================================== */
+.form-card { 
+    background: white; border: 1px solid #e2e8f0; border-radius: 16px;
+    padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.card-header-form { 
+    font-weight: 700; font-size: 16px; margin-bottom: 20px;
+    color: #2563eb; display: flex; align-items: center; gap: 10px;
+}
+
+input, select, textarea { 
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px; 
+    font-size: 14px;
+    color: #334155;
+    background-color: #ffffff;
+    transition: all 0.25s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08); 
+}
+
+/* Custom Select Arrow */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+/* Buttons */
+.btn-save-form, .btn-add-main {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white; border: none; padding: 12px 24px; border-radius: 12px;
+    font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px;
+    cursor: pointer; transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.btn-save-form:hover, .btn-add-main:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(37, 99, 235, 0.3);
+}
+
+.btn-close-form {
+    background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;
+    padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;
+}
+
+.btn-close-form:hover { background: #e2e8f0; color: #1e293b; }
+
+.btn-add-sub {
+    background: #f8fafc; color: #2563eb; border: 1px dashed #bfdbfe;
+    padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 600;
+    width: 100%; margin-top: 10px; cursor: pointer; transition: 0.2s;
+}
+.btn-add-sub:hover { background: #eff6ff; border-color: #3b82f6; }
+
+/* Dynamic Rows */
+.dynamic-row-color {
+    display: grid; grid-template-columns: 1fr 1.5fr auto auto; 
+    gap: 15px; align-items: center; margin-bottom: 12px;
+    background: #f8fafc; padding: 16px; border-radius: 12px;
+    border: 1px solid #f1f5f9;
+}
+
+.variant-block {
+    background: #fff; border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6;
+    padding: 20px; border-radius: 12px; margin-bottom: 16px;
+    transition: all 0.2s;
+}
+.variant-block:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+.v-body-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+
+.remove-icon { color: #94a3b8; cursor: pointer; transition: 0.2s; }
+.remove-icon:hover { color: #ef4444; }
+
+.switch-label { 
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    font-size: 14px; font-weight: 600; color: #64748b;
+}
+.switch-label input { width: 18px; height: 18px; cursor: pointer; }
+
+/* Table Tweak */
+.table-container { background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #f8fafc; padding: 16px; text-align: left; font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+td { padding: 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b; }
+tr:hover td { background: #fbfcfd; }
+/* Container cho danh sách tình trạng */
+.condition-list-input {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px dashed #cbd5e1;
+}
+
+.condition-item-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.condition-item-row select {
+    flex: 1;
+}
+
+/* Nút thêm tình trạng */
+.btn-add-cond {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: white;
+    border: 1px solid #3b82f6;
+    color: #3b82f6;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-add-cond:hover {
+    background: #eff6ff;
+}
+
+/* Nút xóa tình trạng lẻ */
+.btn-remove-cond {
+    background: #fee2e2;
+    color: #ef4444;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.btn-remove-cond:hover {
+    background: #fecaca;
+}
+
+/* Hiển thị tag trong bảng chính */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.used-tag {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #ffedd5;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+}
