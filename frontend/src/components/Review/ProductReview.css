@@ -1,0 +1,260 @@
+/* =========================================
+   THIẾT KẾ GIỐNG MẪU TECHNOVA REVIEW
+========================================= */
+
+.pr-wrapper {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  margin-top: 30px;
+  font-family: 'Inter', sans-serif;
+  color: #1E293B;
+  border: 1px solid #F1F5F9;
+}
+
+/* HEADER */
+.pr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.pr-title-area h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+}
+
+.pr-title-area p {
+  margin: 0;
+  font-size: 14px;
+  color: #64748B;
+}
+
+.btn-write-review {
+  background: #2563EB;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.btn-write-review:hover { background: #1D4ED8; }
+
+/* SUMMARY (TỔNG QUAN) */
+.pr-summary-box {
+  display: flex;
+  background: #fff;
+  border-radius: 12px;
+  padding: 0;
+  margin-bottom: 24px;
+  border: 1px solid #E2E8F0;
+  align-items: center;
+}
+
+.pr-avg-score {
+  width: 30%;
+  padding: 30px;
+  text-align: center;
+  border-right: 1px solid #E2E8F0;
+}
+
+.score-number {
+  font-size: 48px;
+  font-weight: 800;
+  color: #1E293B;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.score-stars {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.score-text {
+  font-size: 13px;
+  color: #64748B;
+}
+
+.pr-progress-bars {
+  width: 70%;
+  padding: 30px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.star-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  width: 45px;
+}
+
+.progress-track {
+  flex: 1;
+  height: 8px;
+  background: #E2E8F0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #2563EB; /* Màu xanh đồng bộ */
+  border-radius: 4px;
+}
+
+.star-percent {
+  font-size: 13px;
+  color: #64748B;
+  width: 35px;
+  text-align: right;
+}
+
+/* FILTER BAR */
+.pr-filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #E2E8F0;
+  margin-bottom: 24px;
+}
+
+.pr-filters {
+  display: flex;
+  gap: 10px;
+}
+
+.pr-filters button {
+  background: white;
+  border: 1px solid #E2E8F0;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pr-filters button:hover { border-color: #CBD5E1; background: #F8FAFC; }
+.pr-filters button.active { background: #2563EB; color: white; border-color: #2563EB; }
+
+.filter-img-btn { display: flex; align-items: center; gap: 6px; }
+
+.pr-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748B;
+}
+
+.pr-sort select {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1E293B;
+  outline: none;
+  cursor: pointer;
+}
+
+/* REVIEW FORM (Thêm ảnh) */
+.pr-form-container {
+  background: #F8FAFC;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: 1px solid #E2E8F0;
+}
+.pr-form-container h4 { margin: 0 0 16px 0; font-size: 16px; }
+
+.pr-form-rating { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; font-size: 14px; font-weight: 600; }
+.stars-input { display: flex; gap: 4px; cursor: pointer; }
+
+.pr-form-container textarea {
+  width: 100%; padding: 16px; border: 1px solid #E2E8F0; border-radius: 8px; font-family: inherit; font-size: 14px; margin-bottom: 16px; resize: vertical; box-sizing: border-box;
+}
+.pr-form-container textarea:focus { border-color: #3B82F6; outline: none; }
+
+.pr-image-upload { margin-bottom: 16px; }
+.btn-upload-img {
+  background: white; border: 1px dashed #CBD5E1; color: #475569; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+}
+.preview-grid { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+.preview-item { position: relative; width: 80px; height: 80px; }
+.preview-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid #E2E8F0; }
+.btn-remove-img { position: absolute; top: -6px; right: -6px; background: #EF4444; color: white; border: none; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+.pr-form-actions { display: flex; justify-content: flex-end; gap: 12px; }
+.btn-cancel { background: white; border: 1px solid #E2E8F0; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; color: #475569; }
+.btn-submit { background: #2563EB; border: none; color: white; padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+
+/* DANH SÁCH REVIEW ITEM */
+.pr-review-list { display: flex; flex-direction: column; gap: 24px; }
+
+.pr-review-item { display: flex; gap: 16px; border-bottom: 1px solid #F1F5F9; padding-bottom: 24px; }
+.pr-review-item:last-child { border-bottom: none; }
+
+.pr-avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+.pr-content { flex: 1; }
+
+.pr-user-line { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.pr-username { font-size: 15px; color: #1E293B; }
+.pr-verified { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #10B981; background: #D1FAE5; padding: 2px 6px; border-radius: 4px; }
+
+.pr-stars-date { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.pr-stars-mini { display: flex; gap: 2px; }
+.pr-date { font-size: 12px; color: #94A3B8; }
+
+.pr-comment { font-size: 14px; color: #334155; line-height: 1.6; margin: 0 0 16px 0; }
+
+.pr-images-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.pr-review-img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #E2E8F0; cursor: pointer; }
+
+.pr-item-actions { display: flex; gap: 16px; align-items: center; }
+.btn-helpful { background: white; border: 1px solid #E2E8F0; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.btn-report { background: none; border: none; color: #64748B; font-size: 13px; cursor: pointer; padding: 0; }
+.btn-helpful:hover { border-color: #CBD5E1; background: #F8FAFC; }
+.btn-report:hover { color: #1E293B; text-decoration: underline; }
+
+/* ADMIN REPLY (Bình luận của Shop) */
+.pr-admin-reply { background: #F8FAFC; border-left: 3px solid #2563EB; padding: 16px; border-radius: 0 8px 8px 0; margin-top: 16px; }
+.admin-reply-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.admin-reply-header strong { font-size: 14px; color: #1E293B; }
+.admin-badge { background: #DBEAFE; color: #1D4ED8; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+.reply-date { font-size: 12px; color: #94A3B8; margin-left: auto; }
+.admin-reply-text { margin: 0; font-size: 14px; color: #475569; font-style: italic; line-height: 1.5; }
+
+/* NÚT XEM THÊM */
+.pr-load-more { text-align: center; margin-top: 24px; }
+.pr-load-more button { background: white; border: 1px solid #2563EB; color: #2563EB; padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.pr-load-more button:hover { background: #EFF6FF; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pr-summary-box { flex-direction: column; }
+  .pr-avg-score { width: 100%; border-right: none; border-bottom: 1px solid #E2E8F0; padding: 20px; }
+  .pr-progress-bars { width: 100%; padding: 20px; }
+  .pr-filter-bar { flex-direction: column; align-items: flex-start; gap: 16px; }
+}

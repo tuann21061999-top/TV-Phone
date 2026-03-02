@@ -7,10 +7,18 @@ exports.register = async (req, res) => {
   try {
     const { fullName, email, phone, password } = req.body;
 
-    // 1. Kiểm tra email đã tồn tại chưa
-    const userExists = await User.findOne({ email });
+    // 1. Kiểm tra email hoặc sđt đã tồn tại chưa
+    const userExists = await User.findOne({
+      $or: [{ email }, { phone }]
+    });
+
     if (userExists) {
-      return res.status(400).json({ message: "Email này đã được đăng ký!" });
+      if (userExists.email === email) {
+        return res.status(400).json({ message: "Email này đã được đăng ký!" });
+      }
+      if (userExists.phone === phone) {
+        return res.status(400).json({ message: "Số điện thoại này đã được đăng ký!" });
+      }
     }
 
     // 2. Mã hóa mật khẩu

@@ -1,85 +1,163 @@
-/* ================= WRAPPER ================= */
-
+/* ================= WRAPPER & LAYOUT ================= */
 .admin-wrapper {
+  background: #F1F5F9; /* Màu nền xám nhạt hiện đại */
   min-height: 100vh;
-  background: #f9fafb;
+  font-family: 'Inter', system-ui, sans-serif;
 }
-
-/* ================= LAYOUT ================= */
 
 .admin-layout {
   display: flex;
-  margin-top: 70px; /* chiều cao header */
   align-items: flex-start;
+  /* Giả sử Header của bạn cao khoảng 70px. Nếu Header absolute, thêm margin-top ở đây */
 }
 
 /* ================= SIDEBAR ================= */
-
 .admin-sidebar {
-  width: 250px;
-  background: #1f2937;
-  color: white;
-  padding: 20px;
-
-  height: calc(100vh - 70px);
-  position: sticky;      /* QUAN TRỌNG */
-  margin-top: -70px;
+  width: 260px;
+  background: #0F172A; /* Slate 900 - Đen sang trọng */
+  color: #94A3B8;
+  height: calc(100vh - 70px); /* Trừ đi chiều cao Header */
+  position: sticky;
+  top: 70px; 
   display: flex;
   flex-direction: column;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  overflow-y: auto; /* Thêm thanh cuộn nếu menu quá dài */
 }
 
-.sidebar-header {
+/* Tùy chỉnh thanh cuộn cho Sidebar */
+.admin-sidebar::-webkit-scrollbar { width: 4px; }
+.admin-sidebar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+.sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 30px;
+  gap: 12px;
+  padding: 24px 20px;
+  color: #FFFFFF;
 }
 
-.sidebar-header h2 {
-  font-size: 18px;
+.brand-icon {
+  background: #3B82F6;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
 }
 
-.sidebar-nav {
+.sidebar-brand h2 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+/* ================= MENU ================= */
+.sidebar-menu {
+  padding: 0 16px 24px 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
 }
 
-.sidebar-nav button {
+.menu-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748B;
+  margin: 16px 0 8px 12px;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-menu button {
   display: flex;
   align-items: center;
-  gap: 10px;
-
+  gap: 12px;
   background: transparent;
   border: none;
-  color: white;
-  padding: 10px;
+  color: #94A3B8;
+  padding: 12px 14px;
   cursor: pointer;
   text-align: left;
-  border-radius: 6px;
-  transition: 0.2s;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
 }
 
-.sidebar-nav button:hover {
-  background: #374151;
+.sidebar-menu button:hover {
+  background: #1E293B;
+  color: #F8FAFC;
 }
 
-.sidebar-nav button.active {
-  background: #2563eb;
+.sidebar-menu button.active {
+  background: #3B82F6; /* Xanh dương đậm */
+  color: #FFFFFF;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+}
+
+.sidebar-divider {
+  border: none;
+  border-top: 1px solid #1E293B;
+  margin: 12px 0;
 }
 
 /* ================= CONTENT ================= */
-
 .admin-content {
   flex: 1;
-  padding: 30px;
+  padding: 32px 40px;
   min-height: calc(100vh - 70px);
+  max-width: calc(100% - 260px); /* Đảm bảo không bị tràn ngang */
+  box-sizing: border-box;
 }
 
-/* ================= EMPTY ================= */
+.content-header {
+  margin-bottom: 24px;
+}
 
+.content-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1E293B;
+  margin: 0;
+}
+
+.content-body {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  min-height: 500px; /* Chiều cao tối thiểu cho khung trắng */
+}
+
+/* ================= EMPTY STATE ================= */
 .empty-state {
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: #64748B;
+  height: 100%;
+}
+
+.empty-icon {
+  color: #CBD5E1;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  color: #334155;
+  margin: 0 0 8px 0;
+}
+
+.empty-state p {
+  font-size: 14px;
+  max-width: 400px;
+  line-height: 1.5;
+  margin: 0;
 }

@@ -1,8 +1,10 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import ProductReview from "../../components/Review/ProductReview";
+import { toast } from "sonner";
 import {
   Cpu,
   ChevronRight,
@@ -12,6 +14,7 @@ import "./ProductDetail.css";
 
 function ProductDetail() {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -66,13 +69,15 @@ function ProductDetail() {
   const currentVariant = useMemo(() => {
     if (!product || !selectedColor || !selectedMem) return null;
 
-    const [size, storage] = selectedMem.split("/");
+    const [size, storage] = selectedMem
+      .split("/")
+      .map(s => s.trim());   // ✅ thêm trim ở đây
 
     return product.variants.find(
       v =>
         v.colorName === selectedColor &&
-        v.size === size &&
-        v.storage === storage &&
+        v.size.trim() === size &&      // ✅ thêm trim
+        v.storage.trim() === storage && // ✅ thêm trim
         v.isActive &&
         v.quantity > 0
     );
@@ -158,7 +163,44 @@ function ProductDetail() {
   const canBuy =
     currentVariant &&
     (product.condition !== "used" || selectedCondition);
+  
+  const handleAddToCart = async () => {
+    if (!canBuy) return;
 
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Vui lòng đăng nhập để mua hàng!");
+        return;
+      }
+      if (!currentVariant?._id) {
+        toast.error("Cấu hình không hợp lệ!");
+        return;
+      }
+      const cartData = {
+        productId: product._id.toString(),  
+        variantId: currentVariant._id.toString(), 
+        quantity: 1,
+        condition: product.condition || "new",
+        conditionLevel: selectedCondition || null
+      };
+      const res = await axios.post(
+        "http://localhost:5000/api/cart/add",
+        cartData,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (res.status === 200) {
+        toast.success("Đã thêm vào giỏ hàng thành công!");
+        setTimeout(() => navigate("/cart"), 1000);
+      }
+    } catch (error) {
+      console.error("Lỗi thêm vào giỏ:", error);
+      toast.error(error.response?.data?.message || "Không thể thêm vào giỏ hàng");
+    }
+  };
   return (
     <div className="product-detail-page">
       <Header />
@@ -283,11 +325,30 @@ function ProductDetail() {
               <button
                 className="buy-now"
                 disabled={!canBuy}
+                onClick={() => {
+                  navigate('/checkout', {
+                    state: {
+                      isBuyNow: true,
+                      items: [{
+                        productId: product._id,         // ID của sản phẩm cha
+                        variantId: currentVariant._id,   // ID của phiên bản (màu/dung lượng)
+                        name: product.name,
+                        image: mainImage,
+                        color: selectedColor,
+                        storage: currentVariant.storage, // Lấy trực tiếp storage từ variant
+                        price: currentVariant.price,
+                        quantity: 1,
+                        condition: product.condition || "new",
+                        conditionLevel: selectedCondition || null
+                      }]
+                    }
+                  });
+                }}
               >
                 MUA NGAY
               </button>
               <button
-                className="add-to-cart"
+                className="add-to-cart" onClick={handleAddToCart}
                 disabled={!canBuy}
               >
                 <ShoppingCart size={20} /> Thêm vào giỏ
@@ -318,7 +379,7 @@ function ProductDetail() {
           )}
         </div>
       </div>
-
+      <ProductReview productId={product._id} />
       <Footer />
     </div>
   );

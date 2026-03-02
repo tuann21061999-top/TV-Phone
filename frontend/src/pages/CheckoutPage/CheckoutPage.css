@@ -1,0 +1,631 @@
+/* ====== BASE & LAYOUT ====== */
+.checkout-page {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  color: #1e293b;
+}
+
+.checkout-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 18px;
+  color: #2563eb;
+}
+
+/* ====== HEADER ====== */
+.checkout-header-wrapper {
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.checkout-header {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.checkout-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: 800;
+  color: #2563eb;
+}
+
+.logo-icon {
+  width: 28px;
+  height: 28px;
+  background: #2563eb;
+  border-radius: 6px;
+}
+
+.checkout-steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.checkout-steps a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.checkout-steps .active {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* ====== MAIN CONTAINER ====== */
+.checkout-container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 1.7fr 1.3fr; /* Tỉ lệ chia cột Trái/Phải */
+  gap: 30px;
+  align-items: start;
+}
+
+/* ====== CỘT TRÁI: FORM INFO ====== */
+.checkout-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  border: 1px solid #f1f5f9;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+.section-title svg {
+  color: #2563eb;
+}
+
+/* Form Styles */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-group-full {
+  margin-bottom: 16px;
+}
+
+.checkout-section label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.checkout-section input[type="text"],
+.checkout-section input[type="email"],
+.checkout-section select,
+.checkout-section textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.checkout-section input:focus,
+.checkout-section select:focus,
+.checkout-section textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ====== CUSTOM RADIO BOX ====== */
+.radio-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.radio-box:hover {
+  background: #f8fafc;
+}
+
+.radio-box.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.radio-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.radio-left input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.radio-texts h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.radio-texts p {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+}
+
+.shipping-price {
+  font-weight: 700;
+  color: #2563eb;
+}
+
+/* Grid cho Phương thức thanh toán */
+.payment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.payment-grid .radio-box {
+  margin-bottom: 0;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.payment-grid .radio-box input {
+  margin: 0;
+  accent-color: #2563eb;
+}
+
+.pay-icon {
+  font-size: 20px;
+}
+
+/* ====== CỘT PHẢI: ORDER SUMMARY ====== */
+.checkout-right {
+  position: sticky;
+  top: 90px;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  border: 1px solid #f1f5f9;
+  margin-bottom: 16px;
+}
+
+.summary-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.summary-items {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 24px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sum-img {
+  width: 60px;
+  height: 60px;
+  background: #f8fafc;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.sum-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.sum-info {
+  flex: 1;
+}
+
+.sum-info h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sum-info p {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+}
+
+.sum-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Voucher */
+.voucher-section label {
+  font-size: 13px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.voucher-input-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.voucher-input-group input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  font-size: 13px;
+}
+
+.voucher-input-group button {
+  padding: 0 16px;
+  background: #eff6ff;
+  color: #2563eb;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.voucher-input-group button:hover {
+  background: #dbeafe;
+}
+
+/* Calculations */
+.summary-calculations {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+  margin-bottom: 24px;
+}
+
+.calc-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.discount-row {
+  color: #16a34a;
+}
+
+.total-row {
+  border-top: 1px dashed #cbd5e1;
+  padding-top: 16px;
+  margin-top: 16px;
+  align-items: flex-start;
+}
+
+.total-row > span {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 16px;
+}
+
+.total-price-wrap {
+  text-align: right;
+}
+
+.total-price {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  color: #2563eb;
+  margin-bottom: 4px;
+}
+
+.vat-note {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Submit Button */
+.btn-place-order {
+  width: 100%;
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.btn-place-order:hover {
+  background: #1d4ed8;
+}
+
+/* Security Badges */
+.security-badges {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.security-badges span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Support Box */
+.support-box {
+  background: #eff6ff;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.support-icon {
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #2563eb;
+}
+
+.support-box strong {
+  font-size: 13px;
+  color: #1e293b;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.support-box p {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+}
+
+.support-box .highlight {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+/* ====== FOOTER ====== */
+.checkout-footer {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.payment-logos {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.pay-logo {
+  background: #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 992px) {
+  .checkout-container {
+    grid-template-columns: 1fr;
+  }
+  .checkout-right {
+    position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  .form-grid-2, .payment-grid {
+    grid-template-columns: 1fr;
+  }
+  .checkout-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+/* ====== BỔ SUNG CSS CHO ĐỊA CHỈ ====== */
+.section-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header-flex .section-title {
+  margin-bottom: 0;
+}
+
+.btn-add-address-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.btn-add-address-toggle:hover {
+  background: #eff6ff;
+}
+
+/* Danh sách Card Địa chỉ */
+.saved-address-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.address-card {
+  display: block;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  cursor: pointer;
+  background: #fff;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.address-card:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.05);
+}
+
+.address-card.active {
+  border-color: #2563eb;
+  background-color: #f8fafc;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.hidden-radio {
+  display: none;
+}
+
+.address-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.user-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1e293b;
+  font-size: 15px;
+}
+
+.badge-default {
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.check-icon {
+  color: #2563eb;
+}
+
+.address-card-body p {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: #475569;
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+}
+
+.address-card-body p:last-child {
+  margin-bottom: 0;
+}
+
+.address-card-body svg {
+  color: #94a3b8;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  .saved-address-list {
+    grid-template-columns: 1fr; /* Xuống 1 cột trên điện thoại */
+  }
+}

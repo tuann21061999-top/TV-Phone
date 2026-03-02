@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
@@ -8,29 +8,33 @@ import {
   Star,
   ShoppingCart,
   Filter,
-  Tv,
-  Speaker,
-  Cpu,
-  Monitor
+  Headphones,
+  BatteryPlus,
+  Watch,
+  Fan
 } from "lucide-react";
 
 function ElectronicPage() {
   const [products, setProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState("Tất cả");
+  const [priceRange, setPriceRange] = useState("all");
+  const [ratingFilter, setRatingFilter] = useState("all");
+  const [brandFilter, setBrandFilter] = useState("all");
+  const [sortOption, setSortOption] = useState("default");
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const categories = [
     { name: "Tất cả", icon: null },
-    { name: "Tivi", icon: <Tv size={16} /> },
-    { name: "Loa", icon: <Speaker size={16} /> },
-    { name: "Máy tính", icon: <Monitor size={16} /> },
-    { name: "Linh kiện", icon: <Cpu size={16} /> }
+    { name: "Tai nghe", icon: <Headphones size={16} /> },
+    { name: "Sạc dự phòng", icon: <BatteryPlus size={16} /> },
+    { name: "Đồng hồ thông minh", icon: <Watch size={16} /> },
+    { name: "Quạt tản nhiệt", icon: <Fan size={16} /> }
   ];
 
-  // ===============================
-  // Fetch products
-  // ===============================
+  /* ================= FETCH ================= */
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -39,10 +43,10 @@ function ElectronicPage() {
           "http://localhost:5000/api/products?type=electronic"
         );
         setProducts(data);
-        setLoading(false);
       // eslint-disable-next-line no-unused-vars
       } catch (err) {
         setError("Không thể tải sản phẩm");
+      } finally {
         setLoading(false);
       }
     };
@@ -50,18 +54,37 @@ function ElectronicPage() {
     fetchProducts();
   }, []);
 
-  // ===============================
-  // Format price
-  // ===============================
+  /* ================= NORMALIZE ================= */
+
+  const normalizeText = (text) => {
+    if (!text) return "";
+    return text
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  };
+
+  const getFirstTwoWords = (text) => {
+    const normalized = normalizeText(text);
+    if (!normalized) return "";
+    return normalized.split(" ").slice(0, 2).join(" ");
+  };
+
+  /* ================= HELPERS ================= */
+
   const formatPrice = (price) =>
     price?.toLocaleString("vi-VN") + "₫";
 
-  // ===============================
-  // Promotion logic
-  // ===============================
-  const getPriceInfo = (product) => {
-    const basePrice = product.variants?.[0]?.price || 0;
-    let finalPrice = basePrice;
+  const getLowestPrice = (product) => {
+    if (!product.variants?.length) return 0;
+    return Math.min(...product.variants.map((v) => v.price));
+  };
+
+  const getFinalPrice = (product) => {
+    const basePrice = getLowestPrice(product);
 
     const isPromoActive =
       product.promotion?.discountPercent > 0 &&
@@ -69,50 +92,114 @@ function ElectronicPage() {
       new Date(product.promotion.endDate) >= new Date();
 
     if (isPromoActive) {
-      finalPrice =
+      return (
         basePrice -
-        (basePrice * product.promotion.discountPercent) / 100;
-    }
-
-    return {
-      basePrice,
-      finalPrice,
-      hasDiscount: finalPrice < basePrice
-    };
-  };
-
-  // ===============================
-  // Save view history
-  // ===============================
-  const handleProductClick = async (productId) => {
-    const token = localStorage.getItem("token");
-
-    if (!token) return; // chưa đăng nhập thì bỏ qua
-
-    try {
-      await axios.post(
-        "http://localhost:5000/api/history/view",
-        { productId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+        (basePrice * product.promotion.discountPercent) / 100
       );
-    } catch (error) {
-      console.error("Lỗi lưu lịch sử xem:", error);
     }
+
+    return basePrice;
   };
 
-  // ===============================
-  // Filter products
-  // ===============================
-  const filteredProducts =
-    activeCategory === "Tất cả"
-      ? products
-      : products.filter(
-          (item) => item.categoryId?.name === activeCategory
-        );
+  /* ================= GET BRANDS ================= */
+
+  const brands = useMemo(() => {
+    return [
+      ...new Set(products.map((p) => p.brand).filter(Boolean))
+    ];
+  }, [products]);
+
+  /* ================= FILTER LOGIC ================= */
+
+  const filteredProducts = useMemo(() => {
+    let filtered = [...products];
+
+    /* 1️⃣ CATEGORY */
+    if (activeCategory !== "Tất cả") {
+      const categoryKey = getFirstTwoWords(activeCategory);
+
+      filtered = filtered.filter((product) => {
+        const productKey = getFirstTwoWords(product.name);
+        return productKey === categoryKey;
+      });
+    }
+
+    /* 2️⃣ PRICE */
+    if (priceRange !== "all") {
+      filtered = filtered.filter((product) => {
+        const price = getFinalPrice(product);
+
+        if (priceRange === "under500")
+          return price < 500000;
+
+        if (priceRange === "500to1m")
+          return price >= 500000 && price <= 1000000;
+
+        if (priceRange === "above1m")
+          return price > 1000000;
+
+        return true;
+      });
+    }
+
+    /* 3️⃣ RATING */
+    if (ratingFilter !== "all") {
+      filtered = filtered.filter(
+        (p) =>
+          Math.round(p.averageRating || 0) >=
+          parseInt(ratingFilter)
+      );
+    }
+
+    /* 4️⃣ BRAND */
+    if (brandFilter !== "all") {
+      filtered = filtered.filter(
+        (p) => p.brand === brandFilter
+      );
+    }
+
+    /* 5️⃣ SORT */
+    if (sortOption === "priceAsc") {
+      filtered.sort(
+        (a, b) =>
+          getFinalPrice(a) - getFinalPrice(b)
+      );
+    }
+
+    if (sortOption === "priceDesc") {
+      filtered.sort(
+        (a, b) =>
+          getFinalPrice(b) - getFinalPrice(a)
+      );
+    }
+
+    if (sortOption === "rating") {
+      filtered.sort(
+        (a, b) =>
+          (b.averageRating || 0) -
+          (a.averageRating || 0)
+      );
+    }
+
+    return filtered;
+  }, [
+    products,
+    activeCategory,
+    priceRange,
+    ratingFilter,
+    brandFilter,
+    sortOption
+  ]);
+
+  const resetFilters = () => {
+    setActiveCategory("Tất cả");
+    setPriceRange("all");
+    setRatingFilter("all");
+    setBrandFilter("all");
+    setSortOption("default");
+  };
+
+  /* ================= UI ================= */
 
   return (
     <div className="electronics-page">
@@ -120,20 +207,19 @@ function ElectronicPage() {
 
       <div className="electronics-container">
         <div className="electronics-header">
-          <h1>Đồ điện tử & Gia dụng</h1>
+          <h1>Đồ điện tử</h1>
           <p>Tìm thấy {filteredProducts.length} sản phẩm</p>
         </div>
 
         <div className="electronics-content">
-          {/* Sidebar */}
           <aside className="electronics-sidebar">
             <h3>
               <Filter size={18} /> Bộ lọc
             </h3>
 
+            {/* CATEGORY */}
             <div className="filter-group">
               <h4>Danh mục</h4>
-
               {categories.map((cat) => (
                 <button
                   key={cat.name}
@@ -142,27 +228,110 @@ function ElectronicPage() {
                       ? "category-btn active"
                       : "category-btn"
                   }
-                  onClick={() => setActiveCategory(cat.name)}
+                  onClick={() =>
+                    setActiveCategory(cat.name)
+                  }
                 >
                   {cat.icon} {cat.name}
                 </button>
               ))}
             </div>
+
+            {/* PRICE */}
+            <div className="filter-group">
+              <h4>Khoảng giá</h4>
+              <select
+                value={priceRange}
+                onChange={(e) =>
+                  setPriceRange(e.target.value)
+                }
+              >
+                <option value="all">Tất cả</option>
+                <option value="under500">
+                  Dưới 500.000₫
+                </option>
+                <option value="500to1m">
+                  500.000₫ - 1.000.000₫
+                </option>
+                <option value="above1m">
+                  Trên 1.000.000₫
+                </option>
+              </select>
+            </div>
+
+            {/* RATING */}
+            <div className="filter-group">
+              <h4>Đánh giá</h4>
+              <select
+                value={ratingFilter}
+                onChange={(e) =>
+                  setRatingFilter(e.target.value)
+                }
+              >
+                <option value="all">Tất cả</option>
+                <option value="4">4★ trở lên</option>
+                <option value="3">3★ trở lên</option>
+              </select>
+            </div>
+
+            {/* BRAND */}
+            <div className="filter-group">
+              <h4>Hãng</h4>
+              <select
+                value={brandFilter}
+                onChange={(e) =>
+                  setBrandFilter(e.target.value)
+                }
+              >
+                <option value="all">Tất cả</option>
+                {brands.map((brand) => (
+                  <option key={brand} value={brand}>
+                    {brand}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* SORT */}
+            <div className="filter-group">
+              <h4>Sắp xếp</h4>
+              <select
+                value={sortOption}
+                onChange={(e) =>
+                  setSortOption(e.target.value)
+                }
+              >
+                <option value="default">Mặc định</option>
+                <option value="priceAsc">
+                  Giá tăng dần
+                </option>
+                <option value="priceDesc">
+                  Giá giảm dần
+                </option>
+                <option value="rating">
+                  Đánh giá cao nhất
+                </option>
+              </select>
+            </div>
+
+            <button
+              className="reset-btn"
+              onClick={resetFilters}
+            >
+              Reset bộ lọc
+            </button>
           </aside>
 
-          {/* Product Section */}
+          {/* PRODUCTS */}
           <section className="electronics-products">
-            {loading && <p>Đang tải sản phẩm...</p>}
-            {error && <p>{error}</p>}
+            {loading && <div>Đang tải...</div>}
+            {error && <div>{error}</div>}
 
             {!loading && !error && (
               <div className="product-grid">
                 {filteredProducts.map((product) => {
-                  const {
-                    basePrice,
-                    finalPrice,
-                    hasDiscount
-                  } = getPriceInfo(product);
+                  const finalPrice =
+                    getFinalPrice(product);
 
                   return (
                     <div
@@ -170,21 +339,9 @@ function ElectronicPage() {
                       className="product-card"
                     >
                       <Link
-                        to={`/product/${product.slug}`}
+                        to={`/product/${product.slug || product._id}`}
                         className="product-link"
-                        onClick={() =>
-                          handleProductClick(product._id)
-                        }
                       >
-                        {(product.isFeatured ||
-                          hasDiscount) && (
-                          <span className="product-tag">
-                            {hasDiscount
-                              ? `-${product.promotion.discountPercent}%`
-                              : "HOT"}
-                          </span>
-                        )}
-
                         <div className="product-image">
                           <img
                             src={
@@ -197,48 +354,27 @@ function ElectronicPage() {
 
                         <h3>{product.name}</h3>
 
-                        <div className="product-rating">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              size={14}
-                              fill={
-                                i <
-                                Math.round(
-                                  product.averageRating || 0
-                                )
-                                  ? "gold"
-                                  : "none"
-                              }
-                              stroke="gold"
-                            />
-                          ))}
-                          <span>
-                            ({product.averageRating || 0})
-                          </span>
-                        </div>
-
                         <div className="product-price">
-                          <span className="new">
-                            {formatPrice(finalPrice)}
-                          </span>
-
-                          {hasDiscount && (
-                            <span className="old">
-                              {formatPrice(basePrice)}
-                            </span>
-                          )}
+                          {formatPrice(finalPrice)}
                         </div>
                       </Link>
 
                       <button className="add-cart">
-                        <ShoppingCart size={16} /> Thêm vào giỏ
+                        <ShoppingCart size={16} />
+                        Thêm vào giỏ
                       </button>
                     </div>
                   );
                 })}
               </div>
             )}
+
+            {!loading &&
+              filteredProducts.length === 0 && (
+                <div className="no-products">
+                  Không tìm thấy sản phẩm phù hợp.
+                </div>
+              )}
           </section>
         </div>
       </div>

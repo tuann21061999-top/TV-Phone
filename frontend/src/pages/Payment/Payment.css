@@ -1,0 +1,107 @@
+/* Add these to your existing Payment.css */
+
+.payment-simulation-card {
+    max-width: 800px; /* Wider card for the split layout */
+}
+
+.payment-simulation-content {
+    display: flex;
+    gap: 40px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.qr-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #e2e8f0;
+    padding-right: 40px;
+}
+
+.qr-section h3 {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #1e293b;
+}
+
+.qr-placeholder {
+    width: 200px;
+    height: 200px;
+    background: #f1f5f9;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+}
+
+.qr-placeholder.momo {
+    color: #a50064; /* MoMo pink */
+    border-color: #fbcfe8;
+    background: #fdf2f8;
+}
+
+.qr-placeholder.vnpay {
+    color: #005baa; /* VNPay blue */
+    border-color: #bfdbfe;
+    background: #eff6ff;
+}
+
+.card-input-section {
+    flex: 1.5;
+}
+
+.card-input-section h3 {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #1e293b;
+}
+
+.momo-test-form, .vnpay-test-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 5px;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.btn-simulate-payment {
+    margin-top: 20px;
+    width: 100%;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-simulate-payment:hover {
+    background: #1d4ed8;
+}

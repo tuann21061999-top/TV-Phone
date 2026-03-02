@@ -1,0 +1,172 @@
+/* =========================================
+   1. LAYOUT & BACKGROUND CHUNG
+========================================= */
+.profile-page { background-color: #F8FAFC; min-height: 100vh; font-family: inherit; }
+.profile-container { padding: 30px 15px 60px 15px; max-width: 1200px; margin: 0 auto; }
+.profile-grid { display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: start; }
+
+/* =========================================
+   2. SIDEBAR STYLING
+========================================= */
+.profile-sidebar-card { background: #FFFFFF; border-radius: 12px; padding: 24px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.user-profile-header { display: flex; align-items: center; gap: 12px; padding: 0 20px 20px 20px; border-bottom: 1px solid #F1F5F9; margin-bottom: 12px; }
+.avatar-wrapper img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+.user-info h4 { margin: 0; font-size: 16px; color: #1E293B; }
+
+.profile-menu { display: flex; flex-direction: column; }
+.menu-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 24px; border: none; background: transparent; color: #475569; font-size: 14px; cursor: pointer; transition: all 0.2s; text-align: left; }
+.menu-item:hover { background: #F8FAFC; color: #2563EB; }
+.menu-item.active { background: #EFF6FF; color: #2563EB; font-weight: 500; border-left: 3px solid #2563EB; }
+.logout-text { color: #EF4444; margin-top: 10px; border-top: 1px solid #F1F5F9; }
+.logout-text:hover { background: #FEF2F2; color: #DC2626; }
+
+/* =========================================
+   3. MAIN CONTENT CARDS (TABS)
+========================================= */
+.card-section { background: #FFFFFF; border-radius: 12px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.section-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #F1F5F9; }
+.section-header-flex h2 { font-size: 20px; color: #1E293B; margin: 0; }
+.info-content p { font-size: 15px; color: #334155; margin-bottom: 12px; }
+
+/* =========================================
+   4. COMPACT LISTS (SỔ ĐỊA CHỈ & THANH TOÁN)
+========================================= */
+.list-container { display: flex; flex-direction: column; gap: 12px; }
+.item-card-compact { display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid #E2E8F0; border-radius: 8px; background-color: #FFFFFF; transition: box-shadow 0.2s, border-color 0.2s; }
+.item-card-compact:hover { border-color: #93C5FD; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.05); }
+.item-info .item-title { margin: 0 0 6px 0; font-size: 15px; font-weight: 600; color: #1E293B; }
+.item-info .item-desc { margin: 0; font-size: 14px; color: #64748B; line-height: 1.5; }
+
+.payment-type-badge { display: flex; align-items: center; gap: 12px; color: #2563EB; }
+.payment-type-badge h4 { margin: 0; color: #1E293B; }
+
+.item-actions-row { display: flex; gap: 8px; }
+.action-btn-icon { background: none; border: 1px solid transparent; cursor: pointer; padding: 8px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.action-btn-icon.edit-btn { color: #2563EB; background-color: #EFF6FF; }
+.action-btn-icon.edit-btn:hover { border-color: #2563EB; }
+.action-btn-icon.delete-btn { color: #EF4444; background-color: #FEF2F2; }
+.action-btn-icon.delete-btn:hover { border-color: #EF4444; }
+
+/* =========================================
+   5. EMPTY STATES
+========================================= */
+.empty-state-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; color: #64748B; text-align: center; }
+.empty-icon { margin-bottom: 16px; color: #CBD5E1; }
+.empty-state-container p { font-size: 15px; margin-bottom: 20px; color: #475569; }
+
+/* =========================================
+   6. BUTTONS CHUNG
+========================================= */
+.btn-primary { background: #2563EB; color: white; padding: 10px 20px; border-radius: 8px; border: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: background 0.2s; }
+.btn-primary:hover { background: #1D4ED8; }
+.btn-secondary { background: white; color: #1E293B; padding: 10px 20px; border-radius: 8px; border: 1px solid #E2E8F0; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+.btn-secondary:hover { background: #F8FAFC; border-color: #CBD5E1; }
+
+/* =========================================
+   7. MODAL CHUNG & ADDRESS MODAL
+========================================= */
+.modal-overlay, .payment-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); animation: fadeIn 0.2s ease-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-content { background: white; border-radius: 12px; padding: 24px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); max-height: 90vh; overflow-y: auto; }
+.modal-content h3 { margin: 0 0 20px 0; font-size: 18px; color: #1E293B; }
+.modal-content input[type="text"], .modal-content input:not([type="checkbox"]), .modal-content select, .modal-content textarea { width: 100%; padding: 12px; margin-bottom: 16px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 14px; color: #1E293B; box-sizing: border-box; font-family: inherit; transition: border-color 0.2s; }
+.modal-content input:focus, .modal-content select:focus, .modal-content textarea:focus { outline: none; border-color: #2563EB; }
+.modal-content textarea { resize: vertical; min-height: 80px; }
+.modal-content label { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #475569; margin-bottom: 24px; cursor: pointer; }
+.modal-content label input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #F1F5F9; padding-top: 20px; }
+.modal-actions button:first-child { background: white; color: #475569; border: 1px solid #E2E8F0; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+.modal-actions button:last-child { background: #2563EB; color: white; border: none; padding: 10px 24px; border-radius: 8px; cursor: pointer; }
+
+/* =========================================
+   8. PAYMENT MODAL RIÊNG BIỆT
+========================================= */
+.payment-modal { background: white; border-radius: 12px; padding: 24px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); }
+.payment-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.payment-modal-header h3 { margin: 0; font-size: 18px; color: #1E293B; }
+.payment-modal-header button { background: none; border: none; color: #64748B; cursor: pointer; display: flex; padding: 4px; }
+.payment-options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+.payment-option { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #E2E8F0; border-radius: 8px; cursor: pointer; color: #475569; font-weight: 500; transition: all 0.2s; }
+.payment-option:hover { background-color: #F8FAFC; }
+.payment-option.active { border-color: #2563EB; background-color: #EFF6FF; color: #2563EB; }
+.bank-form input, .bank-form select { width: 100%; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit; }
+.bank-form input:focus, .bank-form select:focus { border-color: #2563EB; outline: none; }
+.payment-info { background-color: #F1F5F9; color: #475569; padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; animation: fadeIn 0.3s ease; }
+.payment-modal-actions { display: flex; justify-content: flex-end; gap: 12px; }
+.btn-cancel { background: white; color: #475569; border: 1px solid #E2E8F0; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+.btn-save { background: #2563EB; color: white; border: none; padding: 10px 24px; border-radius: 8px; cursor: pointer; }
+
+/* =========================================
+   9. STYLE CHO TAB ĐƠN HÀNG (MỚI THÊM)
+========================================= */
+.order-page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+
+.order-search-box { display: flex; align-items: center; gap: 8px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 8px 16px; width: 300px; transition: all 0.2s; }
+.order-search-box:focus-within { border-color: #3b82f6; background: #fff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+.order-search-box svg { color: #64748b; }
+.order-search-box input { border: none; background: transparent; outline: none; width: 100%; font-size: 14px; color: #1e293b; }
+
+.order-status-tabs { display: flex; gap: 12px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 8px; }
+.order-status-tabs::-webkit-scrollbar { height: 4px; }
+.order-status-tabs::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+.status-tab-btn { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 20px; font-size: 14px; font-weight: 500; color: #475569; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.status-tab-btn:hover { background: #F1F5F9; }
+.status-tab-btn.active { background: #2563EB; color: #fff; border-color: #2563EB; }
+
+.count-badge { background: #E2E8F0; color: #475569; padding: 2px 6px; border-radius: 10px; font-size: 12px; font-weight: 700; }
+.status-tab-btn.active .count-badge { background: rgba(255, 255, 255, 0.2); color: #fff; }
+
+.orders-list { display: flex; flex-direction: column; gap: 20px; }
+.order-item-card { border: 1px solid #E2E8F0; border-radius: 12px; background: #fff; overflow: hidden; }
+
+.order-card-header, .order-card-footer { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #FAFAFA; }
+.order-card-header { border-bottom: 1px solid #F1F5F9; }
+.order-card-footer { border-top: 1px solid #F1F5F9; }
+
+.order-id-date { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #64748B; }
+.order-id { color: #2563EB; font-weight: 700; }
+.divider { color: #CBD5E1; }
+
+.order-status-pill { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.status-waiting_approval { background: #FEF3C7; color: #D97706; }
+.status-pending { background: #DBEAFE; color: #1D4ED8; }
+.status-paid { background: #E0E7FF; color: #1E40AF; }
+.status-done { background: #DCFCE7; color: #15803D; }
+.status-cancelled, .status-unsuccessful { background: #FEE2E2; color: #B91C1C; }
+
+.order-card-body { padding: 20px; }
+.order-product-row { display: flex; align-items: flex-start; gap: 16px; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px dashed #F1F5F9; }
+.order-product-row:last-child { border: none; padding: 0; margin: 0; }
+
+.order-product-img { width: 80px; height: 80px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.order-product-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+.order-product-info { flex: 1; }
+.order-product-info h4 { margin: 0 0 6px 0; font-size: 15px; color: #1E293B; }
+.variant-info, .qty { margin: 0 0 4px 0; font-size: 13px; color: #64748B; }
+.order-product-price { font-size: 15px; font-weight: 700; color: #1E293B; }
+
+.total-display { font-size: 14px; color: #475569; }
+.total-display strong { font-size: 18px; color: #EF4444; margin-left: 8px; }
+
+.action-buttons { display: flex; gap: 10px; }
+.btn-outline-small, .btn-primary-small, .btn-danger-small { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.btn-outline-small { border: 1px solid #E2E8F0; background: #fff; color: #475569; }
+.btn-outline-small:hover { border-color: #2563EB; color: #2563EB; }
+.btn-primary-small { background: #2563EB; color: #fff; }
+.btn-primary-small:hover { background: #1D4ED8; }
+.btn-danger-small { border: 1px solid #FECACA; background: #FEF2F2; color: #EF4444; }
+.btn-danger-small:hover { background: #EF4444; color: #fff; }
+
+/* =========================================
+   10. RESPONSIVE BÀN PHÍM / MOBILE
+========================================= */
+@media (max-width: 768px) {
+    .profile-grid { grid-template-columns: 1fr; }
+    .item-card-compact { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .item-actions-row { width: 100%; justify-content: flex-end; border-top: 1px dashed #E2E8F0; padding-top: 12px; }
+    .order-page-header { flex-direction: column; gap: 16px; }
+    .order-search-box { width: 100%; }
+    .order-card-footer { flex-direction: column; gap: 16px; align-items: flex-end; }
+}

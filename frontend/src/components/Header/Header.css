@@ -60,3 +60,27 @@
 .icon-btn:hover {
   color: #2563eb;
 }
+.cart-wrapper {
+  position: relative; /* Làm gốc tọa độ cho badge */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8px;       /* Đẩy lên trên */
+  right: -8px;     /* Đẩy sang phải */
+  background-color: #ef4444; /* Màu đỏ nổi bật */
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 14px;
+  height: 12px;
+  border-radius: 50%; /* Làm hình tròn */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white; /* Tạo viền trắng để nổi bật trên nền trắng */
+  padding: 2px;
+}

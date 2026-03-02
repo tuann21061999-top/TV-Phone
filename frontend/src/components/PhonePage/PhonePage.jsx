@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 import "./PhonePage.css";
@@ -33,12 +34,10 @@ function PhonePage() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        // Gọi API chỉ lấy thiết bị di động
         const res = await axios.get(
           "http://localhost:5000/api/products?productType=device"
         );
         
-        // Đảm bảo chỉ lấy các sản phẩm có productType là device (double-check)
         const devices = res.data.filter(p => p.productType === "device");
         setProducts(devices);
       } catch (error) {
@@ -52,8 +51,7 @@ function PhonePage() {
   }, []);
 
   /* ================= HELPER FUNCTIONS ================= */
-  const formatPrice = (price) =>
-    price?.toLocaleString("vi-VN") + "₫";
+  const formatPrice = (price) => price?.toLocaleString("vi-VN") + "₫";
 
   const getLowestPrice = (product) => {
     if (!product.variants?.length) return 0;
@@ -145,66 +143,72 @@ function PhonePage() {
           {/* SIDEBAR */}
           <aside className="phone-sidebar">
             <div className="sidebar-header">
-              <Filter size={18} />
-              <h3>Bộ lọc</h3>
+              <Filter size={20} />
+              <h2>Bộ lọc sản phẩm</h2>
             </div>
 
             <div className="filter-group">
               <h3>Thương hiệu</h3>
-              {availableBrands.map((brand) => (
-                <label key={brand}>
-                  <input
-                    type="checkbox"
-                    checked={selectedBrands.includes(brand)}
-                    onChange={() =>
-                      setSelectedBrands((prev) =>
-                        prev.includes(brand)
-                          ? prev.filter((b) => b !== brand)
-                          : [...prev, brand]
-                      )
-                    }
-                  />
-                  {brand}
-                </label>
-              ))}
+              <div className="filter-options">
+                {availableBrands.map((brand) => (
+                  <label key={brand}>
+                    <input
+                      type="checkbox"
+                      checked={selectedBrands.includes(brand)}
+                      onChange={() =>
+                        setSelectedBrands((prev) =>
+                          prev.includes(brand)
+                            ? prev.filter((b) => b !== brand)
+                            : [...prev, brand]
+                        )
+                      }
+                    />
+                    {brand}
+                  </label>
+                ))}
+              </div>
             </div>
 
             <div className="filter-group">
               <h3>Bộ nhớ trong</h3>
-              {availableStorages.map((storage) => (
-                <label key={storage}>
-                  <input
-                    type="checkbox"
-                    checked={selectedStorages.includes(storage)}
-                    onChange={() =>
-                      setSelectedStorages((prev) =>
-                        prev.includes(storage)
-                          ? prev.filter((s) => s !== storage)
-                          : [...prev, storage]
-                      )
-                    }
-                  />
-                  {storage}
-                </label>
-              ))}
+              <div className="filter-options">
+                {availableStorages.map((storage) => (
+                  <label key={storage}>
+                    <input
+                      type="checkbox"
+                      checked={selectedStorages.includes(storage)}
+                      onChange={() =>
+                        setSelectedStorages((prev) =>
+                          prev.includes(storage)
+                            ? prev.filter((s) => s !== storage)
+                            : [...prev, storage]
+                        )
+                      }
+                    />
+                    {storage}
+                  </label>
+                ))}
+              </div>
             </div>
 
             <div className="filter-group">
               <h3>Dung lượng Pin</h3>
-              {["all", "small", "medium", "large"].map((range) => (
-                <label key={range}>
-                  <input
-                    type="radio"
-                    name="battery"
-                    checked={batteryRange === range}
-                    onChange={() => setBatteryRange(range)}
-                  />
-                  {range === "all" && "Tất cả"}
-                  {range === "small" && "Dưới 4000 mAh"}
-                  {range === "medium" && "4000 - 5000 mAh"}
-                  {range === "large" && "Trên 5000 mAh"}
-                </label>
-              ))}
+              <div className="filter-options">
+                {["all", "small", "medium", "large"].map((range) => (
+                  <label key={range}>
+                    <input
+                      type="radio"
+                      name="battery"
+                      checked={batteryRange === range}
+                      onChange={() => setBatteryRange(range)}
+                    />
+                    {range === "all" && "Tất cả"}
+                    {range === "small" && "Dưới 4000 mAh"}
+                    {range === "medium" && "4000 - 5000 mAh"}
+                    {range === "large" && "Trên 5000 mAh"}
+                  </label>
+                ))}
+              </div>
             </div>
 
             <button
@@ -215,7 +219,7 @@ function PhonePage() {
                 setBatteryRange("all");
               }}
             >
-              <RotateCcw size={14} />
+              <RotateCcw size={16} />
               Xóa bộ lọc
             </button>
           </aside>
@@ -231,17 +235,14 @@ function PhonePage() {
                   const final = getFinalPrice(product);
                   const isDiscount = final < base;
                   
-                  // Lấy ảnh mặc định từ colorImages theo Schema mới
                   const displayImage = product.colorImages?.find(img => img.isDefault)?.imageUrl 
                                       || product.colorImages?.[0]?.imageUrl 
                                       || "/no-image.png";
 
                   return (
                     <div key={product._id} className="product-card">
-                      {/* Tags: Featured hoặc Condition */}
                       <div className="product-tags">
                         {product.isFeatured && <span className="tag-hot">HOT</span>}
-                        
                       </div>
 
                       <div
@@ -255,9 +256,10 @@ function PhonePage() {
                         {product.name}
                       </h3>
 
+                      {/* Đã thêm class highlight-item */}
                       <div className="product-highlights">
                         {product.highlights?.slice(0, 2).map((text, idx) => (
-                          <span key={idx}>{text}</span>
+                          <span key={idx} className="highlight-item">{text}</span>
                         ))}
                       </div>
 
@@ -265,12 +267,12 @@ function PhonePage() {
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            size={12}
-                            fill={i < Math.round(product.averageRating || 0) ? "gold" : "none"}
-                            stroke="gold"
+                            size={14}
+                            fill={i < Math.round(product.averageRating || 0) ? "#fbbf24" : "none"}
+                            stroke={i < Math.round(product.averageRating || 0) ? "#fbbf24" : "#d1d5db"}
                           />
                         ))}
-                        <span>({product.averageRating || 0})</span>
+                        <span className="rating-count">({product.averageRating || 0})</span>
                       </div>
 
                       <div className="product-price">

@@ -8,39 +8,47 @@ import {
   Star,
   ShoppingCart,
   Filter,
-  Headphones,
   Zap,
-  Smartphone,
-  Battery
+  ShieldCheck,
+  SquarePercent,
+  Cable,
+  PcCase
 } from "lucide-react";
 
 function AccessoriesPage() {
   const [products, setProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState("Tất cả");
+  const [priceRange, setPriceRange] = useState("all");
+  const [ratingFilter, setRatingFilter] = useState("all");
+  const [brandFilter, setBrandFilter] = useState("all");
+  const [sortOption, setSortOption] = useState("default");
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const categories = [
     { name: "Tất cả", icon: null },
-    { name: "Tai nghe", icon: <Headphones size={16} /> },
+    { name: "Ốp lưng", icon: <PcCase size={16} /> },
+    { name: "Cường lực", icon: <ShieldCheck size={16} /> },
     { name: "Củ sạc", icon: <Zap size={16} /> },
-    { name: "Ốp lưng", icon: <Smartphone size={16} /> },
-    { name: "Pin dự phòng", icon: <Battery size={16} /> }
+    { name: "Cáp sạc", icon: <Cable size={16} /> },
+    { name: "Dán lưng", icon: <SquarePercent size={16} /> }
   ];
 
-  /* ================= FETCH PRODUCTS ================= */
+  /* ================= FETCH ================= */
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        // Gọi API với query filter accessory từ server
         const { data } = await axios.get(
           "http://localhost:5000/api/products?productType=accessory"
         );
 
-        // Lọc lại một lần nữa ở client để đảm bảo dữ liệu sạch
-        const accessories = data.filter(p => p.productType === "accessory");
+        const accessories = data.filter(
+          (p) => p.productType === "accessory"
+        );
+
         setProducts(accessories);
       // eslint-disable-next-line no-unused-vars
       } catch (err) {
@@ -53,6 +61,28 @@ function AccessoriesPage() {
     fetchProducts();
   }, []);
 
+  /* ================= NORMALIZE ================= */
+
+  const normalizeText = (text) => {
+    if (!text) return "";
+
+    return text
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  };
+
+  const getFirstTwoWords = (text) => {
+    const normalized = normalizeText(text);
+    if (!normalized) return "";
+
+    const words = normalized.split(" ");
+    return words.slice(0, 2).join(" ");
+  };
+
   /* ================= HELPERS ================= */
 
   const formatPrice = (price) =>
@@ -60,7 +90,7 @@ function AccessoriesPage() {
 
   const getLowestPrice = (product) => {
     if (!product.variants?.length) return 0;
-    return Math.min(...product.variants.map(v => v.price));
+    return Math.min(...product.variants.map((v) => v.price));
   };
 
   const getFinalPrice = (product) => {
@@ -83,17 +113,108 @@ function AccessoriesPage() {
     return basePrice;
   };
 
-  /* ================= FILTER ================= */
+  /* ================= GET BRANDS ================= */
+
+  const brands = useMemo(() => {
+    return [
+      ...new Set(products.map((p) => p.brand).filter(Boolean))
+    ];
+  }, [products]);
+
+  /* ================= FILTER LOGIC ================= */
 
   const filteredProducts = useMemo(() => {
-    if (activeCategory === "Tất cả") return products;
+    let filtered = [...products];
 
-    return products.filter((item) => {
-      // Logic kiểm tra category dựa trên populate hoặc ID
-      const categoryName = item.categoryId?.name || item.categoryId;
-      return categoryName === activeCategory;
-    });
-  }, [products, activeCategory]);
+    /* 1️⃣ CATEGORY – SO KHỚP 2 TỪ ĐẦU */
+    if (activeCategory !== "Tất cả") {
+      const categoryKey = getFirstTwoWords(activeCategory);
+
+      filtered = filtered.filter((item) => {
+        const rawCategory =
+          item.categoryId?.name || item.categoryId;
+
+        const productKey =
+          getFirstTwoWords(rawCategory);
+
+        return productKey === categoryKey;
+      });
+    }
+
+    /* 2️⃣ PRICE */
+    if (priceRange !== "all") {
+      filtered = filtered.filter((product) => {
+        const price = getFinalPrice(product);
+
+        if (priceRange === "under100")
+          return price < 100000;
+
+        if (priceRange === "100to300")
+          return price >= 100000 && price <= 300000;
+
+        if (priceRange === "above300")
+          return price > 300000;
+
+        return true;
+      });
+    }
+
+    /* 3️⃣ RATING */
+    if (ratingFilter !== "all") {
+      filtered = filtered.filter(
+        (p) =>
+          Math.round(p.averageRating || 0) >=
+          parseInt(ratingFilter)
+      );
+    }
+
+    /* 4️⃣ BRAND */
+    if (brandFilter !== "all") {
+      filtered = filtered.filter(
+        (p) => p.brand === brandFilter
+      );
+    }
+
+    /* 5️⃣ SORT */
+    if (sortOption === "priceAsc") {
+      filtered.sort(
+        (a, b) =>
+          getFinalPrice(a) - getFinalPrice(b)
+      );
+    }
+
+    if (sortOption === "priceDesc") {
+      filtered.sort(
+        (a, b) =>
+          getFinalPrice(b) - getFinalPrice(a)
+      );
+    }
+
+    if (sortOption === "rating") {
+      filtered.sort(
+        (a, b) =>
+          (b.averageRating || 0) -
+          (a.averageRating || 0)
+      );
+    }
+
+    return filtered;
+  }, [
+    products,
+    activeCategory,
+    priceRange,
+    ratingFilter,
+    brandFilter,
+    sortOption
+  ]);
+
+  const resetFilters = () => {
+    setActiveCategory("Tất cả");
+    setPriceRange("all");
+    setRatingFilter("all");
+    setBrandFilter("all");
+    setSortOption("default");
+  };
 
   /* ================= UI ================= */
 
@@ -114,6 +235,7 @@ function AccessoriesPage() {
               <Filter size={18} /> Bộ lọc
             </h3>
 
+            {/* CATEGORY */}
             <div className="filter-group">
               <h4>Danh mục</h4>
               {categories.map((cat) => (
@@ -124,30 +246,120 @@ function AccessoriesPage() {
                       ? "category-btn active"
                       : "category-btn"
                   }
-                  onClick={() => setActiveCategory(cat.name)}
+                  onClick={() =>
+                    setActiveCategory(cat.name)
+                  }
                 >
                   {cat.icon} {cat.name}
                 </button>
               ))}
             </div>
+
+            {/* PRICE */}
+            <div className="filter-group">
+              <h4>Khoảng giá</h4>
+              <select
+                value={priceRange}
+                onChange={(e) =>
+                  setPriceRange(e.target.value)
+                }
+              >
+                <option value="all">Tất cả</option>
+                <option value="under100">Dưới 100.000₫</option>
+                <option value="100to300">
+                  100.000₫ - 300.000₫
+                </option>
+                <option value="above300">
+                  Trên 300.000₫
+                </option>
+              </select>
+            </div>
+
+            {/* RATING */}
+            <div className="filter-group">
+              <h4>Đánh giá</h4>
+              <select
+                value={ratingFilter}
+                onChange={(e) =>
+                  setRatingFilter(e.target.value)
+                }
+              >
+                <option value="all">Tất cả</option>
+                <option value="4">4★ trở lên</option>
+                <option value="3">3★ trở lên</option>
+              </select>
+            </div>
+
+            {/* BRAND */}
+            <div className="filter-group">
+              <h4>Hãng</h4>
+              <select
+                value={brandFilter}
+                onChange={(e) =>
+                  setBrandFilter(e.target.value)
+                }
+              >
+                <option value="all">Tất cả</option>
+                {brands.map((brand) => (
+                  <option key={brand} value={brand}>
+                    {brand}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* SORT */}
+            <div className="filter-group">
+              <h4>Sắp xếp</h4>
+              <select
+                value={sortOption}
+                onChange={(e) =>
+                  setSortOption(e.target.value)
+                }
+              >
+                <option value="default">Mặc định</option>
+                <option value="priceAsc">
+                  Giá tăng dần
+                </option>
+                <option value="priceDesc">
+                  Giá giảm dần
+                </option>
+                <option value="rating">
+                  Đánh giá cao nhất
+                </option>
+              </select>
+            </div>
+
+            <button
+              className="reset-btn"
+              onClick={resetFilters}
+            >
+              Reset bộ lọc
+            </button>
           </aside>
 
-          {/* PRODUCT GRID */}
+          {/* PRODUCTS */}
           <section className="accessories-products">
-            {loading && <div className="loading">Đang tải phụ kiện...</div>}
-            {error && <div className="error-msg">{error}</div>}
+            {loading && <div>Đang tải...</div>}
+            {error && <div>{error}</div>}
 
             {!loading && !error && (
               <div className="product-grid">
                 {filteredProducts.map((product) => {
-                  const basePrice = getLowestPrice(product);
-                  const finalPrice = getFinalPrice(product);
-                  const hasDiscount = finalPrice < basePrice;
+                  const basePrice =
+                    getLowestPrice(product);
+                  const finalPrice =
+                    getFinalPrice(product);
+                  const hasDiscount =
+                    finalPrice < basePrice;
 
-                  // Lấy ảnh mặc định từ colorImages hoặc fallback
-                  const displayImage = product.colorImages?.find(img => img.isDefault)?.imageUrl 
-                                      || product.colorImages?.[0]?.imageUrl 
-                                      || "/no-image.png";
+                  const displayImage =
+                    product.colorImages?.find(
+                      (img) => img.isDefault
+                    )?.imageUrl ||
+                    product.colorImages?.[0]
+                      ?.imageUrl ||
+                    "/no-image.png";
 
                   return (
                     <div
@@ -158,11 +370,9 @@ function AccessoriesPage() {
                         to={`/product/${product.slug || product._id}`}
                         className="product-link"
                       >
-                        {(product.isFeatured || hasDiscount) && (
+                        {hasDiscount && (
                           <span className="product-tag">
-                            {hasDiscount
-                              ? `-${product.promotion.discountPercent}%`
-                              : "HOT"}
+                            -{product.promotion.discountPercent}%
                           </span>
                         )}
 
@@ -175,36 +385,8 @@ function AccessoriesPage() {
 
                         <h3>{product.name}</h3>
 
-                        {/* Rating */}
-                        <div className="product-rating">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              size={14}
-                              fill={
-                                i < Math.round(product.averageRating || 0)
-                                  ? "gold"
-                                  : "none"
-                              }
-                              stroke="gold"
-                            />
-                          ))}
-                          <span>
-                            ({product.averageRating || 0})
-                          </span>
-                        </div>
-
-                        {/* Price */}
                         <div className="product-price">
-                          <span className="new">
-                            {formatPrice(finalPrice)}
-                          </span>
-
-                          {hasDiscount && (
-                            <span className="old">
-                              {formatPrice(basePrice)}
-                            </span>
-                          )}
+                          {formatPrice(finalPrice)}
                         </div>
                       </Link>
 
@@ -217,12 +399,13 @@ function AccessoriesPage() {
                 })}
               </div>
             )}
-            
-            {!loading && filteredProducts.length === 0 && (
-              <div className="no-products">
-                Không tìm thấy sản phẩm nào trong danh mục này.
-              </div>
-            )}
+
+            {!loading &&
+              filteredProducts.length === 0 && (
+                <div className="no-products">
+                  Không tìm thấy sản phẩm.
+                </div>
+              )}
           </section>
         </div>
       </div>

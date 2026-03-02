@@ -14,6 +14,11 @@ const productRoutes = require("./routes/productRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const errorHandler = require("./middleware/errorMiddleware");
 const adminRoutes = require("./routes/adminRoutes");
+const cartRoutes = require("./routes/cartRoutes");
+const userRoutes = require("./routes/userRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -53,8 +58,14 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
-app.use(errorHandler);
 app.use("/api/admin", adminRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/reviews", reviewRoutes);
+
+app.use(errorHandler);
 
 // Connect MongoDB
 mongoose
