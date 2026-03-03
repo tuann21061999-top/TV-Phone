@@ -4,6 +4,7 @@ import ManageElectronic from "../../components/ManageProduct/ManageElectronic";
 import ManageAccessory from "../../components/ManageProduct/ManageAccessory";
 import ManageOrder from "../../components/ManageOrder/ManageOrder"; 
 import ManageReview from "../../components/ManageReview/ManageReview";
+import ManageUser from "../../components/ManageUser/ManageUser";
 
 import Header from "../../components/Header/Header";
 import "./AdminPage.css";
@@ -94,6 +95,7 @@ function AdminPage() {
             {/* 2. NHÚNG COMPONENT MANAGE ORDER VÀO TAB "orders" */}
             {activeTab === "orders" && <ManageOrder />}
             {activeTab === "reviews" && <ManageReview />}
+            {activeTab === "users" && <ManageUser />}
 
             {/* EMPTY STATES CHO CÁC TAB CHƯA LÀM */}
             {(activeTab === "users" || activeTab === "stats") && (

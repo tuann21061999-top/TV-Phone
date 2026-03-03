@@ -1,0 +1,62 @@
+/* Container bọc toàn bộ danh sách Review */
+.review-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%; /* Ép độ rộng full bằng với bảng Table của trang Sản phẩm */
+}
+
+/* Thẻ bao bọc 1 đánh giá */
+.mo-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid #E2E8F0;
+    width: 100%; /* Căng tràn chiều ngang container */
+    box-sizing: border-box; /* Quan trọng để không bị tràn viền */
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.mo-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    border-color: #CBD5E1;
+}
+
+/* Nút Badge và Icon (Dùng chung cho Review) */
+.badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+}
+
+.badge-success { background: #DCFCE7; color: #16A34A; border: 1px solid #BBF7D0; }
+.badge-secondary { background: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0; }
+
+.btn-icon {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.mo-loading {
+    text-align: center;
+    padding: 40px;
+    color: #64748B;
+    font-size: 15px;
+    width: 100%;
+}

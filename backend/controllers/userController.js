@@ -1,4 +1,8 @@
 const User = require("../models/User");
+const bcrypt = require("bcryptjs");
+const cloudinary = require("../config/cloudinary");
+const fs = require("fs");
+
 
 // 1. Lấy thông tin chi tiết User hiện tại
 exports.getProfile = async (req, res) => {
@@ -202,5 +206,88 @@ exports.updatePaymentMethod = async (req, res) => {
     res.status(200).json({ message: "Cập nhật phương thức thanh toán thành công", user });
   } catch (error) {
     res.status(500).json({ message: "Lỗi cập nhật phương thức thanh toán" });
+  }
+};
+
+exports.changePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id);
+
+    // Kiểm tra mật khẩu cũ
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Mật khẩu cũ không chính xác" });
+
+    // Mã hóa mật khẩu mới (Mongoose middleware .pre('save') sẽ lo nếu bạn đã setup, 
+    // nếu chưa thì bạn phải hash thủ công ở đây)
+    user.password = newPassword; 
+    await user.save();
+
+    res.status(200).json({ message: "Đổi mật khẩu thành công" });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi hệ thống" });
+  }
+};
+
+exports.updateAvatar = async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: "Không có file nào được tải lên" });
+
+    // Upload lên Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "avatars",
+    });
+
+    // Xóa file tạm
+    fs.unlinkSync(req.file.path);
+
+    // Cập nhật URL vào DB
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { avatar: result.secure_url },
+      { new: true }
+    ).select("-password");
+
+    res.status(200).json({ message: "Cập nhật ảnh đại diện thành công", user });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi cập nhật ảnh" });
+  }
+};
+
+// --- DÀNH CHO ADMIN ---
+
+// Lấy tất cả người dùng (Admin mới có quyền này)
+exports.getAllUsersAdmin = async (req, res) => {
+  try {
+    const users = await User.find().select("-password").sort({ createdAt: -1 });
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi lấy danh sách người dùng" });
+  }
+};
+
+// Cập nhật quyền Admin cho một User
+exports.updateUserRoleAdmin = async (req, res) => {
+  try {
+    const { role } = req.body; // "admin" hoặc "user"
+    const user = await User.findByIdAndUpdate(
+      req.params.id, 
+      { role }, 
+      { new: true }
+    ).select("-password");
+    
+    res.status(200).json({ message: "Cập nhật quyền thành công", user });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi cập nhật quyền" });
+  }
+};
+
+// Admin xóa người dùng vĩnh viễn
+exports.deleteUserAdmin = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "Đã xóa người dùng vĩnh viễn" });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi khi xóa người dùng" });
   }
 };

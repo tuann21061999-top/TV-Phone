@@ -9,19 +9,28 @@ const GlobalDeliveryConfirm = () => {
 
   const fetchPendingDeliveries = async () => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    
+    // ✅ CHỐT CHẶN: Nếu không có token thì DỪNG LẠI NGAY
+    if (!token) return; 
+
     try {
       const res = await axios.get("http://localhost:5000/api/orders/notifications/pending-delivery", {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setPendingOrders(res.data);
+      
+      // ✅ QUAN TRỌNG: Cập nhật state bằng dữ liệu lấy từ API về
+      setPendingOrders(res.data); 
+      
     } catch (error) {
-      console.error("Lỗi tải thông báo nhận hàng");
+      if (error.response?.status !== 401) {
+        console.error("Lỗi tải thông báo nhận hàng", error);
+      }
     }
   };
 
   // Quét API mỗi 10 giây để xem admin có báo nhận hàng không
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchPendingDeliveries(); // Gọi lần đầu
     const interval = setInterval(fetchPendingDeliveries, 10000); 
     return () => clearInterval(interval);
@@ -43,6 +52,7 @@ const GlobalDeliveryConfirm = () => {
       if(window.location.pathname === "/profile") {
          window.location.reload();
       }
+    // eslint-disable-next-line no-unused-vars
     } catch (error) {
       toast.error("Lỗi xử lý xác nhận!");
     }

@@ -1,10 +1,11 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { 
   Search, Package, CheckCircle, Truck, 
-  XCircle, Clock, RotateCcw, Eye, CreditCard, X
+  XCircle, Clock, RotateCcw, Eye, CreditCard, X, Shield, Calendar
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import "./ManageOrder.css";
 
 const ManageOrder = () => {
@@ -12,8 +13,7 @@ const ManageOrder = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  
-  // State quản lý Modal Chi tiết
+  const [dateFilter, setDateFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   const adminTabs = [
@@ -46,6 +46,9 @@ const ManageOrder = () => {
   }, []);
 
   const updateOrderStatus = async (orderId, newStatus) => {
+    const statusLabels = { cancelled: "Hủy đơn", preparing: "Duyệt đơn", shipping: "Giao hàng", done: "Thành công" };
+    if (!window.confirm(`Xác nhận chuyển trạng thái sang: ${statusLabels[newStatus] || newStatus}?`)) return;
+
     try {
       const token = localStorage.getItem("token");
       await axios.put(
@@ -55,7 +58,7 @@ const ManageOrder = () => {
       );
       toast.success("Cập nhật trạng thái thành công!");
       fetchAllOrders(); 
-      if(selectedOrder && selectedOrder._id === orderId) setSelectedOrder(null); // Đóng modal nếu đang mở
+      if(selectedOrder && selectedOrder._id === orderId) setSelectedOrder(null);
     } catch (error) {
       toast.error("Lỗi cập nhật trạng thái!");
     }
@@ -70,16 +73,30 @@ const ManageOrder = () => {
 
     if (!matchesSearch) return false;
 
+    // 1. Lọc theo tab trạng thái
+    let matchesTab = true;
     switch (activeTab) {
-      case "all": return true;
-      case "needs_action": return order.status === "waiting_approval" || order.status === "paid";
-      case "pending": return order.status === "pending";
-      case "preparing": return order.status === "preparing";
-      case "shipping": return order.status === "shipping";
-      case "done": return order.status === "done";
-      case "cancelled_returned": return order.status === "cancelled" || order.status === "returned";
-      default: return true;
+      case "needs_action": matchesTab = (order.status === "waiting_approval" || order.status === "paid"); break;
+      case "pending": matchesTab = (order.status === "pending"); break;
+      case "preparing": matchesTab = (order.status === "preparing"); break;
+      case "shipping": matchesTab = (order.status === "shipping"); break;
+      case "done": matchesTab = (order.status === "done"); break;
+      case "cancelled_returned": matchesTab = (order.status === "cancelled" || order.status === "returned"); break;
+      default: matchesTab = true;
     }
+    if (!matchesTab) return false;
+
+    // 2. Lọc theo thời gian
+    const orderDate = new Date(order.createdAt);
+    const now = new Date();
+    if (dateFilter === "today") {
+        return orderDate.toDateString() === now.toDateString();
+    }
+    if (dateFilter === "month") {
+        return orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear();
+    }
+
+    return true;
   });
 
   const getStatusBadge = (status) => {
@@ -98,6 +115,8 @@ const ManageOrder = () => {
 
   return (
     <div className="manage-order-container">
+      <Toaster position="top-right" richColors />
+      
       <div className="mo-toolbar">
         <div className="mo-search">
           <Search size={18} />
@@ -107,6 +126,14 @@ const ManageOrder = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
+        </div>
+        <div className="mo-date-filters">
+          <Calendar size={18} color="#64748b" style={{marginRight: '8px'}}/>
+          <select value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}>
+            <option value="all">Mọi thời gian</option>
+            <option value="today">Hôm nay</option>
+            <option value="month">Tháng này</option>
+          </select>
         </div>
       </div>
 
@@ -119,11 +146,7 @@ const ManageOrder = () => {
           else count = orders.filter(o => o.status === tab.id).length;
 
           return (
-            <button 
-              key={tab.id} 
-              className={`mo-tab-btn ${activeTab === tab.id ? "active" : ""}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
+            <button key={tab.id} className={`mo-tab-btn ${activeTab === tab.id ? "active" : ""}`} onClick={() => setActiveTab(tab.id)}>
               {tab.label} <span className="mo-count">{count}</span>
             </button>
           )
@@ -138,7 +161,6 @@ const ManageOrder = () => {
         <div className="mo-list">
           {filteredOrders.map(order => (
             <div key={order._id} className="mo-card">
-              
               <div className="mo-card-header">
                 <div className="mo-header-left">
                   <strong>#{order._id.slice(-8).toUpperCase()}</strong>
@@ -157,6 +179,7 @@ const ManageOrder = () => {
                   <p><strong>Khách hàng:</strong> {order.shippingInfo?.fullName || "Chưa cập nhật"}</p>
                   <p><strong>SĐT:</strong> {order.shippingInfo?.phone}</p>
                   <p><strong>Địa chỉ:</strong> {order.shippingInfo?.addressDetail}, {order.shippingInfo?.district}, {order.shippingInfo?.province}</p>
+                  <p><strong>Bảo hành:</strong> <span style={{ marginLeft: '5px', color: '#2563eb', fontWeight: '600' }}><Shield size={14} style={{display:'inline', marginBottom:'3px'}}/> {order.warrantyType || "Cơ bản"}</span></p>
                 </div>
 
                 <div className="mo-items-summary">
@@ -179,7 +202,6 @@ const ManageOrder = () => {
                 </div>
                 
                 <div className="mo-actions">
-                    {/* NÚT MỞ MODAL CHI TIẾT */}
                     <button className="btn-icon btn-view" onClick={() => setSelectedOrder(order)}>
                         <Eye size={16}/> Chi tiết
                     </button>
@@ -197,20 +219,17 @@ const ManageOrder = () => {
                     )}
 
                     {order.status === "shipping" && !order.isDeliveryConfirming && (
-                        <button 
-                        className="btn-action btn-success" 
-                        onClick={async () => {
+                        <button className="btn-action btn-success" onClick={async () => {
                             try {
-                            const token = localStorage.getItem("token");
-                            await axios.put(`http://localhost:5000/api/orders/admin/${order._id}/notify-delivery`, {}, {
-                                headers: { Authorization: `Bearer ${token}` }
-                            });
-                            toast.success("Đã gửi thông báo xác nhận đến khách hàng!");
-                            fetchAllOrders();
+                                const token = localStorage.getItem("token");
+                                await axios.put(`http://localhost:5000/api/orders/admin/${order._id}/notify-delivery`, {}, {
+                                    headers: { Authorization: `Bearer ${token}` }
+                                });
+                                toast.success("Đã gửi yêu cầu xác nhận cho khách!");
+                                fetchAllOrders();
                             } catch (error) { toast.error("Lỗi gửi thông báo"); }
-                        }}
-                        >
-                        Thông báo nhận hàng
+                        }}>
+                        Yêu cầu xác nhận nhận hàng
                         </button>
                     )}
 
@@ -219,108 +238,104 @@ const ManageOrder = () => {
                     )}
 
                     {["waiting_approval", "pending", "paid", "preparing", "shipping"].includes(order.status) && (
-                        <button 
-                        className="btn-action btn-cancel" 
-                        onClick={() => {
-                            if(window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này?")) {
-                            updateOrderStatus(order._id, "cancelled");
-                            }
-                        }}
-                        >
+                        <button className="btn-action btn-cancel" onClick={() => updateOrderStatus(order._id, "cancelled")}>
                         Hủy đơn
                         </button>
                     )}
-                    </div>
+                </div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* MODAL CHI TIẾT ĐƠN HÀNG */}
+      {/* MODAL CHI TIẾT ĐƠN HÀNG & HẠCH TOÁN */}
       {selectedOrder && (
         <div className="mo-modal-overlay" onClick={() => setSelectedOrder(null)}>
           <div className="mo-modal-content" onClick={e => e.stopPropagation()}>
             <div className="mo-modal-header">
-              <h2>Chi tiết đơn hàng #{selectedOrder._id.slice(-8).toUpperCase()}</h2>
+              <h2>Đơn hàng #{selectedOrder._id.slice(-8).toUpperCase()}</h2>
               <button className="mo-modal-close" onClick={() => setSelectedOrder(null)}><X size={24}/></button>
             </div>
             
             <div className="mo-modal-body">
               <div className="mo-modal-grid">
-                
-                {/* Cột 1: Thông tin người nhận & Thanh toán */}
                 <div className="mo-modal-col">
                   <div className="mo-detail-box">
                     <h3>Thông tin người nhận</h3>
                     <p><strong>Họ tên:</strong> {selectedOrder.shippingInfo?.fullName}</p>
                     <p><strong>Số điện thoại:</strong> {selectedOrder.shippingInfo?.phone}</p>
-                    <p><strong>Email:</strong> {selectedOrder.email || selectedOrder.shippingInfo?.email}</p>
                     <p><strong>Địa chỉ:</strong> {selectedOrder.shippingInfo?.addressDetail}, {selectedOrder.shippingInfo?.ward}, {selectedOrder.shippingInfo?.district}, {selectedOrder.shippingInfo?.province}</p>
                   </div>
                   
                   <div className="mo-detail-box">
-                    <h3>Thông tin thanh toán</h3>
+                    <h3>Thanh toán</h3>
                     <p><strong>Phương thức:</strong> {selectedOrder.paymentMethod}</p>
                     <p><strong>Trạng thái:</strong> {getStatusBadge(selectedOrder.status)}</p>
-                    <p><strong>Ngày tạo:</strong> {new Date(selectedOrder.createdAt).toLocaleString('vi-VN')}</p>
+                    <p><strong>Thời gian:</strong> {new Date(selectedOrder.createdAt).toLocaleString('vi-VN')}</p>
                   </div>
                 </div>
 
-                {/* Cột 2: Danh sách sản phẩm & Tổng tiền */}
                 <div className="mo-modal-col">
                   <div className="mo-detail-box">
-                    <h3>Sản phẩm đã đặt</h3>
+                    <h3>Sản phẩm</h3>
                     <div className="mo-modal-items">
                       {selectedOrder.items.map((item, idx) => (
                         <div key={idx} className="mo-modal-item-row">
                           <img src={item.image} alt={item.name} />
                           <div className="mo-modal-item-info">
                             <p className="name">{item.name}</p>
-                            <p className="meta">{item.color} | {item.storage} | <strong>x{item.quantity}</strong></p>
+                            <p className="meta">{item.color} | {item.storage} | x{item.quantity}</p>
                           </div>
-                          <div className="mo-modal-item-price">
-                            {(item.price * item.quantity).toLocaleString()}đ
-                          </div>
+                          <div className="mo-modal-item-price">{(item.price * item.quantity).toLocaleString()}đ</div>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="mo-detail-box summary-box">
-                    <div className="summary-line">
-                      <span>Tạm tính</span>
-                      <span>{selectedOrder.items.reduce((sum, item) => sum + item.price * item.quantity, 0).toLocaleString()}đ</span>
-                    </div>
-                    <div className="summary-line">
-                      <span>Phí vận chuyển</span>
-                      <span>{selectedOrder.shippingFee === 0 ? "Miễn phí" : `${selectedOrder.shippingFee?.toLocaleString()}đ`}</span>
-                    </div>
-                    {selectedOrder.warrantyFee > 0 && (
-                      <div className="summary-line">
-                        <span>Bảo hành ({selectedOrder.warrantyType})</span>
-                        <span>{selectedOrder.warrantyFee?.toLocaleString()}đ</span>
+                  {/* KHỐI HẠCH TOÁN LỢI NHUẬN (PHẦN QUAN TRỌNG NHẤT) */}
+                  <div className="mo-detail-box summary-box admin-accounting" style={{ background: '#f0fdf4', border: '1px dashed #22c55e' }}>
+                    {["cancelled", "returned"].includes(selectedOrder.status) ? (
+                      <div className="mo-detail-box summary-box admin-accounting" style={{ background: '#fef2f2', border: '1px dashed #ef4444' }}>
+                        <h3 style={{color: '#b91c1c'}}>Hạch toán tài chính</h3>
+                        <p style={{color: '#ef4444', fontStyle: 'italic', fontSize: '14px'}}>Đơn hàng đã bị hủy/trả về. Không ghi nhận lợi nhuận.</p>
+                      </div>
+                    ) : (
+                      <div className="mo-detail-box summary-box admin-accounting" style={{ background: '#f0fdf4', border: '1px dashed #22c55e' }}>
+                        <h3 style={{color: '#166534'}}>Hạch toán tài chính</h3>
+                        <div className="summary-line">
+                          <span>Doanh thu sản phẩm & Bảo hành</span>
+                          <span>{(selectedOrder.total - (selectedOrder.shippingFee || 0)).toLocaleString()}đ</span>
+                        </div>
+                        <div className="summary-line">
+                          <span>Tổng vốn nhập (importPrice)</span>
+                          <span className="text-red">-{selectedOrder.items.reduce((sum, item) => sum + ((item.importPrice || 0) * item.quantity), 0).toLocaleString()}đ</span>
+                        </div>
+                        {selectedOrder.discountAmount > 0 && (
+                            <div className="summary-line">
+                              <span>Giảm giá (Voucher)</span>
+                              <span className="text-red">-{selectedOrder.discountAmount.toLocaleString()}đ</span>
+                            </div>
+                        )}
+                        <div className="summary-line total-line" style={{ borderTop: '2px dashed #bbf7d0', paddingTop: '10px', marginTop: '10px', color: '#166534' }}>
+                          <strong>Lợi nhuận gộp dự kiến</strong>
+                          <strong>
+                            {(
+                              (selectedOrder.total - (selectedOrder.shippingFee || 0)) - 
+                              selectedOrder.items.reduce((sum, item) => sum + ((item.importPrice || 0) * item.quantity), 0) -
+                              (selectedOrder.discountAmount || 0)
+                            ).toLocaleString()}đ
+                          </strong>
+                        </div>
                       </div>
                     )}
-                    {selectedOrder.discountAmount > 0 && (
-                      <div className="summary-line text-green">
-                        <span>Giảm giá</span>
-                        <span>-{selectedOrder.discountAmount?.toLocaleString()}đ</span>
-                      </div>
-                    )}
-                    <div className="summary-line total-line">
-                      <span>Tổng tiền khách trả</span>
-                      <span>{selectedOrder.total?.toLocaleString()}đ</span>
-                    </div>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 };

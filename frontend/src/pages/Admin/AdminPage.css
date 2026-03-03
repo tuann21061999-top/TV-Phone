@@ -1,57 +1,64 @@
 /* ================= WRAPPER & LAYOUT ================= */
 .admin-wrapper {
-  background: #F1F5F9; /* Màu nền xám nhạt hiện đại */
+  background: #F8FAFC; /* Chuyển sang sáng hơn một chút để nổi bật Card nội dung */
   min-height: 100vh;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased; /* Khử răng cưa giúp chữ nét hơn */
 }
 
 .admin-layout {
   display: flex;
   align-items: flex-start;
-  /* Giả sử Header của bạn cao khoảng 70px. Nếu Header absolute, thêm margin-top ở đây */
 }
 
 /* ================= SIDEBAR ================= */
 .admin-sidebar {
-  width: 260px;
-  background: #0F172A; /* Slate 900 - Đen sang trọng */
+  width: 270px; /* Tăng nhẹ độ rộng để menu thở hơn */
+  background: #0F172A;
   color: #94A3B8;
-  height: calc(100vh - 70px); /* Trừ đi chiều cao Header */
+  height: calc(100vh - 70px);
   position: sticky;
   top: 70px; 
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
-  overflow-y: auto; /* Thêm thanh cuộn nếu menu quá dài */
+  border-right: 1px solid #1E293B; /* Thêm đường viền tinh tế phân cách */
+  overflow-y: auto;
+  transition: all 0.3s ease;
 }
 
-/* Tùy chỉnh thanh cuộn cho Sidebar */
-.admin-sidebar::-webkit-scrollbar { width: 4px; }
-.admin-sidebar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+/* Custom Scrollbar xịn hơn */
+.admin-sidebar::-webkit-scrollbar { width: 5px; }
+.admin-sidebar::-webkit-scrollbar-track { background: transparent; }
+.admin-sidebar::-webkit-scrollbar-thumb { 
+  background: #334155; 
+  border-radius: 10px; 
+}
+.admin-sidebar::-webkit-scrollbar-thumb:hover { background: #475569; }
 
+/* ================= BRANDING ================= */
 .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 24px 20px;
+  gap: 14px;
+  padding: 28px 24px 20px;
   color: #FFFFFF;
 }
 
 .brand-icon {
-  background: #3B82F6;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  background: linear-gradient(135deg, #3B82F6, #2563EB); /* Nâng cấp thành Gradient */
+  width: 42px;
+  height: 42px;
+  border-radius: 12px; /* Bo góc mềm hơn */
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); /* Đổ bóng có màu (Color glow) */
 }
 
 .sidebar-brand h2 {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   margin: 0;
 }
 
@@ -60,15 +67,16 @@
   padding: 0 16px 24px 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px; /* Tăng khoảng cách giữa các nút */
 }
 
 .menu-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #64748B;
-  margin: 16px 0 8px 12px;
-  letter-spacing: 0.5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 20px 0 10px 14px;
 }
 
 .sidebar-menu button {
@@ -78,30 +86,33 @@
   background: transparent;
   border: none;
   color: #94A3B8;
-  padding: 12px 14px;
+  padding: 12px 16px;
   cursor: pointer;
   text-align: left;
-  border-radius: 8px;
+  border-radius: 10px; /* Bo tròn tự nhiên hơn */
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* Hiệu ứng chuyển động mượt */
 }
 
 .sidebar-menu button:hover {
-  background: #1E293B;
+  background: rgba(255, 255, 255, 0.05); /* Hover sáng nhẹ */
   color: #F8FAFC;
+  transform: translateX(4px); /* Trượt nhẹ sang phải khi hover */
 }
 
 .sidebar-menu button.active {
-  background: #3B82F6; /* Xanh dương đậm */
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8); /* Gradient cho nút active */
   color: #FFFFFF;
-  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  transform: translateX(4px); /* Giữ nguyên vị trí trượt */
 }
 
 .sidebar-divider {
   border: none;
-  border-top: 1px solid #1E293B;
-  margin: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 16px 0;
 }
 
 /* ================= CONTENT ================= */
@@ -109,27 +120,29 @@
   flex: 1;
   padding: 32px 40px;
   min-height: calc(100vh - 70px);
-  max-width: calc(100% - 260px); /* Đảm bảo không bị tràn ngang */
+  max-width: calc(100% - 270px);
   box-sizing: border-box;
 }
 
 .content-header {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .content-header h1 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1E293B;
+  font-size: 26px;
+  font-weight: 800;
+  color: #0F172A;
   margin: 0;
+  letter-spacing: -0.5px;
 }
 
 .content-body {
   background: #FFFFFF;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
-  padding: 24px;
-  min-height: 500px; /* Chiều cao tối thiểu cho khung trắng */
+  border-radius: 16px; /* Bo góc to hơn cho card */
+  border: 1px solid #E2E8F0; /* Viền mỏng thanh lịch */
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03); /* Bóng đổ rộng và mờ hơn */
+  padding: 30px;
+  min-height: 500px;
 }
 
 /* ================= EMPTY STATE ================= */
@@ -142,22 +155,32 @@
   text-align: center;
   color: #64748B;
   height: 100%;
+  animation: fadeIn 0.5s ease-out; /* Thêm hiệu ứng xuất hiện */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .empty-icon {
-  color: #CBD5E1;
-  margin-bottom: 16px;
+  color: #94A3B8;
+  margin-bottom: 20px;
+  background: #F1F5F9;
+  padding: 20px;
+  border-radius: 50%; /* Icon nằm trong vòng tròn */
 }
 
 .empty-state h3 {
   font-size: 18px;
-  color: #334155;
+  font-weight: 700;
+  color: #1E293B;
   margin: 0 0 8px 0;
 }
 
 .empty-state p {
   font-size: 14px;
-  max-width: 400px;
-  line-height: 1.5;
+  max-width: 350px;
+  line-height: 1.6;
   margin: 0;
 }

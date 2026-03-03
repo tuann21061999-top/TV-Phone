@@ -18,6 +18,16 @@ const warrantyOptions = [
   { id: 'gold', name: 'Bảo hành Vàng', duration: '12 tháng', price: 500000, desc: 'Lỗi 1 đổi 1 trong 30 ngày đầu, bảo hành 12 tháng' },
   { id: 'diamond', name: 'Bảo hành Kim cương', duration: '24 tháng', price: 1000000, desc: 'Bảo hành rơi vỡ, vào nước trong 24 tháng' }
 ];
+const PROVINCE_REGIONS = {
+  // Miền Nam (Giao nhanh nhất nếu kho của bạn ở TP.HCM)
+  SOUTH: ["Thành phố Hồ Chí Minh", "Bình Dương", "Đồng Nai", "Long An", "Bà Rịa - Vũng Tàu", "Tây Ninh", "Bình Phước", "Tiền Giang", "Bến Tre", "Trà Vinh", "Vĩnh Long", "Đồng Tháp", "An Giang", "Kiên Giang", "Cần Thơ", "Hậu Giang", "Sóc Trăng", "Bạc Liêu", "Cà Mau"],
+  
+  // Miền Trung
+  CENTRAL: ["Đà Nẵng", "Quảng Nam", "Quảng Ngãi", "Bình Định", "Phú Yên", "Khánh Hòa", "Ninh Thuận", "Bình Thuận", "Kon Tum", "Gia Lai", "Đắk Lắk", "Đắk Nông", "Lâm Đồng", "Thừa Thiên Huế", "Quảng Trị", "Quảng Bình", "Hà Tĩnh", "Nghệ An", "Thanh Hóa"],
+  
+  // Miền Bắc
+  NORTH: ["Hà Nội", "Hải Phòng", "Hải Dương", "Hưng Yên", "Bắc Ninh", "Bắc Giang", "Vĩnh Phúc", "Phú Thọ", "Quảng Ninh", "Thái Bình", "Nam Định", "Ninh Bình", "Hà Nam", "Hòa Bình", "Sơn La", "Điện Biên", "Lai Châu", "Lào Cai", "Yên Bái", "Hà Giang", "Tuyên Quang", "Cao Bằng", "Bắc Kạn", "Thái Nguyên", "Lạng Sơn"]
+};
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -46,20 +56,35 @@ const CheckoutPage = () => {
   const [selectedWarranty, setSelectedWarranty] = useState(warrantyOptions[0]);
 
   /* ================= FETCH DATA ================= */
+  
   const fetchUserProfile = async (token) => {
-    const headers = { Authorization: `Bearer ${token}` };
-    const userRes = await axios.get("http://localhost:5000/api/users/profile", { headers });
-    const user = userRes.data;
-    setCurrentUser(user);
-    
-    if (user.addresses && user.addresses.length > 0) {
-      setSavedAddresses(user.addresses);
-      if (!selectedAddressId) {
-        const defaultAddr = user.addresses.find(a => a.isDefault) || user.addresses[0];
-        handleSelectAddress(defaultAddr, user.email);
+    try {
+      const headers = { Authorization: `Bearer ${token}` };
+      const userRes = await axios.get("http://localhost:5000/api/users/profile", { headers });
+      
+      // ĐOẠN CODE BỊ THIẾU ĐỂ LƯU ĐỊA CHỈ:
+      const user = userRes.data;
+      setCurrentUser(user);
+      
+      if (user.addresses && user.addresses.length > 0) {
+        setSavedAddresses(user.addresses);
+        if (!selectedAddressId) {
+          const defaultAddr = user.addresses.find(a => a.isDefault) || user.addresses[0];
+          handleSelectAddress(defaultAddr, user.email);
+        }
+      } else {
+        setShowAddressModal(true);
       }
-    } else {
-      setShowAddressModal(true);
+      
+    } catch (error) {
+      // ✅ XỬ LÝ TOKEN HẾT HẠN
+      if (error.response?.status === 401) {
+        toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
+        localStorage.removeItem("token");
+        navigate("/login"); 
+      } else {
+        console.error("Lỗi tải profile:", error);
+      }
     }
   };
 
@@ -107,6 +132,40 @@ const CheckoutPage = () => {
   const total = subTotal + shippingFee + selectedWarranty.price - discountAmount;
 
   /* ================= HANDLERS ================= */
+  // eslint-disable-next-line no-unused-vars
+  const getEstimatedDeliveryDate = (province, shippingFee) => {
+  if (!province) return "Vui lòng chọn địa chỉ";
+  
+  const today = new Date();
+  let minDays = 2;
+  let maxDays = 4;
+
+  // Giả sử kho ở TP.HCM
+  if (PROVINCE_REGIONS.SOUTH.includes(province)) {
+    minDays = 1;
+    maxDays = 2;
+  } else if (PROVINCE_REGIONS.CENTRAL.includes(province)) {
+    minDays = 3;
+    maxDays = 4;
+  } else if (PROVINCE_REGIONS.NORTH.includes(province)) {
+    minDays = 3;
+    maxDays = 5;
+  }
+
+  // Nếu là giao hàng hỏa tốc (phí 55k)
+  if (shippingFee > 30000) {
+    return "Giao trong ngày hôm nay (trước 18:00)";
+  }
+
+  const minDate = new Date(today);
+  minDate.setDate(today.getDate() + minDays);
+  
+  const maxDate = new Date(today);
+  maxDate.setDate(today.getDate() + maxDays);
+
+  const options = { day: '2-digit', month: '2-digit' };
+  return `Dự kiến nhận hàng: ${minDate.toLocaleDateString('vi-VN', options)} - ${maxDate.toLocaleDateString('vi-VN', options)}`;
+};
   const handleSelectAddress = (addr, emailParam = "") => {
     setSelectedAddressId(addr._id);
     setShippingInfo({
@@ -146,33 +205,62 @@ const CheckoutPage = () => {
 
     const isBuyNow = location.state?.isBuyNow || false;
 
+    // Chuẩn hóa lại Payload để khớp 100% với Backend
     const orderPayload = {
-      items: checkoutItems,
+      items: checkoutItems.map(item => ({
+        productId: item.productId,
+        variantId: item.variantId, // Bắt buộc phải có để trừ kho và lấy giá nhập
+        name: item.name,
+        image: item.image,
+        color: item.color,
+        storage: item.storage,
+        quantity: item.quantity,
+        price: item.price,
+        // Không gửi importPrice từ đây (để Backend tự truy vấn cho bảo mật)
+      })),
       shippingInfo,
       shippingFee,
-      warrantyFee: selectedWarranty.price,     // Gửi phí bảo hành
-      warrantyType: selectedWarranty.name,     // Gửi tên gói bảo hành
+      warrantyFee: selectedWarranty.price,
+      warrantyType: selectedWarranty.name,
       paymentMethod,
       discountAmount,
-      totalAmount: total,
+      total: total, // Đổi từ totalAmount thành total cho khớp Model
       isBuyNow
     };
 
-    if (paymentMethod === "COD") {
-      try {
-        const token = localStorage.getItem("token");
-        await axios.post("http://localhost:5000/api/orders/checkout", orderPayload, { 
-          headers: { Authorization: `Bearer ${token}` } 
-        });
-        toast.success("Đặt hàng thành công!");
-        navigate("/"); 
-      } catch (error) {
-        toast.error("Lỗi khi tạo đơn hàng COD!");
-      }
-    } else {
-      navigate("/payment", {
-        state: { orderData: orderPayload }
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      
+      // 1. Tạo đơn hàng
+      const res = await axios.post("http://localhost:5000/api/orders/checkout", orderPayload, { 
+        headers: { Authorization: `Bearer ${token}` } 
       });
+
+      const createdOrder = res.data.order;
+
+      // 2. Điều hướng sau khi tạo đơn thành công
+      if (paymentMethod === "COD") {
+        toast.success("Đặt hàng thành công!");
+        navigate("/profile"); // Nên về trang đơn hàng của tôi để khách theo dõi
+      } else {
+        // NẾU LÀ ONLINE (VNPAY/MOMO)
+        // Thông thường ở đây bạn sẽ gọi API lấy URL thanh toán
+        // Hoặc chuyển sang trang Payment trung gian như bạn đã viết
+        navigate("/payment", {
+          state: { 
+            orderId: createdOrder._id,
+            total: total, // Đồng bộ tên biến
+            paymentMethod: paymentMethod 
+          }
+        });
+      }
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "Lỗi khi tạo đơn hàng!";
+      toast.error(errorMsg);
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -202,6 +290,12 @@ const CheckoutPage = () => {
           <section className="checkout-section">
             <div className="section-header-flex">
               <h2 className="section-title"><MapPin size={20}/> Thông tin giao hàng</h2>
+              {shippingInfo.province && (
+                <div className="estimated-delivery-alert">
+                  <CheckCircle2 size={16} color="#059669" />
+                  <span>{getEstimatedDeliveryDate(shippingInfo.province, shippingFee)}</span>
+                </div>
+              )}
               <button className="btn-add-address-toggle" onClick={() => setShowAddressModal(true)}>
                 <Plus size={16}/> Thêm địa chỉ mới
               </button>
@@ -323,7 +417,12 @@ const CheckoutPage = () => {
                   <div className="sum-img"><img src={item.image} alt={item.name} /></div>
                   <div className="sum-info">
                     <h4>{item.name}</h4>
-                    <p>SL: {item.quantity} {item.color ? `| ${item.color}` : ''} {item.storage ? `| ${item.storage}` : ''}</p>
+                    <p className="variant-info">
+                      SL: {item.quantity} 
+                      {(item.color || item.colorName) ? ` | ${item.color || item.colorName}` : ''} 
+                      {(item.storage && item.storage !== "N/A") ? ` | ${item.storage}` : ''}
+                      {(!item.storage && item.size && item.size !== "Standard") ? ` | ${item.size}` : ''}
+                    </p>
                   </div>
                   <div className="sum-price">{(item.price * item.quantity).toLocaleString()}đ</div>
                 </div>

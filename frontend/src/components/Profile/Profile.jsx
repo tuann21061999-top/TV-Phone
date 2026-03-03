@@ -1,9 +1,11 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { 
   User, Package, MapPin, Tag, LogOut, Plus, 
-  Trash2, CreditCard, Edit, Heart, Search, Eye
+  Trash2, CreditCard, Edit, Heart, Search, Eye,
+  Camera, XCircle, Loader2, AlertCircle
 } from "lucide-react";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
@@ -23,12 +25,13 @@ const Profile = () => {
   const [editingAddress, setEditingAddress] = useState(null);
   const [editingPayment, setEditingPayment] = useState(null);
 
-  // State quản lý đơn hàng
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [activeOrderFilter, setActiveOrderFilter] = useState("all");
 
-  // 1. CHUẨN HÓA LẠI CÁC TABS THEO YÊU CẦU
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = React.useRef(null);
+
   const filterOrderTabs = [
     { id: "all", label: "Tất cả" },
     { id: "waiting", label: "Chờ xác nhận" },
@@ -40,13 +43,106 @@ const Profile = () => {
   ];
 
   /* ================= FETCH PROFILE & ORDERS ================= */
+  const handleAvatarChange = async (e) => {
+    // ... (Giữ nguyên như code của bạn)
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Vui lòng chọn file hình ảnh!");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    setIsUploading(true);
+    const loadingToast = toast.loading("Đang tải ảnh lên...");
+
+    try {
+      const token = localStorage.getItem("token");
+      const { data } = await axios.put(
+        "http://localhost:5000/api/users/update-avatar", 
+        formData, 
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }
+      );
+
+      setUser(prev => ({ ...prev, avatar: data.user.avatar }));
+      toast.success("Cập nhật ảnh đại diện thành công", { id: loadingToast });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Lỗi tải ảnh", { id: loadingToast });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeAvatar = async () => {
+    // ... (Giữ nguyên như code của bạn)
+    if (!window.confirm("Bạn có muốn xóa ảnh đại diện hiện tại?")) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const { data } = await axios.put(
+        "http://localhost:5000/api/users/update", 
+        { avatar: "" }, 
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setUser(prev => ({ ...prev, avatar: "" }));
+      toast.success("Đã xóa ảnh đại diện");
+    } catch (error) {
+      toast.error("Lỗi khi xóa ảnh");
+    }
+  };
+
+  const renderSidebarAvatar = () => (
+    <div className="avatar-wrapper">
+      <div className="avatar-main">
+        {user.avatar ? (
+          <img src={user.avatar} alt="Avatar" />
+        ) : (
+          <img
+            src={`https://ui-avatars.com/api/?name=${user.name}&background=0D9488&color=fff&size=128`}
+            alt="Default Avatar"
+          />
+        )}
+        
+        <button 
+          className="avatar-upload-btn" 
+          onClick={() => fileInputRef.current.click()}
+          disabled={isUploading}
+        >
+          {isUploading ? <Loader2 className="spinner" size={16} /> : <Camera size={16} />}
+        </button>
+
+        {user.avatar && (
+          <button className="avatar-delete-btn" onClick={removeAvatar}>
+            <XCircle size={16} />
+          </button>
+        )}
+      </div>
+      
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        hidden 
+        accept="image/*" 
+        onChange={handleAvatarChange} 
+      />
+      
+      <div className="user-info">
+        <h4>{user.name}</h4>
+        <p className="user-email-sub">{user.email}</p>
+      </div>
+    </div>
+  );
+
   const fetchUserAndOrders = async () => {
     const token = localStorage.getItem("token");
     if (!token) { navigate("/login"); return; }
     const tokenHeader = { headers: { Authorization: `Bearer ${token}` } };
 
     try {
-      // Gọi API lấy User Info
       const { data: userData } = await axios.get("http://localhost:5000/api/users/profile", tokenHeader);
       if (userData.role === "admin") {
         navigate("/admin");
@@ -54,7 +150,6 @@ const Profile = () => {
       }
       setUser(userData);
 
-      // Gọi API lấy Đơn hàng
       setLoadingOrders(true);
       const { data: orderData } = await axios.get("http://localhost:5000/api/orders/my-orders", tokenHeader);
       setOrders(orderData);
@@ -77,27 +172,38 @@ const Profile = () => {
     window.location.reload();
   };
 
+  // ✅ THÊM MỚI: Hàm xử lý Khách hàng tự Hủy đơn
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này không?")) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(
+        `http://localhost:5000/api/orders/admin/${orderId}/status`, 
+        { status: "cancelled" }, 
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Đã hủy đơn hàng thành công.");
+      fetchUserAndOrders(); // Gọi lại để cập nhật danh sách
+    } catch (error) {
+      toast.error("Lỗi khi hủy đơn hàng, vui lòng thử lại.");
+    }
+  };
+
   /* ================= LỌC & HIỂN THỊ ĐƠN HÀNG ================= */
   
-  // 2. LOGIC LỌC ĐƠN HÀNG VÀO TỪNG TAB
   const filteredOrders = orders.filter(order => {
     if (activeOrderFilter === "all") return true;
-    
-    // Tab Chờ xác nhận: Chứa đơn COD, đơn Online đang quét mã, và đơn Online đã trả tiền
     if (activeOrderFilter === "waiting") return ["waiting_approval", "pending", "paid"].includes(order.status);
-    
-    // Các tab còn lại map 1-1 với trạng thái
     return order.status === activeOrderFilter;
   });
 
-  // Helper function đếm số lượng cho từng Tab
   const getTabCount = (tabId) => {
     if (tabId === "all") return orders.length;
     if (tabId === "waiting") return orders.filter(o => ["waiting_approval", "pending", "paid"].includes(o.status)).length;
     return orders.filter(o => o.status === tabId).length;
   };
 
-  // 3. LOGIC HIỂN THỊ TEXT TRẠNG THÁI TRÊN TỪNG ĐƠN HÀNG
   const getStatusText = (status) => {
     switch (status) {
       case "pending": return "Chờ thanh toán";
@@ -162,22 +268,13 @@ const Profile = () => {
       <Header />
 
       <div className="container profile-container">
-        {/* LƯỚI 2 CỘT: SIDEBAR & MAIN CONTENT */}
         <div className="profile-grid">
 
           {/* CỘT TRÁI: SIDEBAR */}
           <aside className="profile-sidebar-card">
-            <div className="user-profile-header">
-              <div className="avatar-wrapper">
-                <img
-                  src={`https://ui-avatars.com/api/?name=${user.name}&background=0D9488&color=fff`}
-                  alt="Avatar"
-                />
-              </div>
-              <div className="user-info">
-                <h4>{user.name}</h4>
-              </div>
-            </div>
+            {renderSidebarAvatar()}
+            {/* Mình ẩn đi user-profile-header cũ của bạn vì renderSidebarAvatar đã có thông tin rồi */}
+            {/* <div className="user-profile-header"> ... </div> */}
 
             <nav className="profile-menu">
               <button className={`menu-item ${activeTab === "info" ? "active" : ""}`} onClick={() => setActiveTab("info")}>
@@ -224,7 +321,7 @@ const Profile = () => {
               </div>
             )}
 
-            {/* TAB ORDERS (ĐÃ ĐƯỢC CẬP NHẬT GIAO DIỆN) */}
+            {/* TAB ORDERS */}
             {activeTab === "orders" && (
               <div className="card-section">
                 <div className="order-page-header">
@@ -238,7 +335,6 @@ const Profile = () => {
                   </div>
                 </div>
 
-                {/* TABS LỌC TRẠNG THÁI */}
                 <div className="order-status-tabs">
                   {filterOrderTabs.map(tab => (
                     <button 
@@ -296,36 +392,62 @@ const Profile = () => {
                         </div>
 
                         {/* Footer Đơn hàng */}
-                        <div className="order-card-footer">
-                          <div className="total-display">
-                            Thành tiền: <strong>{order.total.toLocaleString()}đ</strong>
+                        <div className="order-card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          
+                          {/* Khối bên trái: Báo lỗi nếu chưa thanh toán */}
+                          <div className="footer-left-info">
+                            <div className="total-display">
+                              Thành tiền: <strong style={{ color: '#ef4444', fontSize: '18px' }}>{order.total.toLocaleString()}đ</strong>
+                            </div>
+                            {order.status === 'pending' && ['VNPAY', 'MOMO'].includes(order.paymentMethod) && (
+                              <p style={{ color: '#ef4444', fontSize: '13px', margin: '4px 0 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <AlertCircle size={14}/> Vui lòng thanh toán trong 15 phút.
+                              </p>
+                            )}
                           </div>
-                          <div className="action-buttons">
-                            {/* Nút Xem chi tiết đã được liên kết đúng */}
+
+                          {/* Khối bên phải: Các nút thao tác */}
+                          <div className="action-buttons" style={{ display: 'flex', gap: '10px' }}>
                             <button className="btn-outline-small" onClick={() => navigate(`/order/${order._id}`)}>
                               <Eye size={16} /> Xem chi tiết
                             </button>
                             
-                            {/* Cập nhật điều kiện Hủy Đơn */}
-                            {["waiting_approval", "pending", "paid", "preparing", "shipping"].includes(order.status) && (
-                              <button 
-                                className="btn-danger-small"
-                                onClick={async () => {
-                                  if(window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này?")) {
-                                      try {
-                                          const token = localStorage.getItem("token");
-                                          await axios.put(`http://localhost:5000/api/orders/admin/${order._id}/status`, 
-                                            { status: "cancelled" }, 
-                                            { headers: { Authorization: `Bearer ${token}` } }
-                                          );
-                                          toast.success("Hủy đơn thành công");
-                                          fetchUserAndOrders(); // Tải lại danh sách
-                                      } catch (err) { toast.error("Lỗi hủy đơn"); }
-                                  }
-                                }}
-                              >
-                                Hủy đơn
-                              </button>
+                            {/* NÚT THANH TOÁN TIẾP VÀ HỦY ĐƠN CHO ĐƠN PENDING */}
+                            {order.status === 'pending' && ['VNPAY', 'MOMO'].includes(order.paymentMethod) && (
+                              <>
+                                <button 
+                                  className="btn-danger-small"
+                                  style={{ backgroundColor: '#f1f5f9', color: '#64748b', borderColor: '#cbd5e1' }}
+                                  onClick={() => handleCancelOrder(order._id)}
+                                >
+                                  Hủy đơn
+                                </button>
+                                <button 
+                                  className="btn-primary-small"
+                                  style={{ backgroundColor: '#2563eb', color: 'white', padding: '8px 16px', borderRadius: '6px' }}
+                                  onClick={() => {
+                                    navigate('/payment', {
+                                      state: {
+                                        orderId: order._id,
+                                        total: order.total,
+                                        paymentMethod: order.paymentMethod
+                                      }
+                                    });
+                                  }}
+                                >
+                                  Thanh toán ngay
+                                </button>
+                              </  >
+                            )}
+
+                            {/* Nút hủy đơn cho đơn COD đang chờ duyệt */}
+                            {order.status === 'waiting_approval' && (
+                                <button 
+                                  className="btn-danger-small"
+                                  onClick={() => handleCancelOrder(order._id)}
+                                >
+                                  Hủy đơn
+                                </button>
                             )}
 
                             {(order.status === "done" || order.status === "cancelled" || order.status === "returned") && (

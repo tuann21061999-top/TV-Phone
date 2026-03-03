@@ -629,3 +629,20 @@
     grid-template-columns: 1fr; /* Xuống 1 cột trên điện thoại */
   }
 }
+.estimated-delivery-alert {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #166534;
+  font-weight: 500;
+}
+
+.estimated-delivery-alert span {
+  font-style: italic;
+}

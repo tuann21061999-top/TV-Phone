@@ -9,62 +9,52 @@ const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [activePaymentMethod, setActivePaymentMethod] = useState(null);
 
-  // Data passed from CheckoutPage
-  const orderPayload = location.state?.orderData;
+  // Lấy dữ liệu được truyền từ CheckoutPage sang
+  const orderId = location.state?.orderId;
+  const totalAmount = location.state?.totalAmount;
+  const activePaymentMethod = location.state?.paymentMethod;
 
+  // Nếu không có ID đơn hàng (do người dùng gõ URL trực tiếp vào trang này), đá về giỏ hàng
   useEffect(() => {
-    if (!orderPayload) {
-      toast.error("Không tìm thấy thông tin đơn hàng để thanh toán");
+    if (!orderId) {
+      toast.error("Không tìm thấy mã đơn hàng để thanh toán!");
       navigate("/cart");
-    } else {
-       // Automatically select the method passed from checkout
-       setActivePaymentMethod(orderPayload.paymentMethod);
     }
-  }, [orderPayload, navigate]);
+  }, [orderId, navigate]);
 
   const handleSimulatedPayment = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
       
-      // We send the order payload to the backend to CREATE the order
-      // In this simulated flow, we are treating this as a successful "payment"
-      // and creating the order directly as if it was a COD order.
-      
-      // Update the payload to reflect the simulated "paid" status if needed by your backend
-      const finalPayload = {
-          ...orderPayload,
-          paymentMethod: activePaymentMethod,
-          isSimulatedPaymentSuccess: true // Flag for backend
-      }
-
-      // eslint-disable-next-line no-unused-vars
-      const res = await axios.post(
-        "http://localhost:5000/api/orders/checkout", 
-        finalPayload,
+      // GỌI API CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG THÀNH "PAID"
+      await axios.put(
+        `http://localhost:5000/api/orders/${orderId}/pay`, 
+        {}, // body để trống vì API chỉ cần ID trên URL
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success("Thanh toán thành công (Simulated)!");
-      navigate("/"); // Or redirect to a success page
+      toast.success("Thanh toán thành công!");
+      navigate("/"); // Hoặc bạn có thể tạo một trang "/thank-you" và navigate về đó
 
     } catch (error) {
       console.error("Payment Simulation Error:", error);
-      toast.error("Lỗi khi tạo đơn hàng sau thanh toán");
+      toast.error("Lỗi xác nhận thanh toán, vui lòng thử lại!");
     } finally {
       setLoading(false);
     }
   };
 
-  if (!orderPayload) return null;
+  if (!orderId) return null;
 
   return (
     <div className="payment-page-container">
       <div className="payment-card payment-simulation-card">
+        
+        {/* Nút quay lại */}
         <button className="btn-back" onClick={() => navigate(-1)} disabled={loading}>
-          <ArrowLeft size={18} /> Quay lại thông tin giao hàng
+          <ArrowLeft size={18} /> Quay lại
         </button>
 
         <div className="payment-header">
@@ -74,12 +64,12 @@ const Payment = () => {
           <h1>Mô phỏng Thanh toán</h1>
           <div className="amount-display">
             <span>Tổng tiền thanh toán:</span>
-            <h2>{orderPayload.totalAmount.toLocaleString()}đ</h2>
+            <h2>{totalAmount?.toLocaleString()}đ</h2>
           </div>
         </div>
 
         <div className="payment-simulation-content">
-            {/* Left Side: QR Code Simulation */}
+            {/* Cột trái: Hiển thị QR Code giả lập */}
             <div className="qr-section">
                 <h3>Quét mã QR để thanh toán</h3>
                 <div className={`qr-placeholder ${activePaymentMethod?.toLowerCase()}`}>
@@ -88,7 +78,7 @@ const Payment = () => {
                 </div>
             </div>
 
-            {/* Right Side: Test Card Input Forms */}
+            {/* Cột phải: Thông tin thẻ Test */}
             <div className="card-input-section">
                 <h3>Thông tin thẻ Test</h3>
                 

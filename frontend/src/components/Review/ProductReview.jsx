@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Star, Image as ImageIcon, ThumbsUp, Flag, Edit, X, ShieldCheck, UserCircle } from "lucide-react";
+import { Star, ThumbsUp, Edit, ShieldCheck, UserCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import "./ProductReview.css";
 
@@ -8,26 +8,21 @@ const ProductReview = ({ productId }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // States cho Form viết/sửa đánh giá
+  // States Form Đánh giá
   const [showForm, setShowForm] = useState(false);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
-  const [images, setImages] = useState([]); // Chứa file thật (dùng khi backend đã có multer)
-  const [imagePreviews, setImagePreviews] = useState([]); // Chứa URL preview hiển thị UI
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fileInputRef = useRef(null);
 
-  // States quản lý quyền Đánh giá & Chỉnh sửa
+  // Phân quyền
   const [canReview, setCanReview] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
-  // States cho Lọc & Sắp xếp
   const [activeFilter, setActiveFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
 
   const token = localStorage.getItem("token");
 
-  // 1. Fetch Danh sách Reviews
+  // Fetch Danh sách Reviews
   const fetchReviews = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/api/reviews/${productId}`);
@@ -39,24 +34,40 @@ const ProductReview = ({ productId }) => {
     }
   };
 
-  // 2. Fetch Kiểm tra điều kiện mua hàng & Lấy review cũ (nếu có)
+  // Kiểm tra quyền (Đã mua hàng chưa)
   const checkUserEligibility = async () => {
-    if (!token) return;
+    const token = localStorage.getItem("token");
+    
+    // Nếu khách vãng lai -> Dừng
+    if (!token) {
+      setCanReview(false);
+      return;
+    }
+
     try {
       const res = await axios.get(`http://localhost:5000/api/reviews/check-eligibility/${productId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setCanReview(res.data.canReview);
-      
-      // Nếu đã từng đánh giá, điền sẵn thông tin cũ vào Form
+      // 1. Mở khóa nút viết đánh giá
+      setCanReview(res.data.canReview); 
+
+      // 2. Tự động điền dữ liệu cũ nếu khách đã từng đánh giá (Tính năng Sửa đánh giá)
       if (res.data.existingReview) {
+        setIsEditing(true);
         setRating(res.data.existingReview.rating);
         setComment(res.data.existingReview.comment);
-        setIsEditing(true); // Đánh dấu là đang ở chế độ Sửa
+      } else {
+        setIsEditing(false);
+        setRating(5);
+        setComment("");
       }
+
     } catch (error) {
-      console.error("Lỗi kiểm tra quyền đánh giá:", error);
+      setCanReview(false);
+      if (error.response?.status !== 401) {
+        console.error("Lỗi kiểm tra quyền:", error);
+      }
     }
   };
 
@@ -68,33 +79,7 @@ const ProductReview = ({ productId }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
-  // Xử lý chọn ảnh từ máy tính (UI)
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length + images.length > 5) {
-      toast.error("Chỉ được tải lên tối đa 5 ảnh!");
-      return;
-    }
-    
-    setImages([...images, ...files]);
-    
-    // Tạo preview URL cho ảnh để hiển thị lên màn hình
-    const newPreviews = files.map(file => URL.createObjectURL(file));
-    setImagePreviews([...imagePreviews, ...newPreviews]);
-  };
-
-  // Xóa ảnh đã chọn
-  const removeImage = (index) => {
-    const newImages = [...images];
-    newImages.splice(index, 1);
-    setImages(newImages);
-
-    const newPreviews = [...imagePreviews];
-    newPreviews.splice(index, 1);
-    setImagePreviews(newPreviews);
-  };
-
-  // 3. Xử lý Gửi/Cập nhật Đánh giá
+  // --- GỬI ĐÁNH GIÁ (JSON THUẦN) ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!token) { toast.error("Vui lòng đăng nhập!"); return; }
@@ -102,8 +87,7 @@ const ProductReview = ({ productId }) => {
 
     setIsSubmitting(true);
     try {
-      // Đang dùng chuẩn JSON cơ bản (chưa đính kèm file ảnh) để tránh lỗi 500 do backend chưa có Multer.
-      // Nếu sau này bạn code xong API upload ảnh ở Backend, bạn đổi sang dùng FormData ở đây nhé.
+      // GỬI DỮ LIỆU DẠNG JSON (BỎ FORM DATA VÀ IMAGE)
       await axios.post("http://localhost:5000/api/reviews", {
         productId,
         rating,
@@ -114,7 +98,8 @@ const ProductReview = ({ productId }) => {
       
       toast.success(isEditing ? "Đã cập nhật đánh giá!" : "Cảm ơn bạn đã đánh giá!");
       setShowForm(false);
-      fetchReviews(); // Tải lại danh sách review mới nhất
+      fetchReviews(); 
+      checkUserEligibility(); 
     } catch (error) {
       toast.error(error.response?.data?.message || "Lỗi khi gửi đánh giá!");
     } finally {
@@ -122,39 +107,32 @@ const ProductReview = ({ productId }) => {
     }
   };
 
-  // --- LOGIC TÍNH TOÁN THỐNG KÊ ---
+  // Tính Thống Kê
   const totalReviews = reviews.length;
-  const avgRating = totalReviews > 0 ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / totalReviews).toFixed(1) : 0;
-  
-  // Đếm số lượng từng loại sao (1-5)
+  const avgRating = totalReviews > 0 ? (reviews.reduce((a, c) => a + c.rating, 0) / totalReviews).toFixed(1) : 0;
   const starCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
   reviews.forEach(r => { if(starCounts[r.rating] !== undefined) starCounts[r.rating]++; });
   const getPercent = (star) => totalReviews > 0 ? Math.round((starCounts[star] / totalReviews) * 100) : 0;
 
-  // --- LOGIC LỌC & SẮP XẾP ---
+  // Lọc & Sắp xếp
   let displayReviews = [...reviews];
   if (activeFilter !== "all") {
-    if (activeFilter === "has_image") {
-      displayReviews = displayReviews.filter(r => r.images && r.images.length > 0);
-    } else {
-      displayReviews = displayReviews.filter(r => r.rating === parseInt(activeFilter));
-    }
+    displayReviews = displayReviews.filter(r => r.rating === parseInt(activeFilter));
   }
-
   if (sortBy === "newest") displayReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   if (sortBy === "oldest") displayReviews.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
   return (
     <div className="pr-wrapper">
       
-      {/* HEADER & TỔNG QUAN */}
+      {/* HEADER */}
       <div className="pr-header">
         <div className="pr-title-area">
           <h2>Đánh giá từ khách hàng</h2>
           <p>Dựa trên {totalReviews.toLocaleString()} đánh giá thực tế từ người dùng</p>
         </div>
         
-        {/* NÚT VIẾT ĐÁNH GIÁ (Chứa logic kiểm tra mua hàng) */}
+        {/* NÚT VIẾT / SỬA ĐÁNH GIÁ */}
         {!token ? (
           <p className="login-warning">Vui lòng đăng nhập để đánh giá.</p>
         ) : !canReview ? (
@@ -169,7 +147,6 @@ const ProductReview = ({ productId }) => {
       </div>
 
       <div className="pr-summary-box">
-        {/* Điểm trung bình */}
         <div className="pr-avg-score">
           <div className="score-number">{avgRating}</div>
           <div className="score-stars">
@@ -180,7 +157,6 @@ const ProductReview = ({ productId }) => {
           <div className="score-text">{totalReviews.toLocaleString()} lượt đánh giá</div>
         </div>
 
-        {/* Thanh Progress */}
         <div className="pr-progress-bars">
           {[5, 4, 3, 2, 1].map(star => (
             <div key={star} className="progress-row">
@@ -194,7 +170,7 @@ const ProductReview = ({ productId }) => {
         </div>
       </div>
 
-      {/* FORM VIẾT / SỬA ĐÁNH GIÁ (Ẩn/Hiện khi bấm nút) */}
+      {/* FORM VIẾT ĐÁNH GIÁ (CHỈ CÓ TEXT) */}
       {showForm && (
         <div className="pr-form-container">
           <h4>{isEditing ? "Cập nhật đánh giá của bạn" : "Gửi đánh giá của bạn"}</h4>
@@ -216,46 +192,24 @@ const ProductReview = ({ productId }) => {
               placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..." 
               value={comment} onChange={(e) => setComment(e.target.value)} rows="4" 
             />
-            
-            {/* Chỗ Upload Ảnh (UI) */}
-            <div className="pr-image-upload">
-              <input type="file" multiple accept="image/*" hidden ref={fileInputRef} onChange={handleImageChange} />
-              <button type="button" className="btn-upload-img" onClick={() => fileInputRef.current.click()}>
-                <ImageIcon size={18} /> Thêm hình ảnh (Tối đa 5)
-              </button>
-              
-              {imagePreviews.length > 0 && (
-                <div className="preview-grid">
-                  {imagePreviews.map((src, idx) => (
-                    <div key={idx} className="preview-item">
-                      <img src={src} alt="preview" />
-                      <button type="button" className="btn-remove-img" onClick={() => removeImage(idx)}><X size={14}/></button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
 
             <div className="pr-form-actions">
               <button type="button" className="btn-cancel" onClick={() => setShowForm(false)}>Hủy</button>
               <button type="submit" disabled={isSubmitting || !token} className="btn-submit">
-                {isSubmitting ? "Đang xử lý..." : (isEditing ? "Cập nhật" : "Gửi đánh giá")}
+                {isSubmitting ? <><Loader2 size={16} className="spinner"/> Đang gửi...</> : (isEditing ? "Cập nhật" : "Gửi đánh giá")}
               </button>
             </div>
           </form>
         </div>
       )}
 
-      {/* THANH LỌC & SẮP XẾP */}
+      {/* FILTER & LIST */}
       <div className="pr-filter-bar">
         <div className="pr-filters">
           <button className={activeFilter === "all" ? "active" : ""} onClick={() => setActiveFilter("all")}>Tất cả</button>
           <button className={activeFilter === "5" ? "active" : ""} onClick={() => setActiveFilter("5")}>5 sao</button>
           <button className={activeFilter === "4" ? "active" : ""} onClick={() => setActiveFilter("4")}>4 sao</button>
           <button className={activeFilter === "3" ? "active" : ""} onClick={() => setActiveFilter("3")}>3 sao</button>
-          <button className={`filter-img-btn ${activeFilter === "has_image" ? "active" : ""}`} onClick={() => setActiveFilter("has_image")}>
-            <ImageIcon size={14} /> Có hình ảnh
-          </button>
         </div>
         <div className="pr-sort">
           <span>Sắp xếp:</span>
@@ -266,12 +220,11 @@ const ProductReview = ({ productId }) => {
         </div>
       </div>
 
-      {/* DANH SÁCH REVIEW ITEM */}
       <div className="pr-review-list">
         {loading ? (
           <p className="pr-loading">Đang tải đánh giá...</p>
         ) : displayReviews.length === 0 ? (
-          <p className="pr-empty">Không có đánh giá nào phù hợp với bộ lọc.</p>
+          <p className="pr-empty">Không có đánh giá nào phù hợp.</p>
         ) : (
           displayReviews.map((rev) => (
             <div key={rev._id} className="pr-review-item">
@@ -295,22 +248,11 @@ const ProductReview = ({ productId }) => {
 
                 <p className="pr-comment">{rev.comment}</p>
 
-                {/* Hình ảnh đính kèm (nếu DB có mảng images) */}
-                {rev.images && rev.images.length > 0 && (
-                  <div className="pr-images-grid">
-                    {rev.images.map((img, idx) => (
-                      <img key={idx} src={img} alt="review" className="pr-review-img" />
-                    ))}
-                  </div>
-                )}
-
-                {/* Nút hành động */}
                 <div className="pr-item-actions">
-                  <button className="btn-helpful"><ThumbsUp size={14}/> Hữu ích (12)</button>
+                  <button className="btn-helpful"><ThumbsUp size={14}/> Hữu ích</button>
                   <button className="btn-report">Báo cáo vi phạm</button>
                 </div>
 
-                {/* Phản hồi từ Shop (Nằm trong DB field: adminReply) */}
                 {rev.adminReply && (
                   <div className="pr-admin-reply">
                     <div className="admin-reply-header">
@@ -326,12 +268,6 @@ const ProductReview = ({ productId }) => {
           ))
         )}
       </div>
-
-      {totalReviews > displayReviews.length && (
-        <div className="pr-load-more">
-          <button>Xem thêm đánh giá</button>
-        </div>
-      )}
 
     </div>
   );

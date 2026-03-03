@@ -114,10 +114,13 @@ exports.validateProduct = (req, res, next) => {
   }
 
   for (const variant of variants) {
-    if (!variant.sku || variant.price == null || !variant.storage || !variant.colorName) {
+    const isStorageRequired = productType === "device";
+    
+    if (!variant.sku || variant.price == null || (isStorageRequired && !variant.storage) || !variant.colorName) {
       return res.status(400).json({
-        message:
-          "Each variant must have sku, price, storage and colorName",
+        message: isStorageRequired 
+          ? "Each variant must have sku, price, storage and colorName"
+          : "Each variant must have sku, price and colorName",
       });
     }
 

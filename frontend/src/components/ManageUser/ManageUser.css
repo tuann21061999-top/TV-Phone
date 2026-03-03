@@ -1,0 +1,104 @@
+/* Tận dụng lại các biến màu từ ManageProduct.css nếu có */
+
+.user-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-name-text {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.user-id-text {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #475569;
+    margin-bottom: 2px;
+}
+
+/* Badge Quyền hạn */
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.role-badge.admin {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.role-badge.user {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.user-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.user-stats {
+    font-size: 14px;
+    color: #64748b;
+    background: #fff;
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Hover effect cho hàng */
+tr:hover .user-avatar {
+    transform: scale(1.1);
+    transition: 0.2s ease;
+}
+
+/* Responsive cho bảng user */
+@media (max-width: 768px) {
+    .user-stats {
+        display: none;
+    }
+}

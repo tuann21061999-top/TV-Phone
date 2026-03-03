@@ -326,21 +326,28 @@ function ProductDetail() {
                 className="buy-now"
                 disabled={!canBuy}
                 onClick={() => {
+                  // KHI BẤM MUA NGAY, ĐÓNG GÓI ĐẦY ĐỦ DỮ LIỆU CỦA VARIANT
+                  const checkoutItem = {
+                    productId: product._id,
+                    variantId: currentVariant._id,
+                    name: product.name,
+                    image: mainImage,
+                    price: currentVariant.price,
+                    quantity: 1,
+                    
+                    // THÊM ĐẦY ĐỦ THUỘC TÍNH NÀY CHO CHECKOUT PAGE
+                    color: selectedColor, // Mảng màu
+                    size: currentVariant.size, // BẮT BUỘC PHẢI CÓ CHO ĐIỆN THOẠI (RAM) VÀ PHỤ KIỆN
+                    storage: currentVariant.storage, // BẮT BUỘC PHẢI CÓ CHO ĐIỆN THOẠI (ROM)
+                    
+                    condition: product.condition || "new",
+                    conditionLevel: selectedCondition || null
+                  };
+
                   navigate('/checkout', {
                     state: {
                       isBuyNow: true,
-                      items: [{
-                        productId: product._id,         // ID của sản phẩm cha
-                        variantId: currentVariant._id,   // ID của phiên bản (màu/dung lượng)
-                        name: product.name,
-                        image: mainImage,
-                        color: selectedColor,
-                        storage: currentVariant.storage, // Lấy trực tiếp storage từ variant
-                        price: currentVariant.price,
-                        quantity: 1,
-                        condition: product.condition || "new",
-                        conditionLevel: selectedCondition || null
-                      }]
+                      items: [checkoutItem]
                     }
                   });
                 }}
