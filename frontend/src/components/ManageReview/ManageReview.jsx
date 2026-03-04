@@ -2,9 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Star, EyeOff, Eye, Search, MessageSquare, Trash2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-
-// IMPORT FILE CSS CỦA PRODUCT ĐỂ LẤY KHUNG RỘNG + IMPORT CSS REVIEW CHO CARD
-import "../../components/ManageProduct/ManageProduct.css"; 
 import "./ManageReview.css"; 
 
 const ManageReview = () => {
@@ -53,8 +50,12 @@ const ManageReview = () => {
   };
 
   const openReplyBox = (review) => {
-    if (replyingId === review._id) { setReplyingId(null); } 
-    else { setReplyingId(review._id); setReplyText(review.adminReply || ""); }
+    if (replyingId === review._id) { 
+      setReplyingId(null); 
+    } else { 
+      setReplyingId(review._id); 
+      setReplyText(review.adminReply || ""); 
+    }
   };
 
   const submitReply = async (id) => {
@@ -63,114 +64,120 @@ const ManageReview = () => {
       const token = localStorage.getItem("token");
       await axios.put(`http://localhost:5000/api/reviews/admin/${id}/reply`, { reply: replyText }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Đã gửi phản hồi thành công!");
-      setReplyingId(null); setReplyText(""); fetchReviews();
+      setReplyingId(null); 
+      setReplyText(""); 
+      fetchReviews();
     } catch (error) { toast.error("Lỗi khi gửi phản hồi"); }
   };
 
   const filteredReviews = reviews.filter(rev => 
     rev.username?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    rev.comment?.toLowerCase().includes(searchQuery.toLowerCase())
+    rev.comment?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    rev.productId?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="manage-product"> {/* Dùng chung class rộng 100% của ManageProduct */}
+    <div className="manage-review-container">
       
-      {/* Khung Header y hệt các trang Sản phẩm */}
-      <div className="admin-header">
-        <div className="header-left">
-          <h2>Quản lý Đánh giá</h2>
-          <div className="search-box">
-            <Search size={18} color="#64748b" />
-            <input 
-              type="text" 
-              placeholder="Tìm theo tên KH, nội dung..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+      {/* Thanh công cụ Tìm kiếm (Giống ManageOrder) */}
+      <div className="mr-toolbar">
+        <div className="mr-search">
+          <Search size={18} color="#64748b" />
+          <input 
+            type="text" 
+            placeholder="Tìm theo tên KH, nội dung, sản phẩm..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
       </div>
 
       {/* Danh sách thẻ Review */}
       {loading ? (
-        <div className="mo-loading">Đang tải...</div>
+        <div className="mr-loading">Đang tải danh sách đánh giá...</div>
+      ) : filteredReviews.length === 0 ? (
+        <div className="mr-empty">Không tìm thấy đánh giá nào phù hợp.</div>
       ) : (
-        <div className="review-list-container">
+        <div className="mr-list">
           {filteredReviews.map((rev) => (
-            <div key={rev._id} className="mo-card" style={{ padding: "24px" }}>
+            <div key={rev._id} className="mr-card">
               
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
-                <div>
-                  <h4 style={{ margin: "0 0 6px 0", fontSize: "16px", color: "#1E293B" }}>{rev.username}</h4>
-                  <p style={{ margin: 0, fontSize: "13px", color: "#64748B" }}>
-                    Sản phẩm: <strong style={{color: "#2563EB"}}>{rev.productId?.name || "Sản phẩm đã xóa"}</strong>
-                  </p>
+              {/* Header của thẻ (Tên KH & Ngày) */}
+              <div className="mr-card-header">
+                <div className="mr-header-left">
+                  <strong>{rev.username}</strong>
+                  <span className="mr-product-name">
+                    Sản phẩm: <strong>{rev.productId?.name || "Sản phẩm đã xóa"}</strong>
+                  </span>
                 </div>
-                <div style={{ textAlign: "right" }}>
-                  <div style={{ display: "flex", gap: "2px", justifyContent: "flex-end" }}>
+                <div className="mr-header-right">
+                  <div className="mr-stars">
                     {[1,2,3,4,5].map(s => <Star key={s} size={16} fill={s <= rev.rating ? "#F59E0B" : "none"} color={s <= rev.rating ? "#F59E0B" : "#CBD5E1"}/>)}
                   </div>
-                  <p style={{ margin: "6px 0 0 0", fontSize: "12px", color: "#94A3B8" }}>
+                  <span className="mr-date">
                     {new Date(rev.createdAt).toLocaleString('vi-VN')}
-                  </p>
+                  </span>
                 </div>
               </div>
               
-              <div style={{ background: "#F8FAFC", padding: "16px", borderRadius: "8px", marginBottom: "16px", fontSize: "14px", color: "#334155", lineHeight: "1.5" }}>
-                {rev.comment}
-              </div>
-
-              {rev.adminReply && replyingId !== rev._id && (
-                <div style={{ background: "#EFF6FF", borderLeft: "3px solid #2563EB", padding: "12px 16px", borderRadius: "0 8px 8px 0", marginBottom: "16px" }}>
-                  <strong style={{ fontSize: "13px", color: "#1D4ED8", display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-                    <CheckCircle2 size={14}/> Phản hồi của bạn:
-                  </strong>
-                  <p style={{ margin: 0, fontSize: "13px", color: "#475569", fontStyle: "italic" }}>"{rev.adminReply}"</p>
+              {/* Body của thẻ (Nội dung) */}
+              <div className="mr-card-body">
+                <div className="mr-comment-box">
+                  {rev.comment}
                 </div>
-              )}
 
-              {replyingId === rev._id && (
-                <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", padding: "16px", borderRadius: "8px", marginBottom: "16px" }}>
-                  <p style={{ margin: "0 0 8px 0", fontSize: "13px", fontWeight: "600", color: "#1E293B" }}>Nhập phản hồi của Shop:</p>
-                  <textarea 
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    rows="3"
-                    style={{ width: "100%", padding: "10px", borderRadius: "6px", border: "1px solid #CBD5E1", fontSize: "13px", marginBottom: "10px", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
-                    placeholder="Nhập nội dung trả lời khách hàng..."
-                  />
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <button 
-                      onClick={() => setReplyText(autoReplyTemplate)}
-                      style={{ background: "#F1F5F9", color: "#475569", border: "none", padding: "8px 12px", borderRadius: "6px", fontSize: "12px", cursor: "pointer", fontWeight: "500" }}
-                    >
-                      ✨ Dùng câu trả lời mẫu
-                    </button>
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <button onClick={() => setReplyingId(null)} style={{ background: "white", border: "1px solid #E2E8F0", padding: "8px 16px", borderRadius: "6px", cursor: "pointer", fontSize: "13px" }}>Hủy</button>
-                      <button onClick={() => submitReply(rev._id)} style={{ background: "#2563EB", color: "white", border: "none", padding: "8px 16px", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: "600" }}>Gửi phản hồi</button>
+                {/* Phản hồi của Shop (Nếu đã có) */}
+                {rev.adminReply && replyingId !== rev._id && (
+                  <div className="mr-admin-reply">
+                    <strong>
+                      <CheckCircle2 size={15}/> Phản hồi của bạn:
+                    </strong>
+                    <p>"{rev.adminReply}"</p>
+                  </div>
+                )}
+
+                {/* Form nhập phản hồi */}
+                {replyingId === rev._id && (
+                  <div className="mr-reply-form">
+                    <p>Nhập phản hồi của Shop:</p>
+                    <textarea 
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      rows="3"
+                      placeholder="Nhập nội dung trả lời khách hàng..."
+                    />
+                    <div className="mr-reply-actions">
+                      <button onClick={() => setReplyText(autoReplyTemplate)} className="btn-template">
+                        ✨ Dùng câu trả lời mẫu
+                      </button>
+                      <div className="mr-reply-btn-group">
+                        <button onClick={() => { setReplyingId(null); setReplyText(""); }} className="btn-cancel-reply">Hủy</button>
+                        <button onClick={() => submitReply(rev._id)} className="btn-submit-reply">Gửi phản hồi</button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #F1F5F9", paddingTop: "16px" }}>
-                <span className={`badge ${rev.status === "active" ? "badge-success" : "badge-secondary"}`}>
+              {/* Footer của thẻ (Hành động) */}
+              <div className="mr-card-footer">
+                <span className={`mr-badge ${rev.status === "active" ? "badge-success" : "badge-secondary"}`}>
                   {rev.status === "active" ? "Đang hiển thị" : "Đã bị ẩn"}
                 </span>
                 
-                <div style={{ display: "flex", gap: "10px" }}>
+                <div className="mr-actions">
                   <button onClick={() => toggleStatus(rev._id)} className="btn-icon" style={{ color: rev.status === "active" ? "#475569" : "#2563EB" }}>
                     {rev.status === "active" ? <><EyeOff size={15}/> Ẩn</> : <><Eye size={15}/> Hiện</>}
                   </button>
-                  <button onClick={() => openReplyBox(rev)} className="btn-icon" style={{ color: "#2563EB", background: "#EFF6FF", borderColor: "#BFDBFE" }}>
+                  <button onClick={() => openReplyBox(rev)} className="btn-icon btn-blue">
                     <MessageSquare size={15}/> {rev.adminReply ? "Sửa phản hồi" : "Trả lời"}
                   </button>
-                  <button onClick={() => handleDelete(rev._id)} className="btn-icon" style={{ color: "#EF4444", background: "#FEF2F2", borderColor: "#FECACA" }}>
+                  <button onClick={() => handleDelete(rev._id)} className="btn-icon btn-red">
                     <Trash2 size={15}/> Xóa
                   </button>
                 </div>
               </div>
+
             </div>
           ))}
         </div>

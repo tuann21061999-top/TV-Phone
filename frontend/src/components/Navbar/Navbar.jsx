@@ -1,5 +1,6 @@
 import "./Navbar.css";
 import { NavLink } from "react-router-dom";
+import { ChevronDown } from "lucide-react"; // Thêm mũi tên cho đẹp
 
 function Navbar() {
   return (
@@ -13,7 +14,7 @@ function Navbar() {
         {/* 🔥 DROPDOWN DANH MỤC */}
         <div className="dropdown">
           <span className="dropdown-title">
-            Danh mục
+            Danh mục <ChevronDown size={16} strokeWidth={2.5} />
           </span>
 
           <div className="dropdown-menu">

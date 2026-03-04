@@ -5,36 +5,53 @@ import ManageAccessory from "../../components/ManageProduct/ManageAccessory";
 import ManageOrder from "../../components/ManageOrder/ManageOrder"; 
 import ManageReview from "../../components/ManageReview/ManageReview";
 import ManageUser from "../../components/ManageUser/ManageUser";
+import ManageBanner from "../../components/ManageBanner/ManageBanner";
+import AdminDashboard from "../../components/AdminDashboard/AdminDashboard";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
-import Header from "../../components/Header/Header";
+
 import "./AdminPage.css";
 
 import { 
   ShoppingBag, FileText, Users, BarChart3, 
-  Package, Smartphone, MousePointer2, Settings 
+  Package, Smartphone, MousePointer2, Settings,
+  LogOut, LayoutDashboard 
 } from "lucide-react";
 
 function AdminPage() {
-  const [activeTab, setActiveTab] = useState("products");
-
-  // Helper để hiển thị tiêu đề động dựa trên Tab đang chọn
+  // Đặt Dashboard làm trang mặc định
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const navigate = useNavigate();
   const getTabTitle = () => {
     switch (activeTab) {
+      case "dashboard": return "Bảng điều khiển";
       case "products": return "Quản lý Điện thoại";
       case "electronics": return "Quản lý Đồ điện tử";
       case "accessories": return "Quản lý Phụ kiện";
       case "orders": return "Quản lý Đơn hàng";
       case "users": return "Quản lý Người dùng";
-      case "stats": return "Báo cáo Thống kê";
+      case "reviews": return "Quản lý Đánh giá";
+      case "banners": return "Quản lý Banner";
       default: return "Bảng điều khiển";
     }
   };
 
+  const handleLogout = () => {
+    // 1. Xóa token hoặc dữ liệu user khỏi localStorage/sessionStorage (nếu có)
+    localStorage.removeItem("token"); 
+    localStorage.removeItem("userInfo"); // Thay đổi key này tùy theo cách bạn lưu trữ
+
+    // 2. Hiển thị toast thông báo thành công
+    toast.success("Đăng xuất thành công!");
+
+    navigate("/login"); 
+  };
+
   return (
     <div className="admin-wrapper">
-      <Header />
-
       <div className="admin-layout">
+        
         {/* SIDEBAR */}
         <aside className="admin-sidebar">
           <div className="sidebar-brand">
@@ -45,6 +62,16 @@ function AdminPage() {
           </div>
 
           <div className="sidebar-menu">
+            <p className="menu-label">TỔNG QUAN</p>
+            <button className={activeTab === "dashboard" ? "active" : ""} onClick={() => setActiveTab("dashboard")}>
+              <LayoutDashboard size={18} /> Bảng điều khiển
+            </button>
+            <button className={activeTab === "banners" ? "active" : ""} onClick={() => setActiveTab("banners")}>
+              <Package size={18} /> Banner
+            </button>
+
+            <hr className="sidebar-divider" />
+
             <p className="menu-label">SẢN PHẨM</p>
             <button className={activeTab === "products" ? "active" : ""} onClick={() => setActiveTab("products")}>
               <Smartphone size={18} /> Điện thoại
@@ -59,20 +86,21 @@ function AdminPage() {
             <hr className="sidebar-divider" />
             
             <p className="menu-label">VẬN HÀNH</p>
-            
-            {/* Nút click để mở tab Orders */}
             <button className={activeTab === "orders" ? "active" : ""} onClick={() => setActiveTab("orders")}>
               <FileText size={18} /> Đơn hàng
             </button>
-
             <button className={activeTab === "users" ? "active" : ""} onClick={() => setActiveTab("users")}>
               <Users size={18} /> Người dùng
             </button>
             <button className={activeTab === "reviews" ? "active" : ""} onClick={() => setActiveTab("reviews")}>
               <BarChart3 size={18} /> Đánh giá
             </button>
-            <button className={activeTab === "stats" ? "active" : ""} onClick={() => setActiveTab("stats")}>
-              <BarChart3 size={18} /> Thống kê
+          </div>
+
+          {/* NÚT ĐĂNG XUẤT NẰM Ở ĐÁY SIDEBAR */}
+          <div className="sidebar-footer">
+            <button className="logout-btn" onClick={handleLogout}>
+              <LogOut size={18} /> Đăng xuất
             </button>
           </div>
         </aside>
@@ -81,24 +109,21 @@ function AdminPage() {
         <main className="admin-content">
           <div className="content-header">
             <h1>{getTabTitle()}</h1>
-            <div className="header-actions">
-              {/* Có thể thêm các nút chung ở đây */}
-            </div>
           </div>
 
           <div className="content-body">
             {/* HIỂN THỊ CÁC TAB */}
+            {activeTab === "dashboard" && <AdminDashboard />}
             {activeTab === "products" && <ManageProduct />}
             {activeTab === "electronics" && <ManageElectronic />}
             {activeTab === "accessories" && <ManageAccessory />}
-            
-            {/* 2. NHÚNG COMPONENT MANAGE ORDER VÀO TAB "orders" */}
             {activeTab === "orders" && <ManageOrder />}
             {activeTab === "reviews" && <ManageReview />}
             {activeTab === "users" && <ManageUser />}
+            {activeTab === "banners" && <ManageBanner />}
 
             {/* EMPTY STATES CHO CÁC TAB CHƯA LÀM */}
-            {(activeTab === "users" || activeTab === "stats") && (
+            {(activeTab === "users") && (
               <div className="empty-state">
                 <Package size={48} className="empty-icon" />
                 <h3>Tính năng đang phát triển</h3>

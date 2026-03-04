@@ -4,12 +4,17 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100%; /* Bắt buộc full-width */
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Toolbar & Search */
 .mo-toolbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between; /* Đẩy bộ lọc sang 2 bên để căn bằng với header sản phẩm */
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .mo-search {
@@ -37,6 +42,25 @@
   font-size: 14px;
 }
 
+.mo-date-filters {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.mo-date-filters select {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #475569;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 /* Tabs */
 .mo-tabs {
   display: flex;
@@ -44,6 +68,8 @@
   overflow-x: auto;
   border-bottom: 2px solid #E2E8F0;
   padding-bottom: 2px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .mo-tab-btn {
@@ -58,6 +84,7 @@
   align-items: center;
   gap: 6px;
   position: relative;
+  white-space: nowrap; /* Chống rớt dòng text tab */
 }
 
 .mo-tab-btn:hover { color: #1E293B; }
@@ -94,14 +121,17 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
 }
 
 .mo-card {
   background: #fff;
   border: 1px solid #E2E8F0;
-  border-radius: 10px;
+  border-radius: 12px; /* Bo góc mượt hơn */
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Card Header */
@@ -109,7 +139,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 20px;
+  padding: 16px 24px;
   background: #F8FAFC;
   border-bottom: 1px solid #E2E8F0;
 }
@@ -117,8 +147,14 @@
 .mo-header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
+
+.mo-header-left strong {
+  font-size: 15px;
+  color: #0f172a;
+}
+
 .mo-date { font-size: 13px; color: #64748B; }
 
 /* Badges Trạng thái */
@@ -146,8 +182,8 @@
   gap: 4px;
   font-size: 12px;
   font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
 }
 .mo-payment-method.cod { background: #F1F5F9; color: #475569; }
 .mo-payment-method.vnpay { background: #EFF6FF; color: #005baa; }
@@ -156,15 +192,16 @@
 /* Card Body */
 .mo-card-body {
   display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 20px;
-  padding: 20px;
+  grid-template-columns: 1fr 2fr; /* Chỉnh lại tỷ lệ cho cân đối hơn */
+  gap: 30px;
+  padding: 24px;
 }
 
 .mo-customer-info p {
-  margin: 0 0 6px 0;
+  margin: 0 0 8px 0;
   font-size: 14px;
   color: #334155;
+  line-height: 1.5;
 }
 
 .mo-items-summary {
@@ -172,34 +209,34 @@
   flex-direction: column;
   gap: 12px;
   border-left: 1px dashed #E2E8F0;
-  padding-left: 20px;
+  padding-left: 30px;
 }
 
 .mo-item-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .mo-item-row img {
-  width: 40px;
-  height: 40px;
-  border-radius: 6px;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
   border: 1px solid #E2E8F0;
   object-fit: cover;
 }
 
 .mo-item-text { flex: 1; }
-.mo-item-name { margin: 0; font-size: 14px; font-weight: 600; color: #1E293B; }
-.mo-item-meta { margin: 0; font-size: 12px; color: #64748B; }
-.mo-item-price { font-size: 14px; font-weight: 700; color: #1E293B; }
+.mo-item-name { margin: 0 0 4px 0; font-size: 14px; font-weight: 600; color: #1E293B; }
+.mo-item-meta { margin: 0; font-size: 13px; color: #64748B; }
+.mo-item-price { font-size: 15px; font-weight: 700; color: #1E293B; }
 
 /* Card Footer */
 .mo-card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  padding: 16px 24px;
   border-top: 1px solid #E2E8F0;
   background: #fff;
 }
@@ -216,26 +253,26 @@
 
 .mo-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
 }
 
 .btn-icon {
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
   color: #475569;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  display: flex; align-items: center; gap: 4px;
+  display: flex; align-items: center; gap: 6px;
 }
-.btn-icon:hover { background: #F1F5F9; }
+.btn-icon:hover { background: #F1F5F9; color: #1e293b; }
 
 .btn-action {
   border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 8px 20px;
+  border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -255,8 +292,6 @@
 .btn-cancel { background: #fff; color: #EF4444; border: 1px solid #FECACA; }
 .btn-cancel:hover { background: #FEF2F2; }
 
-.btn-return { background: #475569; }
-.btn-return:hover { background: #334155; }
 /* =====================================
    MODAL CHI TIẾT ĐƠN HÀNG (ADMIN)
 ===================================== */
@@ -282,7 +317,7 @@
   width: 90%;
   max-width: 900px;
   max-height: 90vh;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -293,7 +328,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 20px 30px;
   background: white;
   border-bottom: 1px solid #E2E8F0;
 }
@@ -302,6 +337,7 @@
   margin: 0;
   font-size: 20px;
   color: #1E293B;
+  font-weight: 700;
 }
 
 .mo-modal-close {
@@ -315,21 +351,21 @@
 .mo-modal-close:hover { color: #EF4444; }
 
 .mo-modal-body {
-  padding: 24px;
+  padding: 30px;
   overflow-y: auto;
 }
 
 .mo-modal-grid {
   display: grid;
   grid-template-columns: 1fr 1.5fr;
-  gap: 24px;
+  gap: 30px;
 }
 
 .mo-detail-box {
   background: white;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
   border: 1px solid #E2E8F0;
   box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
@@ -339,11 +375,12 @@
   font-size: 15px;
   color: #1E293B;
   border-bottom: 1px dashed #E2E8F0;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
+  font-weight: 700;
 }
 
 .mo-detail-box p {
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
   font-size: 14px;
   color: #475569;
   line-height: 1.5;
@@ -355,30 +392,30 @@
 .mo-modal-items {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .mo-modal-item-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding-bottom: 12px;
+  gap: 16px;
+  padding-bottom: 16px;
   border-bottom: 1px solid #F1F5F9;
 }
 .mo-modal-item-row:last-child { border: none; padding-bottom: 0; }
 
 .mo-modal-item-row img {
-  width: 50px;
-  height: 50px;
-  border-radius: 6px;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
   border: 1px solid #E2E8F0;
   object-fit: cover;
 }
 
 .mo-modal-item-info { flex: 1; }
-.mo-modal-item-info .name { margin: 0 0 4px 0; font-size: 14px; font-weight: 600; color: #1E293B; }
+.mo-modal-item-info .name { margin: 0 0 6px 0; font-size: 14px; font-weight: 600; color: #1E293B; }
 .mo-modal-item-info .meta { margin: 0; font-size: 13px; color: #64748B; }
-.mo-modal-item-price { font-weight: 700; color: #1E293B; }
+.mo-modal-item-price { font-weight: 700; color: #1E293B; font-size: 15px; }
 
 /* Summary Box */
 .summary-box { background: #FAFAFA; }
@@ -407,4 +444,8 @@
 /* Responsive Modal */
 @media (max-width: 768px) {
   .mo-modal-grid { grid-template-columns: 1fr; }
+  .mo-toolbar { flex-direction: column; align-items: flex-start; gap: 15px; }
+  .mo-search { width: 100%; }
+  .mo-card-body { grid-template-columns: 1fr; }
+  .mo-items-summary { border-left: none; padding-left: 0; border-top: 1px dashed #e2e8f0; padding-top: 20px; }
 }

@@ -21,6 +21,7 @@ const userRoutes = require("./routes/userRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+const bannerRoutes = require("./routes/bannerRoutes");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -96,6 +97,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/banners", bannerRoutes);
 
 app.use(errorHandler);
 

@@ -1,67 +1,94 @@
+/* ========================================================= */
+/* HEADER BACKGROUND (MÀU XANH DƯƠNG CHỦ ĐẠO)                */
+/* ========================================================= */
 .top-header {
-  background: white;
-  border-bottom: 1px solid #eee;
+  background: #1D4ED8; /* Đổi thành màu xanh dương chủ đạo của bạn */
+  /* Thay đường viền xám bằng viền trắng mờ để ngăn cách nhẹ nhàng với Navbar */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+  padding: 0 16px 16px 16px; /* Thêm padding dưới để tạo khoảng cách với Navbar */
+  height: 100px;
 }
 
 .header-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  max-width: 1200px;
+  width: 90%;
+  margin: 0 auto;
 }
 
-/* Logo */
+/* ========================================================= */
+/* LOGO (CHUYỂN SANG MÀU TRẮNG)                              */
+/* ========================================================= */
 .logo {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   text-decoration: none;
-  color: #111827;
+  color: #FFFFFF; /* Chữ màu trắng */
+  letter-spacing: 0.5px;
 }
 
-/* Search */
+/* ========================================================= */
+/* THANH TÌM KIẾM                                            */
+/* ========================================================= */
 .search-wrapper {
   position: relative;
-  width: 40%;
+  width: 45%; /* Rộng ra một chút cho cân đối */
 }
 
 .search {
   width: 100%;
-  padding: 10px 35px 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  padding: 12px 40px 12px 16px;
+  border-radius: 8px;
+  border: none; /* Bỏ viền vì nền trắng đã đủ nổi bật trên nền xanh */
   outline: none;
+  font-size: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ nhẹ */
 }
 
 .search:focus {
-  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.5); /* Đổi màu viền focus sang vàng cho tone-sur-tone */
 }
 
 .search-icon {
   position: absolute;
-  right: 10px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #9ca3af;
+  color: #64748B;
+  cursor: pointer;
 }
 
-/* Icons */
+/* ========================================================= */
+/* ICONS (CHUYỂN SANG TRẮNG, HOVER VÀNG)                     */
+/* ========================================================= */
 .icons {
   display: flex;
-  gap: 20px;
+  gap: 24px;
 }
 
 .icon-btn {
-  color: #374151;
-  transition: 0.2s;
+  color: #FFFFFF; /* Icon màu trắng */
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-btn:hover {
-  color: #2563eb;
+  color: #FACC15; /* Hover sáng màu vàng */
+  transform: translateY(-2px); /* Hiệu ứng nhấc icon lên nhẹ */
 }
+
+/* ========================================================= */
+/* GIỎ HÀNG VÀ BADGE                                         */
+/* ========================================================= */
 .cart-wrapper {
-  position: relative; /* Làm gốc tọa độ cho badge */
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,18 +96,19 @@
 
 .cart-badge {
   position: absolute;
-  top: -8px;       /* Đẩy lên trên */
-  right: -8px;     /* Đẩy sang phải */
-  background-color: #ef4444; /* Màu đỏ nổi bật */
+  top: -8px;       
+  right: -10px;    
+  background-color: #EF4444; 
   color: white;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: bold;
-  min-width: 14px;
-  height: 12px;
-  border-radius: 50%; /* Làm hình tròn */
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50%; 
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white; /* Tạo viền trắng để nổi bật trên nền trắng */
+  /* Viền của badge phải cùng màu với nền xanh của Header để tạo cảm giác "khoét lỗ" */
+  border: 2px solid #1D4ED8; 
   padding: 2px;
 }

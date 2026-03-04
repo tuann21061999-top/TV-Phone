@@ -1,47 +1,264 @@
+/* ========================================================= */
+/* KHUNG HERO BANNER (GIAO DIỆN KHÁCH HÀNG)                  */
+/* ========================================================= */
 .hero {
-  width: 90%;
-  margin: 30px auto;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: linear-gradient(120deg, #111, #1e3a8a);
-  padding: 40px;
-  border-radius: 20px;
-  color: white;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+  border-radius: 24px;
+  padding: 60px 80px;
+  margin: 30px auto;
+  max-width: 1200px;
+  min-height: 450px;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
-.hero img {
-  width: 350px;
+/* ========================================================= */
+/* NỘI DUNG BÊN TRÁI (TEXT & NÚT BẤM)                        */
+/* ========================================================= */
+.hero-left {
+  flex: 1;
+  max-width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 2;
+  animation: slideInLeft 0.6s ease-out forwards;
 }
 
+/* Badge (VD: SẢN PHẨM MỚI) */
+.hero-left .badge {
+  display: inline-block;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563EB;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  padding: 8px 16px;
+  border-radius: 30px;
+  width: fit-content;
+  text-transform: uppercase;
+}
+
+/* Tiêu đề chính */
 .hero-left h1 {
-  font-size: 38px;
+  font-size: 48px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.2;
+  margin: 0;
 }
 
-.hero-left span {
-  color: #60a5fa;
+.hero-left h1 span {
+  color: #2563EB; /* Nhấn mạnh chữ bằng màu xanh */
 }
 
-.badge {
-  background: #2563eb;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
+/* Tiêu đề phụ / Mô tả */
+.hero-left p {
+  font-size: 18px;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0 0 10px 0;
 }
 
-.primary {
-  background: #2563eb;
-  padding: 10px 25px;
-  border-radius: 8px;
+/* ========================================================= */
+/* KHU VỰC NÚT BẤM                                           */
+/* ========================================================= */
+.buttons {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.buttons .primary {
+  background: #2563EB;
+  color: #FFFFFF;
+  text-decoration: none; /* Vì dùng thẻ <Link> */
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
   border: none;
-  color: white;
-  margin-right: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+  display: inline-block;
+  text-align: center;
 }
 
-.secondary {
-  border: 1px solid white;
+.buttons .primary:hover {
+  background: #1D4ED8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.buttons .secondary {
   background: transparent;
-  padding: 10px 25px;
-  border-radius: 8px;
-  color: white;
+  color: #0F172A;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  border: 2px solid #CBD5E1;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.buttons .secondary:hover {
+  border-color: #0F172A;
+  background: rgba(15, 23, 42, 0.05);
+}
+
+/* Chấm tròn chuyển slide */
+.hero-dots {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.hero-dots span {
+  transition: all 0.3s ease;
+}
+
+.hero-dots span:hover {
+  transform: scale(1.2);
+}
+
+/* ========================================================= */
+/* HÌNH ẢNH BÊN PHẢI                                         */
+/* ========================================================= */
+.hero img {
+  width: 45%;
+  max-height: 450px;
+  object-fit: contain; /* Đảm bảo ảnh không bị méo */
+  z-index: 1;
+  animation: fadeInRight 0.8s ease-out forwards;
+  filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15)); /* Tạo bóng đổ 3D cho ảnh sản phẩm */
+}
+
+/* ========================================================= */
+/* HIỆU ỨNG ANIMATION MƯỢT MÀ KHI CHUYỂN SLIDE               */
+/* ========================================================= */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ========================================================= */
+/* RESPONSIVE (CHO ĐIỆN THOẠI & TABLET)                      */
+/* ========================================================= */
+@media (max-width: 992px) {
+  .hero {
+    padding: 40px;
+    min-height: auto;
+  }
+  
+  .hero-left h1 {
+    font-size: 36px;
+  }
+  
+  .hero-left p {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column-reverse; /* Đảo ngược: Chữ dưới, Ảnh trên */
+    text-align: center;
+    padding: 40px 20px;
+    gap: 30px;
+    border-radius: 16px;
+  }
+
+  .hero-left {
+    max-width: 100%;
+    align-items: center; /* Căn giữa nội dung trên mobile */
+  }
+
+  .hero-left h1 {
+    font-size: 32px;
+  }
+
+  .buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .buttons .primary, 
+  .buttons .secondary {
+    width: 100%; /* Nút full ngang trên điện thoại */
+    box-sizing: border-box;
+  }
+
+  .hero img {
+    width: 80%;
+    max-height: 300px;
+  }
+}
+/* ========================================================= */
+/* NÚT ĐIỀU HƯỚNG TRÁI/PHẢI BÊN TRONG HERO                   */
+/* ========================================================= */
+.hero-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  opacity: 0; /* Mặc định ẩn mờ đi */
+}
+
+/* Kéo nút sang 2 sát 2 mép */
+.hero-nav.prev { left: 20px; }
+.hero-nav.next { right: 20px; }
+
+/* Khi trỏ chuột vào vùng Hero, nút sẽ hiện ra */
+.hero:hover .hero-nav {
+  opacity: 1;
+}
+
+/* Hiệu ứng khi hover vào chính cái nút */
+.hero-nav:hover {
+  background: #FFFFFF;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* ========================================================= */
+/* HIỆU ỨNG ẢNH KHI ĐỔI SLIDE                                */
+/* ========================================================= */
+.hero-image-animate {
+  animation: fadeZoomIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeZoomIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Ẩn nút mũi tên trên điện thoại cho đỡ vướng */
+@media (max-width: 768px) {
+  .hero-nav {
+    display: none; 
+  }
 }

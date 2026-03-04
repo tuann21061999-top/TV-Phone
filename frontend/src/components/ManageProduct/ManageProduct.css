@@ -76,12 +76,64 @@ select { appearance: none; background: url("data:image/svg+xml,%3Csvg xmlns='htt
 /* ==========================================================================
    TABLE & TAGS
    ========================================================================== */
-.table-container { background: #fff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 16px; text-align: left; }
-th { background: #f8fafc; font-size: 13px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
-td { border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #1e293b; }
+/* ==========================================================================
+   TABLE & TAGS
+   ========================================================================== */
+.table-container { 
+    background: #fff; 
+    border-radius: 16px; 
+    overflow: hidden; 
+    border: 1px solid #e2e8f0; 
+    width: 100%; /* Bắt buộc full 100% */
+    box-sizing: border-box; /* Ép viền vào trong */
+}
+
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    table-layout: fixed; /* QUAN TRỌNG: Ép các cột không tự ý co giãn theo chữ */
+}
+
+th, td { 
+    padding: 16px; 
+    text-align: left; 
+    box-sizing: border-box;
+}
+
+th { 
+    background: #f8fafc; 
+    font-size: 13px; 
+    color: #64748b; 
+    text-transform: uppercase; 
+    letter-spacing: 0.05em; 
+}
+
+td { 
+    border-bottom: 1px solid #f1f5f9; 
+    font-size: 14px; 
+    color: #1e293b; 
+    /* Đảm bảo chữ quá dài sẽ có dấu 3 chấm chứ không đẩy bảng ra ngoài */
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
 tr:hover td { background: #fbfcfd; }
+
+/* CHIA CỘT CHO BẢNG: Chỉ định tỷ lệ để 3 trang đồng nhất */
+/* Cột "Sản phẩm" / "Thiết bị" / "Tên phụ kiện" (Cột 1) */
+table th:nth-child(1), table td:nth-child(1) { width: 35%; }
+
+/* Cột "Loại" / "Phân loại" (Cột 2) */
+table th:nth-child(2), table td:nth-child(2) { width: 15%; }
+
+/* Cột "Giá" (Cột 3, 4 tùy trang) */
+table th:nth-child(3), table td:nth-child(3) { width: 15%; }
+table th:nth-child(4), table td:nth-child(4) { width: 15%; }
+
+/* Cột "Thao tác" (Cột cuối cùng) */
+table th:last-child, table td:last-child { width: 10%; text-align: right; padding-right: 24px; }
+
 
 .tags-container { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
 .used-tag { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }

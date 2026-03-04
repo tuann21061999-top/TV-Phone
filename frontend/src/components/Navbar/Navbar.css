@@ -1,76 +1,147 @@
 .navbar {
-  background: #111827;
-  padding: 14px 0;
+  /* Thay màu nền cũ thành cùng mã màu xanh với Header */
+  background: #2152d9; 
+  
+  /* Bỏ viền dưới đi để giao diện trông sạch sẽ hơn */
+  border-bottom: none; 
 }
 
 .navbar-content {
-  max-width: 1400px;
+  max-width: 1200px;
   width: 90%;
-  margin: 0 auto;      /* 🔥 Căn giữa */
+  margin: 0 auto;
   display: flex;
-  justify-content: center; /* 🔥 Căn giữa menu */
-  gap: 30px;
+  justify-content: center;
+  gap: 40px; /* Tăng khoảng cách cho thoáng mắt */
   align-items: center;
 }
 
+/* Tùy chỉnh vùng bấm cho Link to hơn */
 .navbar a,
 .dropdown-title {
-  color: white;
+  color: #F8FAFC;
   text-decoration: none;
   font-weight: 500;
+  font-size: 15px;
   position: relative;
   cursor: pointer;
-  transition: 0.2s;
+  padding: 18px 0; /* Tăng padding để vùng hover rộng ra, dễ bấm */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.3s ease;
+}
+
+/* ========================================================= */
+/* HIỆU ỨNG GẠCH CHÂN (UNDERLINE ANIMATION)                  */
+/* ========================================================= */
+.navbar a::after,
+.dropdown-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0; /* Mặc định ẩn gạch chân */
+  height: 3px;
+  background-color: #FACC15; /* Màu vàng nhấn */
+  border-radius: 4px 4px 0 0;
+  transition: width 0.3s ease;
+}
+
+/* Kéo dài gạch chân khi Hover hoặc Active */
+.navbar a:hover::after,
+.navbar a.active::after,
+.dropdown:hover .dropdown-title::after {
+  width: 100%;
 }
 
 .navbar a:hover,
-.dropdown-title:hover {
-  color: #facc15;
+.dropdown-title:hover,
+.navbar a.active,
+.dropdown:hover .dropdown-title {
+  color: #FACC15;
 }
 
-/* 🔥 DROPDOWN */
+/* Xoay mũi tên 180 độ khi mở Dropdown */
+.dropdown-title svg {
+  transition: transform 0.3s ease;
+}
+.dropdown:hover .dropdown-title svg {
+  transform: rotate(180deg);
+}
+
+/* ========================================================= */
+/* DROPDOWN MENU CAO CẤP                                     */
+/* ========================================================= */
 .dropdown {
   position: relative;
 }
 
 .dropdown-menu {
   position: absolute;
-  top: 120%;
-  left: 0;
-  background: white;
-  min-width: 200px;
-  border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  padding: 10px 0;
-
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(15px); /* Căn giữa menu thả xuống */
+  background: #FFFFFF;
+  min-width: 240px;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15), 0 0 4px rgba(0,0,0,0.05);
+  padding: 8px;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(10px);
-  transition: 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); /* Hiệu ứng nảy nhẹ */
   z-index: 1000;
+  border: 1px solid #F1F5F9;
+}
+
+/* Tạo mũi tên chỉ lên (Tam giác) trên đầu Dropdown */
+.dropdown-menu::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 12px;
+  height: 12px;
+  background: #FFFFFF;
+  border-left: 1px solid #F1F5F9;
+  border-top: 1px solid #F1F5F9;
 }
 
 .dropdown-menu a {
   display: block;
-  padding: 10px 15px;
-  color: #111827;
+  padding: 12px 16px;
+  color: #334155;
   font-weight: 500;
+  font-size: 14px;
   text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
+/* Tắt hiệu ứng gạch chân màu vàng cho các link trong Dropdown */
+.dropdown-menu a::after {
+  display: none; 
+}
+
+/* Hiệu ứng thụt lề khi hover vào item trong menu */
 .dropdown-menu a:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: #F8FAFC;
+  color: #2563EB; /* Đổi màu xanh thương hiệu */
+  padding-left: 22px; /* Thụt vào một chút */
 }
 
-/* 🔥 Hover show menu */
+/* Dropdown Active link */
+.dropdown-menu a.active {
+  background: #EFF6FF;
+  color: #2563EB;
+  font-weight: 600;
+}
+
+/* Hover hiện Dropdown */
 .dropdown:hover .dropdown-menu {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
-}
-
-/* Active link */
-.navbar a.active {
-  color: #facc15;
+  transform: translateX(-50%) translateY(0);
 }
