@@ -74,7 +74,8 @@
   margin: 30px auto;
   padding: 0 20px;
   display: grid;
-  grid-template-columns: 1.7fr 1.3fr; /* Tỉ lệ chia cột Trái/Phải */
+  grid-template-columns: 1.7fr 1.3fr;
+  /* Tỉ lệ chia cột Trái/Phải */
   gap: 30px;
   align-items: start;
 }
@@ -85,7 +86,7 @@
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
   border: 1px solid #f1f5f9;
 }
 
@@ -228,7 +229,7 @@
   background: white;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
   border: 1px solid #f1f5f9;
   margin-bottom: 16px;
 }
@@ -335,6 +336,27 @@
   background: #dbeafe;
 }
 
+.voucher-applied-msg {
+  font-size: 13px;
+  color: #16a34a;
+  margin: -16px 0 16px;
+  font-weight: 500;
+}
+
+.btn-remove-voucher {
+  background: #FEF2F2 !important;
+  color: #EF4444 !important;
+}
+
+.btn-remove-voucher:hover {
+  background: #FEE2E2 !important;
+}
+
+.voucher-input-group input:disabled {
+  background: #F1F5F9;
+  color: #94A3B8;
+}
+
 /* Calculations */
 .summary-calculations {
   border-top: 1px solid #e2e8f0;
@@ -361,7 +383,7 @@
   align-items: flex-start;
 }
 
-.total-row > span {
+.total-row>span {
   font-weight: 700;
   color: #0f172a;
   font-size: 16px;
@@ -489,20 +511,25 @@
   .checkout-container {
     grid-template-columns: 1fr;
   }
+
   .checkout-right {
     position: static;
   }
 }
 
 @media (max-width: 600px) {
-  .form-grid-2, .payment-grid {
+
+  .form-grid-2,
+  .payment-grid {
     grid-template-columns: 1fr;
   }
+
   .checkout-header {
     flex-direction: column;
     gap: 12px;
   }
 }
+
 /* ====== BỔ SUNG CSS CHO ĐỊA CHỈ ====== */
 .section-header-flex {
   display: flex;
@@ -620,15 +647,24 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 600px) {
   .saved-address-list {
-    grid-template-columns: 1fr; /* Xuống 1 cột trên điện thoại */
+    grid-template-columns: 1fr;
+    /* Xuống 1 cột trên điện thoại */
   }
 }
+
 .estimated-delivery-alert {
   background-color: #f0fdf4;
   border: 1px solid #bbf7d0;

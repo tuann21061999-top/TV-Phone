@@ -2,21 +2,24 @@ import { useState } from "react";
 import ManageProduct from "../../components/ManageProduct/ManagePhone";
 import ManageElectronic from "../../components/ManageProduct/ManageElectronic";
 import ManageAccessory from "../../components/ManageProduct/ManageAccessory";
-import ManageOrder from "../../components/ManageOrder/ManageOrder"; 
+import ManageOrder from "../../components/ManageOrder/ManageOrder";
 import ManageReview from "../../components/ManageReview/ManageReview";
 import ManageUser from "../../components/ManageUser/ManageUser";
 import ManageBanner from "../../components/ManageBanner/ManageBanner";
+import ManageFeedback from "../../components/ManageFeedback/ManageFeedback";
 import AdminDashboard from "../../components/AdminDashboard/AdminDashboard";
+import ManageChat from "../../components/ManageChat/ManageChat";
+import ManageVoucher from "../../components/ManageVoucher/ManageVoucher";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 
 import "./AdminPage.css";
 
-import { 
-  ShoppingBag, FileText, Users, BarChart3, 
+import {
+  ShoppingBag, FileText, Users, BarChart3,
   Package, Smartphone, MousePointer2, Settings,
-  LogOut, LayoutDashboard 
+  LogOut, LayoutDashboard, MessageSquare, Ticket
 } from "lucide-react";
 
 function AdminPage() {
@@ -33,25 +36,28 @@ function AdminPage() {
       case "users": return "Quản lý Người dùng";
       case "reviews": return "Quản lý Đánh giá";
       case "banners": return "Quản lý Banner";
+      case "feedbacks": return "Quản lý Phản hồi";
+      case "chat": return "Quản lý Chat";
+      case "vouchers": return "Quản lý Voucher";
       default: return "Bảng điều khiển";
     }
   };
 
   const handleLogout = () => {
     // 1. Xóa token hoặc dữ liệu user khỏi localStorage/sessionStorage (nếu có)
-    localStorage.removeItem("token"); 
+    localStorage.removeItem("token");
     localStorage.removeItem("userInfo"); // Thay đổi key này tùy theo cách bạn lưu trữ
 
     // 2. Hiển thị toast thông báo thành công
     toast.success("Đăng xuất thành công!");
 
-    navigate("/login"); 
+    navigate("/login");
   };
 
   return (
     <div className="admin-wrapper">
       <div className="admin-layout">
-        
+
         {/* SIDEBAR */}
         <aside className="admin-sidebar">
           <div className="sidebar-brand">
@@ -84,7 +90,7 @@ function AdminPage() {
             </button>
 
             <hr className="sidebar-divider" />
-            
+
             <p className="menu-label">VẬN HÀNH</p>
             <button className={activeTab === "orders" ? "active" : ""} onClick={() => setActiveTab("orders")}>
               <FileText size={18} /> Đơn hàng
@@ -94,6 +100,15 @@ function AdminPage() {
             </button>
             <button className={activeTab === "reviews" ? "active" : ""} onClick={() => setActiveTab("reviews")}>
               <BarChart3 size={18} /> Đánh giá
+            </button>
+            <button className={activeTab === "feedbacks" ? "active" : ""} onClick={() => setActiveTab("feedbacks")}>
+              <Package size={18} /> Phản hồi
+            </button>
+            <button className={activeTab === "chat" ? "active" : ""} onClick={() => setActiveTab("chat")}>
+              <MessageSquare size={18} /> Chat
+            </button>
+            <button className={activeTab === "vouchers" ? "active" : ""} onClick={() => setActiveTab("vouchers")}>
+              <Ticket size={18} /> Voucher
             </button>
           </div>
 
@@ -121,6 +136,9 @@ function AdminPage() {
             {activeTab === "reviews" && <ManageReview />}
             {activeTab === "users" && <ManageUser />}
             {activeTab === "banners" && <ManageBanner />}
+            {activeTab === "feedbacks" && <ManageFeedback />}
+            {activeTab === "chat" && <ManageChat />}
+            {activeTab === "vouchers" && <ManageVoucher />}
 
             {/* EMPTY STATES CHO CÁC TAB CHƯA LÀM */}
             {(activeTab === "users") && (

@@ -25,12 +25,13 @@ import Payment from "./pages/Payment/Payment";
 import ManageOrder from "./components/ManageOrder/ManageOrder";
 import OrderDetail from "./pages/OrderDetail/OrderDetail";
 import GlobalDeliveryConfirm from "./components/GlobalDeliveryConfirm/GlobalDeliveryConfirm";
+import ChatWidget from "./components/ChatWidget/ChatWidget";
 import "./App.css";
 
 // Khởi tạo Cloudinary bên ngoài component để tránh khởi tạo lại nhiều lần
 // eslint-disable-next-line react-refresh/only-export-components
-export const cld = new Cloudinary({ 
-  cloud: { cloudName: 'dg4tvqz7g' } 
+export const cld = new Cloudinary({
+  cloud: { cloudName: 'dg4tvqz7g' }
 });
 
 function App() {
@@ -38,7 +39,8 @@ function App() {
     <>
       {/* Toaster đặt ngoài Routes để hiển thị thông báo toàn ứng dụng */}
       <Toaster position="top-right" richColors />
-        <GlobalDeliveryConfirm /> {/* Component này sẽ luôn lắng nghe và hiển thị khi có thông báo cần xác nhận giao hàng */}
+      <GlobalDeliveryConfirm />
+      <ChatWidget />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/phones" element={<PhonePage />} />

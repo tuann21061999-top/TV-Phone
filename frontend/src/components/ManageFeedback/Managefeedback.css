@@ -1,0 +1,176 @@
+.manage-feedback-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  color: #1E293B;
+}
+
+/* Toolbar & Filter */
+.fb-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #E2E8F0;
+}
+
+.fb-toolbar h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.fb-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.fb-filter-select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #CBD5E1;
+  outline: none;
+  background: #F8FAFC;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Bảng Dữ Liệu */
+.fb-table-container {
+  background: #FFFFFF;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  overflow: hidden;
+}
+
+.fb-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.fb-table th {
+  background: #F8FAFC;
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.fb-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #E2E8F0;
+  vertical-align: middle;
+}
+
+.fb-table tr:hover {
+  background: #F8FAFC;
+}
+
+/* Highlight dòng tin nhắn mới */
+.fb-row-new {
+  background: #EFF6FF; /* Nền xanh dương siêu nhạt báo hiệu chưa đọc */
+}
+.fb-row-new:hover {
+  background: #DBEAFE;
+}
+
+/* Info Người gửi */
+.fb-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fb-name { font-weight: 600; font-size: 14px; }
+.fb-email { font-size: 12px; color: #64748B; }
+
+.fb-subject {
+  font-weight: 500;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Cắt bớt nếu tiêu đề quá dài */
+}
+
+/* Badges (Nhãn trạng thái) */
+.fb-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+.fb-badge-new { background: #DBEAFE; color: #2563EB; }
+.fb-badge-read { background: #FEF3C7; color: #D97706; }
+.fb-badge-resolved { background: #D1FAE5; color: #059669; }
+
+/* Các nút bấm */
+.fb-actions { display: flex; gap: 8px; justify-content: center; }
+.btn-icon {
+  background: #F8FAFC; border: 1px solid #E2E8F0; padding: 6px 12px; border-radius: 6px;
+  font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;
+}
+.btn-blue { background: #EFF6FF; color: #2563EB; border-color: #BFDBFE; }
+.btn-blue:hover { background: #DBEAFE; }
+.btn-red { background: #FEF2F2; color: #EF4444; border-color: #FECACA; }
+.btn-red:hover { background: #FEE2E2; }
+
+/* Empty Message */
+.fb-message { text-align: center; padding: 40px; color: #64748B; font-size: 15px; }
+
+/* ========================================================= */
+/* MODAL XEM CHI TIẾT                                        */
+/* ========================================================= */
+.fb-modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center; z-index: 9999;
+}
+
+.fb-modal-content {
+  background: #FFFFFF; width: 600px; max-height: 90vh; border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); display: flex; flex-direction: column;
+}
+
+.fb-modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 24px; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; flex-shrink: 0;
+}
+.fb-modal-header h3 { margin: 0; font-size: 18px; color: #0F172A; }
+.fb-close-btn { background: none; border: none; cursor: pointer; color: #64748B; }
+
+.fb-modal-body {
+  padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px;
+}
+
+/* Phần đọc tin nhắn */
+.fb-customer-section {
+  background: #F8FAFC; padding: 16px; border-radius: 8px; border: 1px solid #E2E8F0;
+  display: flex; flex-direction: column; gap: 10px; font-size: 14px;
+}
+.fb-row { color: #475569; }
+.inline-icon { position: relative; top: 2px; color: #94A3B8; margin-right: 4px; }
+.fb-message-box { background: white; padding: 12px; border-radius: 8px; border: 1px solid #E2E8F0; margin-top: 8px; }
+.fb-message-box p { margin: 8px 0 0 0; line-height: 1.6; color: #1E293B; white-space: pre-wrap; }
+
+/* Phần Form Admin xử lý */
+.fb-admin-section { display: flex; flex-direction: column; gap: 16px; }
+.fb-form-group label { display: block; font-size: 13px; font-weight: 600; color: #1E293B; margin-bottom: 8px; }
+.fb-form-group select, .fb-form-group textarea {
+  width: 100%; padding: 10px 14px; border: 1px solid #CBD5E1; border-radius: 8px; outline: none; box-sizing: border-box; font-family: 'Inter', sans-serif;
+}
+.fb-form-group select:focus, .fb-form-group textarea:focus { border-color: #2563EB; }
+.fb-form-group textarea { resize: vertical; }
+
+.fb-modal-footer {
+  display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #E2E8F0; padding-top: 20px;
+}
+.btn-cancel { background: #fff; border: 1px solid #E2E8F0; padding: 10px 20px; border-radius: 8px; font-weight: 600; color: #475569; cursor: pointer; }
+.btn-submit { background: #2563EB; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }

@@ -47,6 +47,15 @@ function ProductDetail() {
   }, [slug]);
 
   /* ==============================
+     ✅ Kiểm tra sản phẩm có cần chọn RAM/ROM không
+     (device = điện thoại → cần, accessory/electronic → không cần)
+  ============================== */
+  const needsMemorySelection = useMemo(() => {
+    if (!product) return true; // Mặc định cần
+    return product.productType === "device";
+  }, [product]);
+
+  /* ==============================
      1️⃣ Ảnh chính
   ============================== */
   const mainImage = useMemo(() => {
@@ -65,26 +74,38 @@ function ProductDetail() {
 
   /* ==============================
      2️⃣ Variant hiện tại
+     ✅ Cập nhật logic: phụ kiện/electronic chỉ cần chọn màu
   ============================== */
   const currentVariant = useMemo(() => {
-    if (!product || !selectedColor || !selectedMem) return null;
+    if (!product || !selectedColor) return null;
+
+    // Phụ kiện / Đồ điện tử: chỉ cần chọn MÀU → tìm variant theo color
+    if (!needsMemorySelection) {
+      return product.variants.find(
+        v => v.colorName === selectedColor && v.isActive && v.quantity > 0
+      );
+    }
+
+    // Điện thoại: cần chọn cả MÀU + RAM/ROM
+    if (!selectedMem) return null;
 
     const [size, storage] = selectedMem
       .split("/")
-      .map(s => s.trim());   // ✅ thêm trim ở đây
+      .map(s => s.trim());
 
     return product.variants.find(
       v =>
         v.colorName === selectedColor &&
-        v.size.trim() === size &&      // ✅ thêm trim
-        v.storage.trim() === storage && // ✅ thêm trim
+        v.size.trim() === size &&
+        v.storage.trim() === storage &&
         v.isActive &&
         v.quantity > 0
     );
-  }, [product, selectedColor, selectedMem]);
+  }, [product, selectedColor, selectedMem, needsMemorySelection]);
 
   /* ==============================
      3️⃣ Filter 2 chiều
+     ✅ Cập nhật: chỉ tạo memory options cho device (phone)
   ============================== */
   const filterOptions = useMemo(() => {
     if (!product)
@@ -101,6 +122,18 @@ function ProductDetail() {
 
     const allColors = product.colorImages.map(c => c.colorName);
 
+    // Phụ kiện/Electronic: không cần memory options
+    if (!needsMemorySelection) {
+      const validColors = validVariants.map(v => v.colorName);
+      return {
+        allColors,
+        allMemories: [],
+        validColors: [...new Set(validColors)],
+        validMemories: []
+      };
+    }
+
+    // Device (phone): logic filter 2 chiều bình thường
     const allMemories = [
       ...new Set(validVariants.map(v => `${v.size}/${v.storage}`))
     ];
@@ -154,16 +187,38 @@ function ProductDetail() {
       validColors,
       validMemories
     };
-  }, [product, selectedColor, selectedMem]);
+  }, [product, selectedColor, selectedMem, needsMemorySelection]);
 
   if (loading) return <div className="loading-state">Đang tải...</div>;
   if (!product)
     return <div className="error-state">Không tìm thấy sản phẩm</div>;
 
-  const canBuy =
-    currentVariant &&
-    (product.condition !== "used" || selectedCondition);
-  
+  /* ==============================
+     ✅ canBuy: cho phụ kiện/electronic, chỉ cần chọn color
+  ============================== */
+  const canBuy = needsMemorySelection
+    ? currentVariant && (product.condition !== "used" || selectedCondition)
+    : currentVariant && (product.condition !== "used" || selectedCondition);
+
+  /* ==============================
+     ✅ Hiển thị giá: phụ kiện chỉ cần chọn color
+  ============================== */
+  const priceDisplay = () => {
+    if (!needsMemorySelection) {
+      // Phụ kiện/Electronic: chỉ cần chọn color
+      if (!selectedColor) return "Vui lòng chọn màu sắc";
+      return currentVariant
+        ? currentVariant.price.toLocaleString() + "đ"
+        : "Hết hàng";
+    }
+    // Device: cần chọn cả color + RAM/ROM
+    if (!selectedColor || !selectedMem) return "Vui lòng chọn cấu hình";
+    if (product.condition === "used" && !selectedCondition) return "Vui lòng chọn tình trạng";
+    return currentVariant
+      ? currentVariant.price.toLocaleString() + "đ"
+      : "Hết hàng";
+  };
+
   const handleAddToCart = async () => {
     if (!canBuy) return;
 
@@ -178,8 +233,8 @@ function ProductDetail() {
         return;
       }
       const cartData = {
-        productId: product._id.toString(),  
-        variantId: currentVariant._id.toString(), 
+        productId: product._id.toString(),
+        variantId: currentVariant._id.toString(),
         quantity: 1,
         condition: product.condition || "new",
         conditionLevel: selectedCondition || null
@@ -230,42 +285,39 @@ function ProductDetail() {
 
             <div className="price-display">
               <span className="current-price">
-                {selectedColor && selectedMem &&
-                (product.condition !== "used" || selectedCondition)
-                  ? currentVariant
-                    ? currentVariant.price.toLocaleString() + "đ"
-                    : "Hết hàng"
-                  : "Vui lòng chọn cấu hình"}
+                {priceDisplay()}
               </span>
             </div>
 
-            {/* RAM/ROM */}
-            <div className="selection-group">
-              <label>RAM/ROM:</label>
-              <div className="options-grid">
-                {filterOptions.allMemories.map(mem => {
-                  const isValid =
-                    filterOptions.validMemories.includes(mem);
+            {/* RAM/ROM — Chỉ hiển thị cho DEVICE (điện thoại) */}
+            {needsMemorySelection && (
+              <div className="selection-group">
+                <label>RAM/ROM:</label>
+                <div className="options-grid">
+                  {filterOptions.allMemories.map(mem => {
+                    const isValid =
+                      filterOptions.validMemories.includes(mem);
 
-                  return (
-                    <button
-                      key={mem}
-                      className={`opt-btn
-                        ${selectedMem === mem ? "active" : ""}
-                        ${!isValid ? "disabled" : ""}
-                      `}
-                      onClick={() =>
-                        setSelectedMem(
-                          selectedMem === mem ? "" : mem
-                        )
-                      }
-                    >
-                      {mem}
-                    </button>
-                  );
-                })}
+                    return (
+                      <button
+                        key={mem}
+                        className={`opt-btn
+                          ${selectedMem === mem ? "active" : ""}
+                          ${!isValid ? "disabled" : ""}
+                        `}
+                        onClick={() =>
+                          setSelectedMem(
+                            selectedMem === mem ? "" : mem
+                          )
+                        }
+                      >
+                        {mem}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* COLOR */}
             <div className="selection-group">
@@ -334,12 +386,12 @@ function ProductDetail() {
                     image: mainImage,
                     price: currentVariant.price,
                     quantity: 1,
-                    
+
                     // THÊM ĐẦY ĐỦ THUỘC TÍNH NÀY CHO CHECKOUT PAGE
                     color: selectedColor, // Mảng màu
                     size: currentVariant.size, // BẮT BUỘC PHẢI CÓ CHO ĐIỆN THOẠI (RAM) VÀ PHỤ KIỆN
                     storage: currentVariant.storage, // BẮT BUỘC PHẢI CÓ CHO ĐIỆN THOẠI (ROM)
-                    
+
                     condition: product.condition || "new",
                     conditionLevel: selectedCondition || null
                   };

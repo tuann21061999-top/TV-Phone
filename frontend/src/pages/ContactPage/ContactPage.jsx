@@ -1,138 +1,244 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import { toast } from "sonner";
 import "./ContactPage.css";
 import {
-  Search,
-  MapPin,
-  Phone,
-  Mail,
-  Send,
-  Navigation,
-  Plus,
-  Minus,
-  Clock
+  Search, MapPin, Phone, Mail, Send, Navigation, Plus, Minus, Clock,
+  MessageSquare, History, CheckCircle, Info, AlertCircle
 } from "lucide-react";
 
 function ContactPage() {
+  const [activeTab, setActiveTab] = useState("form"); 
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [myFeedbacks, setMyFeedbacks] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
+  // Lấy token mỗi khi component render
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (activeTab === "history" && token) {
+      fetchMyFeedbacks();
+    }
+  }, [activeTab, token]);
+
+  const fetchMyFeedbacks = async () => {
+    try {
+      setLoadingHistory(true);
+      const res = await axios.get("http://localhost:5000/api/feedbacks/mine", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMyFeedbacks(res.data);
+    } catch (error) {
+      console.error("Lỗi tải lịch sử:", error);
+      toast.error("Không thể tải lịch sử phản hồi. Vui lòng thử lại!");
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      toast.error("Vui lòng điền đầy đủ thông tin!");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+      await axios.post("http://localhost:5000/api/feedbacks", formData, config);
+      toast.success("Gửi lời nhắn thành công. Chúng tôi sẽ sớm liên hệ!");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+      
+      if (token) {
+        setActiveTab("history");
+        fetchMyFeedbacks(); // Cập nhật lại list ngay lập tức
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Lỗi khi gửi lời nhắn");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const getStatusDisplay = (status) => {
+    switch (status) {
+      case "new": return <span className="status-badge new"><Clock size={12}/> Chờ xử lý</span>;
+      case "read": return <span className="status-badge read"><Info size={12}/> Đang xử lý</span>;
+      case "resolved": return <span className="status-badge resolved"><CheckCircle size={12}/> Đã giải quyết</span>;
+      default: return null;
+    }
+  };
+
   return (
     <div className="contact-page">
       <Header />
 
       <div className="contact-container">
-        <div className="breadcrumb">
-        </div>
-
-        {/* Title */}
         <div className="contact-header">
-          <h1>Liên hệ với chúng tôi</h1>
-          <p>
-            Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn 24/7.
-            Hãy gửi lời nhắn nếu bạn có bất kỳ thắc mắc nào.
-          </p>
+          <h1>Liên hệ với TechNova</h1>
+          <p>Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn 24/7. Hãy gửi lời nhắn nếu bạn có bất kỳ thắc mắc nào.</p>
         </div>
 
         <div className="contact-layout">
-
-          {/* LEFT SIDE */}
+          {/* ======================= CỘT TRÁI: FORM & LỊCH SỬ ======================= */}
           <div className="contact-left">
-
-            {/* Info Cards */}
-            <div className="contact-cards">
-              <div className="contact-card">
-                <MapPin size={20} />
-                <h3>Địa chỉ</h3>
-                <p>123 Đường Lê Lợi, Quận 1, TP.HCM</p>
-              </div>
-
-              <div className="contact-card">
-                <Phone size={20} />
-                <h3>Hotline</h3>
-                <p>1900 1234 567</p>
-                <span>Hỗ trợ 24/7</span>
-              </div>
-
-              <div className="contact-card">
-                <Mail size={20} />
-                <h3>Email</h3>
-                <p>support@mobilestore.vn</p>
-              </div>
-            </div>
-
-            {/* Contact Form */}
-            <div className="contact-form">
-              <h2>Gửi tin nhắn cho chúng tôi</h2>
-
-              <form>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Họ và tên</label>
-                    <input type="text" placeholder="Nguyễn Văn A" />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Email</label>
-                    <input type="email" placeholder="name@example.com" />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Chủ đề</label>
-                  <input type="text" placeholder="Vấn đề cần hỗ trợ" />
-                </div>
-
-                <div className="form-group">
-                  <label>Lời nhắn</label>
-                  <textarea rows="5" placeholder="Chúng tôi có thể giúp gì cho bạn?" />
-                </div>
-
-                <button type="button" className="send-btn">
-                  <Send size={18} />
-                  Gửi tin nhắn
+            
+            {/* TAB ĐIỀU HƯỚNG */}
+            <div className="contact-tabs">
+              <button className={`tab-btn ${activeTab === "form" ? "active" : ""}`} onClick={() => setActiveTab("form")}>
+                <MessageSquare size={18} /> Gửi tin nhắn mới
+              </button>
+              {token && (
+                <button className={`tab-btn ${activeTab === "history" ? "active" : ""}`} onClick={() => setActiveTab("history")}>
+                  <History size={18} /> Lịch sử hỗ trợ
                 </button>
-              </form>
+              )}
             </div>
 
+            {/* NỘI DUNG TABS */}
+            <div className="contact-content-area">
+              
+              {/* TAB 1: FORM */}
+              {activeTab === "form" ? (
+                <div className="contact-form-box fade-in">
+                  <h2>Bạn cần hỗ trợ điều gì?</h2>
+                  <form onSubmit={handleSubmit}>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label>Họ và tên</label>
+                        <input type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="VD: Nguyễn Văn A" required />
+                      </div>
+                      <div className="form-group">
+                        <label>Email liên hệ</label>
+                        <input type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="name@example.com" required />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label>Chủ đề (Vấn đề bạn gặp phải)</label>
+                      <input type="text" name="subject" value={formData.subject} onChange={handleInputChange} placeholder="VD: Hỗ trợ bảo hành, Tư vấn mua hàng..." required />
+                    </div>
+                    <div className="form-group">
+                      <label>Nội dung chi tiết</label>
+                      <textarea rows="5" name="message" value={formData.message} onChange={handleInputChange} placeholder="Mô tả chi tiết vấn đề để chúng tôi hỗ trợ tốt nhất..." required />
+                    </div>
+                    <button type="submit" className="send-btn" disabled={isSubmitting}>
+                      <Send size={18} /> {isSubmitting ? "Đang xử lý..." : "Gửi yêu cầu hỗ trợ"}
+                    </button>
+                  </form>
+                </div>
+              ) : (
+                
+                /* TAB 2: LỊCH SỬ PHẢN HỒI */
+                <div className="contact-history-box fade-in">
+                  <div className="history-header-title">
+                    <h2>Lịch sử yêu cầu của bạn</h2>
+                    <span className="history-count">Bạn có {myFeedbacks.length} yêu cầu</span>
+                  </div>
+
+                  {loadingHistory ? (
+                    <p className="history-msg">Đang tải dữ liệu...</p>
+                  ) : myFeedbacks.length === 0 ? (
+                    <div className="history-empty">
+                      <AlertCircle size={40} color="#CBD5E1" />
+                      <p>Bạn chưa gửi yêu cầu hỗ trợ nào.</p>
+                      <button onClick={() => setActiveTab("form")} className="btn-outline">Gửi yêu cầu ngay</button>
+                    </div>
+                  ) : (
+                    <div className="history-list">
+                      {myFeedbacks.map((fb) => (
+                        /* Gắn thêm class dựa trên status để làm hiệu ứng Sáng/Tối */
+                        <div key={fb._id} className={`history-card ${fb.status}`}>
+                          <div className="hc-header">
+                            <h4>{fb.subject}</h4>
+                            {getStatusDisplay(fb.status)}
+                          </div>
+                          <span className="hc-date"><Clock size={12}/> {new Date(fb.createdAt).toLocaleString('vi-VN')}</span>
+                          
+                          <div className="hc-message">
+                            <strong>Nội dung gửi:</strong>
+                            <p>{fb.message}</p>
+                          </div>
+
+                          {/* PHẢN HỒI TỪ ADMIN */}
+                          {fb.adminNote ? (
+                            <div className="hc-admin-reply">
+                              <div className="reply-title"><CheckCircle size={14}/> TechNova phản hồi:</div>
+                              <p>{fb.adminNote}</p>
+                            </div>
+                          ) : (
+                            fb.status !== "resolved" && (
+                              <div className="hc-admin-waiting">
+                                <span>Đội ngũ CSKH đang xem xét và sẽ phản hồi sớm nhất...</span>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* RIGHT SIDE - MAP */}
+          {/* ======================= CỘT PHẢI: THÔNG TIN & MAP ======================= */}
           <div className="contact-right">
-            <h3>Vị trí của chúng tôi</h3>
+            
+            <div className="contact-cards-compact">
+              <div className="card-item">
+                <div className="icon-box"><MapPin size={20} color="#1D4ED8"/></div>
+                <div>
+                  <h3>Địa chỉ Showroom</h3>
+                  <p>123 Đường Lê Lợi, Quận 1, TP.HCM</p>
+                </div>
+              </div>
+              <div className="card-item">
+                <div className="icon-box"><Phone size={20} color="#1D4ED8"/></div>
+                <div>
+                  <h3>Hotline Hỗ Trợ</h3>
+                  <p><strong>1900 1234 567</strong> (24/7)</p>
+                </div>
+              </div>
+              <div className="card-item">
+                <div className="icon-box"><Mail size={20} color="#1D4ED8"/></div>
+                <div>
+                  <h3>Email Liên Hệ</h3>
+                  <p>support@technova.vn</p>
+                </div>
+              </div>
+            </div>
 
-            <div className="map-wrapper">
-
+            <div className="map-wrapper shadow-box">
+              <h3>Vị trí trên bản đồ</h3>
               <div className="map-search">
                 <Search size={14} />
-                <input placeholder="Tìm cửa hàng..." />
+                <input placeholder="Tìm cửa hàng gần nhất..." />
               </div>
-
               <div className="map-controls">
                 <button><Plus size={16} /></button>
                 <button><Minus size={16} /></button>
                 <button><Navigation size={16} /></button>
               </div>
-
               <div className="map-card">
-                <div className="status">
-                  <span className="dot"></span>
-                  Cửa hàng trung tâm
-                </div>
-                <p>
-                  <Clock size={12} />
-                  Mở cửa: 08:00 - 21:00 hàng ngày
-                </p>
+                <div className="status"><span className="dot"></span> Đang mở cửa</div>
+                <p><Clock size={12} /> 08:00 - 21:00 hàng ngày</p>
               </div>
-
-              <div className="map-marker">
-                MobileStore Lê Lợi
-              </div>
-
+              <div className="map-marker">TechNova Center</div>
             </div>
+
           </div>
 
         </div>
       </div>
-
       <Footer />
     </div>
   );

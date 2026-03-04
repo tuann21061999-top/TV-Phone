@@ -1,6 +1,8 @@
 const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
+const Voucher = require("../models/Voucher");
+const { validateVoucher, calculateDiscount } = require("./voucherController");
 
 // Hàm bổ trợ cập nhật kho báu
 const updateInventory = async (items, type) => {
@@ -11,11 +13,11 @@ const updateInventory = async (items, type) => {
   for (const item of items) {
     await Product.updateOne(
       { _id: item.productId, "variants._id": item.variantId },
-      { 
-        $inc: { 
-          "variants.$.quantity": multiplier * item.quantity, 
-          totalSold: soldMultiplier * item.quantity 
-        } 
+      {
+        $inc: {
+          "variants.$.quantity": multiplier * item.quantity,
+          totalSold: soldMultiplier * item.quantity
+        }
       }
     );
   }
@@ -25,10 +27,11 @@ const orderController = {
   createOrder: async (req, res) => {
     try {
       const userId = req.user.id;
-      const { 
-        shippingInfo, paymentMethod, shippingFee = 0, 
-        discountAmount = 0, warrantyFee = 0, warrantyType,    
-        items, isBuyNow, isSimulatedPaymentSuccess 
+      const {
+        shippingInfo, paymentMethod, shippingFee = 0,
+        discountAmount = 0, warrantyFee = 0, warrantyType,
+        items, isBuyNow, isSimulatedPaymentSuccess,
+        voucherCode
       } = req.body;
 
       let orderItems = [];
@@ -52,29 +55,58 @@ const orderController = {
         itemsTotal = cart.total;
       }
 
-      const finalTotal = itemsTotal + shippingFee + warrantyFee - discountAmount;
+      // ── Validate voucher server-side nếu có ─────────────
+      let validatedDiscount = discountAmount;
+      let appliedVoucherCode = null;
+
+      if (voucherCode) {
+        const voucher = await Voucher.findOne({ code: voucherCode.toUpperCase() });
+        if (!voucher) {
+          return res.status(400).json({ message: "Mã giảm giá không tồn tại!" });
+        }
+
+        const validation = validateVoucher(voucher, userId, itemsTotal);
+        if (!validation.valid) {
+          return res.status(400).json({ message: validation.message });
+        }
+
+        // Tính lại discount server-side (không tin tưởng frontend)
+        validatedDiscount = calculateDiscount(voucher, itemsTotal);
+        appliedVoucherCode = voucher.code;
+      }
+
+      const finalTotal = itemsTotal + shippingFee + warrantyFee - validatedDiscount;
 
       let initialStatus = "waiting_approval";
       let isOrderPaid = false;
       let orderPaidAt = null;
 
       if (isSimulatedPaymentSuccess) {
-          initialStatus = "paid";
-          isOrderPaid = true;
-          orderPaidAt = new Date();
+        initialStatus = "paid";
+        isOrderPaid = true;
+        orderPaidAt = new Date();
       } else if (paymentMethod === "VNPAY" || paymentMethod === "MOMO") {
-          initialStatus = "pending";
+        initialStatus = "pending";
       }
 
       const newOrder = new Order({
         userId, email: req.user.email, items: orderItems,
         total: finalTotal, shippingInfo, shippingFee,
-        discountAmount, warrantyFee, warrantyType,
+        discountAmount: validatedDiscount, warrantyFee, warrantyType,
         paymentMethod, status: initialStatus,
-        isPaid: isOrderPaid, paidAt: orderPaidAt
+        isPaid: isOrderPaid, paidAt: orderPaidAt,
+        voucherCode: appliedVoucherCode
       });
 
       const savedOrder = await newOrder.save();
+
+      // ── Cập nhật voucher usage sau khi đơn hàng được tạo thành công ──
+      if (appliedVoucherCode) {
+        await Voucher.findOneAndUpdate(
+          { code: appliedVoucherCode },
+          { $inc: { usedCount: 1 }, $addToSet: { usedBy: userId } }
+        );
+      }
 
       // Giảm kho ngay khi đặt COD hoặc thanh toán online thành công (giữ hàng)
       if (paymentMethod === "COD" || isSimulatedPaymentSuccess) {
@@ -112,7 +144,7 @@ const orderController = {
 
   confirmDelivery: async (req, res) => {
     try {
-      const { isAccepted } = req.body; 
+      const { isAccepted } = req.body;
       const order = await Order.findById(req.params.id);
       if (!order) return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
 
@@ -123,7 +155,7 @@ const orderController = {
         order.status = "returned";
         await updateInventory(order.items, "increase");
       }
-      
+
       order.isDeliveryConfirming = false;
       await order.save();
       res.status(200).json({ message: "Xác nhận thành công", order });
@@ -136,7 +168,7 @@ const orderController = {
   getAdminStats: async (req, res) => {
     try {
       const User = require("../models/User"); // Import thêm User model để đếm
-      
+
       const now = new Date();
       const currentYear = now.getFullYear();
       const currentMonth = now.getMonth() + 1;
@@ -145,7 +177,7 @@ const orderController = {
       const allDoneOrders = await Order.find({ status: "done" });
       let totalRevenue = 0;
       let totalImportCost = 0;
-      
+
       allDoneOrders.forEach(order => {
         totalRevenue += (order.total - (order.shippingFee || 0));
         order.items.forEach(item => {
@@ -155,7 +187,7 @@ const orderController = {
 
       const totalProfit = totalRevenue - totalImportCost;
       const totalUsers = await User.countDocuments({ role: "user" });
-      const newOrdersCount = await Order.countDocuments({ 
+      const newOrdersCount = await Order.countDocuments({
         createdAt: { $gte: new Date(now.getFullYear(), now.getMonth(), 1) } // Đơn mới trong tháng
       });
 
@@ -165,7 +197,7 @@ const orderController = {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         const month = d.getMonth() + 1;
         const year = d.getFullYear();
-        
+
         const monthlyOrders = await Order.find({
           status: "done",
           createdAt: {
@@ -182,13 +214,15 @@ const orderController = {
       const topProducts = await Order.aggregate([
         { $match: { status: "done" } },
         { $unwind: "$items" },
-        { $group: {
+        {
+          $group: {
             _id: "$items.productId",
             name: { $first: "$items.name" },
             image: { $first: "$items.image" },
             sales: { $sum: "$items.quantity" },
             revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } }
-        }},
+          }
+        },
         { $sort: { sales: -1 } },
         { $limit: 4 } // Lấy top 4
       ]);
@@ -196,11 +230,13 @@ const orderController = {
       // 4. THỐNG KÊ GÓI BẢO HÀNH ĐÃ BÁN
       const warrantyStats = await Order.aggregate([
         { $match: { status: "done", warrantyType: { $exists: true, $ne: null } } },
-        { $group: {
+        {
+          $group: {
             _id: "$warrantyType",
             count: { $sum: 1 },
             revenue: { $sum: "$warrantyFee" }
-        }},
+          }
+        },
         { $sort: { count: -1 } }
       ]);
 
@@ -238,7 +274,7 @@ const orderController = {
     try {
       const order = await Order.findById(req.params.id);
       if (!order) return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
-      
+
       if (order.userId.toString() !== req.user.id && req.user.role !== 'admin') {
         return res.status(403).json({ message: "Bạn không có quyền xem đơn hàng này" });
       }
@@ -261,8 +297,8 @@ const orderController = {
   notifyDelivery: async (req, res) => {
     try {
       const order = await Order.findByIdAndUpdate(
-        req.params.id, 
-        { isDeliveryConfirming: true }, 
+        req.params.id,
+        { isDeliveryConfirming: true },
         { new: true }
       );
       res.status(200).json({ message: "Đã gửi thông báo cho khách", order });
@@ -273,10 +309,10 @@ const orderController = {
 
   getPendingConfirmations: async (req, res) => {
     try {
-      const orders = await Order.find({ 
-        userId: req.user.id, 
-        status: "shipping", 
-        isDeliveryConfirming: true 
+      const orders = await Order.find({
+        userId: req.user.id,
+        status: "shipping",
+        isDeliveryConfirming: true
       });
       res.status(200).json(orders);
     } catch (error) {
@@ -288,7 +324,7 @@ const orderController = {
     try {
       const order = await Order.findById(req.params.id);
       if (!order) return res.status(404).json({ message: "Không tìm thấy" });
-      
+
       order.status = "paid";
       order.isPaid = true;
       order.paidAt = new Date();
@@ -298,8 +334,8 @@ const orderController = {
       await updateInventory(order.items, "decrease");
 
       res.status(200).json({ message: "Thành công", order });
-    } catch (error) { 
-      res.status(500).json({ error: error.message }); 
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   }
 };

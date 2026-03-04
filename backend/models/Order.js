@@ -18,7 +18,7 @@ const orderSchema = new mongoose.Schema(
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     items: [orderItemSchema],
     total: Number, // Đây sẽ là tổng tiền cuối cùng khách phải trả
-    
+
     // Thông tin giao hàng (lưu dưới dạng object cho gọn, khớp với Frontend)
     shippingInfo: {
       fullName: String,
@@ -33,24 +33,26 @@ const orderSchema = new mongoose.Schema(
     // Đã thay thế các fee cũ bằng các fee thực tế từ Frontend
     shippingFee: { type: Number, default: 0 },
     discountAmount: { type: Number, default: 0 },
-    
+
     warrantyFee: { type: Number, default: 0 },
     warrantyType: { type: String, default: "Bảo hành cơ bản" },
 
-    paymentMethod: { 
-      type: String, 
-      enum: ["COD", "MOMO", "VNPAY"], 
-      default: "COD" 
+    paymentMethod: {
+      type: String,
+      enum: ["COD", "MOMO", "VNPAY"],
+      default: "COD"
     },
-    
-    paymentGatewayId: { type: String }, 
+
+    voucherCode: { type: String, default: null },
+
+    paymentGatewayId: { type: String },
     isPaid: { type: Boolean, default: false },
     paidAt: { type: Date },
     paymentUrl: { type: String },
     // Trong OrderSchema
 
     isDeliveryConfirming: { type: Boolean, default: false },
-    
+
     status: {
       type: String,
       enum: [
@@ -67,7 +69,7 @@ const orderSchema = new mongoose.Schema(
     }
   },
   { timestamps: true }
-  
+
 );
 
 module.exports = mongoose.model("Order", orderSchema);

@@ -3,10 +3,13 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cron = require("node-cron");
+const http = require("http");
+const { Server } = require("socket.io");
 dotenv.config();
 const cloudinary = require("./config/cloudinary");
 const upload = require("./middleware/upload");
 const Order = require("./models/Order");
+const Message = require("./models/Message");
 const fs = require("fs");
 
 
@@ -22,9 +25,24 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const bannerRoutes = require("./routes/bannerRoutes");
+const feedbackRoutes = require("./routes/feedbackRoutes");
+const inventoryRoutes = require("./routes/inventoryRoutes");
+const voucherRoutes = require("./routes/voucherRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 
 const app = express();
 const port = process.env.PORT || 5000;
+
+// =============================
+// ✅ TẠO HTTP SERVER + SOCKET.IO
+// =============================
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Trong production nên giới hạn origin
+    methods: ["GET", "POST"],
+  },
+});
 
 // Middleware
 app.use(cors());
@@ -65,12 +83,12 @@ cron.schedule("*/5 * * * *", async () => {
     // TÌM VÀ CẬP NHẬT: Các đơn hàng 'pending' được tạo trước mốc 15 phút này
     // Chuyển chúng sang trạng thái 'cancelled' (Đã hủy)
     const result = await Order.updateMany(
-      { 
-        status: "pending", 
-        createdAt: { $lte: fifteenMinsAgo } 
+      {
+        status: "pending",
+        createdAt: { $lte: fifteenMinsAgo }
       },
-      { 
-        $set: { status: "cancelled" } 
+      {
+        $set: { status: "cancelled" }
       }
     );
 
@@ -98,8 +116,106 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/banners", bannerRoutes);
+app.use("/api/feedbacks", feedbackRoutes);
+app.use("/api/admin/inventory", inventoryRoutes);
+app.use("/api/vouchers", voucherRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.use(errorHandler);
+
+// =============================
+// ✅ SOCKET.IO - CHAT REAL-TIME
+// =============================
+// Lưu mapping: userId -> socketId để gửi tin nhắn đến đúng người
+const onlineUsers = new Map();
+
+io.on("connection", (socket) => {
+  console.log(`[Socket.io] User connected: ${socket.id}`);
+
+  // Khi user đăng nhập, join room bằng userId
+  socket.on("join_room", (userId) => {
+    onlineUsers.set(userId, socket.id);
+    socket.join(userId); // Mỗi user có 1 room riêng = chính userId
+    console.log(`[Socket.io] User ${userId} joined room`);
+  });
+
+  // Khi gửi tin nhắn
+  socket.on("send_message", async (data) => {
+    try {
+      const { senderId, receiverId, content } = data;
+
+      if (!senderId || !receiverId || !content) {
+        return socket.emit("error_message", { message: "Thiếu thông tin tin nhắn" });
+      }
+
+      // Lưu tin nhắn vào Database
+      const newMessage = await Message.create({
+        senderId,
+        receiverId,
+        content: content.trim(),
+      });
+
+      // Emit tin nhắn đến người nhận
+      io.to(receiverId).emit("receive_message", {
+        _id: newMessage._id,
+        senderId: newMessage.senderId,
+        receiverId: newMessage.receiverId,
+        content: newMessage.content,
+        isRead: newMessage.isRead,
+        createdAt: newMessage.createdAt,
+      });
+
+      // Emit lại cho người gửi (để confirm tin nhắn đã gửi)
+      socket.emit("message_sent", {
+        _id: newMessage._id,
+        senderId: newMessage.senderId,
+        receiverId: newMessage.receiverId,
+        content: newMessage.content,
+        isRead: newMessage.isRead,
+        createdAt: newMessage.createdAt,
+      });
+
+    } catch (error) {
+      console.error("[Socket.io] Lỗi gửi tin nhắn:", error);
+      socket.emit("error_message", { message: "Lỗi gửi tin nhắn" });
+    }
+  });
+
+  // Đánh dấu đã đọc real-time
+  socket.on("mark_read", async ({ readerId, senderId }) => {
+    try {
+      await Message.updateMany(
+        { senderId, receiverId: readerId, isRead: false },
+        { $set: { isRead: true } }
+      );
+      // Thông báo cho người gửi biết tin nhắn đã được đọc
+      io.to(senderId).emit("messages_read", { readerId });
+    } catch (error) {
+      console.error("[Socket.io] Lỗi mark read:", error);
+    }
+  });
+
+  // Typing indicator
+  socket.on("typing", ({ senderId, receiverId }) => {
+    io.to(receiverId).emit("user_typing", { senderId });
+  });
+
+  socket.on("stop_typing", ({ senderId, receiverId }) => {
+    io.to(receiverId).emit("user_stop_typing", { senderId });
+  });
+
+  // Khi user disconnect
+  socket.on("disconnect", () => {
+    // Xóa user khỏi map
+    for (const [userId, socketId] of onlineUsers.entries()) {
+      if (socketId === socket.id) {
+        onlineUsers.delete(userId);
+        console.log(`[Socket.io] User ${userId} disconnected`);
+        break;
+      }
+    }
+  });
+});
 
 // Connect MongoDB
 mongoose
@@ -111,7 +227,7 @@ mongoose
     console.error("Error connecting to MongoDB:", err);
   });
 
-// Start server
-app.listen(port, () => {
+// Start server (dùng HTTP server thay vì app.listen để hỗ trợ Socket.io)
+server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

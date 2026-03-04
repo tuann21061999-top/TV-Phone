@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { 
-  MapPin, Truck, CreditCard, ShieldCheck, ChevronRight, 
-  CheckCircle2, Plus, Phone, Home, User, Wallet, Shield 
+import {
+  MapPin, Truck, CreditCard, ShieldCheck, ChevronRight,
+  CheckCircle2, Plus, Phone, Home, User, Wallet, Shield
 } from "lucide-react";
 import axios from "axios";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import AddressModal from "../../components/Profile/AddressModal";
 import "./CheckoutPage.css";
-import { toast } from "sonner"; 
+import { toast } from "sonner";
 
 // --- CÁC GÓI BẢO HÀNH ---
 const warrantyOptions = [
@@ -21,10 +21,10 @@ const warrantyOptions = [
 const PROVINCE_REGIONS = {
   // Miền Nam (Giao nhanh nhất nếu kho của bạn ở TP.HCM)
   SOUTH: ["Thành phố Hồ Chí Minh", "Bình Dương", "Đồng Nai", "Long An", "Bà Rịa - Vũng Tàu", "Tây Ninh", "Bình Phước", "Tiền Giang", "Bến Tre", "Trà Vinh", "Vĩnh Long", "Đồng Tháp", "An Giang", "Kiên Giang", "Cần Thơ", "Hậu Giang", "Sóc Trăng", "Bạc Liêu", "Cà Mau"],
-  
+
   // Miền Trung
   CENTRAL: ["Đà Nẵng", "Quảng Nam", "Quảng Ngãi", "Bình Định", "Phú Yên", "Khánh Hòa", "Ninh Thuận", "Bình Thuận", "Kon Tum", "Gia Lai", "Đắk Lắk", "Đắk Nông", "Lâm Đồng", "Thừa Thiên Huế", "Quảng Trị", "Quảng Bình", "Hà Tĩnh", "Nghệ An", "Thanh Hóa"],
-  
+
   // Miền Bắc
   NORTH: ["Hà Nội", "Hải Phòng", "Hải Dương", "Hưng Yên", "Bắc Ninh", "Bắc Giang", "Vĩnh Phúc", "Phú Thọ", "Quảng Ninh", "Thái Bình", "Nam Định", "Ninh Bình", "Hà Nam", "Hòa Bình", "Sơn La", "Điện Biên", "Lai Châu", "Lào Cai", "Yên Bái", "Hà Giang", "Tuyên Quang", "Cao Bằng", "Bắc Kạn", "Thái Nguyên", "Lạng Sơn"]
 };
@@ -32,10 +32,10 @@ const PROVINCE_REGIONS = {
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const [loading, setLoading] = useState(true);
   const [checkoutItems, setCheckoutItems] = useState([]);
-  
+
   // State quản lý địa chỉ
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState("");
@@ -47,7 +47,7 @@ const CheckoutPage = () => {
     fullName: "", phone: "", email: "", addressDetail: "", province: "", district: "", ward: "",
   });
 
-  const [shippingFee, setShippingFee] = useState(30000); 
+  const [shippingFee, setShippingFee] = useState(30000);
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [discountCode, setDiscountCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
@@ -56,16 +56,16 @@ const CheckoutPage = () => {
   const [selectedWarranty, setSelectedWarranty] = useState(warrantyOptions[0]);
 
   /* ================= FETCH DATA ================= */
-  
+
   const fetchUserProfile = async (token) => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
       const userRes = await axios.get("http://localhost:5000/api/users/profile", { headers });
-      
+
       // ĐOẠN CODE BỊ THIẾU ĐỂ LƯU ĐỊA CHỈ:
       const user = userRes.data;
       setCurrentUser(user);
-      
+
       if (user.addresses && user.addresses.length > 0) {
         setSavedAddresses(user.addresses);
         if (!selectedAddressId) {
@@ -75,13 +75,13 @@ const CheckoutPage = () => {
       } else {
         setShowAddressModal(true);
       }
-      
+
     } catch (error) {
       // ✅ XỬ LÝ TOKEN HẾT HẠN
       if (error.response?.status === 401) {
         toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
         localStorage.removeItem("token");
-        navigate("/login"); 
+        navigate("/login");
       } else {
         console.error("Lỗi tải profile:", error);
       }
@@ -122,54 +122,54 @@ const CheckoutPage = () => {
       }
     };
     fetchData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location, navigate]);
 
   /* ================= CALCULATIONS ================= */
   const subTotal = checkoutItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  
+
   // CỘNG DỒN TIỀN BẢO HÀNH VÀO TỔNG
   const total = subTotal + shippingFee + selectedWarranty.price - discountAmount;
 
   /* ================= HANDLERS ================= */
   // eslint-disable-next-line no-unused-vars
   const getEstimatedDeliveryDate = (province, shippingFee) => {
-  if (!province) return "Vui lòng chọn địa chỉ";
-  
-  const today = new Date();
-  let minDays = 2;
-  let maxDays = 4;
+    if (!province) return "Vui lòng chọn địa chỉ";
 
-  // Giả sử kho ở TP.HCM
-  if (PROVINCE_REGIONS.SOUTH.includes(province)) {
-    minDays = 1;
-    maxDays = 2;
-  } else if (PROVINCE_REGIONS.CENTRAL.includes(province)) {
-    minDays = 3;
-    maxDays = 4;
-  } else if (PROVINCE_REGIONS.NORTH.includes(province)) {
-    minDays = 3;
-    maxDays = 5;
-  }
+    const today = new Date();
+    let minDays = 2;
+    let maxDays = 4;
 
-  // Nếu là giao hàng hỏa tốc (phí 55k)
-  if (shippingFee > 30000) {
-    return "Giao trong ngày hôm nay (trước 18:00)";
-  }
+    // Giả sử kho ở TP.HCM
+    if (PROVINCE_REGIONS.SOUTH.includes(province)) {
+      minDays = 1;
+      maxDays = 2;
+    } else if (PROVINCE_REGIONS.CENTRAL.includes(province)) {
+      minDays = 3;
+      maxDays = 4;
+    } else if (PROVINCE_REGIONS.NORTH.includes(province)) {
+      minDays = 3;
+      maxDays = 5;
+    }
 
-  const minDate = new Date(today);
-  minDate.setDate(today.getDate() + minDays);
-  
-  const maxDate = new Date(today);
-  maxDate.setDate(today.getDate() + maxDays);
+    // Nếu là giao hàng hỏa tốc (phí 55k)
+    if (shippingFee > 30000) {
+      return "Giao trong ngày hôm nay (trước 18:00)";
+    }
 
-  const options = { day: '2-digit', month: '2-digit' };
-  return `Dự kiến nhận hàng: ${minDate.toLocaleDateString('vi-VN', options)} - ${maxDate.toLocaleDateString('vi-VN', options)}`;
-};
+    const minDate = new Date(today);
+    minDate.setDate(today.getDate() + minDays);
+
+    const maxDate = new Date(today);
+    maxDate.setDate(today.getDate() + maxDays);
+
+    const options = { day: '2-digit', month: '2-digit' };
+    return `Dự kiến nhận hàng: ${minDate.toLocaleDateString('vi-VN', options)} - ${maxDate.toLocaleDateString('vi-VN', options)}`;
+  };
   const handleSelectAddress = (addr, emailParam = "") => {
     setSelectedAddressId(addr._id);
     setShippingInfo({
-      fullName: addr.fullName, phone: addr.phone, email: emailParam || currentUser?.email || "", 
+      fullName: addr.fullName, phone: addr.phone, email: emailParam || currentUser?.email || "",
       addressDetail: addr.detail, province: addr.province, district: addr.district, ward: addr.ward || "",
     });
   };
@@ -188,13 +188,38 @@ const CheckoutPage = () => {
     }
   };
 
-  const handleApplyVoucher = () => {
-    if (discountCode === "TECHNOVA") {
-      setDiscountAmount(200000);
-      toast.success("Áp dụng mã thành công!");
-    } else {
-      toast.error("Mã không hợp lệ!");
+  const [appliedVoucherCode, setAppliedVoucherCode] = useState(null);
+
+  const handleApplyVoucher = async () => {
+    if (!discountCode.trim()) {
+      toast.error("Vui lòng nhập mã giảm giá!");
+      return;
     }
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post(
+        "http://localhost:5000/api/vouchers/apply",
+        { code: discountCode.trim(), orderTotal: subTotal },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setDiscountAmount(res.data.discountAmount);
+      setAppliedVoucherCode(res.data.voucherCode);
+      toast.success(res.data.message);
+    } catch (error) {
+      const msg = error.response?.data?.message || "Mã không hợp lệ!";
+      toast.error(msg);
+      setDiscountAmount(0);
+      setAppliedVoucherCode(null);
+    }
+  };
+
+  const handleRemoveVoucher = () => {
+    setDiscountAmount(0);
+    setAppliedVoucherCode(null);
+    setDiscountCode("");
+    toast.info("Đã hủy mã giảm giá");
   };
 
   const handleSubmit = async () => {
@@ -224,6 +249,7 @@ const CheckoutPage = () => {
       warrantyType: selectedWarranty.name,
       paymentMethod,
       discountAmount,
+      voucherCode: appliedVoucherCode || null,
       total: total, // Đổi từ totalAmount thành total cho khớp Model
       isBuyNow
     };
@@ -231,10 +257,10 @@ const CheckoutPage = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      
+
       // 1. Tạo đơn hàng
-      const res = await axios.post("http://localhost:5000/api/orders/checkout", orderPayload, { 
-        headers: { Authorization: `Bearer ${token}` } 
+      const res = await axios.post("http://localhost:5000/api/orders/checkout", orderPayload, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       const createdOrder = res.data.order;
@@ -248,10 +274,10 @@ const CheckoutPage = () => {
         // Thông thường ở đây bạn sẽ gọi API lấy URL thanh toán
         // Hoặc chuyển sang trang Payment trung gian như bạn đã viết
         navigate("/payment", {
-          state: { 
+          state: {
             orderId: createdOrder._id,
             total: total, // Đồng bộ tên biến
-            paymentMethod: paymentMethod 
+            paymentMethod: paymentMethod
           }
         });
       }
@@ -276,8 +302,8 @@ const CheckoutPage = () => {
             <span>TechNova</span>
           </Link>
           <div className="checkout-steps">
-            <Link to="/cart">Giỏ hàng</Link> <ChevronRight size={14}/>
-            <span className="active">Thanh toán</span> <ChevronRight size={14}/>
+            <Link to="/cart">Giỏ hàng</Link> <ChevronRight size={14} />
+            <span className="active">Thanh toán</span> <ChevronRight size={14} />
             <span>Hoàn tất</span>
           </div>
         </div>
@@ -285,11 +311,11 @@ const CheckoutPage = () => {
 
       <main className="checkout-container">
         <div className="checkout-left">
-          
+
           {/* SECTION 1: ĐỊA CHỈ GIAO HÀNG */}
           <section className="checkout-section">
             <div className="section-header-flex">
-              <h2 className="section-title"><MapPin size={20}/> Thông tin giao hàng</h2>
+              <h2 className="section-title"><MapPin size={20} /> Thông tin giao hàng</h2>
               {shippingInfo.province && (
                 <div className="estimated-delivery-alert">
                   <CheckCircle2 size={16} color="#059669" />
@@ -297,7 +323,7 @@ const CheckoutPage = () => {
                 </div>
               )}
               <button className="btn-add-address-toggle" onClick={() => setShowAddressModal(true)}>
-                <Plus size={16}/> Thêm địa chỉ mới
+                <Plus size={16} /> Thêm địa chỉ mới
               </button>
             </div>
 
@@ -308,14 +334,14 @@ const CheckoutPage = () => {
                     <input type="radio" name="selectedAddress" checked={selectedAddressId === addr._id} onChange={() => handleSelectAddress(addr)} className="hidden-radio" />
                     <div className="address-card-header">
                       <div className="user-name">
-                        <User size={16}/> <strong>{addr.fullName}</strong>
+                        <User size={16} /> <strong>{addr.fullName}</strong>
                         {addr.isDefault && <span className="badge-default">Mặc định</span>}
                       </div>
                       {selectedAddressId === addr._id && <CheckCircle2 size={20} className="check-icon" />}
                     </div>
                     <div className="address-card-body">
-                      <p><Phone size={14}/> {addr.phone}</p>
-                      <p><Home size={14}/> {addr.detail}, {addr.ward ? addr.ward + ", " : ""}{addr.district}, {addr.province}</p>
+                      <p><Phone size={14} /> {addr.phone}</p>
+                      <p><Home size={14} /> {addr.detail}, {addr.ward ? addr.ward + ", " : ""}{addr.district}, {addr.province}</p>
                     </div>
                   </label>
                 ))}
@@ -329,7 +355,7 @@ const CheckoutPage = () => {
 
           {/* SECTION 2: VẬN CHUYỂN */}
           <section className="checkout-section">
-            <h2 className="section-title"><Truck size={20}/> Phương thức vận chuyển</h2>
+            <h2 className="section-title"><Truck size={20} /> Phương thức vận chuyển</h2>
             <div className="shipping-methods">
               <label className={`radio-box ${shippingFee === 30000 ? 'active' : ''}`}>
                 <div className="radio-left">
@@ -357,16 +383,16 @@ const CheckoutPage = () => {
 
           {/* SECTION 3: GÓI BẢO HÀNH */}
           <section className="checkout-section">
-            <h2 className="section-title"><Shield size={20}/> Gói bảo hành (Tùy chọn)</h2>
+            <h2 className="section-title"><Shield size={20} /> Gói bảo hành (Tùy chọn)</h2>
             <div className="shipping-methods">
               {warrantyOptions.map((warranty) => (
                 <label key={warranty.id} className={`radio-box ${selectedWarranty.id === warranty.id ? 'active' : ''}`}>
                   <div className="radio-left">
-                    <input 
-                      type="radio" 
-                      name="warranty" 
-                      checked={selectedWarranty.id === warranty.id} 
-                      onChange={() => setSelectedWarranty(warranty)} 
+                    <input
+                      type="radio"
+                      name="warranty"
+                      checked={selectedWarranty.id === warranty.id}
+                      onChange={() => setSelectedWarranty(warranty)}
                     />
                     <div className="radio-texts">
                       <h4>{warranty.name} ({warranty.duration})</h4>
@@ -383,7 +409,7 @@ const CheckoutPage = () => {
 
           {/* SECTION 4: THANH TOÁN */}
           <section className="checkout-section">
-            <h2 className="section-title"><Wallet size={20}/> Phương thức thanh toán</h2>
+            <h2 className="section-title"><Wallet size={20} /> Phương thức thanh toán</h2>
             <div className="payment-grid">
               <label className={`radio-box ${paymentMethod === 'COD' ? 'active' : ''}`}>
                 <input type="radio" name="payment" checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} />
@@ -418,8 +444,8 @@ const CheckoutPage = () => {
                   <div className="sum-info">
                     <h4>{item.name}</h4>
                     <p className="variant-info">
-                      SL: {item.quantity} 
-                      {(item.color || item.colorName) ? ` | ${item.color || item.colorName}` : ''} 
+                      SL: {item.quantity}
+                      {(item.color || item.colorName) ? ` | ${item.color || item.colorName}` : ''}
                       {(item.storage && item.storage !== "N/A") ? ` | ${item.storage}` : ''}
                       {(!item.storage && item.size && item.size !== "Standard") ? ` | ${item.size}` : ''}
                     </p>
@@ -432,15 +458,28 @@ const CheckoutPage = () => {
             <div className="voucher-section">
               <label>Mã giảm giá / Quà tặng</label>
               <div className="voucher-input-group">
-                <input type="text" placeholder="NHẬP MÃ ƯU ĐÃI" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} />
-                <button onClick={handleApplyVoucher}>Áp dụng</button>
+                <input
+                  type="text"
+                  placeholder="NHẬP MÃ ƯU ĐÃI"
+                  value={discountCode}
+                  onChange={(e) => setDiscountCode(e.target.value)}
+                  disabled={!!appliedVoucherCode}
+                />
+                {appliedVoucherCode ? (
+                  <button onClick={handleRemoveVoucher} className="btn-remove-voucher">Hủy mã</button>
+                ) : (
+                  <button onClick={handleApplyVoucher}>Áp dụng</button>
+                )}
               </div>
+              {appliedVoucherCode && (
+                <p className="voucher-applied-msg">✅ Đã áp dụng mã: <strong>{appliedVoucherCode}</strong></p>
+              )}
             </div>
 
             <div className="summary-calculations">
               <div className="calc-row"><span>Tạm tính</span><span>{subTotal.toLocaleString()}đ</span></div>
               <div className="calc-row"><span>Phí vận chuyển</span><span>{shippingFee.toLocaleString()}đ</span></div>
-              
+
               {/* Thêm dòng hiển thị phí bảo hành */}
               {selectedWarranty.price > 0 && (
                 <div className="calc-row">
@@ -450,7 +489,7 @@ const CheckoutPage = () => {
               )}
 
               {discountAmount > 0 && <div className="calc-row discount-row"><span>Giảm giá</span><span>-{discountAmount.toLocaleString()}đ</span></div>}
-              
+
               <div className="calc-row total-row">
                 <span>Tổng cộng</span>
                 <div className="total-price-wrap">
@@ -462,11 +501,11 @@ const CheckoutPage = () => {
 
             {/* ĐỔI TEXT NÚT TÙY THEO PHƯƠNG THỨC THANH TOÁN */}
             <button className="btn-place-order" onClick={handleSubmit}>
-              {paymentMethod === "COD" ? "ĐẶT HÀNG NGAY" : "TIẾN HÀNH THANH TOÁN"} <ChevronRight size={18}/>
+              {paymentMethod === "COD" ? "ĐẶT HÀNG NGAY" : "TIẾN HÀNH THANH TOÁN"} <ChevronRight size={18} />
             </button>
 
             <div className="security-badges">
-              <span><ShieldCheck size={14}/> Bảo mật 100%</span>
+              <span><ShieldCheck size={14} /> Bảo mật 100%</span>
               <span>✔️ Chính hãng 100%</span>
               <span>🔄 Đổi trả 30 ngày</span>
             </div>
