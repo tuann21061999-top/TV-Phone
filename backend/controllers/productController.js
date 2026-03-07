@@ -7,9 +7,13 @@ const mongoose = require("mongoose");
 
 exports.createProduct = async (req, res) => {
   try {
+    const fs = require('fs');
+    fs.appendFileSync('debug_logs.txt', 'Create Product Payload: ' + JSON.stringify(req.body, null, 2) + '\n');
+    console.log("Create Product Request Body:", JSON.stringify(req.body, null, 2));
     const product = await Product.create(req.body);
     res.status(201).json(product);
   } catch (error) {
+    console.error("Create Product Error:", error.message);
     res.status(400).json({ message: error.message });
   }
 };
@@ -20,11 +24,17 @@ exports.createProduct = async (req, res) => {
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const { type, brand, search, condition } = req.query;
+    const { type, brand, search, condition, admin } = req.query;
 
-    let filter = { isActive: true };
+    let filter = {};
+    if (!admin) filter.isActive = true;
 
-    if (type) filter.productType = type;
+    if (type === 'hot') {
+      filter.isFeatured = true;
+    } else if (type) {
+      filter.productType = type;
+      filter.isFeatured = { $ne: true }; // Loại trừ sản phẩm hot khỏi danh sách thường
+    }
     if (brand) filter.brand = brand;
     if (condition) filter.condition = condition;
 
@@ -89,9 +99,16 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   try {
+    // Explicitly destructure to ensure detailImages is forcefully set if present
+    const updateData = { ...req.body };
+    if (req.body.detailImages) {
+      updateData.detailImages = req.body.detailImages;
+    }
+
+    console.log("Update Product Request Body DetailImages:", updateData.detailImages);
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       {
         new: true,
         runValidators: true,
@@ -104,6 +121,7 @@ exports.updateProduct = async (req, res) => {
 
     res.json(product);
   } catch (error) {
+    console.error("Update Product Error:", error.message);
     res.status(400).json({ message: error.message });
   }
 };

@@ -8,6 +8,7 @@ exports.validateProduct = (req, res, next) => {
     variants,
     highlights,
     colorImages,
+    detailImages,
     condition,
     conditionLevel
   } = req.body;
@@ -59,15 +60,15 @@ exports.validateProduct = (req, res, next) => {
     if (condition === "used") {
       const validLevels = ["99%", "98%", "97%"];
       if (
-  !Array.isArray(conditionLevel) ||
-  conditionLevel.length === 0 ||
-  !conditionLevel.every(lv => validLevels.includes(lv))
-) {
-  return res.status(400).json({
-    message:
-      "Used products must have conditionLevel (99%, 98%, 97%)",
-  });
-}
+        !Array.isArray(conditionLevel) ||
+        conditionLevel.length === 0 ||
+        !conditionLevel.every(lv => validLevels.includes(lv))
+      ) {
+        return res.status(400).json({
+          message:
+            "Used products must have conditionLevel (99%, 98%, 97%)",
+        });
+      }
     }
   }
 
@@ -115,10 +116,10 @@ exports.validateProduct = (req, res, next) => {
 
   for (const variant of variants) {
     const isStorageRequired = productType === "device";
-    
+
     if (!variant.sku || variant.price == null || (isStorageRequired && !variant.storage) || !variant.colorName) {
       return res.status(400).json({
-        message: isStorageRequired 
+        message: isStorageRequired
           ? "Each variant must have sku, price, storage and colorName"
           : "Each variant must have sku, price and colorName",
       });

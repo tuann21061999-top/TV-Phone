@@ -23,12 +23,12 @@ const cartController = {
   addToCart: async (req, res) => {
     try {
       const userId = req.user.id;
-      const { 
-        productId, 
-        variantId, 
-        quantity, 
-        condition, 
-        conditionLevel 
+      const {
+        productId,
+        variantId,
+        quantity,
+        condition,
+        conditionLevel
       } = req.body;
 
       // Tìm sản phẩm trong DB để lấy thông tin chính xác (giá, tên, ảnh)
@@ -55,8 +55,8 @@ const cartController = {
 
       // Kiểm tra xem item này đã có trong giỏ chưa (cùng variant và cùng condition)
       const itemIndex = cart.items.findIndex(
-        (item) => 
-          item.variantId.toString() === variantId && 
+        (item) =>
+          item.variantId.toString() === variantId &&
           item.condition === (condition || "new") &&
           item.conditionLevel === conditionLevel
       );
@@ -64,7 +64,16 @@ const cartController = {
       if (itemIndex > -1) {
         // Nếu đã có, tăng số lượng
         cart.items[itemIndex].quantity += (quantity || 1);
+        // Cập nhật lại giá nếu có thay đổi khuyến mãi
+        const activePrice = (variant.discountPrice != null && variant.promotionEnd && variant.promotionEnd > new Date())
+          ? variant.discountPrice
+          : variant.price;
+        cart.items[itemIndex].price = activePrice;
       } else {
+        const activePrice = (variant.discountPrice != null && variant.promotionEnd && variant.promotionEnd > new Date())
+          ? variant.discountPrice
+          : variant.price;
+
         // Nếu chưa có, thêm mới item vào mảng
         cart.items.push({
           productId,
@@ -76,7 +85,7 @@ const cartController = {
           storage: variant.storage,
           condition: condition || "new",
           conditionLevel: conditionLevel || null,
-          price: variant.price,
+          price: activePrice,
           quantity: quantity || 1
         });
       }
@@ -85,12 +94,12 @@ const cartController = {
       await cart.save();
       res.status(200).json(cart);
     } catch (error) {
-  console.error("ADD TO CART ERROR >>>", error);
-  res.status(500).json({ 
-    message: "Lỗi khi thêm vào giỏ", 
-    error: error.message 
-  });
-}
+      console.error("ADD TO CART ERROR >>>", error);
+      res.status(500).json({
+        message: "Lỗi khi thêm vào giỏ",
+        error: error.message
+      });
+    }
   },
 
   // 3. Cập nhật số lượng (Tăng/Giảm)
@@ -141,13 +150,13 @@ const cartController = {
     try {
       const userId = req.user.id;
       const cart = await Cart.findOne({ userId });
-      
+
       if (cart) {
         cart.items = [];
         cart.total = 0;
         await cart.save();
       }
-      
+
       res.status(200).json({ message: "Đã làm trống giỏ hàng" });
     } catch (error) {
       res.status(500).json({ message: "Lỗi khi dọn giỏ hàng", error: error.message });

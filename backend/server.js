@@ -10,6 +10,8 @@ const cloudinary = require("./config/cloudinary");
 const upload = require("./middleware/upload");
 const Order = require("./models/Order");
 const Message = require("./models/Message");
+const Product = require("./models/Product");
+const Promotion = require("./models/Promotion");
 const fs = require("fs");
 
 
@@ -29,6 +31,9 @@ const feedbackRoutes = require("./routes/feedbackRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
 const voucherRoutes = require("./routes/voucherRoutes");
 const chatRoutes = require("./routes/chatRoutes");
+const promotionRoutes = require("./routes/promotionRoutes");
+const favoriteRoutes = require("./routes/favoriteRoutes");
+const newsRoutes = require("./routes/newsRoutes");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -99,6 +104,40 @@ cron.schedule("*/5 * * * *", async () => {
     // 💡 LƯU Ý: Nếu bạn muốn XÓA HẲN đơn hàng khỏi Database thay vì chuyển thành "Hủy",
     // Hãy thay câu lệnh updateMany ở trên bằng lệnh sau:
     // await Order.deleteMany({ status: "pending", createdAt: { $lte: fifteenMinsAgo } });
+    // === RESET CÁC KHUYẾN MÃI HẾT HẠN ===
+    const now = new Date();
+    const expiredProducts = await Product.find({
+      "variants.promotionEnd": { $lte: now },
+      "variants.discountPrice": { $ne: null }
+    });
+
+    let resetCount = 0;
+    for (const product of expiredProducts) {
+      let changed = false;
+      product.variants.forEach(variant => {
+        if (variant.promotionEnd && variant.promotionEnd <= now && variant.discountPrice != null) {
+          variant.discountType = "none";
+          variant.discountValue = 0;
+          variant.promotionEnd = null;
+          variant.isShockDeal = false;
+          variant.discountPrice = null;
+          changed = true;
+        }
+      });
+      if (changed) {
+        await product.save();
+        // Cũng cập nhật trong collection Promotions
+        await Promotion.findOneAndUpdate(
+          { productId: product._id },
+          { isActive: false, discountType: "none", discountValue: 0, promotionEnd: null, discountedPrice: null }
+        );
+        resetCount++;
+      }
+    }
+
+    if (resetCount > 0) {
+      console.log(`[Cron Job] Đã reset ${resetCount} sản phẩm hết hạn khuyến mãi.`);
+    }
 
   } catch (error) {
     console.error("Lỗi khi chạy cron job tự động hủy đơn:", error);
@@ -120,6 +159,9 @@ app.use("/api/feedbacks", feedbackRoutes);
 app.use("/api/admin/inventory", inventoryRoutes);
 app.use("/api/vouchers", voucherRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/promotions", promotionRoutes);
+app.use("/api/favorites", favoriteRoutes);
+app.use("/api/news", newsRoutes);
 
 app.use(errorHandler);
 
@@ -215,6 +257,40 @@ io.on("connection", (socket) => {
       }
     }
   });
+});
+
+// CRON JOB 2: Tự động chạy mỗi 5 phút để check và xóa khuyến mãi nào hêt hạn
+cron.schedule("*/5 * * * *", async () => {
+  try {
+    const Product = require("./models/Product"); // require here to avoid circular dep issues just in case, or we can use the top level one
+    const now = new Date();
+    // Tìm các sản phẩm có ít nhất 1 variant hết hạn khuyến mãi
+    const products = await Product.find({
+      "variants": {
+        $elemMatch: {
+          promotionEnd: { $lt: now, $ne: null }
+        }
+      }
+    });
+
+    for (const product of products) {
+      let changed = false;
+      for (const variant of product.variants) {
+        if (variant.promotionEnd && variant.promotionEnd < now) {
+          variant.discountType = "none";
+          variant.discountValue = 0;
+          variant.promotionEnd = null;
+          variant.isShockDeal = false;
+          variant.discountPrice = null;
+          changed = true;
+        }
+      }
+      if (changed) await product.save();
+    }
+    // console.log("[Cron] Đã dọn dẹp khuyến mãi hết hạn");
+  } catch (error) {
+    console.error("[Cron] Lỗi khi quản lý khuyến mãi:", error);
+  }
 });
 
 // Connect MongoDB

@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import axios from "axios";
+import { toast } from "sonner";
 import "./ElectronicPage.css";
 import {
   Star,
@@ -11,12 +12,18 @@ import {
   Headphones,
   BatteryPlus,
   Watch,
-  Fan
+  Fan,
+  HeartPlus,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 
 function ElectronicPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [products, setProducts] = useState([]);
-  const [activeCategory, setActiveCategory] = useState("Tất cả");
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
+  const [activeCategory, setActiveCategory] = useState(location.state?.category || "Tất cả");
   const [priceRange, setPriceRange] = useState("all");
   const [ratingFilter, setRatingFilter] = useState("all");
   const [brandFilter, setBrandFilter] = useState("all");
@@ -24,6 +31,10 @@ function ElectronicPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 9;
 
   const categories = [
     { name: "Tất cả", icon: null },
@@ -36,14 +47,21 @@ function ElectronicPage() {
   /* ================= FETCH ================= */
 
   useEffect(() => {
+    if (location.state?.category) {
+      setActiveCategory(location.state.category);
+    }
+  }, [location.state?.category]);
+
+  useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
         const { data } = await axios.get(
-          "http://localhost:5000/api/products?type=electronic"
+          "http://localhost:5000/api/products?productType=electronic"
         );
-        setProducts(data);
-      // eslint-disable-next-line no-unused-vars
+        const electronics = data.filter(p => p.productType === "electronic");
+        setProducts(electronics);
+        // eslint-disable-next-line no-unused-vars
       } catch (err) {
         setError("Không thể tải sản phẩm");
       } finally {
@@ -52,7 +70,44 @@ function ElectronicPage() {
     };
 
     fetchProducts();
+
+    // Fetch favorites nếu đã đăng nhập
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.get("http://localhost:5000/api/favorites", {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(res => {
+        const ids = new Set(res.data.map(p => p._id));
+        setFavoriteIds(ids);
+      }).catch(() => { });
+    }
   }, []);
+
+  const handleToggleFavorite = async (e, productId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.warning("Vui lòng đăng nhập để sử dụng tính năng yêu thích!");
+      navigate("/login");
+      return;
+    }
+    try {
+      const { data } = await axios.post(
+        "http://localhost:5000/api/favorites/toggle",
+        { productId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setFavoriteIds(prev => {
+        const next = new Set(prev);
+        data.isFavorited ? next.add(productId) : next.delete(productId);
+        return next;
+      });
+      toast.success(data.message);
+    } catch {
+      toast.error("Lỗi khi thực hiện yêu thích!");
+    }
+  };
 
   /* ================= NORMALIZE ================= */
 
@@ -78,27 +133,39 @@ function ElectronicPage() {
   const formatPrice = (price) =>
     price?.toLocaleString("vi-VN") + "₫";
 
-  const getLowestPrice = (product) => {
-    if (!product.variants?.length) return 0;
-    return Math.min(...product.variants.map((v) => v.price));
-  };
+  const getPricingInfo = (product) => {
+    if (!product.variants?.length) return { basePrice: 0, finalPrice: 0, discountPercent: 0 };
 
-  const getFinalPrice = (product) => {
-    const basePrice = getLowestPrice(product);
+    let bestBasePrice = Infinity;
+    let bestFinalPrice = Infinity;
+    let bestDiscountPercent = 0;
 
-    const isPromoActive =
-      product.promotion?.discountPercent > 0 &&
-      new Date(product.promotion.startDate) <= new Date() &&
-      new Date(product.promotion.endDate) >= new Date();
+    product.variants.forEach(v => {
+      const now = new Date();
+      let currentActivePrice = v.price;
+      let currentDiscountPercent = 0;
 
-    if (isPromoActive) {
-      return (
-        basePrice -
-        (basePrice * product.promotion.discountPercent) / 100
-      );
-    }
+      if (v.discountPrice != null && v.promotionEnd && new Date(v.promotionEnd) > now) {
+        currentActivePrice = v.discountPrice;
+        if (v.discountType === "percentage") {
+          currentDiscountPercent = v.discountValue;
+        } else if (v.discountType === "fixed") {
+          currentDiscountPercent = Math.round((v.discountValue / v.price) * 100);
+        }
+      }
 
-    return basePrice;
+      if (currentActivePrice < bestFinalPrice) {
+        bestFinalPrice = currentActivePrice;
+        bestBasePrice = v.price;
+        bestDiscountPercent = currentDiscountPercent;
+      }
+    });
+
+    return {
+      basePrice: bestBasePrice === Infinity ? 0 : bestBasePrice,
+      finalPrice: bestFinalPrice === Infinity ? 0 : bestFinalPrice,
+      discountPercent: bestDiscountPercent
+    };
   };
 
   /* ================= GET BRANDS ================= */
@@ -127,7 +194,7 @@ function ElectronicPage() {
     /* 2️⃣ PRICE */
     if (priceRange !== "all") {
       filtered = filtered.filter((product) => {
-        const price = getFinalPrice(product);
+        const price = getPricingInfo(product).finalPrice;
 
         if (priceRange === "under500")
           return price < 500000;
@@ -162,14 +229,14 @@ function ElectronicPage() {
     if (sortOption === "priceAsc") {
       filtered.sort(
         (a, b) =>
-          getFinalPrice(a) - getFinalPrice(b)
+          getPricingInfo(a).finalPrice - getPricingInfo(b).finalPrice
       );
     }
 
     if (sortOption === "priceDesc") {
       filtered.sort(
         (a, b) =>
-          getFinalPrice(b) - getFinalPrice(a)
+          getPricingInfo(b).finalPrice - getPricingInfo(a).finalPrice
       );
     }
 
@@ -198,6 +265,32 @@ function ElectronicPage() {
     setBrandFilter("all");
     setSortOption("default");
   };
+
+  /* ================= PAGINATION ================= */
+  const indexOfLast = currentPage * productsPerPage;
+  const indexOfFirst = indexOfLast - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  const getPaginationNumbers = () => {
+    const pages = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, 4, '...', totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+      }
+    }
+    return pages;
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeCategory, priceRange, ratingFilter, brandFilter, sortOption]);
 
   /* ================= UI ================= */
 
@@ -329,9 +422,9 @@ function ElectronicPage() {
 
             {!loading && !error && (
               <div className="product-grid">
-                {filteredProducts.map((product) => {
-                  const finalPrice =
-                    getFinalPrice(product);
+                {currentProducts.map((product) => {
+                  const { basePrice, finalPrice, discountPercent } = getPricingInfo(product);
+                  const hasDiscount = finalPrice < basePrice;
 
                   return (
                     <div
@@ -343,8 +436,16 @@ function ElectronicPage() {
                         className="product-link"
                       >
                         <div className="product-image">
+                          <button
+                            className={`wishlist-btn ${favoriteIds.has(product._id) ? "liked" : ""}`}
+                            onClick={(e) => handleToggleFavorite(e, product._id)}
+                            title={favoriteIds.has(product._id) ? "Bỏ yêu thích" : "Yêu thích"}
+                          >
+                            <HeartPlus size={18} fill="none" stroke={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"} />
+                          </button>
                           <img
                             src={
+                              product.colorImages?.[0]?.imageUrl ||
                               product.images?.[0] ||
                               "/no-image.png"
                             }
@@ -354,8 +455,21 @@ function ElectronicPage() {
 
                         <h3>{product.name}</h3>
 
+                        <div className="product-highlights-small" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', margin: '5px 0' }}>
+                          {product.highlights?.map((text, idx) => (
+                            <span key={idx} style={{ background: '#f1f5f9', color: '#475569', fontSize: '11px', padding: '4px 8px', borderRadius: '4px' }}>{text}</span>
+                          ))}
+                        </div>
+
                         <div className="product-price">
-                          {formatPrice(finalPrice)}
+                          {hasDiscount && discountPercent > 0 ? (
+                            <>
+                              <span className="old-price" style={{ textDecoration: 'line-through', color: '#9ca3af', marginRight: '6px', fontSize: '12px' }}>{formatPrice(basePrice)}</span>
+                              <span className="new-price" style={{ color: '#ef4444' }}>{formatPrice(finalPrice)}</span>
+                            </>
+                          ) : (
+                            formatPrice(basePrice)
+                          )}
                         </div>
                       </Link>
 
@@ -375,6 +489,36 @@ function ElectronicPage() {
                   Không tìm thấy sản phẩm phù hợp.
                 </div>
               )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="pagination">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                >
+                  <ChevronLeft size={18} />
+                </button>
+
+                {getPaginationNumbers().map((item, index) => (
+                  <button
+                    key={index}
+                    className={`${currentPage === item ? "active" : ""} ${item === '...' ? "dots" : ""}`}
+                    onClick={() => typeof item === 'number' && setCurrentPage(item)}
+                    disabled={item === '...'}
+                  >
+                    {item}
+                  </button>
+                ))}
+
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                >
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            )}
           </section>
         </div>
       </div>

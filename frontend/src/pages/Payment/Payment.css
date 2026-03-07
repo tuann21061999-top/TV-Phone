@@ -1,7 +1,8 @@
 /* Add these to your existing Payment.css */
 
 .payment-simulation-card {
-    max-width: 800px; /* Wider card for the split layout */
+    max-width: 800px;
+    /* Wider card for the split layout */
 }
 
 .payment-simulation-content {
@@ -28,6 +29,14 @@
     color: #1e293b;
 }
 
+.payment-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px;
+    background-color: #f8fafc;
+}
+
 .qr-placeholder {
     width: 200px;
     height: 200px;
@@ -42,13 +51,15 @@
 }
 
 .qr-placeholder.momo {
-    color: #a50064; /* MoMo pink */
+    color: #a50064;
+    /* MoMo pink */
     border-color: #fbcfe8;
     background: #fdf2f8;
 }
 
 .qr-placeholder.vnpay {
-    color: #005baa; /* VNPay blue */
+    color: #005baa;
+    /* VNPay blue */
     border-color: #bfdbfe;
     background: #eff6ff;
 }
@@ -63,7 +74,8 @@
     color: #1e293b;
 }
 
-.momo-test-form, .vnpay-test-form {
+.momo-test-form,
+.vnpay-test-form {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -77,7 +89,8 @@
     margin-bottom: 5px;
 }
 
-.form-group input, .form-group select {
+.form-group input,
+.form-group select {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid #cbd5e1;

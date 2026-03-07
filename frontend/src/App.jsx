@@ -7,10 +7,13 @@ import Home from "./pages/Home/Home";
 import PhonePage from "./components/PhonePage/PhonePage";
 import ElectronicPage from "./components/ElectronicPage/ElectronicPage";
 import AccessoryPage from "./components/AccessoryPage/AccessoryPage";
-import PromotionPage from "./pages/PromotionPage/PromotionPage";
+import Promotions from "./pages/Promotions/Promotions";
 import ContactPage from "./pages/ContactPage/ContactPage";
 import News from "./pages/News/News";
+import NewsDetail from "./pages/NewsDetail/NewsDetail";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
+import SpecDetail from "./pages/SpecDetail/SpecDetail";
+import ReviewPage from "./pages/ReviewPage/ReviewPage";
 import Cart from "./components/Cart/Cart";
 import LoginPage from "./components/LoginPages/LoginPage";
 import RegisterPage from "./components/RegisterPage/RegisterPage";
@@ -26,6 +29,7 @@ import ManageOrder from "./components/ManageOrder/ManageOrder";
 import OrderDetail from "./pages/OrderDetail/OrderDetail";
 import GlobalDeliveryConfirm from "./components/GlobalDeliveryConfirm/GlobalDeliveryConfirm";
 import ChatWidget from "./components/ChatWidget/ChatWidget";
+import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import "./App.css";
 
 // Khởi tạo Cloudinary bên ngoài component để tránh khởi tạo lại nhiều lần
@@ -37,23 +41,26 @@ export const cld = new Cloudinary({
 function App() {
   return (
     <>
-      {/* Toaster đặt ngoài Routes để hiển thị thông báo toàn ứng dụng */}
       <Toaster position="top-right" richColors />
       <GlobalDeliveryConfirm />
       <ChatWidget />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/phones" element={<PhonePage />} />
         <Route path="/electronics" element={<ElectronicPage />} />
         <Route path="/accessories" element={<AccessoryPage />} />
-        <Route path="/promotions" element={<PromotionPage />} />
+        <Route path="/promotions" element={<Promotions />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/news" element={<News />} />
+        <Route path="/news/:slug" element={<NewsDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/product/:slug" element={<ProductDetail />} />
+        <Route path="/product/:slug/specs" element={<SpecDetail />} />
+        <Route path="/product/:slug/reviews" element={<ReviewPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/admin/products" element={<ManageProduct />} />
         <Route path="/admin/electronics" element={<ManageElectronic />} />

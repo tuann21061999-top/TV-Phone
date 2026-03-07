@@ -2,23 +2,37 @@ const mongoose = require("mongoose");
 
 const promotionSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
-    description: String,
-    type: {
-      type: String,
-      enum: ["discount", "gift", "combo", "voucher"],
-      default: "discount"
-    },
+    // Tham chiếu đến sản phẩm
     productId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product"
+      ref: "Product",
+      required: true,
     },
-    discountPercent: Number,
-    discountPrice: Number,
-    giftItem: String,
-    startDate: Date,
-    endDate: Date,
-    image: String
+    productName: { type: String, required: true },
+    productImage: { type: String },
+
+    // Loại và giá trị giảm giá
+    discountType: {
+      type: String,
+      enum: ["fixed", "percentage", "none"],
+      default: "none",
+    },
+    discountValue: { type: Number, default: 0 },
+    promotionEnd: { type: Date, default: null },
+    isShockDeal: { type: Boolean, default: false },
+
+    // Trạng thái
+    isActive: { type: Boolean, default: true },
+
+    // Dữ liệu snapshot: mức giá đại diện cho sản phẩm (variant rẻ nhất có giảm)
+    originalPrice: { type: Number, default: 0 },
+    discountedPrice: { type: Number, default: null },
+
+    // Admin tạo
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   { timestamps: true }
 );

@@ -20,6 +20,10 @@ const variantSchema = new mongoose.Schema(
       type: String, // 8GB RAM (optional)
     },
 
+    condition: {
+      type: String, // Cho hàng cũ: 99%, 98%
+    },
+
     price: {
       type: Number,
       required: true,
@@ -36,6 +40,32 @@ const variantSchema = new mongoose.Schema(
       min: 0,
       default: 0,
     },
+
+    // --- VARIANT DISCOUNT PROPERTIES ---
+    discountPrice: {
+      type: Number,
+      min: 0,
+      default: null,
+    },
+    discountType: {
+      type: String,
+      enum: ["fixed", "percentage", "none"],
+      default: "none",
+    },
+    discountValue: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+    promotionEnd: {
+      type: Date,
+      default: null,
+    },
+    isShockDeal: {
+      type: Boolean,
+      default: false,
+    },
+    // -----------------------------------
 
     isActive: {
       type: Boolean,
@@ -102,6 +132,10 @@ const productSchema = new mongoose.Schema(
       },
     ],
 
+    detailImages: {
+      type: [String],
+      default: [],
+    },
 
     productType: {
       type: String,
@@ -123,6 +157,11 @@ const productSchema = new mongoose.Schema(
 
     specs: {
       type: Object,
+    },
+
+    detailedSpecs: {
+      type: Object,
+      default: {},
     },
 
     /* ===============================

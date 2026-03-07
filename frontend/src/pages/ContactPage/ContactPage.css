@@ -4,9 +4,10 @@
 }
 
 .contact-container {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1400px;
   margin: 40px auto;
-  padding: 0 20px;
+  padding: 0 40px;
 }
 
 .contact-header {
@@ -39,7 +40,7 @@
   flex: 6;
   background: #FFFFFF;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   overflow: hidden;
 }
 
@@ -74,7 +75,9 @@
   border-bottom: 3px solid transparent;
 }
 
-.tab-btn:hover { background: #E2E8F0; }
+.tab-btn:hover {
+  background: #E2E8F0;
+}
 
 .tab-btn.active {
   color: #1D4ED8;
@@ -94,30 +97,121 @@
   color: #1E293B;
 }
 
-.form-row { display: flex; gap: 20px; }
-.form-group { margin-bottom: 20px; flex: 1; }
-.form-group label { display: block; font-size: 14px; font-weight: 600; color: #334155; margin-bottom: 8px; }
-.form-group input, .form-group textarea {
-  width: 100%; padding: 12px 16px; border-radius: 8px; border: 1px solid #CBD5E1; background: #F8FAFC; box-sizing: border-box; outline: none; transition: 0.2s;
+.form-row {
+  display: flex;
+  gap: 20px;
 }
-.form-group input:focus, .form-group textarea:focus { border-color: #1D4ED8; background: #FFF; box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1); }
+
+.form-group {
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #CBD5E1;
+  background: #F8FAFC;
+  box-sizing: border-box;
+  outline: none;
+  transition: 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #1D4ED8;
+  background: #FFF;
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+}
 
 .send-btn {
-  background: #1D4ED8; color: white; border: none; padding: 14px 24px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; transition: 0.2s;
+  background: #1D4ED8;
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  transition: 0.2s;
 }
-.send-btn:hover { background: #1E40AF; transform: translateY(-2px); }
+
+.send-btn:hover {
+  background: #1E40AF;
+  transform: translateY(-2px);
+}
 
 /* ================== TAB 2: LỊCH SỬ PHẢN HỒI ================== */
-.history-header-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.history-header-title h2 { margin: 0; font-size: 20px; color: #1E293B; }
-.history-count { font-size: 13px; font-weight: 600; background: #EFF6FF; color: #1D4ED8; padding: 6px 12px; border-radius: 20px; }
+.history-header-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
 
-.history-empty { text-align: center; padding: 40px 0; color: #64748B; }
-.history-empty p { margin: 16px 0; font-size: 15px; }
-.btn-outline { border: 1px solid #1D4ED8; color: #1D4ED8; background: transparent; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; }
-.btn-outline:hover { background: #EFF6FF; }
+.history-header-title h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #1E293B;
+}
 
-.history-list { display: flex; flex-direction: column; gap: 20px; max-height: 600px; overflow-y: auto; padding-right: 10px; }
+.history-count {
+  font-size: 13px;
+  font-weight: 600;
+  background: #EFF6FF;
+  color: #1D4ED8;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.history-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: #64748B;
+}
+
+.history-empty p {
+  margin: 16px 0;
+  font-size: 15px;
+}
+
+.btn-outline {
+  border: 1px solid #1D4ED8;
+  color: #1D4ED8;
+  background: transparent;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background: #EFF6FF;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
 
 /* === LÕI HIỆU ỨNG THẺ (SÁNG / TỐI) === */
 .history-card {
@@ -128,10 +222,12 @@
 }
 
 /* Trạng thái Mới & Đang xử lý: Sáng rực, đổ bóng nổi bật */
-.history-card.new, .history-card.read {
+.history-card.new,
+.history-card.read {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
-  border-left-color: #3B82F6; /* Đánh dấu viền trái xanh dương */
+  border-left-color: #3B82F6;
+  /* Đánh dấu viền trái xanh dương */
   box-shadow: 0 10px 25px rgba(59, 130, 246, 0.08);
 }
 
@@ -139,46 +235,193 @@
 .history-card.resolved {
   background: #F8FAFC;
   border: 1px dashed #CBD5E1;
-  border-left-color: #10B981; /* Đánh dấu viền trái xanh lá */
-  opacity: 0.7; /* Làm mờ khối này đi */
+  border-left-color: #10B981;
+  /* Đánh dấu viền trái xanh lá */
+  opacity: 0.7;
+  /* Làm mờ khối này đi */
 }
-.history-card.resolved:hover { opacity: 0.9; }
 
-.hc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-.hc-header h4 { margin: 0; font-size: 16px; color: #0F172A; line-height: 1.4; }
-.hc-date { font-size: 12px; color: #64748B; display: flex; align-items: center; gap: 4px; margin-bottom: 12px; }
+.history-card.resolved:hover {
+  opacity: 0.9;
+}
 
-.hc-message { font-size: 14px; color: #334155; background: #F1F5F9; padding: 12px; border-radius: 8px; }
-.hc-message p { margin: 4px 0 0 0; }
+.hc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
 
-.hc-admin-reply { margin-top: 16px; padding: 16px; background: #ECFDF5; border-radius: 8px; border: 1px solid #D1FAE5; }
-.reply-title { font-size: 13px; font-weight: 700; color: #059669; display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
-.hc-admin-reply p { margin: 0; font-size: 14px; color: #065F46; line-height: 1.6;}
+.hc-header h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #0F172A;
+  line-height: 1.4;
+}
 
-.hc-admin-waiting { margin-top: 12px; font-size: 13px; color: #F59E0B; font-style: italic; }
+.hc-date {
+  font-size: 12px;
+  color: #64748B;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.hc-message {
+  font-size: 14px;
+  color: #334155;
+  background: #F1F5F9;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.hc-message p {
+  margin: 4px 0 0 0;
+}
+
+.hc-admin-reply {
+  margin-top: 16px;
+  padding: 16px;
+  background: #ECFDF5;
+  border-radius: 8px;
+  border: 1px solid #D1FAE5;
+}
+
+.reply-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #059669;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.hc-admin-reply p {
+  margin: 0;
+  font-size: 14px;
+  color: #065F46;
+  line-height: 1.6;
+}
+
+.hc-admin-waiting {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #F59E0B;
+  font-style: italic;
+}
 
 /* Status Badges */
-.status-badge { display: flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap;}
-.status-badge.new { background: #DBEAFE; color: #1D4ED8; }
-.status-badge.read { background: #FEF3C7; color: #D97706; }
-.status-badge.resolved { background: #D1FAE5; color: #059669; }
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-badge.new {
+  background: #DBEAFE;
+  color: #1D4ED8;
+}
+
+.status-badge.read {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.status-badge.resolved {
+  background: #D1FAE5;
+  color: #059669;
+}
 
 /* ================== CỘT PHẢI ================== */
-.contact-cards-compact { display: flex; flex-direction: column; gap: 16px; background: #FFFFFF; padding: 24px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
-.card-item { display: flex; gap: 16px; align-items: center; }
-.icon-box { background: #EFF6FF; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
-.card-item h3 { margin: 0 0 4px 0; font-size: 14px; color: #64748B; font-weight: 600;}
-.card-item p { margin: 0; font-size: 15px; color: #0F172A; font-weight: 500;}
+.contact-cards-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #FFFFFF;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
 
-.shadow-box { background: #FFFFFF; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); position: relative; overflow: hidden;}
-.shadow-box h3 { margin-top: 0; margin-bottom: 16px; color: #0F172A; font-size: 18px;}
+.card-item {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.icon-box {
+  background: #EFF6FF;
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-item h3 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #64748B;
+  font-weight: 600;
+}
+
+.card-item p {
+  margin: 0;
+  font-size: 15px;
+  color: #0F172A;
+  font-weight: 500;
+}
+
+.shadow-box {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.shadow-box h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #0F172A;
+  font-size: 18px;
+}
 
 /* Map area giữ nguyên từ CSS cũ của bạn, có thể thêm nền #E2E8F0 cho .map-wrapper nếu cần */
-.fade-in { animation: fadeIn 0.4s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 /* Responsive */
 @media (max-width: 992px) {
-  .contact-layout { flex-direction: column; }
-  .contact-left, .contact-right { flex: none; width: 100%; box-sizing: border-box;}
+  .contact-layout {
+    flex-direction: column;
+  }
+
+  .contact-left,
+  .contact-right {
+    flex: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
 }

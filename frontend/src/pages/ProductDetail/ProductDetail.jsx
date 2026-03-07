@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import axios from "axios";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
@@ -7,10 +7,22 @@ import ProductReview from "../../components/Review/ProductReview";
 import { toast } from "sonner";
 import {
   Cpu,
+  ChevronLeft,
   ChevronRight,
-  ShoppingCart
+  ShoppingCart,
+  HeartPlus,
+  ShieldCheck,
+  RefreshCcw,
+  Truck,
+  CreditCard,
+  Wrench,
+  HeadphonesIcon,
+  ThumbsUp,
+  PackageCheck,
+  FileText
 } from "lucide-react";
 import "./ProductDetail.css";
+import "../SpecDetail/SpecDetail.css"; // Dùng chung CSS cho sticky header
 
 function ProductDetail() {
   const { slug } = useParams();
@@ -20,7 +32,18 @@ function ProductDetail() {
 
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedMem, setSelectedMem] = useState("");
-  const [selectedCondition, setSelectedCondition] = useState(""); // ✅ thêm
+  const [selectedCondition, setSelectedCondition] = useState("");
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [activeImage, setActiveImage] = useState(null);
+
+  const thumbnailsRef = useRef(null);
+
+  const scrollThumbnails = (direction) => {
+    if (thumbnailsRef.current) {
+      const scrollAmount = direction === "left" ? -210 : 210; // Scroll width roughly equal to 3 images
+      thumbnailsRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -36,6 +59,7 @@ function ProductDetail() {
         setSelectedColor("");
         setSelectedMem("");
         setSelectedCondition("");
+        setActiveImage(null);
       } catch (error) {
         console.error("Lỗi lấy sản phẩm:", error);
       } finally {
@@ -46,6 +70,40 @@ function ProductDetail() {
     fetchProduct();
   }, [slug]);
 
+  // Fetch trạng thái yêu thích của sản phẩm hiện tại
+  useEffect(() => {
+    if (!product) return;
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.get("http://localhost:5000/api/favorites", {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(res => {
+        const favIds = res.data.map(p => p._id);
+        setIsFavorited(favIds.includes(product._id));
+      }).catch(() => { });
+    }
+  }, [product]);
+
+  const handleToggleFavorite = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.warning("Vui lòng đăng nhập để sử dụng tính năng yêu thích!");
+      navigate("/login");
+      return;
+    }
+    try {
+      const { data } = await axios.post(
+        "http://localhost:5000/api/favorites/toggle",
+        { productId: product._id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setIsFavorited(data.isFavorited);
+      toast.success(data.message);
+    } catch {
+      toast.error("Lỗi khi thực hiện yêu thích!");
+    }
+  };
+
   /* ==============================
      ✅ Kiểm tra sản phẩm có cần chọn RAM/ROM không
      (device = điện thoại → cần, accessory/electronic → không cần)
@@ -55,10 +113,16 @@ function ProductDetail() {
     return product.productType === "device";
   }, [product]);
 
+  // Khi đổi màu sắc, reset activeImage về null để hiện ảnh màu
+  useEffect(() => {
+    setActiveImage(null);
+  }, [selectedColor]);
+
   /* ==============================
      1️⃣ Ảnh chính
   ============================== */
   const mainImage = useMemo(() => {
+    if (activeImage) return activeImage;
     if (!product) return "";
 
     if (selectedColor) {
@@ -70,7 +134,7 @@ function ProductDetail() {
 
     const defaultColor = product.colorImages.find(c => c.isDefault);
     return defaultColor?.imageUrl || product.colorImages[0]?.imageUrl;
-  }, [product, selectedColor]);
+  }, [product, selectedColor, activeImage]);
 
   /* ==============================
      2️⃣ Variant hiện tại
@@ -98,10 +162,11 @@ function ProductDetail() {
         v.colorName === selectedColor &&
         v.size.trim() === size &&
         v.storage.trim() === storage &&
+        (product.condition !== "used" || v.condition === selectedCondition) &&
         v.isActive &&
         v.quantity > 0
     );
-  }, [product, selectedColor, selectedMem, needsMemorySelection]);
+  }, [product, selectedColor, selectedMem, selectedCondition, needsMemorySelection]);
 
   /* ==============================
      3️⃣ Filter 2 chiều
@@ -117,7 +182,8 @@ function ProductDetail() {
       };
 
     const validVariants = product.variants.filter(
-      v => v.isActive && v.quantity > 0
+      v => v.isActive && v.quantity > 0 &&
+        (product.condition !== "used" || !selectedCondition || v.condition === selectedCondition)
     );
 
     const allColors = product.colorImages.map(c => c.colorName);
@@ -187,7 +253,7 @@ function ProductDetail() {
       validColors,
       validMemories
     };
-  }, [product, selectedColor, selectedMem, needsMemorySelection]);
+  }, [product, selectedColor, selectedMem, selectedCondition, needsMemorySelection]);
 
   if (loading) return <div className="loading-state">Đang tải...</div>;
   if (!product)
@@ -203,20 +269,44 @@ function ProductDetail() {
   /* ==============================
      ✅ Hiển thị giá: phụ kiện chỉ cần chọn color
   ============================== */
+  const getActivePrice = () => {
+    if (!currentVariant) return null;
+    const now = new Date();
+    if (
+      currentVariant.discountPrice != null &&
+      currentVariant.promotionEnd &&
+      new Date(currentVariant.promotionEnd) > now
+    ) {
+      return {
+        base: currentVariant.price,
+        sale: currentVariant.discountPrice,
+        isDiscount: true
+      };
+    }
+    return { base: currentVariant.price, sale: currentVariant.price, isDiscount: false };
+  };
+
+  const priceData = getActivePrice();
+
   const priceDisplay = () => {
     if (!needsMemorySelection) {
-      // Phụ kiện/Electronic: chỉ cần chọn color
       if (!selectedColor) return "Vui lòng chọn màu sắc";
-      return currentVariant
-        ? currentVariant.price.toLocaleString() + "đ"
-        : "Hết hàng";
+      if (!currentVariant) return "Hết hàng";
+    } else {
+      if (!selectedColor || !selectedMem) return "Vui lòng chọn cấu hình";
+      if (product.condition === "used" && !selectedCondition) return "Vui lòng chọn tình trạng";
+      if (!currentVariant) return "Hết hàng";
     }
-    // Device: cần chọn cả color + RAM/ROM
-    if (!selectedColor || !selectedMem) return "Vui lòng chọn cấu hình";
-    if (product.condition === "used" && !selectedCondition) return "Vui lòng chọn tình trạng";
-    return currentVariant
-      ? currentVariant.price.toLocaleString() + "đ"
-      : "Hết hàng";
+
+    if (priceData.isDiscount) {
+      return (
+        <div className="price-wrapper">
+          <span className="current-price text-danger">{priceData.sale.toLocaleString()}đ</span>
+          <span className="old-price-detail">{priceData.base.toLocaleString()}đ</span>
+        </div>
+      );
+    }
+    return <span className="current-price">{priceData.base.toLocaleString()}đ</span>;
   };
 
   const handleAddToCart = async () => {
@@ -260,6 +350,26 @@ function ProductDetail() {
     <div className="product-detail-page">
       <Header />
 
+      {/* STICKY TOP HEADER BAR */}
+      {product && (
+        <div className="spec-sticky-header">
+          <div className="spec-container sticky-content">
+            <div className="sticky-product-info">
+              <img src={mainImage} alt={product.name} />
+              <div>
+                <h2 className="sticky-title">{product.name}</h2>
+                <span className="sticky-price">{priceData?.base?.toLocaleString() || 0}đ</span>
+              </div>
+            </div>
+            <div className="sticky-nav">
+              <span className="nav-link active">Tổng quan</span>
+              <Link to={`/product/${slug}/specs`} className="nav-link">Thông số kỹ thuật</Link>
+              <Link to={`/product/${slug}/reviews`} className="nav-link">Đánh giá</Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="product-detail-container">
         <nav className="breadcrumb">
           <Link to="/">Trang chủ</Link> <ChevronRight size={14} />
@@ -277,6 +387,53 @@ function ProductDetail() {
                 className="main-image"
               />
             </div>
+            {/* THUMBNAILS - DETAIL IMAGES */}
+            {product.detailImages && product.detailImages.length > 0 && (
+              <div className="thumbnail-slider-wrapper">
+                {product.detailImages.length > 4 && (
+                  <button className="slider-btn" onClick={() => scrollThumbnails('left')}>
+                    <ChevronLeft size={32} strokeWidth={1} />
+                  </button>
+                )}
+
+                <div className="detail-thumbnails" ref={thumbnailsRef}>
+                  {product.detailImages.map((imgUrl, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        padding: '4px',
+                        border: activeImage === imgUrl ? '1px solid #cbd5e1' : '1px solid #e2e8f0',
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                        width: '75px',
+                        height: '75px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: '#fff'
+                      }}
+                      onClick={() => setActiveImage(imgUrl)}
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`${product.name} chi tiết ${idx + 1}`}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'contain' // Contain to prevent cropping like in the screenshot
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {product.detailImages.length > 4 && (
+                  <button className="slider-btn" onClick={() => scrollThumbnails('right')}>
+                    <ChevronRight size={32} strokeWidth={1} />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* INFO */}
@@ -284,94 +441,174 @@ function ProductDetail() {
             <h1>{product.name}</h1>
 
             <div className="price-display">
-              <span className="current-price">
-                {priceDisplay()}
-              </span>
+              {priceDisplay()}
             </div>
 
-            {/* RAM/ROM — Chỉ hiển thị cho DEVICE (điện thoại) */}
-            {needsMemorySelection && (
-              <div className="selection-group">
-                <label>RAM/ROM:</label>
-                <div className="options-grid">
-                  {filterOptions.allMemories.map(mem => {
-                    const isValid =
-                      filterOptions.validMemories.includes(mem);
-
-                    return (
-                      <button
-                        key={mem}
-                        className={`opt-btn
-                          ${selectedMem === mem ? "active" : ""}
-                          ${!isValid ? "disabled" : ""}
-                        `}
-                        onClick={() =>
-                          setSelectedMem(
-                            selectedMem === mem ? "" : mem
-                          )
-                        }
-                      >
-                        {mem}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* COLOR */}
-            <div className="selection-group">
-              <label>Màu sắc:</label>
-              <div className="options-grid">
-                {filterOptions.allColors.map(color => {
-                  const isValid =
-                    filterOptions.validColors.includes(color);
-
-                  return (
-                    <button
-                      key={color}
-                      className={`opt-btn
-                        ${selectedColor === color ? "active" : ""}
-                        ${!isValid ? "disabled" : ""}
-                      `}
-                      onClick={() =>
-                        setSelectedColor(
-                          selectedColor === color ? "" : color
-                        )
-                      }
-                    >
-                      {color}
-                    </button>
-                  );
-                })}
-              </div>
+            {/* HIGHLIGHTS */}
+            <div className="product-highlights-detail">
+              {product.highlights?.map((h, i) => (
+                <div key={i} className="highlight-item-detail">✓ {h}</div>
+              ))}
             </div>
 
-            {/* ✅ CONDITION LEVEL (Máy cũ) */}
-            {product.condition === "used" &&
-              product.conditionLevel &&
-              product.conditionLevel.length > 0 && (
+            <div className="config-and-commitments">
+              <div className="config-section">
+                {/* ✅ CONDITION LEVEL (Máy cũ) */}
+                {product.condition === "used" &&
+                  product.conditionLevel &&
+                  product.conditionLevel.length > 0 && (
+                    <div className="selection-group">
+                      <label>Tình trạng:</label>
+                      <div className="options-grid">
+                        {product.conditionLevel.map(level => {
+                          const validConds = product.variants.filter(v => v.isActive && v.quantity > 0).map(v => v.condition);
+                          const isValid = validConds.includes(level);
+                          return (
+                            <button
+                              key={level}
+                              className={`opt-btn
+                                ${selectedCondition === level ? "active" : ""}
+                                ${!isValid ? "disabled" : ""}
+                              `}
+                              onClick={() =>
+                                isValid && setSelectedCondition(
+                                  selectedCondition === level ? "" : level
+                                )
+                              }
+                            >
+                              {level}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                {/* RAM/ROM — Chỉ hiển thị cho DEVICE (điện thoại) */}
+                {needsMemorySelection && (
+                  <div className="selection-group">
+                    <label>RAM/ROM:</label>
+                    <div className="options-grid">
+                      {filterOptions.allMemories.map(mem => {
+                        const isValid =
+                          filterOptions.validMemories.includes(mem);
+
+                        return (
+                          <button
+                            key={mem}
+                            className={`opt-btn
+                              ${selectedMem === mem ? "active" : ""}
+                              ${!isValid ? "disabled" : ""}
+                            `}
+                            onClick={() =>
+                              setSelectedMem(
+                                selectedMem === mem ? "" : mem
+                              )
+                            }
+                          >
+                            {mem}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* COLOR */}
                 <div className="selection-group">
-                  <label>Tình trạng:</label>
+                  <label>Màu sắc:</label>
                   <div className="options-grid">
-                    {product.conditionLevel.map(level => (
-                      <button
-                        key={level}
-                        className={`opt-btn
-                          ${selectedCondition === level ? "active" : ""}
-                        `}
-                        onClick={() =>
-                          setSelectedCondition(
-                            selectedCondition === level ? "" : level
-                          )
-                        }
-                      >
-                        {level}
-                      </button>
-                    ))}
+                    {filterOptions.allColors.map(color => {
+                      const isValid =
+                        filterOptions.validColors.includes(color);
+
+                      return (
+                        <button
+                          key={color}
+                          className={`opt-btn
+                            ${selectedColor === color ? "active" : ""}
+                            ${!isValid ? "disabled" : ""}
+                          `}
+                          onClick={() =>
+                            setSelectedColor(
+                              selectedColor === color ? "" : color
+                            )
+                          }
+                        >
+                          {color}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-              )}
+
+                {/* ✅ CONDITION LEVEL (Máy cũ) */}
+              </div>
+
+              {/* COMMITMENTS SECTION */}
+              <div className="commitments-section">
+                {product.productType === "device" && (
+                  <>
+                    <div className="commitment-item">
+                      <ShieldCheck size={24} />
+                      <span>Bảo hành chính hãng 12 tháng</span>
+                    </div>
+                    <div className="commitment-item">
+                      <RefreshCcw size={24} />
+                      <span>1 đổi 1 trong 30 ngày nếu có lỗi NSX</span>
+                    </div>
+                    <div className="commitment-item">
+                      <Truck size={24} />
+                      <span>Giao hàng siêu tốc trong 2h</span>
+                    </div>
+                    <div className="commitment-item">
+                      <CreditCard size={24} />
+                      <span>Trả góp 0% qua thẻ tín dụng</span>
+                    </div>
+                  </>
+                )}
+                {product.productType === "electronic" && (
+                  <>
+                    <div className="commitment-item">
+                      <ShieldCheck size={24} />
+                      <span>Bảo hành chính hãng 24 tháng</span>
+                    </div>
+                    <div className="commitment-item">
+                      <Wrench size={24} />
+                      <span>Miễn phí lắp đặt tại nhà</span>
+                    </div>
+                    <div className="commitment-item">
+                      <HeadphonesIcon size={24} />
+                      <span>Hỗ trợ kỹ thuật 24/7</span>
+                    </div>
+                    <div className="commitment-item">
+                      <RefreshCcw size={24} />
+                      <span>Đổi trả tận nhà trong 7 ngày</span>
+                    </div>
+                  </>
+                )}
+                {product.productType === "accessory" && (
+                  <>
+                    <div className="commitment-item">
+                      <RefreshCcw size={24} />
+                      <span>Bảo hành 6 tháng lỗi 1 đổi 1</span>
+                    </div>
+                    <div className="commitment-item">
+                      <ThumbsUp size={24} />
+                      <span>Tương thích hoàn toàn với thiết bị</span>
+                    </div>
+                    <div className="commitment-item">
+                      <Truck size={24} />
+                      <span>Giao hàng toàn quốc siêu tốc</span>
+                    </div>
+                    <div className="commitment-item">
+                      <PackageCheck size={24} />
+                      <span>Kiểm tra hàng trước khi thanh toán</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
 
             <div className="action-buttons">
               <button
@@ -384,7 +621,7 @@ function ProductDetail() {
                     variantId: currentVariant._id,
                     name: product.name,
                     image: mainImage,
-                    price: currentVariant.price,
+                    price: priceData.sale,
                     quantity: 1,
 
                     // THÊM ĐẦY ĐỦ THUỘC TÍNH NÀY CHO CHECKOUT PAGE
@@ -412,35 +649,69 @@ function ProductDetail() {
               >
                 <ShoppingCart size={20} /> Thêm vào giỏ
               </button>
+              <button
+                className={`btn-favorite-detail ${isFavorited ? "liked" : ""}`}
+                onClick={handleToggleFavorite}
+                title={isFavorited ? "Bỏ yêu thích" : "Thêm vào yêu thích"}
+              >
+                <HeartPlus size={20} fill="none" stroke={isFavorited ? "#ef4444" : "#6b7280"} />
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* THÔNG SỐ KỸ THUẬT */}
-      <div className="specs-section">
-        <h3 className="specs-title">
-          <Cpu size={18} /> Thông số kỹ thuật
-        </h3>
-
-        <div className="specs-table">
-          {product.specs && Object.keys(product.specs).length > 0 ? (
-            Object.entries(product.specs).map(([key, value]) => (
-              <div className="spec-row" key={key}>
-                <span className="spec-key">{key}</span>
-                <span className="spec-value">{value}</span>
+      {/* THÔNG TIN CHI TIẾT & THÔNG SỐ KỸ THUẬT */}
+      <div className="product-bottom-details">
+        {/* MÔ TẢ SẢN PHẨM */}
+        <div className="description-section">
+          <h3 className="section-title">
+            <FileText size={18} /> Đặc điểm nổi bật
+          </h3>
+          <div className="description-content">
+            {product.description ? (
+              <div className="desc-text" style={{ whiteSpace: 'pre-line' }}>
+                {product.description}
               </div>
-            ))
-          ) : (
-            <div className="no-specs">
-              Chưa có thông số kỹ thuật
+            ) : (
+              <div className="no-info">chưa có thông tin phù hợp</div>
+            )}
+          </div>
+        </div>
+
+        {/* THÔNG SỐ KỸ THUẬT */}
+        <div className="specs-section">
+          <h3 className="section-title">
+            <Cpu size={18} /> Thông số kỹ thuật
+          </h3>
+
+          <div className="specs-table">
+            {product.specs && Object.keys(product.specs).length > 0 ? (
+              Object.entries(product.specs).map(([key, value]) => (
+                <div className="spec-row" key={key}>
+                  <span className="spec-key">{key}</span>
+                  <span className="spec-value">{value}</span>
+                </div>
+              ))
+            ) : (
+              <div className="no-specs">
+                chưa có thông tin phù hợp
+              </div>
+            )}
+          </div>
+
+          {/* Nút xem chi tiết thông số */}
+          {product.detailedSpecs && Object.keys(product.detailedSpecs).length > 0 && (
+            <div className="view-detailed-specs-action" style={{ marginTop: '20px', textAlign: 'center' }}>
+              <Link to={`/product/${slug}/specs`} className="btn-view-spec-detail">
+                <Cpu size={18} /> Xem cấu hình chi tiết
+              </Link>
             </div>
           )}
         </div>
       </div>
-      <ProductReview productId={product._id} />
       <Footer />
-    </div>
+    </div >
   );
 }
 

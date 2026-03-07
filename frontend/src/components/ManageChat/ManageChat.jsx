@@ -272,8 +272,8 @@ function ManageChat() {
                                     <div
                                         key={msg._id || idx}
                                         className={`mc-msg ${msg.senderId === adminId || msg.senderId?._id === adminId
-                                                ? "sent"
-                                                : "received"
+                                            ? "sent"
+                                            : "received"
                                             }`}
                                     >
                                         {msg.content}

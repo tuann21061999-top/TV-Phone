@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { 
-  User, Package, MapPin, Tag, LogOut, Plus, 
+import {
+  User, Package, MapPin, Tag, LogOut, Plus,
   Trash2, CreditCard, Edit, Heart, Search, Eye,
   Camera, XCircle, Loader2, AlertCircle
 } from "lucide-react";
@@ -12,6 +12,7 @@ import Footer from "../Footer/Footer";
 import axios from "axios";
 import AddressModal from "./AddressModal";
 import PaymentModal from "./PaymentModal";
+import ProductCard from "../Product/ProductCard";
 import "./Profile.css";
 
 const Profile = () => {
@@ -28,6 +29,9 @@ const Profile = () => {
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [activeOrderFilter, setActiveOrderFilter] = useState("all");
+
+  const [favorites, setFavorites] = useState([]);
+  const [loadingFavorites, setLoadingFavorites] = useState(false);
 
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = React.useRef(null);
@@ -62,8 +66,8 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       const { data } = await axios.put(
-        "http://localhost:5000/api/users/update-avatar", 
-        formData, 
+        "http://localhost:5000/api/users/update-avatar",
+        formData,
         { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }
       );
 
@@ -83,8 +87,8 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       const { data } = await axios.put(
-        "http://localhost:5000/api/users/update", 
-        { avatar: "" }, 
+        "http://localhost:5000/api/users/update",
+        { avatar: "" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -106,9 +110,9 @@ const Profile = () => {
             alt="Default Avatar"
           />
         )}
-        
-        <button 
-          className="avatar-upload-btn" 
+
+        <button
+          className="avatar-upload-btn"
           onClick={() => fileInputRef.current.click()}
           disabled={isUploading}
         >
@@ -121,15 +125,15 @@ const Profile = () => {
           </button>
         )}
       </div>
-      
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        hidden 
-        accept="image/*" 
-        onChange={handleAvatarChange} 
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        hidden
+        accept="image/*"
+        onChange={handleAvatarChange}
       />
-      
+
       <div className="user-info">
         <h4>{user.name}</h4>
         <p className="user-email-sub">{user.email}</p>
@@ -163,8 +167,36 @@ const Profile = () => {
 
   useEffect(() => {
     fetchUserAndOrders();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Fetch danh sách yêu thích khi chuyển tab
+  useEffect(() => {
+    if (activeTab === "favorites") {
+      const fetchFavorites = async () => {
+        setLoadingFavorites(true);
+        try {
+          const token = localStorage.getItem("token");
+          const { data } = await axios.get("http://localhost:5000/api/favorites", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setFavorites(data);
+        } catch (error) {
+          console.error("Error fetching favorites:", error);
+        } finally {
+          setLoadingFavorites(false);
+        }
+      };
+      fetchFavorites();
+    }
+  }, [activeTab]);
+
+  // Khi user bỏ yêu thích trong tab favorites → xóa khỏi danh sách
+  const handleFavoriteToggle = (productId, isFavorited) => {
+    if (!isFavorited) {
+      setFavorites((prev) => prev.filter((p) => p._id !== productId));
+    }
+  };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -179,8 +211,8 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/orders/admin/${orderId}/status`, 
-        { status: "cancelled" }, 
+        `http://localhost:5000/api/orders/admin/${orderId}/status`,
+        { status: "cancelled" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Đã hủy đơn hàng thành công.");
@@ -191,7 +223,7 @@ const Profile = () => {
   };
 
   /* ================= LỌC & HIỂN THỊ ĐƠN HÀNG ================= */
-  
+
   const filteredOrders = orders.filter(order => {
     if (activeOrderFilter === "all") return true;
     if (activeOrderFilter === "waiting") return ["waiting_approval", "pending", "paid"].includes(order.status);
@@ -337,8 +369,8 @@ const Profile = () => {
 
                 <div className="order-status-tabs">
                   {filterOrderTabs.map(tab => (
-                    <button 
-                      key={tab.id} 
+                    <button
+                      key={tab.id}
                       className={`status-tab-btn ${activeOrderFilter === tab.id ? "active" : ""}`}
                       onClick={() => setActiveOrderFilter(tab.id)}
                     >
@@ -359,7 +391,7 @@ const Profile = () => {
                   <div className="orders-list">
                     {filteredOrders.map(order => (
                       <div key={order._id} className="order-item-card">
-                        
+
                         {/* Header Đơn hàng */}
                         <div className="order-card-header">
                           <div className="order-id-date">
@@ -393,7 +425,7 @@ const Profile = () => {
 
                         {/* Footer Đơn hàng */}
                         <div className="order-card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          
+
                           {/* Khối bên trái: Báo lỗi nếu chưa thanh toán */}
                           <div className="footer-left-info">
                             <div className="total-display">
@@ -401,7 +433,7 @@ const Profile = () => {
                             </div>
                             {order.status === 'pending' && ['VNPAY', 'MOMO'].includes(order.paymentMethod) && (
                               <p style={{ color: '#ef4444', fontSize: '13px', margin: '4px 0 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <AlertCircle size={14}/> Vui lòng thanh toán trong 15 phút.
+                                <AlertCircle size={14} /> Vui lòng thanh toán trong 15 phút.
                               </p>
                             )}
                           </div>
@@ -411,18 +443,18 @@ const Profile = () => {
                             <button className="btn-outline-small" onClick={() => navigate(`/order/${order._id}`)}>
                               <Eye size={16} /> Xem chi tiết
                             </button>
-                            
+
                             {/* NÚT THANH TOÁN TIẾP VÀ HỦY ĐƠN CHO ĐƠN PENDING */}
                             {order.status === 'pending' && ['VNPAY', 'MOMO'].includes(order.paymentMethod) && (
                               <>
-                                <button 
+                                <button
                                   className="btn-danger-small"
                                   style={{ backgroundColor: '#f1f5f9', color: '#64748b', borderColor: '#cbd5e1' }}
                                   onClick={() => handleCancelOrder(order._id)}
                                 >
                                   Hủy đơn
                                 </button>
-                                <button 
+                                <button
                                   className="btn-primary-small"
                                   style={{ backgroundColor: '#2563eb', color: 'white', padding: '8px 16px', borderRadius: '6px' }}
                                   onClick={() => {
@@ -442,12 +474,12 @@ const Profile = () => {
 
                             {/* Nút hủy đơn cho đơn COD đang chờ duyệt */}
                             {order.status === 'waiting_approval' && (
-                                <button 
-                                  className="btn-danger-small"
-                                  onClick={() => handleCancelOrder(order._id)}
-                                >
-                                  Hủy đơn
-                                </button>
+                              <button
+                                className="btn-danger-small"
+                                onClick={() => handleCancelOrder(order._id)}
+                              >
+                                Hủy đơn
+                              </button>
                             )}
 
                             {(order.status === "done" || order.status === "cancelled" || order.status === "returned") && (
@@ -467,10 +499,26 @@ const Profile = () => {
             {activeTab === "favorites" && (
               <div className="card-section">
                 <div className="section-header-flex"><h2>Sản phẩm yêu thích</h2></div>
-                <div className="empty-state-container">
-                  <Heart size={48} className="empty-icon" />
-                  <p>Chưa có sản phẩm nào trong danh sách yêu thích.</p>
-                </div>
+                {loadingFavorites ? (
+                  <div style={{ textAlign: "center", padding: "40px", color: "#64748B" }}>Đang tải danh sách yêu thích...</div>
+                ) : favorites.length === 0 ? (
+                  <div className="empty-state-container">
+                    <Heart size={48} className="empty-icon" />
+                    <p>Chưa có sản phẩm nào trong danh sách yêu thích.</p>
+                    <button className="btn-secondary" onClick={() => navigate("/")}>Khám phá sản phẩm</button>
+                  </div>
+                ) : (
+                  <div className="favorites-grid">
+                    {favorites.map((product) => (
+                      <ProductCard
+                        key={product._id}
+                        product={product}
+                        isFavorited={true}
+                        onFavoriteToggle={handleFavoriteToggle}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -491,7 +539,7 @@ const Profile = () => {
                 <div className="section-header-flex">
                   <h2>Sổ địa chỉ</h2>
                   <button className="btn-primary" onClick={() => { setEditingAddress(null); setShowAddressModal(true); }}>
-                    <Plus size={18}/> Thêm mới
+                    <Plus size={18} /> Thêm mới
                   </button>
                 </div>
                 <div className="list-container">
@@ -503,8 +551,8 @@ const Profile = () => {
                         <p className="item-desc">{addr.detail}, {addr.ward}, {addr.district}, {addr.province}</p>
                       </div>
                       <div className="item-actions-row">
-                        <button className="action-btn-icon edit-btn" onClick={() => { setEditingAddress(addr); setShowAddressModal(true); }}><Edit size={18}/></button>
-                        <button className="action-btn-icon delete-btn" onClick={() => deleteAddress(addr._id)}><Trash2 size={18}/></button>
+                        <button className="action-btn-icon edit-btn" onClick={() => { setEditingAddress(addr); setShowAddressModal(true); }}><Edit size={18} /></button>
+                        <button className="action-btn-icon delete-btn" onClick={() => deleteAddress(addr._id)}><Trash2 size={18} /></button>
                       </div>
                     </div>
                   ))}
@@ -518,7 +566,7 @@ const Profile = () => {
                 <div className="section-header-flex">
                   <h2>Phương thức thanh toán</h2>
                   <button className="btn-primary" onClick={() => { setEditingPayment(null); setShowPaymentModal(true); }}>
-                    <Plus size={18}/> Thêm mới
+                    <Plus size={18} /> Thêm mới
                   </button>
                 </div>
                 <div className="list-container">
@@ -527,13 +575,13 @@ const Profile = () => {
                     <div key={pm._id} className="item-card-compact">
                       <div className="item-info">
                         <div className="payment-type-badge">
-                          <CreditCard size={18}/>
+                          <CreditCard size={18} />
                           <h4 className="item-title">{pm.type}</h4>
                         </div>
                       </div>
                       <div className="item-actions-row">
-                        <button className="action-btn-icon edit-btn" onClick={() => { setEditingPayment(pm); setShowPaymentModal(true); }}><Edit size={18}/></button>
-                        <button className="action-btn-icon delete-btn" onClick={() => deletePayment(pm._id)}><Trash2 size={18}/></button>
+                        <button className="action-btn-icon edit-btn" onClick={() => { setEditingPayment(pm); setShowPaymentModal(true); }}><Edit size={18} /></button>
+                        <button className="action-btn-icon delete-btn" onClick={() => deletePayment(pm._id)}><Trash2 size={18} /></button>
                       </div>
                     </div>
                   ))}

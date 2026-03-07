@@ -38,20 +38,43 @@ const orderController = {
       let itemsTotal = 0;
 
       if (isBuyNow && items && items.length > 0) {
-        // Lấy importPrice thực tế từ DB để bảo mật
+        // Lấy importPrice và giá (đã có khuyến mãi) thực tế từ DB để bảo mật
         for (const item of items) {
           const product = await Product.findById(item.productId);
-          const variant = product.variants.id(item.variantId);
+          const variant = product ? product.variants.id(item.variantId) : null;
+
+          let activePrice = item.price; // fallback fallback
+          let variantImportPrice = 0;
+
+          if (variant) {
+            activePrice = (variant.discountPrice != null && variant.promotionEnd && variant.promotionEnd > new Date())
+              ? variant.discountPrice
+              : variant.price;
+            variantImportPrice = variant.importPrice || 0;
+          }
+
           orderItems.push({
             ...item,
-            importPrice: variant ? variant.importPrice : 0
+            price: activePrice, // Ghi đè lại giá để bảo mật
+            importPrice: variantImportPrice
           });
-          itemsTotal += item.price * item.quantity;
+          itemsTotal += activePrice * item.quantity;
         }
       } else {
         const cart = await Cart.findOne({ userId });
         if (!cart || cart.items.length === 0) return res.status(400).json({ message: "Giỏ hàng trống" });
-        orderItems = cart.items;
+
+        // Cần map importPrice lại từ DB cho các item trong giỏ hàng để tránh importPrice = 0
+        for (const item of cart.items) {
+          const product = await Product.findById(item.productId);
+          const variant = product ? product.variants.id(item.variantId) : null;
+          let variantImportPrice = variant ? (variant.importPrice || 0) : 0;
+
+          orderItems.push({
+            ...item.toObject(),
+            importPrice: variantImportPrice
+          });
+        }
         itemsTotal = cart.total;
       }
 

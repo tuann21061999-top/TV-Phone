@@ -2,30 +2,26 @@ import { useEffect, useState } from "react";
 import "./Product.css";
 import ProductCard from "./ProductCard";
 import axios from "axios";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
-function ProductGrid({ type }) {
+function ProductGrid() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const itemsPerView = 4; // Số lượng hiển thị mỗi khung hình
-
-  // Tiêu đề tương ứng
-  const titles = {
-    device: "Điện thoại nổi bật",
-    electronic: "Đồ điện tử",
-    accessory: "Phụ kiện giá tốt",
-  };
+  // Trạng thái cho bộ lọc và phân trang
+  const [activeTab, setActiveTab] = useState("all");
+  const [visibleCount, setVisibleCount] = useState(6); // Mặc định hiển thị 6 sản phẩm (2 hàng)
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`http://localhost:5000/api/products?productType=${type}`);
-        // Giả sử API trả về mảng trực tiếp hoặc nằm trong res.data.data
-        const data = Array.isArray(res.data) ? res.data : res.data.data;
-        setProducts(data || []);
+        // Lấy tất cả sản phẩm
+        const res = await axios.get("http://localhost:5000/api/products");
+        const allProducts = Array.isArray(res.data) ? res.data : res.data.data || [];
+
+        // Chỉ lấy các sản phẩm HOT (Nổi bật)
+        const hotProducts = allProducts.filter(p => p.isFeatured === true);
+        setProducts(hotProducts);
       } catch (error) {
         console.error("Lỗi lấy sản phẩm:", error);
       } finally {
@@ -33,87 +29,89 @@ function ProductGrid({ type }) {
       }
     };
     fetchProducts();
-  }, [type]);
+  }, []);
 
-  // Logic chuyển slide:
-  // Chúng ta di chuyển theo từng đơn vị sản phẩm thay vì di chuyển theo cụm 100% 
-  // để tránh việc trang cuối bị trống nếu số lượng không chia hết cho 4.
-  const nextSlide = () => {
-    if (currentIndex < products.length - itemsPerView) {
-      setCurrentIndex(currentIndex + 1);
-    }
+  // Lọc sản phẩm theo Tab (Tất cả, Điện thoại, Điện tử, Phụ kiện)
+  const filteredProducts = products.filter(p => {
+    if (activeTab === "all") return true;
+    // So sánh trường productType trong database với tab đang chọn
+    return p.productType === activeTab;
+  });
+
+  // Cắt mảng sản phẩm theo số lượng hiển thị hiện tại
+  const displayedProducts = filteredProducts.slice(0, visibleCount);
+
+  // Xử lý nút Tải thêm
+  const handleLoadMore = () => {
+    setVisibleCount(prevCount => prevCount + 6);
   };
 
-  const prevSlide = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
+  // Reset số lượng hiển thị khi đổi tab
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setVisibleCount(6); // Quay về hiển thị 6 cái đầu tiên của tab mới
   };
 
   if (loading) return <div className="loading">Đang tải sản phẩm...</div>;
-  if (products.length === 0) return null;
 
   return (
-    <section className="product-section">
-      <div className="section-header">
-        <h2>{titles[type] || "Sản phẩm"}</h2>
-        <button className="view-all-btn">Xem tất cả</button>
-      </div>
-
-      <div className="slider-wrapper">
-        {/* Nút Trái: Chỉ hiện khi không ở vị trí đầu tiên */}
-        <button 
-          className={`nav-btn left ${currentIndex === 0 ? "hidden" : ""}`} 
-          onClick={prevSlide}
-          disabled={currentIndex === 0}
-        >
-          <ChevronLeft size={24} />
-        </button>
-
-        <div className="slider-container">
-          <div
-            className="slider-track"
-            style={{
-              // Di chuyển bằng % của một item lẻ (100 / 4 = 25%)
-              transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
-            }}
+    <section className="product-grid-section">
+      <div className="grid-header">
+        <div className="grid-header-text">
+          <h2>Sản phẩm nổi bật</h2>
+          <p>Sản phẩm bán chạy nhất được tuyển chọn cho bạn.</p>
+        </div>
+        <div className="grid-filters">
+          <button
+            className={`filter-btn ${activeTab === "all" ? "active" : ""}`}
+            onClick={() => handleTabChange("all")}
           >
-            {products.map((p) => (
-              <div
-                key={p._id}
-                className="slide-item"
-                style={{
-                  flex: `0 0 ${100 / itemsPerView}%`,
-                }}
-              >
-                <ProductCard product={p} />
-              </div>
-            ))}
-          </div>
+            Tất cả
+          </button>
+          <button
+            className={`filter-btn ${activeTab === "device" ? "active" : ""}`}
+            onClick={() => handleTabChange("device")}
+          >
+            Điện thoại
+          </button>
+          {/* Đã đổi từ Âm thanh sang Điện tử */}
+          <button
+            className={`filter-btn ${activeTab === "electronic" ? "active" : ""}`}
+            onClick={() => handleTabChange("electronic")}
+          >
+            Điện tử
+          </button>
+          {/* Đã thêm tab Phụ kiện */}
+          <button
+            className={`filter-btn ${activeTab === "accessory" ? "active" : ""}`}
+            onClick={() => handleTabChange("accessory")}
+          >
+            Phụ kiện
+          </button>
         </div>
-
-        {/* Nút Phải: Chỉ hiện khi chưa chạm đến giới hạn hiển thị cuối cùng */}
-        <button 
-          className={`nav-btn right ${currentIndex >= products.length - itemsPerView ? "hidden" : ""}`} 
-          onClick={nextSlide}
-          disabled={currentIndex >= products.length - itemsPerView}
-        >
-          <ChevronRight size={24} />
-        </button>
       </div>
 
-      {/* DOTS (Tùy chọn: Thường Slider có nút rồi thì bỏ Dot cho đỡ rối) */}
-      {products.length > itemsPerView && (
-        <div className="dots">
-          {Array.from({ length: products.length - itemsPerView + 1 }).map((_, index) => (
-            <span
-              key={index}
-              className={`dot ${currentIndex === index ? "active" : ""}`}
-              onClick={() => setCurrentIndex(index)}
-            />
-          ))}
-        </div>
-      )}
+      <div className="grid-container">
+        {displayedProducts.map((p) => (
+          <ProductCard key={p._id} product={p} />
+        ))}
+      </div>
+
+      <div className="load-more-container">
+        {visibleCount < filteredProducts.length ? (
+          <button className="load-more-btn" onClick={handleLoadMore}>
+            Tải thêm sản phẩm
+          </button>
+        ) : (
+          filteredProducts.length > 0 && (
+            <p className="no-more-msg">Đã hiển thị tất cả sản phẩm trong mục này.</p>
+          )
+        )}
+
+        {filteredProducts.length === 0 && (
+          <p className="no-more-msg">Không tìm thấy sản phẩm nào.</p>
+        )}
+      </div>
     </section>
   );
 }

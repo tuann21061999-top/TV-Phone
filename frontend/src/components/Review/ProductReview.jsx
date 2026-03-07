@@ -7,7 +7,7 @@ import "./ProductReview.css";
 const ProductReview = ({ productId }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // States Form Đánh giá
   const [showForm, setShowForm] = useState(false);
   const [rating, setRating] = useState(5);
@@ -37,7 +37,7 @@ const ProductReview = ({ productId }) => {
   // Kiểm tra quyền (Đã mua hàng chưa)
   const checkUserEligibility = async () => {
     const token = localStorage.getItem("token");
-    
+
     // Nếu khách vãng lai -> Dừng
     if (!token) {
       setCanReview(false);
@@ -48,9 +48,9 @@ const ProductReview = ({ productId }) => {
       const res = await axios.get(`http://localhost:5000/api/reviews/check-eligibility/${productId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       // 1. Mở khóa nút viết đánh giá
-      setCanReview(res.data.canReview); 
+      setCanReview(res.data.canReview);
 
       // 2. Tự động điền dữ liệu cũ nếu khách đã từng đánh giá (Tính năng Sửa đánh giá)
       if (res.data.existingReview) {
@@ -76,7 +76,7 @@ const ProductReview = ({ productId }) => {
       fetchReviews();
       checkUserEligibility();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
   // --- GỬI ĐÁNH GIÁ (JSON THUẦN) ---
@@ -92,14 +92,14 @@ const ProductReview = ({ productId }) => {
         productId,
         rating,
         comment
-      }, { 
-        headers: { Authorization: `Bearer ${token}` } 
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       toast.success(isEditing ? "Đã cập nhật đánh giá!" : "Cảm ơn bạn đã đánh giá!");
       setShowForm(false);
-      fetchReviews(); 
-      checkUserEligibility(); 
+      fetchReviews();
+      checkUserEligibility();
     } catch (error) {
       toast.error(error.response?.data?.message || "Lỗi khi gửi đánh giá!");
     } finally {
@@ -111,7 +111,7 @@ const ProductReview = ({ productId }) => {
   const totalReviews = reviews.length;
   const avgRating = totalReviews > 0 ? (reviews.reduce((a, c) => a + c.rating, 0) / totalReviews).toFixed(1) : 0;
   const starCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-  reviews.forEach(r => { if(starCounts[r.rating] !== undefined) starCounts[r.rating]++; });
+  reviews.forEach(r => { if (starCounts[r.rating] !== undefined) starCounts[r.rating]++; });
   const getPercent = (star) => totalReviews > 0 ? Math.round((starCounts[star] / totalReviews) * 100) : 0;
 
   // Lọc & Sắp xếp
@@ -124,19 +124,19 @@ const ProductReview = ({ productId }) => {
 
   return (
     <div className="pr-wrapper">
-      
+
       {/* HEADER */}
       <div className="pr-header">
         <div className="pr-title-area">
           <h2>Đánh giá từ khách hàng</h2>
           <p>Dựa trên {totalReviews.toLocaleString()} đánh giá thực tế từ người dùng</p>
         </div>
-        
+
         {/* NÚT VIẾT / SỬA ĐÁNH GIÁ */}
         {!token ? (
           <p className="login-warning">Vui lòng đăng nhập để đánh giá.</p>
         ) : !canReview ? (
-          <p className="login-warning" style={{color: "#F59E0B", display: "flex", alignItems: "center", gap: "6px"}}>
+          <p className="login-warning" style={{ color: "#F59E0B", display: "flex", alignItems: "center", gap: "6px" }}>
             <ShieldCheck size={16} /> Chỉ khách hàng đã mua và nhận hàng mới được đánh giá.
           </p>
         ) : (
@@ -179,24 +179,24 @@ const ProductReview = ({ productId }) => {
               <span>Chất lượng sản phẩm:</span>
               <div className="stars-input">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <Star 
-                    key={star} size={28} className="star-clickable" 
-                    fill={star <= rating ? "#F59E0B" : "none"} color={star <= rating ? "#F59E0B" : "#CBD5E1"} 
-                    onClick={() => setRating(star)} 
+                  <Star
+                    key={star} size={28} className="star-clickable"
+                    fill={star <= rating ? "#F59E0B" : "none"} color={star <= rating ? "#F59E0B" : "#CBD5E1"}
+                    onClick={() => setRating(star)}
                   />
                 ))}
               </div>
             </div>
-            
-            <textarea 
-              placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..." 
-              value={comment} onChange={(e) => setComment(e.target.value)} rows="4" 
+
+            <textarea
+              placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."
+              value={comment} onChange={(e) => setComment(e.target.value)} rows="4"
             />
 
             <div className="pr-form-actions">
               <button type="button" className="btn-cancel" onClick={() => setShowForm(false)}>Hủy</button>
               <button type="submit" disabled={isSubmitting || !token} className="btn-submit">
-                {isSubmitting ? <><Loader2 size={16} className="spinner"/> Đang gửi...</> : (isEditing ? "Cập nhật" : "Gửi đánh giá")}
+                {isSubmitting ? <><Loader2 size={16} className="spinner" /> Đang gửi...</> : (isEditing ? "Cập nhật" : "Gửi đánh giá")}
               </button>
             </div>
           </form>
@@ -234,9 +234,9 @@ const ProductReview = ({ productId }) => {
               <div className="pr-content">
                 <div className="pr-user-line">
                   <strong className="pr-username">{rev.username}</strong>
-                  <span className="pr-verified"><ShieldCheck size={14}/> ĐÃ MUA HÀNG</span>
+                  <span className="pr-verified"><ShieldCheck size={14} /> ĐÃ MUA HÀNG</span>
                 </div>
-                
+
                 <div className="pr-stars-date">
                   <div className="pr-stars-mini">
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -249,7 +249,7 @@ const ProductReview = ({ productId }) => {
                 <p className="pr-comment">{rev.comment}</p>
 
                 <div className="pr-item-actions">
-                  <button className="btn-helpful"><ThumbsUp size={14}/> Hữu ích</button>
+                  <button className="btn-helpful"><ThumbsUp size={14} /> Hữu ích</button>
                   <button className="btn-report">Báo cáo vi phạm</button>
                 </div>
 

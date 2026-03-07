@@ -80,7 +80,5 @@ const voucherSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Index để tìm kiếm nhanh theo code
-voucherSchema.index({ code: 1 });
 
 module.exports = mongoose.model("Voucher", voucherSchema);

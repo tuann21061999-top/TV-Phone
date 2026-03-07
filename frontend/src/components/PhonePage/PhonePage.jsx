@@ -9,16 +9,19 @@ import {
   ChevronRight,
   Filter,
   RotateCcw,
+  HeartPlus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
+import { toast } from "sonner";
 
 function PhonePage() {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
 
   // Filter states
   const [selectedBrands, setSelectedBrands] = useState([]);
@@ -27,7 +30,7 @@ function PhonePage() {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 8;
+  const productsPerPage = 9;
 
   /* ================= FETCH PRODUCTS ================= */
   useEffect(() => {
@@ -37,7 +40,7 @@ function PhonePage() {
         const res = await axios.get(
           "http://localhost:5000/api/products?productType=device"
         );
-        
+
         const devices = res.data.filter(p => p.productType === "device");
         setProducts(devices);
       } catch (error) {
@@ -48,28 +51,80 @@ function PhonePage() {
     };
 
     fetchProducts();
+
+    // Fetch favorites nếu đã đăng nhập
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.get("http://localhost:5000/api/favorites", {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(res => {
+        const ids = new Set(res.data.map(p => p._id));
+        setFavoriteIds(ids);
+      }).catch(() => { });
+    }
   }, []);
+
+  const handleToggleFavorite = async (e, productId) => {
+    e.stopPropagation();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.warning("Vui lòng đăng nhập để sử dụng tính năng yêu thích!");
+      navigate("/login");
+      return;
+    }
+    try {
+      const { data } = await axios.post(
+        "http://localhost:5000/api/favorites/toggle",
+        { productId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setFavoriteIds(prev => {
+        const next = new Set(prev);
+        data.isFavorited ? next.add(productId) : next.delete(productId);
+        return next;
+      });
+      toast.success(data.message);
+    } catch {
+      toast.error("Lỗi khi thực hiện yêu thích!");
+    }
+  };
 
   /* ================= HELPER FUNCTIONS ================= */
   const formatPrice = (price) => price?.toLocaleString("vi-VN") + "₫";
 
-  const getLowestPrice = (product) => {
-    if (!product.variants?.length) return 0;
-    return Math.min(...product.variants.map((v) => v.price));
-  };
+  const getPricingInfo = (product) => {
+    if (!product.variants?.length) return { basePrice: 0, finalPrice: 0, discountPercent: 0 };
 
-  const getFinalPrice = (product) => {
-    const basePrice = getLowestPrice(product);
-    if (!product.promotion?.discountPercent) return basePrice;
+    let bestBasePrice = Infinity;
+    let bestFinalPrice = Infinity;
+    let bestDiscountPercent = 0;
 
-    const now = new Date();
-    const start = new Date(product.promotion.startDate);
-    const end = new Date(product.promotion.endDate);
+    product.variants.forEach(v => {
+      const now = new Date();
+      let currentActivePrice = v.price;
+      let currentDiscountPercent = 0;
 
-    if (now >= start && now <= end) {
-      return basePrice - (basePrice * product.promotion.discountPercent) / 100;
-    }
-    return basePrice;
+      if (v.discountPrice != null && v.promotionEnd && new Date(v.promotionEnd) > now) {
+        currentActivePrice = v.discountPrice;
+        if (v.discountType === "percentage") {
+          currentDiscountPercent = v.discountValue;
+        } else if (v.discountType === "fixed") {
+          currentDiscountPercent = Math.round((v.discountValue / v.price) * 100);
+        }
+      }
+
+      if (currentActivePrice < bestFinalPrice) {
+        bestFinalPrice = currentActivePrice;
+        bestBasePrice = v.price;
+        bestDiscountPercent = currentDiscountPercent;
+      }
+    });
+
+    return {
+      basePrice: bestBasePrice === Infinity ? 0 : bestBasePrice,
+      finalPrice: bestFinalPrice === Infinity ? 0 : bestFinalPrice,
+      discountPercent: bestDiscountPercent
+    };
   };
 
   const extractBatteryValue = (product) => {
@@ -112,6 +167,22 @@ function PhonePage() {
   const indexOfFirst = indexOfLast - productsPerPage;
   const currentProducts = filteredProducts.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  const getPaginationNumbers = () => {
+    const pages = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, 4, '...', totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+      }
+    }
+    return pages;
+  };
 
   useEffect(() => {
     setCurrentPage(1);
@@ -231,24 +302,31 @@ function PhonePage() {
             ) : (
               <div className="product-grid">
                 {currentProducts.map((product) => {
-                  const base = getLowestPrice(product);
-                  const final = getFinalPrice(product);
-                  const isDiscount = final < base;
-                  
-                  const displayImage = product.colorImages?.find(img => img.isDefault)?.imageUrl 
-                                      || product.colorImages?.[0]?.imageUrl 
-                                      || "/no-image.png";
+                  const { basePrice, finalPrice, discountPercent } = getPricingInfo(product);
+                  const isDiscount = finalPrice < basePrice;
+
+                  const displayImage = product.colorImages?.find(img => img.isDefault)?.imageUrl
+                    || product.colorImages?.[0]?.imageUrl
+                    || "/no-image.png";
 
                   return (
                     <div key={product._id} className="product-card">
                       <div className="product-tags">
                         {product.isFeatured && <span className="tag-hot">HOT</span>}
+                        {isDiscount && discountPercent > 0 && <span className="discount-badge">-{discountPercent}%</span>}
                       </div>
 
                       <div
                         className="product-image"
                         onClick={() => navigate(`/product/${product.slug || product._id}`)}
                       >
+                        <button
+                          className={`wishlist-btn ${favoriteIds.has(product._id) ? "liked" : ""}`}
+                          onClick={(e) => handleToggleFavorite(e, product._id)}
+                          title={favoriteIds.has(product._id) ? "Bỏ yêu thích" : "Yêu thích"}
+                        >
+                          <HeartPlus size={18} fill="none" stroke={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"} />
+                        </button>
                         <img src={displayImage} alt={product.name} />
                       </div>
 
@@ -258,7 +336,7 @@ function PhonePage() {
 
                       {/* Đã thêm class highlight-item */}
                       <div className="product-highlights">
-                        {product.highlights?.slice(0, 2).map((text, idx) => (
+                        {product.highlights?.map((text, idx) => (
                           <span key={idx} className="highlight-item">{text}</span>
                         ))}
                       </div>
@@ -278,11 +356,11 @@ function PhonePage() {
                       <div className="product-price">
                         {isDiscount ? (
                           <>
-                            <span className="old">{formatPrice(base)}</span>
-                            <span className="new">{formatPrice(final)}</span>
+                            <span className="old">{formatPrice(basePrice)}</span>
+                            <span className="new">{formatPrice(finalPrice)}</span>
                           </>
                         ) : (
-                          <span className="new">{formatPrice(base)}</span>
+                          <span className="new">{formatPrice(basePrice)}</span>
                         )}
                       </div>
 
@@ -309,13 +387,14 @@ function PhonePage() {
                   <ChevronLeft size={18} />
                 </button>
 
-                {[...Array(totalPages)].map((_, i) => (
+                {getPaginationNumbers().map((item, index) => (
                   <button
-                    key={i}
-                    className={currentPage === i + 1 ? "active" : ""}
-                    onClick={() => setCurrentPage(i + 1)}
+                    key={index}
+                    className={`${currentPage === item ? "active" : ""} ${item === '...' ? "dots" : ""}`}
+                    onClick={() => typeof item === 'number' && setCurrentPage(item)}
+                    disabled={item === '...'}
                   >
-                    {i + 1}
+                    {item}
                   </button>
                 ))}
 

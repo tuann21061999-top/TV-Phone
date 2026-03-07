@@ -1,0 +1,329 @@
+.spec-detail-page {
+    background-color: #f8fafc;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.spec-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    width: 100%;
+}
+
+/* STICKY HEADER TƯƠNG TỰ HÌNH */
+.spec-sticky-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    z-index: 50;
+    padding: 12px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.sticky-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sticky-product-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.sticky-product-info img {
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+    background: #f1f5f9;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.sticky-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 2px 0;
+    color: #1e293b;
+}
+
+.sticky-price {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.sticky-nav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.nav-link {
+    font-size: 14px;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 20px;
+    margin-bottom: -20px;
+}
+
+.nav-link:hover {
+    color: #2563eb;
+}
+
+.nav-link.active {
+    color: #2563eb;
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #2563eb;
+    border-radius: 3px 3px 0 0;
+}
+
+.btn-buy-now-sticky {
+    background: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.btn-buy-now-sticky:hover {
+    background: #1d4ed8;
+}
+
+/* MAIN LAYOUT */
+.main-content-layout {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+    margin-bottom: 60px;
+}
+
+.spec-sidebar {
+    width: 320px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e2e8f0;
+}
+
+.sidebar-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    color: #1e293b;
+}
+
+.sidebar-card.support-card {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.text-primary {
+    color: #2563eb !important;
+}
+
+.sidebar-desc {
+    font-size: 13.5px;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.compare-search {
+    display: flex;
+    align-items: center;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 10px 15px;
+    background: #f8fafc;
+}
+
+.compare-search input {
+    border: none;
+    background: transparent;
+    flex: 1;
+    outline: none;
+    font-size: 14px;
+}
+
+.plus-icon {
+    background: #2563eb;
+    color: white;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.btn-support-chat {
+    display: block;
+    text-align: center;
+    background: white;
+    border: 1px solid #2563eb;
+    color: #2563eb;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.btn-support-chat:hover {
+    background: #eff6ff;
+}
+
+
+/* RIGHT SECTION */
+.spec-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.breadcrumb {
+    margin-bottom: 24px;
+}
+
+
+/* CARD SPECS BÓC TÁCH NHƯ APPLE / SAMSUNG DEMO */
+.detailed-specs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.spec-group-box {
+    background: transparent;
+}
+
+.spec-group-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.icon-wrapper {
+    background: #eff6ff;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.spec-group-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.spec-items-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.spec-item-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.spec-item-key {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94a3b8;
+}
+
+.spec-item-value {
+    font-size: 15px;
+    color: #334155;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+.no-detailed-specs-message {
+    background: white;
+    padding: 40px;
+    text-align: center;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.no-detailed-specs-message p {
+    color: #64748b;
+    margin-bottom: 20px;
+}
+
+.btn-back {
+    background: #2563eb;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+    .main-content-layout {
+        flex-direction: column;
+    }
+
+    .spec-sidebar {
+        width: 100%;
+        order: 2;
+    }
+
+    .spec-main {
+        order: 1;
+    }
+
+    .spec-items-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .sticky-nav {
+        display: none;
+        /* Ẩn bớt nav trên mobile cho đỡ rối */
+    }
+}

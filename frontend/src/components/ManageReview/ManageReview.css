@@ -4,9 +4,10 @@
 .manage-review-container {
   display: flex;
   flex-direction: column;
-  gap: 24px; /* Tăng khoảng cách tổng thể */
+  gap: 24px;
   width: 100%;
   max-width: 100%;
+  min-width: 0;
   box-sizing: border-box;
   font-family: 'Inter', sans-serif;
 }
@@ -16,12 +17,14 @@
 /* ========================================================= */
 .mr-toolbar {
   display: flex;
-  justify-content: space-between; /* Kéo giãn 2 bên nếu có thêm nút */
+  justify-content: space-between;
+  /* Kéo giãn 2 bên nếu có thêm nút */
   align-items: center;
   margin-bottom: 10px;
   width: 100%;
   padding-bottom: 16px;
-  border-bottom: 2px solid #E2E8F0; /* Thêm đường viền giống Order */
+  border-bottom: 2px solid #E2E8F0;
+  /* Thêm đường viền giống Order */
 }
 
 .mr-search {
@@ -31,9 +34,11 @@
   background: #fff;
   border: 1px solid #E2E8F0;
   border-radius: 8px;
-  padding: 12px 20px; /* Tăng độ to của ô tìm kiếm */
-  width: 400px; /* Mở rộng ô tìm kiếm */
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  padding: 12px 20px;
+  /* Tăng độ to của ô tìm kiếm */
+  width: 400px;
+  /* Mở rộng ô tìm kiếm */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   transition: all 0.2s;
 }
 
@@ -56,7 +61,8 @@
 .mr-list {
   display: flex;
   flex-direction: column;
-  gap: 24px; /* GIÃN CÁCH GIỮA CÁC ĐÁNH GIÁ VỚI NHAU (RỘNG HƠN) */
+  gap: 24px;
+  /* GIÃN CÁCH GIỮA CÁC ĐÁNH GIÁ VỚI NHAU (RỘNG HƠN) */
   width: 100%;
 }
 
@@ -64,7 +70,7 @@
   background: #fff;
   border: 1px solid #E2E8F0;
   border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
   width: 100%;
   box-sizing: border-box;
   overflow: hidden;
@@ -77,7 +83,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 30px; /* TĂNG PADDING CHO DÀY DẶN GIỐNG ORDER */
+  padding: 20px 30px;
+  /* TĂNG PADDING CHO DÀY DẶN GIỐNG ORDER */
   background: #F8FAFC;
   border-bottom: 1px solid #E2E8F0;
 }
@@ -85,7 +92,8 @@
 .mr-header-left {
   display: flex;
   align-items: center;
-  gap: 24px; /* Giãn cách giữa Tên và Tên Sản phẩm */
+  gap: 24px;
+  /* Giãn cách giữa Tên và Tên Sản phẩm */
 }
 
 .mr-header-left strong {
@@ -101,17 +109,23 @@
   border-radius: 6px;
   border: 1px solid #E2E8F0;
 }
-.mr-product-name strong { color: #2563EB; font-size: 14px; }
+
+.mr-product-name strong {
+  color: #2563EB;
+  font-size: 14px;
+}
 
 .mr-header-right {
   display: flex;
   align-items: center;
-  gap: 20px; /* Giãn cách giữa Ngôi sao và Ngày tháng */
+  gap: 20px;
+  /* Giãn cách giữa Ngôi sao và Ngày tháng */
 }
 
 .mr-stars {
   display: flex;
-  gap: 4px; /* Giãn cách các ngôi sao */
+  gap: 4px;
+  /* Giãn cách các ngôi sao */
 }
 
 .mr-date {
@@ -121,18 +135,22 @@
 
 /* Card Body */
 .mr-card-body {
-  padding: 30px; /* TĂNG PADDING LỀ TRONG GIÚP RỘNG RÃI */
+  padding: 30px;
+  /* TĂNG PADDING LỀ TRONG GIÚP RỘNG RÃI */
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Giãn cách giữa Bình luận và Form trả lời */
+  gap: 20px;
+  /* Giãn cách giữa Bình luận và Form trả lời */
 }
 
 .mr-comment-box {
   font-size: 15px;
   color: #334155;
   line-height: 1.6;
-  background: #F1F5F9; /* TẠO KHUNG NỀN CHO BÌNH LUẬN */
-  padding: 20px 24px; /* DÙ BÌNH LUẬN CHỈ CÓ 1 CHỮ VẪN TO RỘNG */
+  background: #F1F5F9;
+  /* TẠO KHUNG NỀN CHO BÌNH LUẬN */
+  padding: 20px 24px;
+  /* DÙ BÌNH LUẬN CHỈ CÓ 1 CHỮ VẪN TO RỘNG */
   border-radius: 8px;
   border-left: 4px solid #CBD5E1;
   min-height: 50px;
@@ -168,7 +186,7 @@
   border: 1px solid #E2E8F0;
   padding: 24px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
 }
 
 .mr-reply-form p {
@@ -191,7 +209,9 @@
   resize: vertical;
 }
 
-.mr-reply-form textarea:focus { border-color: #3B82F6; }
+.mr-reply-form textarea:focus {
+  border-color: #3B82F6;
+}
 
 .mr-reply-actions {
   display: flex;
@@ -204,14 +224,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 30px; /* TĂNG PADDING */
+  padding: 20px 30px;
+  /* TĂNG PADDING */
   border-top: 1px solid #E2E8F0;
   background: #fff;
 }
 
 .mr-actions {
   display: flex;
-  gap: 16px; /* Giãn cách các nút Bấm */
+  gap: 16px;
+  /* Giãn cách các nút Bấm */
 }
 
 /* Buttons & Badges */
@@ -224,37 +246,99 @@
   align-items: center;
 }
 
-.badge-success { background: #DCFCE7; color: #16A34A; border: 1px solid #BBF7D0; }
-.badge-secondary { background: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0; }
+.badge-success {
+  background: #DCFCE7;
+  color: #16A34A;
+  border: 1px solid #BBF7D0;
+}
+
+.badge-secondary {
+  background: #F1F5F9;
+  color: #64748B;
+  border: 1px solid #E2E8F0;
+}
 
 .btn-icon {
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
   color: #475569;
-  padding: 10px 18px; /* TĂNG ĐỘ TO CỦA NÚT */
+  padding: 10px 18px;
+  /* TĂNG ĐỘ TO CỦA NÚT */
   border-radius: 8px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  display: flex; 
-  align-items: center; 
+  display: flex;
+  align-items: center;
   gap: 8px;
   transition: 0.2s;
 }
-.btn-icon:hover { background: #F1F5F9; color: #1e293b; }
 
-.btn-blue { background: #EFF6FF; color: #2563EB; border-color: #BFDBFE; }
-.btn-blue:hover { background: #DBEAFE; }
+.btn-icon:hover {
+  background: #F1F5F9;
+  color: #1e293b;
+}
 
-.btn-red { background: #FEF2F2; color: #EF4444; border-color: #FECACA; }
-.btn-red:hover { background: #FEE2E2; }
+.btn-blue {
+  background: #EFF6FF;
+  color: #2563EB;
+  border-color: #BFDBFE;
+}
 
-.btn-template { background: #F1F5F9; color: #475569; border: none; padding: 10px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 500; }
-.mr-reply-btn-group { display: flex; gap: 12px; }
-.btn-cancel-reply { background: white; border: 1px solid #E2E8F0; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; color: #475569; }
-.btn-submit-reply { background: #2563EB; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+.btn-blue:hover {
+  background: #DBEAFE;
+}
 
-.mr-loading, .mr-empty {
+.btn-red {
+  background: #FEF2F2;
+  color: #EF4444;
+  border-color: #FECACA;
+}
+
+.btn-red:hover {
+  background: #FEE2E2;
+}
+
+.btn-template {
+  background: #F1F5F9;
+  color: #475569;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.mr-reply-btn-group {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-cancel-reply {
+  background: white;
+  border: 1px solid #E2E8F0;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.btn-submit-reply {
+  background: #2563EB;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mr-loading,
+.mr-empty {
   text-align: center;
   padding: 60px;
   color: #64748B;

@@ -3,7 +3,6 @@
 }
 
 .promotion-container {
-  max-width: 1200px;
   margin: auto;
   padding: 40px 20px;
 }
@@ -118,7 +117,7 @@
 
 .product-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 }
 
 .product-tag {
@@ -165,6 +164,18 @@
 
 .load-more-wrapper {
   display: flex;
+
+  /* Main Container */
+  .pp-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
   justify-content: center;
   margin: 40px 0 80px;
 }

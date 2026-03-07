@@ -1,0 +1,1942 @@
+Create Product Payload: {
+  "name": "Samsung Galaxy S21 Ultra Cũ Hàn Quốc",
+  "brand": "Samsung",
+  "description": "Điện thoại Samsung Galaxy S21 Ultra Chính hãng hiệu năng siêu mạnh mẽ, camera siêu đẹp. Mua điện thoại Samsung Galaxy S21 Ultra uy tín, giá rẻ, hỗ trợ trả góp 0%.\n\nSản phẩm Samsung Galaxy S21 Ultra Chính hãng là anh cả của dòng S21 series, chiếc smartphone đầu bảng của Samsung trong năm 2021. Nó được trang bị tất cả những công nghệ tiên tiến nhất từ chất lượng hoàn thiện, hiệu năng, camera hay màn hình. Vẫn là thiết kế quen thuộc với khung kim loại và hai mặt kính sang trọng, con chip Exynos 2100 siêu mạnh mẽ, camera 108MP thuộc hàng top thế giới và màn hình Dynamic AMOLED 2X cho khả năng hiển thị cực kỳ tuyệt vời.",
+  "productType": "device",
+  "categoryName": "Samsung Galaxy S21 Ultra Cũ Hàn Quốc",
+  "condition": "used",
+  "conditionLevel": [
+    "99%",
+    "97%"
+  ],
+  "colorImages": [
+    {
+      "colorName": "Bạc",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859203/tv-phone-test/uzpjscrzs4pzprk5w9lx.png",
+      "isDefault": false
+    },
+    {
+      "colorName": "Vàng Đồng",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859204/tv-phone-test/rmfjnblr8imgfqz3rc48.png",
+      "isDefault": false
+    },
+    {
+      "colorName": "Tím Than",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859206/tv-phone-test/mi4cpg5osv2owczsesna.png",
+      "isDefault": false
+    },
+    {
+      "colorName": "Đen",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859207/tv-phone-test/erk63yjyc9dgxdjderyl.png",
+      "isDefault": true
+    },
+    {
+      "colorName": "Xanh Than",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859208/tv-phone-test/rtwyhe6mcqolrdqfybgd.png",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xám",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859210/tv-phone-test/qvmgc7veuv2hk1mj6bks.png",
+      "isDefault": false
+    }
+  ],
+  "detailImages": [
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859211/tv-phone-test/nbe6ry6l5s84lynmtbbp.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859212/tv-phone-test/hmuwvk1jkjd9pf2yxhcw.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859213/tv-phone-test/rjk7dqxlh5qjmnjgtojp.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859214/tv-phone-test/pj2h8cf24rjxhttwcdr3.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859215/tv-phone-test/g4bilyizp43ohhudujzn.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859216/tv-phone-test/pb3ocf5dnevifx1zuo3z.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859217/tv-phone-test/jz95l2xng2qwbtcwdjuk.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859218/tv-phone-test/wk2osbqhu5nyishtfbua.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859220/tv-phone-test/bkd1axlzwqvtws2tbhjd.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859221/tv-phone-test/ihkesii25fb1tlvbehwh.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859222/tv-phone-test/l8q2ymlarfku1ngc5i8f.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859223/tv-phone-test/vlzqwiq22sjk8ktuoyri.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859224/tv-phone-test/jwarq54p86fc8dftq0xp.webp",
+    "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772859225/tv-phone-test/zhganwynpsru3vixrxnv.webp"
+  ],
+  "highlights": [
+    "108MP, zoom 100x, chụp xa sắc nét",
+    "Màn hình mượt và sắc nét hàng đầu",
+    "Hiệu năng mạnh, pin 5000mAh bền bỉ"
+  ],
+  "isFeatured": false,
+  "isActive": true,
+  "specs": {
+    "Màn hình": "Dynamic AMOLED 2X, 120Hz, HDR10+, 1500 nits (tối đa) 6.8 inches, QHD+ (1440 x 3200 pixels), tỉ lệ 20:9 Corning Gorilla Glass Victus Always-on display",
+    "Hệ điều hành": "Android 11, One UI 3.1 Được cập nhật lên Android 14, One UI 6",
+    "Camera sau": "108 MP, f/1.8 (góc rộng), PDAF, Laser AF, OIS 10 MP, f/4.9 (tiềm vọng), dual pixel PDAF, OIS, zoom quang 10x 10 MP, f/2.4 ( chân dung), dual pixel PDAF, OIS, zoom quang 3x 12 MP, f/2.2 (góc siêu rộng), dual pixel PDAF, Super Steady video Quay phim: 8K@24fps, 4K@30/60fps, 1080p@30/60/240fps, 720p@960fps, HDR10+, stereo sound rec., gyro-EIS",
+    "Camera trước": "40 MP, f/2.2 (góc rộng), PDAF Quay phim: 4K@30/60fps, 1080p@30fps",
+    "CPU": "Qualcomm SM8350 Snapdragon 888 5G (5 nm) 8 nhân (1x2.84 GHz & 3x2.42 GHz & 4x1.80 GHz) GPU: Adreno 660",
+    "RAM": "12-16GB",
+    "Bộ nhớ trong": "128-512GB",
+    "Thẻ SIM": "1 SIM, Nano SIM",
+    "Dung lượng pin": "Li-Ion 5000 mAh Sạc nhanh 25W Sạc nhanh không dây 15W Sạc ngược không dây 4.5W USB Power Delivery 3.0",
+    "Thiết kế": "Khung kim loại + 2 mặt kính"
+  },
+  "variants": [
+    {
+      "sku": "DEV-1772859256343-0-0",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 6750000,
+      "importPrice": 5500000,
+      "colorName": "Tím Than",
+      "quantity": 11
+    },
+    {
+      "sku": "DEV-1772859256343-0-1",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 6750000,
+      "importPrice": 5500000,
+      "colorName": "Bạc",
+      "quantity": 12
+    },
+    {
+      "sku": "DEV-1772859256343-0-2",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 6750000,
+      "importPrice": 5500000,
+      "colorName": "Vàng Đồng",
+      "quantity": 13
+    },
+    {
+      "sku": "DEV-1772859256343-0-3",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 6750000,
+      "importPrice": 5500000,
+      "colorName": "Đen",
+      "quantity": 11
+    },
+    {
+      "sku": "DEV-1772859256343-0-4",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 6750000,
+      "importPrice": 5500000,
+      "colorName": "Xanh Than",
+      "quantity": 12
+    },
+    {
+      "sku": "DEV-1772859256343-0-5",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 6750000,
+      "importPrice": 5500000,
+      "colorName": "Xám",
+      "quantity": 14
+    },
+    {
+      "sku": "DEV-1772859256343-1-0",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Bạc",
+      "quantity": 14
+    },
+    {
+      "sku": "DEV-1772859256343-1-1",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Vàng Đồng",
+      "quantity": 15
+    },
+    {
+      "sku": "DEV-1772859256343-1-2",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Tím Than",
+      "quantity": 16
+    },
+    {
+      "sku": "DEV-1772859256343-1-3",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Đen",
+      "quantity": 16
+    },
+    {
+      "sku": "DEV-1772859256343-1-4",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Xanh Than",
+      "quantity": 15
+    },
+    {
+      "sku": "DEV-1772859256343-1-5",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Xám",
+      "quantity": 12
+    },
+    {
+      "sku": "DEV-1772859256343-2-0",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 7550000,
+      "importPrice": 6500000,
+      "colorName": "Bạc",
+      "quantity": 12
+    },
+    {
+      "sku": "DEV-1772859256343-2-1",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 7550000,
+      "importPrice": 6500000,
+      "colorName": "Vàng Đồng",
+      "quantity": 13
+    },
+    {
+      "sku": "DEV-1772859256343-2-2",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 7550000,
+      "importPrice": 6500000,
+      "colorName": "Tím Than",
+      "quantity": 14
+    },
+    {
+      "sku": "DEV-1772859256343-2-3",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 7550000,
+      "importPrice": 6500000,
+      "colorName": "Đen",
+      "quantity": 15
+    },
+    {
+      "sku": "DEV-1772859256343-2-4",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 7550000,
+      "importPrice": 6500000,
+      "colorName": "Xanh Than",
+      "quantity": 22
+    },
+    {
+      "sku": "DEV-1772859256343-2-5",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 7550000,
+      "importPrice": 6500000,
+      "colorName": "Xám",
+      "quantity": 12
+    },
+    {
+      "sku": "DEV-1772859256343-3-0",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "97%",
+      "price": 6450000,
+      "importPrice": 5400000,
+      "colorName": "Bạc",
+      "quantity": 5
+    },
+    {
+      "sku": "DEV-1772859256343-3-1",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "97%",
+      "price": 6450000,
+      "importPrice": 5400000,
+      "colorName": "Vàng Đồng",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772859256343-3-2",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "97%",
+      "price": 6450000,
+      "importPrice": 5400000,
+      "colorName": "Tím Than",
+      "quantity": 7
+    },
+    {
+      "sku": "DEV-1772859256343-3-3",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "97%",
+      "price": 6450000,
+      "importPrice": 5400000,
+      "colorName": "Đen",
+      "quantity": 8
+    },
+    {
+      "sku": "DEV-1772859256343-3-4",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "97%",
+      "price": 6450000,
+      "importPrice": 5400000,
+      "colorName": "Xanh Than",
+      "quantity": 9
+    },
+    {
+      "sku": "DEV-1772859256343-3-5",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "97%",
+      "price": 6450000,
+      "importPrice": 5400000,
+      "colorName": "Xám",
+      "quantity": 5
+    },
+    {
+      "sku": "DEV-1772859256343-4-0",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "97%",
+      "price": 6850000,
+      "importPrice": 5800000,
+      "colorName": "Bạc",
+      "quantity": 3
+    },
+    {
+      "sku": "DEV-1772859256343-4-1",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "97%",
+      "price": 6850000,
+      "importPrice": 5800000,
+      "colorName": "Vàng Đồng",
+      "quantity": 3
+    },
+    {
+      "sku": "DEV-1772859256343-4-2",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "97%",
+      "price": 6850000,
+      "importPrice": 5800000,
+      "colorName": "Tím Than",
+      "quantity": 4
+    },
+    {
+      "sku": "DEV-1772859256343-4-3",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "97%",
+      "price": 6850000,
+      "importPrice": 5800000,
+      "colorName": "Đen",
+      "quantity": 5
+    },
+    {
+      "sku": "DEV-1772859256343-4-4",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "97%",
+      "price": 6850000,
+      "importPrice": 5800000,
+      "colorName": "Xanh Than",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772859256343-4-5",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "97%",
+      "price": 6850000,
+      "importPrice": 5800000,
+      "colorName": "Xám",
+      "quantity": 3
+    },
+    {
+      "sku": "DEV-1772859256343-5-0",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "97%",
+      "price": 7250000,
+      "importPrice": 6200000,
+      "colorName": "Bạc",
+      "quantity": 4
+    },
+    {
+      "sku": "DEV-1772859256343-5-1",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "97%",
+      "price": 7250000,
+      "importPrice": 6200000,
+      "colorName": "Vàng Đồng",
+      "quantity": 5
+    },
+    {
+      "sku": "DEV-1772859256343-5-2",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "97%",
+      "price": 7250000,
+      "importPrice": 6200000,
+      "colorName": "Tím Than",
+      "quantity": 2
+    },
+    {
+      "sku": "DEV-1772859256343-5-3",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "97%",
+      "price": 7250000,
+      "importPrice": 6200000,
+      "colorName": "Đen",
+      "quantity": 3
+    },
+    {
+      "sku": "DEV-1772859256343-5-4",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "97%",
+      "price": 7250000,
+      "importPrice": 6200000,
+      "colorName": "Xanh Than",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772859256343-5-5",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "97%",
+      "price": 7250000,
+      "importPrice": 6200000,
+      "colorName": "Xám",
+      "quantity": 2
+    }
+  ],
+  "categoryId": "69abaf781b944a7cebf6f9d1"
+}
+Create Product Payload: {
+  "name": "Samsung Galaxy S23 Mỹ cũ",
+  "brand": "Samsung cũ",
+  "description": "Bạn muốn lựa chọn một chiếc Samsung S23 cũ để tiết kiệm chi phí nhưng chưa biết làm sao để lựa chọn?\n\nChắc hẳn, bạn đang phân vân và quan tâm đến giá cả, chất lượng sản phẩm và chế độ bảo hàng trước khi chuẩn bị chọn cho mình mẫu Samsung S23 cũ. Trong các phần tiếp theo đây, Chúng tôi sẽ giải đáp mọi thắc mắc trên để bạn có thể sắm cho mình chiếc Samsung S23 cũ có chất lượng tốt nhất với giá hời nhất.",
+  "productType": "device",
+  "categoryName": "Samsung Galaxy S23 Mỹ cũ",
+  "condition": "used",
+  "conditionLevel": [
+    "99%",
+    "98%"
+  ],
+  "colorImages": [
+    {
+      "colorName": "Đen",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772863348/tv-phone-test/cyeuk10nqyuldn6z4lnd.jpg",
+      "isDefault": true
+    },
+    {
+      "colorName": "Tím",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772863349/tv-phone-test/myzgufjacw2lsindddt3.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Trắng ",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772863350/tv-phone-test/rylp8td2x9hslgszroz2.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xám",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772863351/tv-phone-test/vx1ngyzhmyzuq7mtrnvl.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xanh Đậm",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772863352/tv-phone-test/gfajrqoc2y9ikfayym4o.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xanh",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772863353/tv-phone-test/ucthdslwlrkdgpzlwh3a.jpg",
+      "isDefault": false
+    }
+  ],
+  "detailImages": [],
+  "highlights": [
+    "Camera 50MP chụp cực nét",
+    "Màn hình AMOLED 120Hz mượt mà",
+    "Chip Snapdragon 8 Gen 2 siêu mạnh"
+  ],
+  "isFeatured": false,
+  "isActive": true,
+  "specs": {
+    "Màn hình": "Dynamic AMOLED 2X, 120Hz, HDR10+, 1200 nits (HBM), 1750 nits (tối đa) 6.1 inches, Full HD+ (1080 x 2340 pixels), tỉ lệ 20:9 Corning Gorilla Glass Victus 2 Always-on display",
+    "Hệ điều hành": "Android 13, được lên Android 14, One UI 6.1",
+    "Camera sau": "50 MP, f/1.8, 24mm (góc rộng), Dual Pixel PDAF, OIS 10 MP, f/2.4, 70mm (telephoto), PDAF, OIS, zoom quang 3x 12 MP, f/2.2, 13mm, 120˚ (góc siêu rộng), Dual Pixel PDAF, Super Steady video Quay phim: 8K@24/30fps, 4K@30/60fps, 1080p@30/60/240fps, 720p@960fps, HDR10+, stereo sound rec., gyro-EIS",
+    "Camera trước": "12 MP, f/2.2, 26mm (góc rộng), Dual Pixel PDAF Dual video call, Auto-HDR, HDR10+ Quay phim: 4K@30/60fps, 1080p@30fps",
+    "CPU": "Qualcomm SM8550-AC Snapdragon 8 Gen 2 (4 nm) 8 nhân (1x3.36 GHz & 2x2.8 GHz & 2x2.8 GHz & 3x2.0 GHz) GPU: Adreno 740",
+    "RAM": "8GB",
+    "Bộ nhớ trong": "128GB (UFS 3.1) 256-512GB (UFS 4.0)",
+    "Thẻ SIM": "2 SIM, Nano SIM/eSIM",
+    "Dung lượng pin": "Li-Ion 3900 mAh Sạc nhanh 25W, 50% trong 30ph (Quảng cáo) Sạc không dây 15W Sạc ngược k/dây 4.5W",
+    "Thiết kế": "Khung nhôm bọc thép 2 mặt kính Gorilla Glass Victus 2 Chống nước/bụi IP68"
+  },
+  "variants": [
+    {
+      "sku": "DEV-1772863383942-0-0",
+      "size": "8GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Trắng ",
+      "quantity": 4
+    },
+    {
+      "sku": "DEV-1772863383942-0-1",
+      "size": "8GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Đen",
+      "quantity": 4
+    },
+    {
+      "sku": "DEV-1772863383942-0-2",
+      "size": "8GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Tím",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772863383942-0-3",
+      "size": "8GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Xám",
+      "quantity": 7
+    },
+    {
+      "sku": "DEV-1772863383942-0-4",
+      "size": "8GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Xanh Đậm",
+      "quantity": 8
+    },
+    {
+      "sku": "DEV-1772863383942-0-5",
+      "size": "8GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Xanh",
+      "quantity": 9
+    },
+    {
+      "sku": "DEV-1772863383942-1-0",
+      "size": "8GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 7450000,
+      "importPrice": 6400000,
+      "colorName": "Đen",
+      "quantity": 21
+    },
+    {
+      "sku": "DEV-1772863383942-1-1",
+      "size": "8GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 7450000,
+      "importPrice": 6400000,
+      "colorName": "Tím",
+      "quantity": 11
+    },
+    {
+      "sku": "DEV-1772863383942-1-2",
+      "size": "8GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 7450000,
+      "importPrice": 6400000,
+      "colorName": "Trắng ",
+      "quantity": 8
+    },
+    {
+      "sku": "DEV-1772863383942-1-3",
+      "size": "8GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 7450000,
+      "importPrice": 6400000,
+      "colorName": "Xám",
+      "quantity": 22
+    },
+    {
+      "sku": "DEV-1772863383942-1-4",
+      "size": "8GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 7450000,
+      "importPrice": 6400000,
+      "colorName": "Xanh Đậm",
+      "quantity": 11
+    },
+    {
+      "sku": "DEV-1772863383942-1-5",
+      "size": "8GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 7450000,
+      "importPrice": 6400000,
+      "colorName": "Xanh",
+      "quantity": 13
+    },
+    {
+      "sku": "DEV-1772863383942-2-0",
+      "size": "8GB",
+      "storage": "128GB",
+      "condition": "98%",
+      "price": 6850000,
+      "importPrice": 5800000,
+      "colorName": "Đen",
+      "quantity": 5
+    },
+    {
+      "sku": "DEV-1772863383942-2-1",
+      "size": "8GB",
+      "storage": "128GB",
+      "condition": "98%",
+      "price": 6850000,
+      "importPrice": 5800000,
+      "colorName": "Tím",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772863383942-2-2",
+      "size": "8GB",
+      "storage": "128GB",
+      "condition": "98%",
+      "price": 6850000,
+      "importPrice": 5800000,
+      "colorName": "Trắng ",
+      "quantity": 7
+    },
+    {
+      "sku": "DEV-1772863383942-2-3",
+      "size": "8GB",
+      "storage": "128GB",
+      "condition": "98%",
+      "price": 6850000,
+      "importPrice": 5800000,
+      "colorName": "Xám",
+      "quantity": 8
+    },
+    {
+      "sku": "DEV-1772863383942-2-4",
+      "size": "8GB",
+      "storage": "128GB",
+      "condition": "98%",
+      "price": 6850000,
+      "importPrice": 5800000,
+      "colorName": "Xanh Đậm",
+      "quantity": 7
+    },
+    {
+      "sku": "DEV-1772863383942-2-5",
+      "size": "8GB",
+      "storage": "128GB",
+      "condition": "98%",
+      "price": 6850000,
+      "importPrice": 5800000,
+      "colorName": "Xanh",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772863383942-3-0",
+      "size": "8GB",
+      "storage": "256GB",
+      "condition": "98%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Đen",
+      "quantity": 11
+    },
+    {
+      "sku": "DEV-1772863383942-3-1",
+      "size": "8GB",
+      "storage": "256GB",
+      "condition": "98%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Tím",
+      "quantity": 12
+    },
+    {
+      "sku": "DEV-1772863383942-3-2",
+      "size": "8GB",
+      "storage": "256GB",
+      "condition": "98%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Trắng ",
+      "quantity": 13
+    },
+    {
+      "sku": "DEV-1772863383942-3-3",
+      "size": "8GB",
+      "storage": "256GB",
+      "condition": "98%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Xám",
+      "quantity": 14
+    },
+    {
+      "sku": "DEV-1772863383942-3-4",
+      "size": "8GB",
+      "storage": "256GB",
+      "condition": "98%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Xanh Đậm",
+      "quantity": 15
+    },
+    {
+      "sku": "DEV-1772863383942-3-5",
+      "size": "8GB",
+      "storage": "256GB",
+      "condition": "98%",
+      "price": 7150000,
+      "importPrice": 6100000,
+      "colorName": "Xanh",
+      "quantity": 16
+    }
+  ],
+  "categoryId": "69abbf974c3182dc3299e969"
+}
+Create Product Payload: {
+  "name": "Samsung Galaxy S24 Plus",
+  "brand": "Samsung",
+  "description": "Sản phẩm Samsung S24 Plus Chính hãng mang đến thiết kế tinh tế với khung nhôm và hai mặt kính, tạo sự sang trọng, đẳng cấp và độ bền bỉ theo thời gian cho chiếc máy.\n\nMáy cũng được tích hợp nhiều công nghệ hiện đại như sạc không dây, cảm biến vân tay siêu âm trong màn hình. Tấm nền Dynamic LTPO AMOLED 2X độ sáng 2600 nit, cung cấp hiển thị chất lượng tuyệt đỉnh.\n\nMáy được ra mắt với 2 phiên bản chip tùy thuộc vào từng thị trường, gồm Snapdragon 8 Gen 3 và Exynos 2400, đi kèm RAM 12GB và bộ nhớ trong UFS 4.0 siêu tốc độ.\n\nHệ thống camera 3 ống kính có camera chính 50MP, kết Camera selfie 12MP đáp ứng nhu cầu tự sướng và videocall.\n\nCung cấp năng lượng cho điện thoại là viên pin 4900 mAh hỗ trợ sạc dây 45W. Chạy trên nền Android 14 và giao diện One UI 6, S24 Plus là lựa chọn cực kỳ hợp lý cho trải nghiệm di động cao cấp.",
+  "productType": "device",
+  "categoryName": "Samsung Galaxy S24 Plus",
+  "condition": "new",
+  "conditionLevel": [
+    "99%"
+  ],
+  "colorImages": [
+    {
+      "colorName": "Cam Cát Sandstone",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772865197/tv-phone-test/irurl2uhvq042x9tdif2.jpg",
+      "isDefault": true
+    },
+    {
+      "colorName": "Đen Onyx",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772865198/tv-phone-test/ouu5wglocmdwfrpk7asq.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Tím Cobalt",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772865199/tv-phone-test/gf4q28houlhqhxopbjqn.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Vàng Amber",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772865200/tv-phone-test/k64u6m1mbqjs6sfreb4h.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xám Marble",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772865201/tv-phone-test/w6ljbj89o0fjfjcdpkhw.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xanh lục Jadeite",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772865202/tv-phone-test/geuisyjwej0rth2hlq2k.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xanh Sapphire",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772865203/tv-phone-test/yh3qgy9mcm9gf3skogqs.jpg",
+      "isDefault": false
+    }
+  ],
+  "detailImages": [],
+  "highlights": [
+    "Thiết kế vuông vức, màu sắc phong phú",
+    "Màn hình QHD+ cùng LTPO đỉnh cao",
+    "Camera chụp ảnh chất lượng, quay phim 8K",
+    "Pin 4900 mAh, sạc siêu nhanh 45W"
+  ],
+  "isFeatured": false,
+  "isActive": true,
+  "specs": {
+    "Màn hình": "Dynamic LTPO AMOLED 2X, 120Hz, HDR10+, 2600 nits (tối đa) 6.7 inches, QHD+ (1440 x 3120 pixels), tỷ lệ 19.5:9 Corning Gorilla Glass Victus 2 Always-on Display",
+    "Hệ điều hành": "Android 14, One UI 6.1",
+    "Camera sau": "50 MP, f/1.8, 24mm (góc rộng), Dual Pixel PDAF, OIS 10 MP, f/2.4, 67mm (tele), PDAF, OIS, zoom quang 3x 12 MP, f/2.2, 13mm, 120˚ (góc siêu rộng), Super Steady video Quay phim: 8K@24/30fps, 4K@30/60/120fps, 1080p@30/60/240fps, 1080p@960fps, HDR10+, stereo sound rec., gyro-EIS",
+    "Camera trước": "12 MP, f/2.2, 26mm (góc rộng), Dual Pixel PDAF Dual video call, Auto-HDR, HDR10+ Quay phim: 4K@30/60fps, 1080p@30fps",
+    "CPU": "Exynos 2400 (4 nm) 10 nhân (1x3.2 GHz & 2x2.90 GHz & 3x2.60 GHz & 4x2.0 GHz) GPU: Xclipse 940",
+    "RAM": "12GB",
+    "Bộ nhớ trong": "256-512GB, UFS 4.0",
+    "Thẻ SIM": "1 SIM Nano và eSIM Hoặc 2 SIM nano và eSIM",
+    "Dung lượng pin": "Li-Ion 4900 mAh Sạc dây 45W, PD3.0, 65% trong 30 ph Sạc không dây 15W (Qi/PMA) Sạc ngược không dây 4.5W",
+    "Thiết kế": "Khung nhôm vuông vức Hai mặt kính Gorilla Glass Victus 2 Kháng nước, bụi IP68 Cảm biến vân tay dưới màn hình"
+  },
+  "variants": [
+    {
+      "sku": "DEV-1772865233689-0-0",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 18950000,
+      "importPrice": 17000000,
+      "colorName": "Cam Cát Sandstone",
+      "quantity": 5
+    },
+    {
+      "sku": "DEV-1772865233689-0-1",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 18950000,
+      "importPrice": 17000000,
+      "colorName": "Đen Onyx",
+      "quantity": 4
+    },
+    {
+      "sku": "DEV-1772865233689-0-2",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 18950000,
+      "importPrice": 17000000,
+      "colorName": "Tím Cobalt",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772865233689-0-3",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 18950000,
+      "importPrice": 17000000,
+      "colorName": "Vàng Amber",
+      "quantity": 7
+    },
+    {
+      "sku": "DEV-1772865233689-0-4",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 18950000,
+      "importPrice": 17000000,
+      "colorName": "Xám Marble",
+      "quantity": 5
+    },
+    {
+      "sku": "DEV-1772865233689-0-5",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 18950000,
+      "importPrice": 17000000,
+      "colorName": "Xanh lục Jadeite",
+      "quantity": 9
+    },
+    {
+      "sku": "DEV-1772865233689-0-6",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 18950000,
+      "importPrice": 17000000,
+      "colorName": "Xanh Sapphire",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772865233689-1-0",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 22450000,
+      "importPrice": 20400000,
+      "colorName": "Cam Cát Sandstone",
+      "quantity": 10
+    },
+    {
+      "sku": "DEV-1772865233689-1-1",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 22450000,
+      "importPrice": 20400000,
+      "colorName": "Đen Onyx",
+      "quantity": 11
+    },
+    {
+      "sku": "DEV-1772865233689-1-2",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 22450000,
+      "importPrice": 20400000,
+      "colorName": "Tím Cobalt",
+      "quantity": 12
+    },
+    {
+      "sku": "DEV-1772865233689-1-3",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 22450000,
+      "importPrice": 20400000,
+      "colorName": "Vàng Amber",
+      "quantity": 13
+    },
+    {
+      "sku": "DEV-1772865233689-1-4",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 22450000,
+      "importPrice": 20400000,
+      "colorName": "Xám Marble",
+      "quantity": 14
+    },
+    {
+      "sku": "DEV-1772865233689-1-5",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 22450000,
+      "importPrice": 20400000,
+      "colorName": "Xanh lục Jadeite",
+      "quantity": 15
+    },
+    {
+      "sku": "DEV-1772865233689-1-6",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 22450000,
+      "importPrice": 20400000,
+      "colorName": "Xanh Sapphire",
+      "quantity": 16
+    }
+  ],
+  "categoryId": "69abc6d14c3182dc329a0490"
+}
+Create Product Payload: {
+  "name": "Samsung Galaxy Z Fold 7",
+  "brand": "Samsung",
+  "description": "Hôm nay (9/7/2025), Samsung Z Fold 7 Chính hãng đã chính thức trình làng với thiết kế siêu mỏng chỉ 4,2 mm, thiết kế tinh xảo và có tiêu chuẩn kháng nước, bụi IP48 bền bỉ.\n\nTheo như công bố, Samsung Z Fold 7 Chính hãng có hiệu năng siêu mạnh mẽ được cung cấp bởi Snapdragon 8 Elite For Galaxy đi kèm RAM lên tới 16GB giúp đảm bảo hiệu năng siêu mạnh mẽ. Màn hình Fold 7 lớn 8 inch (màn hình chính) và 6,5 inch (màn hình phụ), camera 200MP, tích hợp Galaxy AI thế hệ mới hoàn thiện cao hơn thế hệ trước.\n\nVậy sản phẩm có còn đáng mua?",
+  "productType": "device",
+  "categoryName": "Samsung Galaxy Z Fold 7",
+  "condition": "new",
+  "conditionLevel": [
+    "99%"
+  ],
+  "colorImages": [
+    {
+      "colorName": "Đen Jet",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772865667/tv-phone-test/ea7rb4c1pgbdyl4km92v.jpg",
+      "isDefault": true
+    },
+    {
+      "colorName": "Xám Metal",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772865668/tv-phone-test/uqcazyr5d8hj2zddwygz.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xanh Mint",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772865668/tv-phone-test/zyy4fpwgdecrs9hy7zey.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xanh Navy",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772865669/tv-phone-test/cnlflyi5cfddfu84mj48.jpg",
+      "isDefault": false
+    }
+  ],
+  "detailImages": [],
+  "highlights": [
+    "Thiết kế tinh xảo mỏng 4.2mm",
+    "Màn hình xuất sắc & Camera 200MP, video 8K",
+    "Pin 4400mAh đủ dùng & Sạc nhanh 25W"
+  ],
+  "isFeatured": false,
+  "isActive": true,
+  "specs": {
+    "Màn hình": "Màn trong: Foldable Dynamic LTPO AMOLED 2X, 120Hz, HDR10+, 2600 nits (peak) 8 inches, 1968 x 2184 pixels Mật độ điểm ảnh ~368 ppi Màn ngoài: Dynamic LTPO AMOLED 2X, 120Hz 6.5 inches, 1080 x 2520 pixels Mật độ điểm ảnh ~422 ppi",
+    "Hệ điều hành": "Android 16, One UI 8 Hỗ trợ cập nhật 7 bản Android chính",
+    "Camera sau": "200 MP, f/1.7, 24mm (góc rộng), 1/1.3\", 0.6µm, multi-directional PDAF, OIS 10 MP, f/2.4, 67mm (telep), 1.0µm, PDAF, OIS, zoom quang 3x 12 MP, f/2.2, 120˚ (góc siêu rộng), 1.4µm, dual pixel PDAF Quay phim: 8K@30fps, 4K@60fps, 1080p@60/120/240fps (gyro-EIS), 720p@960fps (gyro-EIS), 10-bit HDR, HDR10+",
+    "Camera trước": "10 MP, f/2.2, 18mm (góc siêu rộng), 1.12µm Camera màn ngoài: 10 MP, f/2.2, 24mm (góc rộng), 1.12µm Quay phim: 4K@30/60fps, 1080p@30/60fps, gyro-EIS",
+    "CPU": "Qualcomm Snapdragon 8 Elite (3 nm) For Galaxy 8 nhân (2x4.47 GHz + 6x3.50 GHz) GPU: Adreno 830",
+    "RAM": "12-16GB",
+    "Bộ nhớ trong": "256GB-1TB, UFS 4.0",
+    "Thẻ SIM": "2 SIM Nano + eSIM (tối đa 2 SIM cùng lúc)",
+    "Dung lượng pin": "Li-Po 4400 mAh Sạc nhanh 25W, QC2.0, 50% pin trong 30 phút Sạc không dây 15W Sạc ngược 4.5W (không dây)",
+    "Thiết kế": "Điện thoại gập kiểu quyển sổ Khung nhôm phẳng, mặt lưng kính Gorilla Victus 2 Kính màn hình ngoài Gorilla Glass Victus Ceramic 2 Kháng nước, bụi IP48 Cảm biến vân tay cạnh bên"
+  },
+  "variants": [
+    {
+      "sku": "DEV-1772865700365-0-0",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 36950000,
+      "importPrice": 34100000,
+      "colorName": "Đen Jet",
+      "quantity": 5
+    },
+    {
+      "sku": "DEV-1772865700365-0-1",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 36950000,
+      "importPrice": 34100000,
+      "colorName": "Xám Metal",
+      "quantity": 4
+    },
+    {
+      "sku": "DEV-1772865700365-0-2",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 36950000,
+      "importPrice": 34100000,
+      "colorName": "Xanh Mint",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772865700365-0-3",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 36950000,
+      "importPrice": 34100000,
+      "colorName": "Xanh Navy",
+      "quantity": 7
+    },
+    {
+      "sku": "DEV-1772865700365-1-0",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 40450000,
+      "importPrice": 37500000,
+      "colorName": "Đen Jet",
+      "quantity": 11
+    },
+    {
+      "sku": "DEV-1772865700365-1-1",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 40450000,
+      "importPrice": 37500000,
+      "colorName": "Xám Metal",
+      "quantity": 12
+    },
+    {
+      "sku": "DEV-1772865700365-1-2",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 40450000,
+      "importPrice": 37500000,
+      "colorName": "Xanh Mint",
+      "quantity": 13
+    },
+    {
+      "sku": "DEV-1772865700365-1-3",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 40450000,
+      "importPrice": 37500000,
+      "colorName": "Xanh Navy",
+      "quantity": 13
+    },
+    {
+      "sku": "DEV-1772865700365-2-0",
+      "size": "16GB",
+      "storage": "1TB",
+      "condition": "99%",
+      "price": 49950000,
+      "importPrice": 45900000,
+      "colorName": "Đen Jet",
+      "quantity": 5
+    },
+    {
+      "sku": "DEV-1772865700365-2-1",
+      "size": "16GB",
+      "storage": "1TB",
+      "condition": "99%",
+      "price": 49950000,
+      "importPrice": 45900000,
+      "colorName": "Xám Metal",
+      "quantity": 7
+    },
+    {
+      "sku": "DEV-1772865700365-2-2",
+      "size": "16GB",
+      "storage": "1TB",
+      "condition": "99%",
+      "price": 49950000,
+      "importPrice": 45900000,
+      "colorName": "Xanh Mint",
+      "quantity": 8
+    },
+    {
+      "sku": "DEV-1772865700365-2-3",
+      "size": "16GB",
+      "storage": "1TB",
+      "condition": "99%",
+      "price": 49950000,
+      "importPrice": 45900000,
+      "colorName": "Xanh Navy",
+      "quantity": 10
+    }
+  ],
+  "categoryId": "69abc8a44c3182dc329a090b"
+}
+Create Product Payload: {
+  "name": "Honor GT Pro",
+  "brand": "Honor",
+  "description": "Sau thành công rực rỡ của Honor GT, hãng này tiếp tục cho ra mắt thêm Honor GT Pro có nhiều nâng cấp hơn. Theo đó, bản Pro này tích hợp chip Snapdragon 8 Elite xung nhip cao và RAM lên tới 16GB và trở thành chiếc điện thoại có điểm số AnTuTu cao nhất trong năm nay.\n\nKhông chỉ vậy, Honor GT Pro còn có màn hình LTPO AMOLED 144Hz 1 tỷ màu độ phân giải 1.5K, camera 50MP quay video 4K, viên pin Si/C 7200mAh và sạc nhanh 90W. ",
+  "productType": "device",
+  "categoryName": "Honor GT Pro",
+  "condition": "new",
+  "conditionLevel": [
+    "99%"
+  ],
+  "colorImages": [
+    {
+      "colorName": "Đen",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772866569/tv-phone-test/bzmio2enoojwfm37vipj.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Trắng",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772866570/tv-phone-test/cdnckleb9g45howi2boz.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Vàng",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772866571/tv-phone-test/ee2nsawf8og58jtjllow.jpg",
+      "isDefault": true
+    }
+  ],
+  "detailImages": [],
+  "highlights": [
+    "Thiết kế sang trọng, khung nhôm và hỗ trợ IP68/IP69",
+    "Màn hình AMOLED 144Hz & Camera 50MP, video 4K",
+    "Pin khủng 7200mAh & Sạc siêu nhanh 90W"
+  ],
+  "isFeatured": true,
+  "isActive": true,
+  "specs": {
+    "Màn hình": "LTPO AMOLED, 1 tỷ màu, 144Hz, HDR Vivid, 1600 nits (HBM), 6000 nits (peak) 6.78 inches, 1.5K (1224 x 2800 pixels) Mật độ điểm ảnh ~453 ppi Hỗ trợ hình ảnh Ultra HDR Kính cường lực Giant Rhino",
+    "Hệ điều hành": "Android 15, MagicOS 9",
+    "Camera sau": "50 MP, f/2.0 (góc rộng), 1/1.56\", 1.0µm, PDAF, OIS 50 MP, f/2.0, 122˚ (góc siêu rộng), AF 50 MP, f/2.4 (tele), 1/2.0\", 0.8µm, PDAF, OIS, 3x optical zoom Quay phim: 4K@24/30/60fps, 1080p@30/60/120/240fps, gyro-EIS, OIS, HDR Vivid",
+    "Camera trước": "50 MP, f/2.0, 22mm (góc rộng), HDR Quay phim: 4K@30/60fps, 1080p@30/60fps, gyro-EIS",
+    "CPU": "Qualcomm SM8750-AB Snapdragon 8 Elite (3 nm) 8 nhân (2x4.47 GHz & 6x3.53 GHz) GPU: Adreno 830",
+    "RAM": "12-16GB, LPDDR5X",
+    "Bộ nhớ trong": "256GB-1TB, UFS 4.1",
+    "Thẻ SIM": "2 SIM Nano",
+    "Dung lượng pin": "Si/C Li-Ion 7200 mAh Sạc nhanh 90W Sạc ngược 5W (dây)",
+    "Thiết kế": "Khung nhôm phẳng Mặt lưng sợi polymer cong nhẹ Cảm biến vân tay siêu âm dưới màn hình Kháng nước, bụi IP68/IP69"
+  },
+  "variants": [
+    {
+      "sku": "DEV-1772866601658-0-0",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 12950000,
+      "importPrice": 11600000,
+      "colorName": "Đen",
+      "quantity": 5
+    },
+    {
+      "sku": "DEV-1772866601658-0-1",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 12950000,
+      "importPrice": 11600000,
+      "colorName": "Trắng",
+      "quantity": 4
+    },
+    {
+      "sku": "DEV-1772866601658-0-2",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 12950000,
+      "importPrice": 11600000,
+      "colorName": "Vàng",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772866601658-1-0",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 14950000,
+      "importPrice": 13300000,
+      "colorName": "Đen",
+      "quantity": 11
+    },
+    {
+      "sku": "DEV-1772866601658-1-1",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 14950000,
+      "importPrice": 13300000,
+      "colorName": "Trắng",
+      "quantity": 12
+    },
+    {
+      "sku": "DEV-1772866601658-1-2",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 14950000,
+      "importPrice": 13300000,
+      "colorName": "Vàng",
+      "quantity": 11
+    },
+    {
+      "sku": "DEV-1772866601658-2-0",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 15950000,
+      "importPrice": 14200000,
+      "colorName": "Đen",
+      "quantity": 15
+    },
+    {
+      "sku": "DEV-1772866601658-2-1",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 15950000,
+      "importPrice": 14200000,
+      "colorName": "Trắng",
+      "quantity": 7
+    },
+    {
+      "sku": "DEV-1772866601658-2-2",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 15950000,
+      "importPrice": 14200000,
+      "colorName": "Vàng",
+      "quantity": 9
+    }
+  ],
+  "categoryId": "69abcc294c3182dc329a0d88"
+}
+Create Product Payload: {
+  "name": "Honor Magic 8 5G",
+  "brand": "Honor",
+  "description": "Honor mới ra mắt bộ đôi, Honor Magic8 và Magic8 Pro là hai flagship hàng đầu, tại Trung Quốc vào ngày 15 tháng 10. Trong đó mẫu Magic8 được nhiều người dùng quan tâm hơn cả. Vậy những điểm nổi bật của hai chiếc điện thoại này là gì?\n\nĐược trang bị chip Snapdragon 8 Elite Gen 5 mới, Honor Magic8 cùng với bản Pro trở thành những mẫu điện thoại có hiệu năng mạnh mẽ nhất trong thế giới Android. Hơn nữa, chiếc điện thoại này còn sở hữu màn hình tuyệt đẹp cùng khả năng chụp ảnh và quay video vượt trội.\n\nHonor Magic8 được trang bị pin 7000mAh và bộ sạc 90W, cho phép người dùng sử dụng cả ngày mà không lo hết pin.",
+  "productType": "device",
+  "categoryName": "Honor Magic 8 5G",
+  "condition": "new",
+  "conditionLevel": [
+    "99%"
+  ],
+  "colorImages": [
+    {
+      "colorName": "Đen",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772867019/tv-phone-test/dxuj39dal4mfv6mbr2gj.jpg",
+      "isDefault": true
+    },
+    {
+      "colorName": "Trắng",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772867020/tv-phone-test/qeq3stteryk4hnwaoby7.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Vàng",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772867021/tv-phone-test/roks9vtdyx1zazhs42ax.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xanh",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772867022/tv-phone-test/fmjwypdtydbkpxf08fmi.jpg",
+      "isDefault": false
+    }
+  ],
+  "detailImages": [],
+  "highlights": [
+    "Thiết kế không quá khác biệt",
+    "Màn hình OLED 120Hz 1.5K sống động",
+    "Pin khủng 7000mAh & Sạc nhanh 90W"
+  ],
+  "isFeatured": false,
+  "isActive": true,
+  "specs": {
+    "Màn hình": "LTPO OLED, 1 tỷ màu, 120Hz, 4320Hz PWM, Dolby Vision, HDR Vivid, 1800 nits (HBM), 6000 nits (peak) 6.58 inches, 1.5K (1256 x 2760 pixels) Mật độ điểm ảnh ~461 ppi Kính cường lực Giant Rhino Hỗ trợ hình ảnh HDR",
+    "Hệ điều hành": "Android 16, MagicOS 10 Hỗ trợ cập nhật 7 bản Android chính",
+    "Camera sau": "50 MP, f/1.9, 24mm (góc rộng), 1/1.56\", 1.0µm, multi-directional PDAF, OIS 64 MP, f/2.5 (tele), PDAF, OIS, zoom quang 3x 50 MP, f/2.0, 12mm, 122˚ (góc siêu rộng), 1/2.88\", 0.61µm, dual pixel PDAF Quay phim: 4K@24/30/60fps, 1080p@24/30/60/120/240fps, gyro-EIS, OIS, HDR, 10-bit video",
+    "Camera trước": "50 MP, f/2.0, 21mm (góc rộng) Quay phim: 4K@30/60fps, 1080p@30/60fps, gyro-EIS",
+    "CPU": "Qualcomm SM8850-AC Snapdragon 8 Elite Gen 5 (3 nm) 8 nhân (2x4.6 GHz & 6x3.62 GHz) GPU: Adreno 840",
+    "RAM": "12-16GB, LPDDR5X",
+    "Bộ nhớ trong": "256GB-1TB, UFS 4.0",
+    "Thẻ SIM": "2 SIM Nano",
+    "Dung lượng pin": "Si/C Li-Ion 7000 mAh Sạc nhanh 90W Sạc không dây 80W Sạc ngược 5W (dây); sạc ngược không dây",
+    "Thiết kế": "Khung kim loại phẳng Mặt lưng kính phẳng Cảm biến vân tay siêu âm dưới màn hình Kháng nước, bụi IP68/IP69"
+  },
+  "variants": [
+    {
+      "sku": "DEV-1772867053021-0-0",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 16650000,
+      "importPrice": 15000000,
+      "colorName": "Đen",
+      "quantity": 20
+    },
+    {
+      "sku": "DEV-1772867053021-0-1",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 16650000,
+      "importPrice": 15000000,
+      "colorName": "Trắng",
+      "quantity": 21
+    },
+    {
+      "sku": "DEV-1772867053021-0-2",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 16650000,
+      "importPrice": 15000000,
+      "colorName": "Vàng",
+      "quantity": 22
+    },
+    {
+      "sku": "DEV-1772867053021-0-3",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 16650000,
+      "importPrice": 15000000,
+      "colorName": "Xanh",
+      "quantity": 23
+    },
+    {
+      "sku": "DEV-1772867053021-1-0",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 17750000,
+      "importPrice": 16300000,
+      "colorName": "Đen",
+      "quantity": 10
+    },
+    {
+      "sku": "DEV-1772867053021-1-1",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 17750000,
+      "importPrice": 16300000,
+      "colorName": "Trắng",
+      "quantity": 7
+    },
+    {
+      "sku": "DEV-1772867053021-1-2",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 17750000,
+      "importPrice": 16300000,
+      "colorName": "Vàng",
+      "quantity": 8
+    },
+    {
+      "sku": "DEV-1772867053021-1-3",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 17750000,
+      "importPrice": 16300000,
+      "colorName": "Xanh",
+      "quantity": 9
+    },
+    {
+      "sku": "DEV-1772867053021-2-0",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 18500000,
+      "importPrice": 17000000,
+      "colorName": "Đen",
+      "quantity": 5
+    },
+    {
+      "sku": "DEV-1772867053021-2-1",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 18500000,
+      "importPrice": 17000000,
+      "colorName": "Trắng",
+      "quantity": 4
+    },
+    {
+      "sku": "DEV-1772867053021-2-2",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 18500000,
+      "importPrice": 17000000,
+      "colorName": "Vàng",
+      "quantity": 3
+    },
+    {
+      "sku": "DEV-1772867053021-2-3",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 18500000,
+      "importPrice": 17000000,
+      "colorName": "Xanh",
+      "quantity": 3
+    }
+  ],
+  "categoryId": "69abcded4c3182dc329a133c"
+}
+Create Product Payload: {
+  "name": "Honor Magic 8 Pro",
+  "brand": "Honor",
+  "description": "Chiếc điện thoại Honor Magic8 Pro - cao cấp hàng đầu của Honor ra mắt ngày 15/10 tại quê nhà Trung Quốc. Vậy sản phẩm này có những điểm gì nổi bật?\n\nCung cấp sức mạnh cho Honor Magic8 Pro hoạt động chính là chip Snapdragon 8 Elite Gen 5 mới và mạnh nhất chip Android hiện nay. Không chỉ vậy, máy còn sở hữu màn hình hiển thị xuất sắc, camera chụp ảnh quay video chất lượng tuyệt vời.\n\nCung cấp năng lượng cho máy là viên pin 7200mAh kèm theo sạc 120W giúp người dùng sử dụng cả ngay không lo hết pin.",
+  "productType": "device",
+  "categoryName": "Honor Magic 8 Pro",
+  "condition": "new",
+  "conditionLevel": [
+    "99%"
+  ],
+  "colorImages": [
+    {
+      "colorName": "Đen",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772867855/tv-phone-test/dsaz0fgvlvztyighihj2.jpg",
+      "isDefault": true
+    },
+    {
+      "colorName": "Trắng",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772867856/tv-phone-test/jmmmyupuqgzzwjyrphiz.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Vàng",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772867856/tv-phone-test/c4hcqkejpxuhzmcz99zh.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xanh Ngọc",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772867857/tv-phone-test/nqn0kr9r5a1fv4pauwsc.jpg",
+      "isDefault": false
+    }
+  ],
+  "detailImages": [],
+  "highlights": [
+    "Loa top đầu thế giới Smartphone",
+    "Màn hình hiển thị xuất sắc & Camera chất lượng cao",
+    "Pin khủng 7200mAh & Sạc nhanh 120W"
+  ],
+  "isFeatured": false,
+  "isActive": true,
+  "specs": {
+    "Màn hình": "LTPO OLED, 1 tỷ màu, 120Hz, 4320Hz PWM, Dolby Vision, HDR Vivid, 1800 nits (HBM), 6000 nits (peak) 6.71 inches, 1.5K (1256 x 2808 pixels) Tỷ lệ 20:9, mật độ điểm ảnh ~458 ppi Hỗ trợ hình ảnh HDR Kính cường lực Giant Rhino",
+    "Hệ điều hành": "Android 16, MagicOS 10 Hỗ trợ cập nhật 7 bản Android chính",
+    "Camera sau": "50 MP, f/1.6, 24mm (góc rộng), 1/1.3\", 1.2µm, multi-directional PDAF, OIS 200 MP, f/2.6 (tiềm vọng tele), 1/1.4\", 0.56µm, multi-directional PDAF, OIS, zoom quang 3.7x 50 MP, f/2.0, 12mm, 122˚ (góc siêu rộng), 1/2.88\", 0.61µm, multi-directional PDAF Quay phim: 4K@24/30/60/120fps, 1080p@24/30/60/120/240fps, gyro-EIS, OIS, HDR, 10-bit video",
+    "Camera trước": "50 MP, f/2.0, 21mm (góc rộng), 1/2.93\", 0.6µm, PDAF TOF 3D, (độ sâu/cảm biến sinh trắc - Face ID) Quay phim: 4K@30/60fps, 1080p@30/60fps, gyro-EIS",
+    "CPU": "Qualcomm SM8850-AC Snapdragon 8 Elite Gen 5 (3 nm) 8 nhân (2x4.6 GHz & 6x3.62 GHz) GPU: Adreno 840",
+    "RAM": "12-16GB, LPDDR5X",
+    "Bộ nhớ trong": "256GB-1TB, UFS 4.0",
+    "Thẻ SIM": "2 SIM Nano - Trung Quốc Hoặc SIM Nano + eSIM Hoặc eSIM + eSIM",
+    "Dung lượng pin": "Si/C Li-Ion 7100 mAh Si/C Li-Ion 6270 mAh (bản EU) Sạc nhanh 100W, 100W PPS, 40W UFCS Sạc không dây 80W Sạc ngược 5W (dây); sạc ngược không dây",
+    "Thiết kế": "Khung kim loại phẳng Mặt lưng cong nhẹ Màn hình cong nhẹ đều 4 cạnh Cảm biến vân tay siêu âm dưới màn hình Kháng nước, bụi IP68/IP69"
+  },
+  "variants": [
+    {
+      "sku": "DEV-1772867889699-0-0",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 21000000,
+      "importPrice": 19499999,
+      "colorName": "Đen",
+      "quantity": 9
+    },
+    {
+      "sku": "DEV-1772867889699-0-1",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 21000000,
+      "importPrice": 19499999,
+      "colorName": "Trắng",
+      "quantity": 8
+    },
+    {
+      "sku": "DEV-1772867889699-0-2",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 21000000,
+      "importPrice": 19499999,
+      "colorName": "Vàng",
+      "quantity": 7
+    },
+    {
+      "sku": "DEV-1772867889699-0-3",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 21000000,
+      "importPrice": 19499999,
+      "colorName": "Xanh Ngọc",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772867889699-1-0",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 22000000,
+      "importPrice": 20400000,
+      "colorName": "Đen",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772867889699-1-1",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 22000000,
+      "importPrice": 20400000,
+      "colorName": "Trắng",
+      "quantity": 7
+    },
+    {
+      "sku": "DEV-1772867889699-1-2",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 22000000,
+      "importPrice": 20400000,
+      "colorName": "Vàng",
+      "quantity": 8
+    },
+    {
+      "sku": "DEV-1772867889699-1-3",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 22000000,
+      "importPrice": 20400000,
+      "colorName": "Xanh Ngọc",
+      "quantity": 9
+    },
+    {
+      "sku": "DEV-1772867889699-2-0",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 23000000,
+      "importPrice": 21300000,
+      "colorName": "Đen",
+      "quantity": 5
+    },
+    {
+      "sku": "DEV-1772867889699-2-1",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 23000000,
+      "importPrice": 21300000,
+      "colorName": "Trắng",
+      "quantity": 3
+    },
+    {
+      "sku": "DEV-1772867889699-2-2",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 23000000,
+      "importPrice": 21300000,
+      "colorName": "Vàng",
+      "quantity": 4
+    },
+    {
+      "sku": "DEV-1772867889699-2-3",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 23000000,
+      "importPrice": 21300000,
+      "colorName": "Xanh Ngọc",
+      "quantity": 3
+    }
+  ],
+  "categoryId": "69abd1314c3182dc329a2053"
+}
+Create Product Payload: {
+  "name": "Honor WIN RT",
+  "brand": "Honor",
+  "description": "Honor WIN RT có hiệu năng siêu mạnh mẽ với chip Snapdragon 8 Elite, thời lượng pin vô cùng lâu với viên pin 10000mAh cùng sạc nhanh 100W. Máy được tích hợp quạt tản nhiệt.\n",
+  "productType": "device",
+  "categoryName": "Honor WIN RT",
+  "condition": "new",
+  "conditionLevel": [
+    "99%"
+  ],
+  "colorImages": [
+    {
+      "colorName": "Đen",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772868450/tv-phone-test/koi4iqqgbfqxd4lvbduo.jpg",
+      "isDefault": true
+    },
+    {
+      "colorName": "Trắng",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772868451/tv-phone-test/cvhbsymeyfagxoaokami.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xanh",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772868451/tv-phone-test/deq8cldnnenhjw7umabe.jpg",
+      "isDefault": false
+    }
+  ],
+  "detailImages": [],
+  "highlights": [
+    "Thiết kế vuông vức, có quạt tản nhiệt",
+    "Màn hình AMOLED 1.5K & Camera sắc nét",
+    "Pin siêu khủng 10000mAh & Sạc nhanh 100W"
+  ],
+  "isFeatured": false,
+  "isActive": true,
+  "specs": {
+    "Màn hình": "AMOLED 185Hz, 4320Hz PWM, HDR Vivid, 1600 nits (HBM), 6000 nits (peak) 6.83 inches, 1.5K (1272 x 2800 pixels)",
+    "Hệ điều hành": "Android 16, MagicOS 10",
+    "Camera sau": "50 MP (góc rộng) 12 MP (góc siêu rộng) Quay phim: 4K, 1080p",
+    "Camera trước": "50 MP (góc rộng) Quay phim: 1080p",
+    "CPU": "Qualcomm SM8750-AB Snapdragon 8 Elite (3 nm) 8 nhân (2x4.32 GHz & 6x3.53 GHz) GPU: Adreno 830",
+    "RAM": "12-16GB, LPDDR5X Ultra",
+    "Bộ nhớ trong": "256GB-1TB, UFS 4.1",
+    "Thẻ SIM": "2 Nano SIM",
+    "Dung lượng pin": "Si/C Li-Ion 10.000 mAh Sạc nhanh có dây 100W Sạc nhanh không dây 80W Sạc ngược có dây 27W",
+    "Thiết kế": "Khung nhôm phẳng Mặt lưng phẳng + Quạt tản nhiệt"
+  },
+  "variants": [
+    {
+      "sku": "DEV-1772868482513-0-0",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 11750000,
+      "importPrice": 10500000,
+      "colorName": "Đen",
+      "quantity": 12
+    },
+    {
+      "sku": "DEV-1772868482513-0-1",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 11750000,
+      "importPrice": 10500000,
+      "colorName": "Trắng",
+      "quantity": 13
+    },
+    {
+      "sku": "DEV-1772868482513-0-2",
+      "size": "12GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 11750000,
+      "importPrice": 10500000,
+      "colorName": "Xanh",
+      "quantity": 15
+    },
+    {
+      "sku": "DEV-1772868482513-1-0",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 12250000,
+      "importPrice": 10800000,
+      "colorName": "Đen",
+      "quantity": 11
+    },
+    {
+      "sku": "DEV-1772868482513-1-1",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 12250000,
+      "importPrice": 10800000,
+      "colorName": "Trắng",
+      "quantity": 11
+    },
+    {
+      "sku": "DEV-1772868482513-1-2",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 12250000,
+      "importPrice": 10800000,
+      "colorName": "Xanh",
+      "quantity": 10
+    },
+    {
+      "sku": "DEV-1772868482513-2-0",
+      "size": "16GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 12250000,
+      "importPrice": 10800000,
+      "colorName": "Đen",
+      "quantity": 11
+    },
+    {
+      "sku": "DEV-1772868482513-2-1",
+      "size": "16GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 12250000,
+      "importPrice": 10800000,
+      "colorName": "Trắng",
+      "quantity": 15
+    },
+    {
+      "sku": "DEV-1772868482513-2-2",
+      "size": "16GB",
+      "storage": "256GB",
+      "condition": "99%",
+      "price": 12250000,
+      "importPrice": 10800000,
+      "colorName": "Xanh",
+      "quantity": 18
+    },
+    {
+      "sku": "DEV-1772868482513-3-0",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 13250000,
+      "importPrice": 11600000,
+      "colorName": "Đen",
+      "quantity": 6
+    },
+    {
+      "sku": "DEV-1772868482513-3-1",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 13250000,
+      "importPrice": 11600000,
+      "colorName": "Trắng",
+      "quantity": 7
+    },
+    {
+      "sku": "DEV-1772868482513-3-2",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 13250000,
+      "importPrice": 11600000,
+      "colorName": "Xanh",
+      "quantity": 8
+    }
+  ],
+  "categoryId": "69abd3824c3182dc329a2bee"
+}
+Create Product Payload: {
+  "name": "Honor WIN 5G",
+  "brand": "Honor",
+  "description": "Sau bao sự chờ đợi, Honor WIN cũng đã chính thức ra mắt với hiệu năng vượt trội tập trung vào chơi game. Được trang bị quạt tản nhiệt và hiệu suất từ chip Snandragon 8 Elite Gen 5. Đi kèm viên pin 10000mAh sạc nhanh 100W Mang lại trải nghiệm về pin là vô cùng tuyệt vời, vượt xa mọi đối thủ cùng tầm giá ở thời điểm hiện tại.\n",
+  "productType": "device",
+  "categoryName": "Honor WIN 5G",
+  "condition": "new",
+  "conditionLevel": [
+    "99%"
+  ],
+  "colorImages": [
+    {
+      "colorName": "Đen",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772869748/tv-phone-test/n1eut22hxo3gmfzfzsei.jpg",
+      "isDefault": true
+    },
+    {
+      "colorName": "Trắng",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772869749/tv-phone-test/jemhixhtnwpcearnbqzj.jpg",
+      "isDefault": false
+    },
+    {
+      "colorName": "Xanh",
+      "imageUrl": "https://res.cloudinary.com/dg4tvqz7g/image/upload/v1772869749/tv-phone-test/e79w6nxgidna1juovvpc.jpg",
+      "isDefault": false
+    }
+  ],
+  "detailImages": [],
+  "highlights": [
+    "Thiết kế quen thuộc, có quạt tản nhiệt",
+    "Màn hình AMOLED 185Hz & Camera 50MP sắc nét",
+    "Pin siêu trâu 10.000mAh & Sạc cực nhanh 100W"
+  ],
+  "isFeatured": true,
+  "isActive": true,
+  "specs": {
+    "Màn hình": "AMOLED 185Hz, 4320Hz PWM, HDR Vivid, 1600 nits (HBM), 6000 nits (peak) 6.83 inches, 1.5K (2800x1272 pixels)",
+    "Hệ điều hành": "Android 16, MagicOS 10",
+    "Camera sau": "50 MP (góc rộng) 50 MP (tele) 12 MP (góc siêu rộng) Quay phim: 4K, 1080p",
+    "Camera trước": "50 MP (góc rộng) Quay phim: 4K",
+    "CPU": "Qualcomm SM8850-AC Snapdragon 8 Elite Gen 5 (3 nm) 8 nhân (2x4.6 GHz & 6x3.62 GHz) GPU: Adreno 840",
+    "RAM": "12-16GB",
+    "Bộ nhớ trong": "256GB-1TGB",
+    "Thẻ SIM": "2 Nano SIM",
+    "Dung lượng pin": "Si/C Li-Ion 10.000 mAh Sạc nhanh 100W",
+    "Thiết kế": "Khung kim loại phẳng Mặt lưng kính cong nhẹ Có quạt tản nhiệt Hỗ trợ kháng nước IP68/IP69"
+  },
+  "variants": [
+    {
+      "sku": "DEV-1772869780366-0-0",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 15450000,
+      "importPrice": 14000000,
+      "colorName": "Đen",
+      "quantity": 22
+    },
+    {
+      "sku": "DEV-1772869780366-0-1",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 15450000,
+      "importPrice": 14000000,
+      "colorName": "Trắng",
+      "quantity": 25
+    },
+    {
+      "sku": "DEV-1772869780366-0-2",
+      "size": "12GB",
+      "storage": "128GB",
+      "condition": "99%",
+      "price": 15450000,
+      "importPrice": 14000000,
+      "colorName": "Xanh",
+      "quantity": 27
+    },
+    {
+      "sku": "DEV-1772869780366-1-0",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 16950000,
+      "importPrice": 15300000,
+      "colorName": "Đen",
+      "quantity": 33
+    },
+    {
+      "sku": "DEV-1772869780366-1-1",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 16950000,
+      "importPrice": 15300000,
+      "colorName": "Trắng",
+      "quantity": 33
+    },
+    {
+      "sku": "DEV-1772869780366-1-2",
+      "size": "12GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 16950000,
+      "importPrice": 15300000,
+      "colorName": "Xanh",
+      "quantity": 21
+    },
+    {
+      "sku": "DEV-1772869780366-2-0",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 17750000,
+      "importPrice": 16000000,
+      "colorName": "Đen",
+      "quantity": 12
+    },
+    {
+      "sku": "DEV-1772869780366-2-1",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 17750000,
+      "importPrice": 16000000,
+      "colorName": "Trắng",
+      "quantity": 14
+    },
+    {
+      "sku": "DEV-1772869780366-2-2",
+      "size": "16GB",
+      "storage": "512GB",
+      "condition": "99%",
+      "price": 17750000,
+      "importPrice": 16000000,
+      "colorName": "Xanh",
+      "quantity": 16
+    }
+  ],
+  "categoryId": "69abd8944c3182dc329a50b1"
+}

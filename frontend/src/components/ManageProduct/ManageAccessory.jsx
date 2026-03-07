@@ -2,7 +2,7 @@
 import React from "react";
 import { Plus, Trash2, Save, X, Edit3, Eye, EyeOff, Search, Settings, ImageIcon, Layers, Zap, Smartphone, ShieldCheck, Cpu, Link as LinkIcon, ListPlus } from "lucide-react";
 import { Toaster, toast } from "sonner";
-import { useProductManager } from "./useProductManager"; 
+import { useProductManager } from "./useProductManager";
 import "./ManageProduct.css";
 
 // Cấu hình thông số tự động cho Phụ kiện
@@ -16,20 +16,20 @@ const accessorySpecsConfig = {
 
 const emptyFormAccessory = {
   name: "", brand: "", description: "Phụ kiện cao cấp chính hãng", productType: "accessory", categoryName: "Ốp lưng", condition: "new",
-  colorImages: [{ colorName: "Mặc định", imageUrl: "", isDefault: true, imageFile: null }], highlights: [""], isFeatured: false, isActive: true,
+  colorImages: [{ colorName: "Mặc định", imageUrl: "", isDefault: true, imageFile: null }], detailImages: [], highlights: [""], isFeatured: false, isActive: true,
   specs: [], variants: [{ sku: "", colorName: "Mặc định", size: "Standard", storage: "N/A", price: 0, importPrice: 0, quantity: 0 }]
 };
 
 export default function ManageAccessory() {
   const {
     products, form, setForm, showModal, isEditing, searchTerm, setSearchTerm,
-    addField, removeField, handleImageFileChange, openModalForAdd, openModalForEdit, closeModal, handleDelete, toggleActive, handleSubmit
+    addField, removeField, handleImageFileChange, handleDetailImageChange, openModalForAdd, openModalForEdit, closeModal, handleDelete, toggleActive, handleSubmit
   } = useProductManager("accessory", emptyFormAccessory, accessorySpecsConfig);
 
   return (
     <div className="manage-product">
       <Toaster position="top-right" richColors />
-      
+
       {/* HEADER */}
       <div className="admin-header">
         <div className="header-left">
@@ -39,7 +39,7 @@ export default function ManageAccessory() {
             <input placeholder="Tìm ốp, sạc, cáp..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
           </div>
         </div>
-        <button className="btn-add-main" style={{backgroundColor: '#8b5cf6'}} onClick={openModalForAdd}>
+        <button className="btn-add-main" style={{ backgroundColor: '#8b5cf6' }} onClick={openModalForAdd}>
           <Plus size={20} /> Thêm phụ kiện
         </button>
       </div>
@@ -54,16 +54,16 @@ export default function ManageAccessory() {
             {products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase())).map((p) => (
               <tr key={p._id} className={!p.isActive ? "row-disabled" : ""}>
                 <td>
-                  <strong>{p.name}</strong><br/>
+                  <strong>{p.name}</strong><br />
                   <small className="brand-tag">{p.brand}</small>
                 </td>
                 <td>
-                  <span className="type-badge-acc" style={{background: '#f3e8ff', color: '#7e22ce', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600'}}>
+                  <span className="type-badge-acc" style={{ background: '#f3e8ff', color: '#7e22ce', padding: '4px 10px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>
                     {p.categoryId?.name || p.categoryName || "Phụ kiện"}
                   </span>
                 </td>
-                <td style={{color: '#94a3b8'}}>{Math.min(...(p.variants?.map(v => v.importPrice) || [0])).toLocaleString()}đ</td>
-                <td style={{color: '#8b5cf6', fontWeight: 'bold'}}>{Math.min(...(p.variants?.map(v => v.price) || [0])).toLocaleString()}đ</td>
+                <td style={{ color: '#94a3b8' }}>{Math.min(...(p.variants?.map(v => v.importPrice) || [0])).toLocaleString()}đ</td>
+                <td style={{ color: '#8b5cf6', fontWeight: 'bold' }}>{Math.min(...(p.variants?.map(v => v.price) || [0])).toLocaleString()}đ</td>
                 <td>{p.variants?.reduce((sum, v) => sum + v.quantity, 0)}</td>
                 <td>
                   <button onClick={() => toggleActive(p)} className={`status-btn ${p.isActive ? "on" : "off"}`}>
@@ -94,24 +94,28 @@ export default function ManageAccessory() {
 
             <form onSubmit={handleSubmit}>
               <div className="modal-scroll-body">
-                
+
                 {/* 1. THÔNG TIN CƠ BẢN */}
                 <div className="form-card">
-                  <div className="card-header-form"><Settings size={18} color="#8b5cf6"/> Thông tin cơ bản</div>
+                  <div className="card-header-form"><Settings size={18} color="#8b5cf6" /> Thông tin cơ bản</div>
                   <div className="form-grid-3">
                     <div className="form-group-full">
                       <label>Tên sản phẩm *</label>
-                      <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required placeholder="Vd: Ốp lưng iPhone 15 Pro Max Silicon Case" />
+                      <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required placeholder="Vd: Ốp lưng iPhone 15 Pro Max Silicon Case" />
                     </div>
                     <div className="form-group">
                       <label>Phân loại phụ kiện</label>
-                      <select value={form.categoryName} onChange={e => setForm({...form, categoryName: e.target.value})}>
+                      <select value={form.categoryName} onChange={e => setForm({ ...form, categoryName: e.target.value })}>
                         {Object.keys(accessorySpecsConfig).map(cat => <option key={cat} value={cat}>{cat}</option>)}
                       </select>
                     </div>
                     <div className="form-group">
                       <label>Hãng</label>
-                      <input value={form.brand} onChange={e => setForm({...form, brand: e.target.value})} placeholder="Apple, Samsung, Hoco..." />
+                      <input value={form.brand} onChange={e => setForm({ ...form, brand: e.target.value })} placeholder="Apple, Samsung, Hoco..." />
+                    </div>
+                    <div className="form-group-full">
+                      <label>Mô tả chi tiết</label>
+                      <textarea rows="6" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Mô tả chung về sản phẩm..." style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', resize: 'vertical' }} />
                     </div>
                   </div>
                 </div>
@@ -120,12 +124,12 @@ export default function ManageAccessory() {
                 <div className="form-card">
                   <div className="card-header-form"><Zap size={18} color="#f59e0b" /> Đặc điểm nổi bật</div>
                   {form.highlights.map((h, i) => (
-                    <div key={`highlight-${i}`} className="dynamic-row" style={{display: 'flex', gap: '10px', marginBottom: '8px'}}>
-                      <input style={{flex: 1}} value={h} onChange={e => { const n = [...form.highlights]; n[i] = e.target.value; setForm({...form, highlights: n}); }} placeholder="Vd: Chống sốc chuẩn quân đội" />
-                      <button type="button" className="remove-icon-btn" onClick={() => removeField("highlights", i)}><Trash2 size={16}/></button>
+                    <div key={`highlight-${i}`} className="dynamic-row" style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
+                      <input style={{ flex: 1 }} value={h} onChange={e => { const n = [...form.highlights]; n[i] = e.target.value; setForm({ ...form, highlights: n }); }} placeholder="Vd: Chống sốc chuẩn quân đội" />
+                      <button type="button" className="remove-icon-btn" onClick={() => removeField("highlights", i)}><Trash2 size={16} /></button>
                     </div>
                   ))}
-                  <button type="button" className="btn-add-sub" style={{color: '#8b5cf6', borderColor: '#8b5cf6'}} onClick={() => addField("highlights", "")}>+ Thêm đặc điểm</button>
+                  <button type="button" className="btn-add-sub" style={{ color: '#8b5cf6', borderColor: '#8b5cf6' }} onClick={() => addField("highlights", "")}>+ Thêm đặc điểm</button>
                 </div>
 
                 {/* 3. HÌNH ẢNH MÀU SẮC - UP FILE */}
@@ -133,92 +137,143 @@ export default function ManageAccessory() {
                   <div className="card-header-form"><ImageIcon size={18} color="#8b5cf6" /> Hình ảnh & Màu sắc (File)</div>
                   <div className="color-images-grid">
                     {form.colorImages.map((ci, i) => (
-                      <div key={`color-${i}`} className="dynamic-row-color" style={{gridTemplateColumns: '1.5fr 2fr 60px auto auto', gap:'15px', alignItems:'center'}}>
-                        <input placeholder="Tên màu" value={ci.colorName} onChange={e => { const u = [...form.colorImages]; u[i].colorName = e.target.value; setForm({...form, colorImages: u}); }} required />
-                        
+                      <div key={`color-${i}`} className="dynamic-row-color" style={{ gridTemplateColumns: '1.5fr 2fr 60px auto auto', gap: '15px', alignItems: 'center' }}>
+                        <input placeholder="Tên màu" value={ci.colorName} onChange={e => { const u = [...form.colorImages]; u[i].colorName = e.target.value; setForm({ ...form, colorImages: u }); }} required />
+
                         <div className="file-input-wrapper">
-                            <input 
-                                type="file" 
-                                accept="image/*" 
-                                id={`file-acc-${i}`} 
-                                hidden 
-                                onChange={(e) => handleImageFileChange(i, e.target.files[0])} 
-                            />
-                            <button 
-                                type="button" 
-                                className="btn-upload-img" 
-                                onClick={() => document.getElementById(`file-acc-${i}`).click()}
-                                style={{ width: '100%' }}
-                            >
-                                {ci.imageFile ? "✓ Đã chọn file" : "📁 Chọn ảnh từ máy"}
-                            </button>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            id={`file-acc-${i}`}
+                            hidden
+                            onChange={(e) => handleImageFileChange(i, e.target.files[0])}
+                          />
+                          <button
+                            type="button"
+                            className="btn-upload-img"
+                            onClick={() => document.getElementById(`file-acc-${i}`).click()}
+                            style={{ width: '100%' }}
+                          >
+                            {ci.imageFile ? "✓ Đã chọn file" : "📁 Chọn ảnh từ máy"}
+                          </button>
                         </div>
 
                         <div className="img-preview-box">
-                            {ci.imageUrl ? (
-                                <img src={ci.imageUrl} alt="preview" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
-                            ) : (
-                                <div style={{ width: '50px', height: '50px', background: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <ImageIcon size={20} color="#cbd5e1" />
-                                </div>
-                            )}
+                          {ci.imageUrl ? (
+                            <img src={ci.imageUrl} alt="preview" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+                          ) : (
+                            <div style={{ width: '50px', height: '50px', background: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <ImageIcon size={20} color="#cbd5e1" />
+                            </div>
+                          )}
                         </div>
 
-                        <label className="checkbox-default" style={{display:'flex', alignItems:'center', gap:'5px', color:'#64748b'}}>
-                          <input type="checkbox" checked={ci.isDefault} onChange={() => { const u = form.colorImages.map((item, idx) => ({ ...item, isDefault: idx === i })); setForm({...form, colorImages: u}); }} /> Mặc định
+                        <label className="checkbox-default" style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#64748b' }}>
+                          <input type="checkbox" checked={ci.isDefault} onChange={() => { const u = form.colorImages.map((item, idx) => ({ ...item, isDefault: idx === i })); setForm({ ...form, colorImages: u }); }} /> Mặc định
                         </label>
                         <button type="button" className="remove-icon-btn" onClick={() => removeField("colorImages", i)}><Trash2 size={18} /></button>
                       </div>
                     ))}
                   </div>
-                  <button type="button" className="btn-add-sub" style={{color: '#8b5cf6', borderColor: '#8b5cf6'}} onClick={() => addField("colorImages", { colorName: "", imageUrl: "", isDefault: false, imageFile: null })}>+ Thêm màu sắc</button>
+                  <button type="button" className="btn-add-sub" style={{ color: '#8b5cf6', borderColor: '#8b5cf6' }} onClick={() => addField("colorImages", { colorName: "", imageUrl: "", isDefault: false, imageFile: null })}>+ Thêm màu sắc</button>
+                </div>
+
+                {/* 3.5 HÌNH ẢNH CHI TIẾT */}
+                <div className="form-card">
+                  <div className="card-header-form"><ImageIcon size={18} /> Ảnh chi tiết sản phẩm (Tùy chọn)</div>
+                  <div className="detail-images-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '15px' }}>
+                    {(form.detailImages || []).map((di, i) => (
+                      <div key={`detail-img-${i}`} className="detail-img-item" style={{ position: 'relative', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '5px', textAlign: 'center' }}>
+                        <div className="img-preview-box" style={{ width: '100%', height: '80px', marginBottom: '8px' }}>
+                          {di.imageUrl ? (
+                            <img src={di.imageUrl} alt={`chi-tiet-${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }} />
+                          ) : (
+                            <div style={{ width: '100%', height: '100%', background: '#f1f5f9', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <ImageIcon size={24} color="#cbd5e1" />
+                            </div>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          id={`file-detail-${i}`}
+                          hidden
+                          onChange={(e) => handleDetailImageChange(i, e.target.files[0])}
+                        />
+                        <button
+                          type="button"
+                          className="btn-upload-img"
+                          onClick={() => document.getElementById(`file-detail-${i}`).click()}
+                          style={{ width: '100%', fontSize: '11px', padding: '4px' }}
+                        >
+                          Đổi ảnh
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-icon-remove remove-icon-btn"
+                          onClick={() => removeField("detailImages", i)}
+                          style={{ position: 'absolute', top: '-8px', right: '-8px', background: '#fff', borderRadius: '50%', boxShadow: '0 2px 4px rgba(0,00,0.1)' }}
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ))}
+                    <div
+                      className="add-detail-img-btn"
+                      onClick={() => addField("detailImages", { imageUrl: "", imageFile: null })}
+                      style={{ border: '2px dashed #cbd5e1', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '120px', cursor: 'pointer', color: '#64748b' }}
+                    >
+                      <Plus size={24} style={{ marginBottom: '8px' }} />
+                      <span style={{ fontSize: '12px' }}>Thêm ảnh</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* 4. THÔNG SỐ KỸ THUẬT */}
                 <div className="form-card" style={{ borderLeft: '4px solid #8b5cf6' }}>
                   <div className="card-header-form"><ListPlus size={18} color="#8b5cf6" /> Thông số & Giá trị</div>
-                  <div className="specs-grid-admin" style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
+                  <div className="specs-grid-admin" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {form.specs.map((spec, idx) => (
-                      <div key={`spec-${idx}`} style={{display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: '10px'}}>
-                        <input value={spec.key} onChange={e => { const newSpecs = [...form.specs]; newSpecs[idx].key = e.target.value; setForm({...form, specs: newSpecs}); }} placeholder="Tên thông số" />
-                        <input value={spec.value} onChange={e => { const newSpecs = [...form.specs]; newSpecs[idx].value = e.target.value; setForm({...form, specs: newSpecs}); }} placeholder="Giá trị..." />
+                      <div key={`spec-${idx}`} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: '10px' }}>
+                        <input value={spec.key} onChange={e => { const newSpecs = [...form.specs]; newSpecs[idx].key = e.target.value; setForm({ ...form, specs: newSpecs }); }} placeholder="Tên thông số" />
+                        <input value={spec.value} onChange={e => { const newSpecs = [...form.specs]; newSpecs[idx].value = e.target.value; setForm({ ...form, specs: newSpecs }); }} placeholder="Giá trị..." />
                         <button type="button" className="remove-icon-btn" onClick={() => removeField("specs", idx)}><X size={16} /></button>
                       </div>
                     ))}
                   </div>
-                  <button type="button" className="btn-add-sub" style={{color: '#8b5cf6', borderColor: '#8b5cf6'}} onClick={() => addField("specs", {key: "", value: ""})}>+ Thêm thông số</button>
+                  <button type="button" className="btn-add-sub" style={{ color: '#8b5cf6', borderColor: '#8b5cf6' }} onClick={() => addField("specs", { key: "", value: "" })}>+ Thêm thông số</button>
                 </div>
 
                 {/* 5. PHÂN LOẠI & GIÁ BÁN */}
                 <div className="form-card">
                   <div className="card-header-form"><Layers size={18} color="#8b5cf6" /> Phân loại & Giá bán</div>
                   {form.variants.map((v, i) => (
-                    <div key={`variant-${i}`} className="variant-block" style={{padding: '15px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', marginBottom: '10px'}}>
-                      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '15px', alignItems: 'end'}}>
+                    <div key={`variant-${i}`} className="variant-block" style={{ padding: '15px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', marginBottom: '10px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '15px', alignItems: 'end' }}>
                         <div className="form-group">
                           <label>Màu sắc</label>
-                          <select value={v.colorName} onChange={e => { const u = [...form.variants]; u[i].colorName = e.target.value; setForm({...form, variants: u}); }} required>
+                          <select value={v.colorName} onChange={e => { const u = [...form.variants]; u[i].colorName = e.target.value; setForm({ ...form, variants: u }); }} required>
                             <option value="">- Chọn màu -</option>
-                            {form.colorImages.map(c => ( <option key={`opt-color-${c.colorName}`} value={c.colorName}>{c.colorName || "Chưa đặt tên"}</option> ))}
+                            {form.colorImages.map(c => (<option key={`opt-color-${c.colorName}`} value={c.colorName}>{c.colorName || "Chưa đặt tên"}</option>))}
                           </select>
                         </div>
                         <div className="form-group">
                           <label>Giá nhập</label>
-                          <input type="number" value={v.importPrice} onChange={e => { const u = [...form.variants]; u[i].importPrice = e.target.value; setForm({...form, variants: u}); }} />
+                          <input type="number" value={v.importPrice} onChange={e => { const u = [...form.variants]; u[i].importPrice = e.target.value; setForm({ ...form, variants: u }); }} />
                         </div>
                         <div className="form-group">
-                          <label style={{color: '#8b5cf6'}}>Giá bán</label>
-                          <input type="number" style={{fontWeight: 'bold', color: '#8b5cf6'}} value={v.price} onChange={e => { const u = [...form.variants]; u[i].price = e.target.value; setForm({...form, variants: u}); }} required/>
+                          <label style={{ color: '#8b5cf6' }}>Giá bán</label>
+                          <input type="number" style={{ fontWeight: 'bold', color: '#8b5cf6' }} value={v.price} onChange={e => { const u = [...form.variants]; u[i].price = e.target.value; setForm({ ...form, variants: u }); }} required />
                         </div>
                         <div className="form-group">
                           <label>Tồn kho</label>
-                          <input type="number" value={v.quantity} onChange={e => { const u = [...form.variants]; u[i].quantity = e.target.value; setForm({...form, variants: u}); }} required/>
+                          <input type="number" value={v.quantity} onChange={e => { const u = [...form.variants]; u[i].quantity = e.target.value; setForm({ ...form, variants: u }); }} required />
                         </div>
-                        <button type="button" className="remove-icon-btn" onClick={() => removeField("variants", i)}><Trash2 size={18}/></button>
+                        <button type="button" className="remove-icon-btn" onClick={() => removeField("variants", i)}><Trash2 size={18} /></button>
                       </div>
                     </div>
                   ))}
-                  <button type="button" className="btn-add-variant-big" style={{background: '#f3e8ff', color: '#7e22ce'}} onClick={() => addField("variants", {sku: "", colorName: "Mặc định", size: "Standard", storage: "N/A", price: 0, importPrice: 0, quantity: 0})}>
+                  <button type="button" className="btn-add-variant-big" style={{ background: '#f3e8ff', color: '#7e22ce' }} onClick={() => addField("variants", { sku: "", colorName: "Mặc định", size: "Standard", storage: "N/A", price: 0, importPrice: 0, quantity: 0 })}>
                     + Thêm biến thể giá mới
                   </button>
                 </div>
@@ -226,15 +281,19 @@ export default function ManageAccessory() {
 
               {/* 6. FOOTER */}
               <div className="modal-footer-sticky">
-                <div className="footer-left">
+                <div className="footer-left" style={{ display: 'flex', gap: '20px' }}>
                   <label className="switch-label">
                     <input type="checkbox" checked={form.isActive} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} />
                     <span>Đang kinh doanh</span>
                   </label>
+                  <label className="switch-label">
+                    <input type="checkbox" checked={form.isFeatured} onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })} />
+                    <span>Sản phẩm HOT</span>
+                  </label>
                 </div>
                 <div className="footer-right">
                   <button type="button" className="btn-close-form" onClick={closeModal}>Hủy bỏ</button>
-                  <button type="submit" className="btn-save-form" style={{background: '#8b5cf6'}}><Save size={18}/> Lưu phụ kiện</button>
+                  <button type="submit" className="btn-save-form" style={{ background: '#8b5cf6' }}><Save size={18} /> Lưu phụ kiện</button>
                 </div>
               </div>
             </form>
