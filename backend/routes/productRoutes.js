@@ -3,6 +3,7 @@ const router = express.Router();
 
 const productController = require("../controllers/productController");
 const { validateProduct } = require("../middleware/productMiddleware");
+const { protect, admin } = require("../middleware/authMiddleware");
 
 /* ===============================
    CREATE
@@ -33,5 +34,6 @@ router.put("/:id", validateProduct, productController.updateProduct);
 =============================== */
 
 router.delete("/:id", productController.deleteProduct);
+router.put("/:id/status", protect, admin, productController.toggleProductStatus);
 
 module.exports = router;

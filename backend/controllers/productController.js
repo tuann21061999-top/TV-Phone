@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 /* =====================================
    CREATE PRODUCT
 ===================================== */
-
 exports.createProduct = async (req, res) => {
   try {
     const fs = require('fs');
@@ -21,13 +20,16 @@ exports.createProduct = async (req, res) => {
 /* =====================================
    GET ALL PRODUCTS (FILTER + SEARCH)
 ===================================== */
-
 exports.getAllProducts = async (req, res) => {
   try {
     const { type, brand, search, condition, admin } = req.query;
 
     let filter = {};
-    if (!admin) filter.isActive = true;
+
+    // ✅ FIX LỖI 1: Phải so sánh chuỗi chính xác. Chỉ khi admin đích thị là 'true' thì mới lấy cả hàng ẩn.
+    if (admin !== 'true') {
+      filter.isActive = true;
+    }
 
     if (type === 'hot') {
       filter.isFeatured = true;
@@ -60,7 +62,6 @@ exports.getAllProducts = async (req, res) => {
 /* =====================================
    GET PRODUCT BY ID OR SLUG
 ===================================== */
-
 exports.getProductById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -80,12 +81,15 @@ exports.getProductById = async (req, res) => {
         .populate("compatibleWith", "name slug colorImages");
     }
 
+    // Nếu không có sp, HOẶC sp đã bị ẩn (isActive = false)
     if (!product || !product.isActive) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // 🔥 Chỉ trả về variant đang active
-    product.variants = product.variants.filter(v => v.isActive);
+    // Chỉ trả về variant đang active
+    if (product.variants) {
+      product.variants = product.variants.filter(v => v.isActive !== false);
+    }
 
     res.json(product);
   } catch (error) {
@@ -96,19 +100,19 @@ exports.getProductById = async (req, res) => {
 /* =====================================
    UPDATE PRODUCT
 ===================================== */
-
 exports.updateProduct = async (req, res) => {
   try {
-    // Explicitly destructure to ensure detailImages is forcefully set if present
     const updateData = { ...req.body };
     if (req.body.detailImages) {
       updateData.detailImages = req.body.detailImages;
     }
 
-    console.log("Update Product Request Body DetailImages:", updateData.detailImages);
+    console.log("Update Product Payload:", updateData);
+
+    // ✅ FIX LỖI 2: Thêm $set để đảm bảo Mongoose chỉ cập nhật đúng trường gửi lên (vd: isActive: false)
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      updateData,
+      { $set: updateData },
       {
         new: true,
         runValidators: true,
@@ -129,7 +133,6 @@ exports.updateProduct = async (req, res) => {
 /* =====================================
    DELETE PRODUCT
 ===================================== */
-
 exports.deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
@@ -141,5 +144,27 @@ exports.deleteProduct = async (req, res) => {
     res.json({ message: "Product deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+exports.toggleProductStatus = async (req, res) => {
+  try {
+    const { isActive } = req.body;
+
+    // Dùng findByIdAndUpdate nhưng KHÔNG dùng runValidators: true
+    // và chỉ update đúng trường isActive
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { $set: { isActive: isActive } },
+      { new: true } // Trả về doc sau khi update
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+    }
+
+    res.json({ message: "Cập nhật trạng thái thành công", isActive: product.isActive });
+  } catch (error) {
+    console.error("Toggle Status Error:", error.message);
+    res.status(500).json({ message: "Lỗi server khi cập nhật trạng thái" });
   }
 };

@@ -244,9 +244,21 @@ export default function ManageElectronic() {
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '15px', alignItems: 'end' }}>
                         <div className="form-group">
                           <label>Màu sắc</label>
-                          <select value={v.colorName} onChange={e => { const u = [...form.variants]; u[i].colorName = e.target.value; setForm({ ...form, variants: u }); }} required>
+                          <select
+                            value={v.colorName}
+                            onChange={e => { const u = [...form.variants]; u[i].colorName = e.target.value; setForm({ ...form, variants: u }); }}
+                            required
+                          >
                             <option value="">- Chọn màu -</option>
-                            {form.colorImages.map(c => (<option key={`opt-color-${c.colorName}`} value={c.colorName}>{c.colorName || "Chưa đặt tên"}</option>))}
+                            {form.colorImages
+                              // 👇 THÊM DÒNG FILTER NÀY ĐỂ ẨN ĐI CÁC MÀU CHƯA NHẬP TÊN
+                              .filter(c => c.colorName && c.colorName.trim() !== "")
+                              .map((c, idx) => (
+                                <option key={`opt-color-${idx}-${c.colorName}`} value={c.colorName}>
+                                  {c.colorName}
+                                </option>
+                              ))
+                            }
                           </select>
                         </div>
                         <div className="form-group">

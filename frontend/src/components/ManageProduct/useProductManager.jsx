@@ -81,8 +81,9 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
 
     let processedVariants = p.variants?.map(v => ({ ...v, importPrice: v.importPrice || 0 })) || [];
 
-    // Nếu form hỗ trợ tính năng gom nhóm cấu hình theo màu sắc (mảng colors)
-    if (emptyFormTemplate?.variants?.[0]?.colors !== undefined) {
+    // ✅ FIX LỖI: Chỉ áp dụng logic gom nhóm "colors" cho ĐIỆN THOẠI (device)
+    // Các loại khác (accessory, electronic) giữ nguyên cấu trúc phẳng.
+    if (productType === "device" && emptyFormTemplate?.variants?.[0]?.colors !== undefined) {
       const groups = {};
       processedVariants.forEach(v => {
         const key = `${v.size || ''}_${v.storage || ''}_${v.condition || ''}_${v.price || 0}_${v.importPrice || 0}`;
@@ -120,8 +121,8 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
       ...p,
       categoryName: p.categoryId?.name || p.categoryId || p.categoryName || "",
       specs: specsArr.length > 0 ? specsArr : [{ key: "", value: "" }],
-      detailedSpecs: p.detailedSpecs || JSON.parse(JSON.stringify(emptyFormTemplate.detailedSpecs)),
-      variants: processedVariants,
+      detailedSpecs: p.detailedSpecs || JSON.parse(JSON.stringify(emptyFormTemplate.detailedSpecs || {})),
+      variants: processedVariants.length > 0 ? processedVariants : [JSON.parse(JSON.stringify(emptyFormTemplate.variants[0]))],
       conditionLevel: p.conditionLevel || ["99%"],
       detailImages: processedDetailImages
     });
@@ -153,10 +154,18 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
 
   const toggleActive = async (product) => {
     try {
-      await api.put(`/${product._id}`, { isActive: !product.isActive });
+      // Đổi đường dẫn API thêm "/status" vào cuối
+      await api.put(`/${product._id}/status`, { isActive: !product.isActive });
+
+      toast.success(
+        !product.isActive ? "Đã hiện sản phẩm!" : "Đã ẩn sản phẩm!"
+      );
+
       fetchProducts();
-      // eslint-disable-next-line no-unused-vars
-    } catch (err) { toast.error("Lỗi đổi trạng thái"); }
+    } catch (err) {
+      toast.error("Lỗi đổi trạng thái");
+      console.error(err);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -243,7 +252,12 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
           });
         }
       });
+      const validColorImages = updatedColorImages.filter(ci => ci.colorName && ci.colorName.trim() !== "");
 
+      // Nếu người dùng lỡ tay xóa hết màu, tự động gán lại màu Mặc định để tránh lỗi DB
+      if (validColorImages.length === 0) {
+        validColorImages.push({ colorName: "Mặc định", imageUrl: "", isDefault: true });
+      }
       const dataToSave = {
         ...form,
         categoryId: finalCategoryId,
