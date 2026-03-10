@@ -34,6 +34,7 @@ const chatRoutes = require("./routes/chatRoutes");
 const promotionRoutes = require("./routes/promotionRoutes");
 const favoriteRoutes = require("./routes/favoriteRoutes");
 const newsRoutes = require("./routes/newsRoutes");
+const viewHistoryRoutes = require("./routes/viewHistoryRoutes");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -162,6 +163,7 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/promotions", promotionRoutes);
 app.use("/api/favorites", favoriteRoutes);
 app.use("/api/news", newsRoutes);
+app.use("/api/view-history", viewHistoryRoutes);
 
 app.use(errorHandler);
 

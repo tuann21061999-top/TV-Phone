@@ -60,6 +60,16 @@ function ProductDetail() {
         setSelectedMem("");
         setSelectedCondition("");
         setActiveImage(null);
+
+        // Ghi nhận lịch sử xem sản phẩm nếu user đã đăng nhập
+        const token = localStorage.getItem("token");
+        if (token && data && data._id) {
+          axios.post(
+            "http://localhost:5000/api/view-history/record",
+            { productId: data._id, productName: data.name },
+            { headers: { Authorization: `Bearer ${token}` } }
+          ).catch(err => console.error("Lỗi lưu lịch sử xem:", err));
+        }
       } catch (error) {
         console.error("Lỗi lấy sản phẩm:", error);
       } finally {

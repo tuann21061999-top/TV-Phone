@@ -17,6 +17,7 @@ import ReviewPage from "./pages/ReviewPage/ReviewPage";
 import Cart from "./components/Cart/Cart";
 import LoginPage from "./components/LoginPages/LoginPage";
 import RegisterPage from "./components/RegisterPage/RegisterPage";
+import ForgotPassword from "./components/LoginPages/ForgotPassword";
 import Profile from "./components/Profile/Profile";
 import AdminPage from "./pages/Admin/AdminPage";
 import ManageProduct from "./components/ManageProduct/ManagePhone";
@@ -57,6 +58,7 @@ function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/product/:slug" element={<ProductDetail />} />
         <Route path="/product/:slug/specs" element={<SpecDetail />} />

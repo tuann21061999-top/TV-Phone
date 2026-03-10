@@ -20,7 +20,7 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const response = await loginUser({
         identifier: formData.identifier,
@@ -44,10 +44,10 @@ const LoginPage = () => {
             navigate("/profile");
           }
           // Ép reload nếu Header không tự cập nhật (tùy chọn)
-          window.location.reload(); 
+          window.location.reload();
         }, 100);
       }
-      
+
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Đăng nhập thất bại!";
       toast.error(errorMessage);
@@ -116,7 +116,7 @@ const LoginPage = () => {
                   />
                   <span>Ghi nhớ đăng nhập</span>
                 </label>
-                <a href="#" className="forgot-pass">Quên mật khẩu?</a>
+                <Link to="/forgot-password" className="forgot-pass">Quên mật khẩu?</Link>
               </div>
 
               <button type="submit" className="login-btn" disabled={loading}>
