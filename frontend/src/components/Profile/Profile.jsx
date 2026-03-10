@@ -111,17 +111,24 @@ const Profile = () => {
           />
         )}
 
+        {/* Nút Đổi ảnh đại diện */}
         <button
           className="avatar-upload-btn"
           onClick={() => fileInputRef.current.click()}
           disabled={isUploading}
+          title="Đổi ảnh đại diện"
         >
           {isUploading ? <Loader2 className="spinner" size={16} /> : <Camera size={16} />}
         </button>
 
+        {/* Nút Xóa ảnh đại diện (Chỉ hiện khi đã có ảnh) */}
         {user.avatar && (
-          <button className="avatar-delete-btn" onClick={removeAvatar}>
-            <XCircle size={16} />
+          <button
+            className="avatar-delete-btn"
+            onClick={removeAvatar}
+            title="Xóa ảnh hiện tại"
+          >
+            <Trash2 size={14} />
           </button>
         )}
       </div>

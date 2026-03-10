@@ -30,26 +30,103 @@
    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.user-profile-header {
+.avatar-wrapper {
    display: flex;
+   flex-direction: column;
    align-items: center;
-   gap: 12px;
+   /* Căn giữa avatar và text */
    padding: 0 20px 20px 20px;
    border-bottom: 1px solid #F1F5F9;
-   margin-bottom: 12px;
+   margin-bottom: 16px;
 }
 
-.avatar-wrapper img {
-   width: 48px;
-   height: 48px;
+.avatar-main {
+   position: relative;
+   width: 96px;
+   /* Tăng kích thước khung chứa */
+   height: 96px;
+   margin-bottom: 16px;
+}
+
+.avatar-main img {
+   width: 100%;
+   height: 100%;
    border-radius: 50%;
    object-fit: cover;
+   border: 3px solid #EFF6FF;
+   /* Thêm viền mỏng bao quanh */
+   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+   /* Đổ bóng nhẹ */
+}
+
+/* Nút Tải ảnh lên (Camera) */
+.avatar-upload-btn {
+   position: absolute;
+   bottom: 0;
+   right: 0;
+   width: 32px;
+   height: 32px;
+   border-radius: 50%;
+   background: #2563EB;
+   color: white;
+   border: 2px solid white;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   cursor: pointer;
+   transition: all 0.2s;
+}
+
+.avatar-upload-btn:hover:not(:disabled) {
+   background: #1D4ED8;
+   transform: scale(1.05);
+}
+
+/* Nút Xóa ảnh */
+.avatar-delete-btn {
+   position: absolute;
+   top: 0;
+   right: 0;
+   width: 26px;
+   height: 26px;
+   border-radius: 50%;
+   background: #EF4444;
+   color: white;
+   border: 2px solid white;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   cursor: pointer;
+   transition: all 0.2s;
+}
+
+.avatar-delete-btn:hover {
+   background: #DC2626;
+   transform: scale(1.05);
+}
+
+.avatar-upload-btn:disabled {
+   opacity: 0.7;
+   cursor: not-allowed;
+}
+
+.user-info {
+   text-align: center;
+   /* Căn giữa Text */
 }
 
 .user-info h4 {
-   margin: 0;
-   font-size: 16px;
+   margin: 0 0 6px 0;
+   font-size: 18px;
+   /* Tăng size tên người dùng */
+   font-weight: 600;
    color: #1E293B;
+}
+
+.user-email-sub {
+   margin: 0;
+   font-size: 13px;
+   color: #64748B;
 }
 
 .profile-menu {

@@ -3,7 +3,14 @@ const bcrypt = require("bcryptjs");
 const cloudinary = require("../config/cloudinary");
 const fs = require("fs");
 
-
+const getCloudinaryPublicId = (url) => {
+  if (!url || !url.includes("cloudinary")) return null;
+  const urlParts = url.split("/");
+  const fileName = urlParts[urlParts.length - 1];
+  const folderName = urlParts[urlParts.length - 2];
+  const id = fileName.split(".")[0];
+  return `${folderName}/${id}`;
+};
 // 1. Lấy thông tin chi tiết User hiện tại
 exports.getProfile = async (req, res) => {
   try {
@@ -15,25 +22,39 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-// 2. Cập nhật thông tin cơ bản (Tên, Số điện thoại)
+// 2. Cập nhật thông tin cơ bản (Tên, Số điện thoại, và Xóa Avatar)
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, phone } = req.body;
+    const { name, phone, avatar } = req.body;
 
-    // TỐI ƯU: Kiểm tra số điện thoại có bị trùng với người khác không
     if (phone) {
       const phoneExists = await User.findOne({ phone, _id: { $ne: req.user.id } });
       if (phoneExists) {
-        return res.status(400).json({ message: "Số điện thoại này đã được sử dụng bởi tài khoản khác!" });
+        return res.status(400).json({ message: "Số điện thoại này đã được sử dụng!" });
       }
+    }
+
+    const updateFields = { name, phone };
+
+    // Nếu user bấm nút "Xóa ảnh" (avatar truyền lên là chuỗi rỗng "")
+    if (avatar === "") {
+      const user = await User.findById(req.user.id);
+
+      // Tìm và xóa ảnh cũ trên Cloudinary
+      const publicId = getCloudinaryPublicId(user.avatar);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId).catch(err => console.log("Lỗi xóa ảnh cũ:", err));
+      }
+
+      updateFields.avatar = ""; // Cập nhật database thành rỗng
     }
 
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { $set: { name, phone } },
+      { $set: updateFields },
       { new: true, runValidators: true }
     ).select("-password");
-    
+
     res.status(200).json({ message: "Cập nhật thành công", user });
   } catch (error) {
     res.status(500).json({ message: "Lỗi cập nhật: " + error.message });
@@ -52,7 +73,7 @@ exports.addAddress = async (req, res) => {
 
     if (req.body.isDefault || user.addresses.length === 0) {
       user.addresses.forEach(addr => addr.isDefault = false);
-      req.body.isDefault = true; 
+      req.body.isDefault = true;
     }
 
     user.addresses.push(req.body);
@@ -73,7 +94,7 @@ exports.deleteAddress = async (req, res) => {
     if (!addressToRemove) return res.status(404).json({ message: "Không tìm thấy địa chỉ" });
 
     const wasDefault = addressToRemove.isDefault;
-    
+
     // TỐI ƯU: Dùng pull của mongoose để xóa subdocument
     user.addresses.pull(req.params.addressId);
 
@@ -115,9 +136,9 @@ exports.updateAddress = async (req, res) => {
 
     await user.save();
 
-    res.status(200).json({ 
-      message: "Cập nhật địa chỉ thành công", 
-      addresses: user.addresses 
+    res.status(200).json({
+      message: "Cập nhật địa chỉ thành công",
+      addresses: user.addresses
     });
   } catch (error) {
     res.status(500).json({ message: "Lỗi cập nhật địa chỉ: " + error.message });
@@ -220,7 +241,7 @@ exports.changePassword = async (req, res) => {
 
     // Mã hóa mật khẩu mới (Mongoose middleware .pre('save') sẽ lo nếu bạn đã setup, 
     // nếu chưa thì bạn phải hash thủ công ở đây)
-    user.password = newPassword; 
+    user.password = newPassword;
     await user.save();
 
     res.status(200).json({ message: "Đổi mật khẩu thành công" });
@@ -233,23 +254,33 @@ exports.updateAvatar = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "Không có file nào được tải lên" });
 
-    // Upload lên Cloudinary
+    const user = await User.findById(req.user.id);
+
+    // BƯỚC MỚI: Xóa ảnh cũ trên Cloudinary trước khi up ảnh mới
+    const publicId = getCloudinaryPublicId(user.avatar);
+    if (publicId) {
+      // Dùng .catch để lỡ Cloudinary lỗi xóa thì vẫn đi tiếp bước up ảnh mới
+      await cloudinary.uploader.destroy(publicId).catch(err => console.log("Lỗi xóa ảnh cũ:", err));
+    }
+
+    // Upload ảnh mới lên Cloudinary
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "avatars",
     });
 
-    // Xóa file tạm
+    // Xóa file tạm trên server Node.js
     fs.unlinkSync(req.file.path);
 
-    // Cập nhật URL vào DB
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { avatar: result.secure_url },
-      { new: true }
-    ).select("-password");
+    // Cập nhật URL mới vào DB
+    user.avatar = result.secure_url;
+    await user.save();
 
-    res.status(200).json({ message: "Cập nhật ảnh đại diện thành công", user });
+    // Trả về user mới (nhớ bỏ password)
+    const updatedUser = await User.findById(req.user.id).select("-password");
+
+    res.status(200).json({ message: "Cập nhật ảnh đại diện thành công", user: updatedUser });
   } catch (error) {
+    console.error("Upload error:", error);
     res.status(500).json({ message: "Lỗi cập nhật ảnh" });
   }
 };
@@ -271,11 +302,11 @@ exports.updateUserRoleAdmin = async (req, res) => {
   try {
     const { role } = req.body; // "admin" hoặc "user"
     const user = await User.findByIdAndUpdate(
-      req.params.id, 
-      { role }, 
+      req.params.id,
+      { role },
       { new: true }
     ).select("-password");
-    
+
     res.status(200).json({ message: "Cập nhật quyền thành công", user });
   } catch (error) {
     res.status(500).json({ message: "Lỗi cập nhật quyền" });
