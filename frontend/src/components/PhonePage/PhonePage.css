@@ -281,6 +281,7 @@
 
 /* Price */
 .product-price {
+  margin-top: auto;
   margin-bottom: 16px;
   display: flex;
   flex-direction: column;
@@ -304,7 +305,6 @@
 }
 
 .add-cart {
-  margin-top: auto;
   padding: 10px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
@@ -430,6 +430,7 @@
   border-radius: 50%;
   width: 32px;
   height: 32px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;

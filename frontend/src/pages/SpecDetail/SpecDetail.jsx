@@ -52,7 +52,10 @@ function SpecDetail() {
     if (loading) return <div className="loading-state">Đang tải cấu hình chi tiết...</div>;
     if (!product) return <div className="error-state">Không tìm thấy sản phẩm</div>;
 
-    const hasDetailedSpecs = product.detailedSpecs && Object.keys(product.detailedSpecs).length > 0;
+    const hasDetailedSpecs = product.detailedSpecs && 
+                             Object.keys(product.detailedSpecs).length > 0 &&
+                             Object.values(product.detailedSpecs).some(val => val !== null && val !== "" && (typeof val !== 'object' || Object.keys(val).length > 0));
+    const hasBasicSpecs = product.specs && Object.keys(product.specs).length > 0;
 
     return (
         <div className="spec-detail-page">
@@ -130,6 +133,25 @@ function SpecDetail() {
                                     </div>
                                 );
                             })}
+                        </div>
+                    ) : hasBasicSpecs ? (
+                        <div className="detailed-specs-list fallback-specs">
+                            <div className="spec-group-box">
+                                <div className="spec-group-header">
+                                    <div className="icon-wrapper">
+                                        <List size={20} color="#2563eb" />
+                                    </div>
+                                    <h3 className="spec-group-title">Cấu hình sản phẩm</h3>
+                                </div>
+                                <div className="spec-items-grid">
+                                    {Object.entries(product.specs).map(([key, value], idx) => (
+                                        <div key={idx} className="spec-item-cell">
+                                            <div className="spec-item-key">{key}</div>
+                                            <div className="spec-item-value">{value}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     ) : (
                         <div className="no-detailed-specs-message">

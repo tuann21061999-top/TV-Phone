@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 import "./PhonePage.css";
@@ -9,7 +9,7 @@ import {
   ChevronRight,
   Filter,
   RotateCcw,
-  HeartPlus,
+  Heart,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
@@ -325,7 +325,7 @@ function PhonePage() {
                           onClick={(e) => handleToggleFavorite(e, product._id)}
                           title={favoriteIds.has(product._id) ? "Bỏ yêu thích" : "Yêu thích"}
                         >
-                          <HeartPlus size={18} fill="none" stroke={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"} />
+                          <Heart size={18} color={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"} fill={favoriteIds.has(product._id) ? "#ef4444" : "none"} />
                         </button>
                         <img src={displayImage} alt={product.name} />
                       </div>
