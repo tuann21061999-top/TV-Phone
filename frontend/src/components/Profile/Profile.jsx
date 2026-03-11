@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import {
   User, Package, MapPin, Tag, LogOut, Plus,
   Trash2, CreditCard, Edit, Heart, Search, Eye,
-  Camera, XCircle, Loader2, AlertCircle
+  Camera, XCircle, Loader2, AlertCircle, Star
 } from "lucide-react";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
@@ -490,7 +490,32 @@ const Profile = () => {
                             )}
 
                             {(order.status === "done" || order.status === "cancelled" || order.status === "returned") && (
-                              <button className="btn-primary-small">Mua lại</button>
+                              <button
+                                className="btn-primary-small"
+                                onClick={() => {
+                                  const firstItem = order.items[0];
+                                  const slug = firstItem?.productId?.slug;
+                                  if (slug) navigate(`/product/${slug}`);
+                                  else toast.error("Không tìm thấy sản phẩm.");
+                                }}
+                              >
+                                Mua lại
+                              </button>
+                            )}
+
+                            {order.status === "done" && (
+                              <button
+                                className="btn-outline-small"
+                                style={{ color: '#f59e0b', borderColor: '#f59e0b' }}
+                                onClick={() => {
+                                  const firstItem = order.items[0];
+                                  const slug = firstItem?.productId?.slug;
+                                  if (slug) navigate(`/product/${slug}/reviews`);
+                                  else toast.error("Không tìm thấy sản phẩm.");
+                                }}
+                              >
+                                <Star size={16} /> Đánh giá
+                              </button>
                             )}
                           </div>
                         </div>

@@ -128,7 +128,7 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
               />
             ))}
           </div>
-          <span className="rating-count">({product.reviewsCount || Math.floor(Math.random() * 200) + 10})</span>
+          <span className="rating-count">({product.reviewsCount || 0})</span>
         </div>
 
         <div className="card-footer-grid">

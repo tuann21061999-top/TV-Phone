@@ -1,5 +1,6 @@
 const Product = require("../models/Product");
 const Category = require("../models/Category");
+const Review = require("../models/Review");
 const mongoose = require("mongoose");
 
 /* =====================================
@@ -54,7 +55,35 @@ exports.getAllProducts = async (req, res) => {
       .populate("categoryId", "name")
       .sort({ createdAt: -1 });
 
-    res.json(products);
+    // Aggregate averageRating + reviewsCount từ reviews collection
+    const reviewStats = await Review.aggregate([
+      { $match: { status: "active" } },
+      {
+        $group: {
+          _id: "$productId",
+          averageRating: { $avg: "$rating" },
+          reviewsCount: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const statsMap = {};
+    reviewStats.forEach(s => {
+      statsMap[s._id.toString()] = {
+        averageRating: Math.round(s.averageRating * 10) / 10,
+        reviewsCount: s.reviewsCount
+      };
+    });
+
+    const enriched = products.map(p => {
+      const obj = p.toObject();
+      const stats = statsMap[p._id.toString()];
+      obj.averageRating = stats ? stats.averageRating : 0;
+      obj.reviewsCount = stats ? stats.reviewsCount : 0;
+      return obj;
+    });
+
+    res.json(enriched);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

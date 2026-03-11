@@ -35,7 +35,11 @@
   background: #fff;
   padding: 20px;
   border-radius: 10px;
-  height: fit-content;
+  position: sticky;
+  top: 100px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .filter-group {

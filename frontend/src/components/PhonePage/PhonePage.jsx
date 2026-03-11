@@ -350,7 +350,7 @@ function PhonePage() {
                             stroke={i < Math.round(product.averageRating || 0) ? "#fbbf24" : "#d1d5db"}
                           />
                         ))}
-                        <span className="rating-count">({product.averageRating || 0})</span>
+                        <span className="rating-count">({product.reviewsCount || 0})</span>
                       </div>
 
                       <div className="product-price">

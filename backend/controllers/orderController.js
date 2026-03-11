@@ -286,7 +286,7 @@ const orderController = {
   getMyOrders: async (req, res) => {
     try {
       const userId = req.user.id;
-      const orders = await Order.find({ userId }).sort({ createdAt: -1 });
+      const orders = await Order.find({ userId }).sort({ createdAt: -1 }).populate("items.productId", "slug");
       res.status(200).json(orders);
     } catch (error) {
       res.status(500).json({ message: "Lỗi khi lấy lịch sử đơn hàng", error: error.message });

@@ -179,29 +179,30 @@ function AccessoriesPage() {
 
   /* ================= GET BRANDS ================= */
 
+  const categoryProducts = useMemo(() => {
+    if (activeCategory === "Tất cả") return products;
+    return products.filter(p => p.categoryId?.name === activeCategory);
+  }, [products, activeCategory]);
+
   const brands = useMemo(() => {
     return [
-      ...new Set(products.map((p) => p.brand).filter(Boolean))
+      ...new Set(categoryProducts.map((p) => p.brand).filter(Boolean))
     ];
-  }, [products]);
+  }, [categoryProducts]);
+
+  const hasRatedProducts = useMemo(() => {
+    return categoryProducts.some(p => (p.averageRating || 0) > 0);
+  }, [categoryProducts]);
 
   /* ================= FILTER LOGIC ================= */
 
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
-    /* 1️⃣ CATEGORY – SO KHỚP 2 TỪ ĐẦU */
+    /* 1️⃣ CATEGORY */
     if (activeCategory !== "Tất cả") {
-      const categoryKey = getFirstTwoWords(activeCategory);
-
       filtered = filtered.filter((item) => {
-        const rawCategory =
-          item.categoryId?.name || item.categoryId;
-
-        const productKey =
-          getFirstTwoWords(rawCategory);
-
-        return productKey === categoryKey;
+        return item.categoryId?.name === activeCategory;
       });
     }
 
@@ -337,8 +338,11 @@ function AccessoriesPage() {
                       : "category-btn"
                   }
                   onClick={() =>
-                    setActiveCategory(cat.name)
+                  {
+                    setActiveCategory(cat.name);
+                    setBrandFilter("all");
                   }
+                }
                 >
                   {cat.icon} {cat.name}
                 </button>
@@ -365,20 +369,22 @@ function AccessoriesPage() {
               </select>
             </div>
 
-            {/* RATING */}
-            <div className="filter-group">
-              <h4>Đánh giá</h4>
-              <select
-                value={ratingFilter}
-                onChange={(e) =>
-                  setRatingFilter(e.target.value)
-                }
-              >
-                <option value="all">Tất cả</option>
-                <option value="4">4★ trở lên</option>
-                <option value="3">3★ trở lên</option>
-              </select>
-            </div>
+            {/* RATING - chỉ hiện khi có sản phẩm có review */}
+            {hasRatedProducts && (
+              <div className="filter-group">
+                <h4>Đánh giá</h4>
+                <select
+                  value={ratingFilter}
+                  onChange={(e) =>
+                    setRatingFilter(e.target.value)
+                  }
+                >
+                  <option value="all">Tất cả</option>
+                  <option value="4">4★ trở lên</option>
+                  <option value="3">3★ trở lên</option>
+                </select>
+              </div>
+            )}
 
             {/* BRAND */}
             <div className="filter-group">
