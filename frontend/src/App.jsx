@@ -12,6 +12,7 @@ import ContactPage from "./pages/ContactPage/ContactPage";
 import News from "./pages/News/News";
 import NewsDetail from "./pages/NewsDetail/NewsDetail";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
+import SearchPage from "./pages/SearchPage/SearchPage";
 import SpecDetail from "./pages/SpecDetail/SpecDetail";
 import ReviewPage from "./pages/ReviewPage/ReviewPage";
 import Cart from "./components/Cart/Cart";
@@ -31,6 +32,7 @@ import OrderDetail from "./pages/OrderDetail/OrderDetail";
 import GlobalDeliveryConfirm from "./components/GlobalDeliveryConfirm/GlobalDeliveryConfirm";
 import ChatWidget from "./components/ChatWidget/ChatWidget";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
+import AdminRoute from "./components/AdminRoute/AdminRoute";
 import "./App.css";
 
 // Khởi tạo Cloudinary bên ngoài component để tránh khởi tạo lại nhiều lần
@@ -55,6 +57,7 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/news" element={<News />} />
         <Route path="/news/:slug" element={<NewsDetail />} />
+        <Route path="/search" element={<SearchPage />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -63,14 +66,14 @@ function App() {
         <Route path="/product/:slug" element={<ProductDetail />} />
         <Route path="/product/:slug/specs" element={<SpecDetail />} />
         <Route path="/product/:slug/reviews" element={<ReviewPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/admin/products" element={<ManageProduct />} />
-        <Route path="/admin/electronics" element={<ManageElectronic />} />
-        <Route path="/admin/accessories" element={<ManageAccessory />} />
+        <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
+        <Route path="/admin/products" element={<AdminRoute><ManageProduct /></AdminRoute>} />
+        <Route path="/admin/electronics" element={<AdminRoute><ManageElectronic /></AdminRoute>} />
+        <Route path="/admin/accessories" element={<AdminRoute><ManageAccessory /></AdminRoute>} />
         <Route path="/profile/address" element={<AddressModal />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/payment" element={<Payment />} />
-        <Route path="/admin/orders" element={<ManageOrder />} />
+        <Route path="/admin/orders" element={<AdminRoute><ManageOrder /></AdminRoute>} />
         <Route path="/order/:id" element={<OrderDetail />} />
       </Routes>
     </>

@@ -86,6 +86,17 @@
   border-radius: 10px;
   position: relative;
   transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.product-link {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  text-decoration: none;
+  color: inherit;
 }
 
 .product-card:hover {
@@ -118,6 +129,11 @@
 .product-rating {
   font-size: 13px;
   margin: 5px 0;
+}
+
+.product-price {
+  margin-top: auto;
+  margin-bottom: 10px;
 }
 
 .product-price .new {
@@ -212,6 +228,7 @@
   border-radius: 50%;
   width: 32px;
   height: 32px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -14,7 +14,7 @@ import {
   SquarePercent,
   Cable,
   PcCase,
-  HeartPlus,
+  Heart,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
@@ -468,7 +468,7 @@ function AccessoriesPage() {
                             onClick={(e) => handleToggleFavorite(e, product._id)}
                             title={favoriteIds.has(product._id) ? "Bỏ yêu thích" : "Yêu thích"}
                           >
-                            <HeartPlus size={18} fill="none" stroke={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"} />
+                            <Heart size={18} color={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"} fill={favoriteIds.has(product._id) ? "#ef4444" : "none"} />
                           </button>
                           <img
                             src={displayImage}
