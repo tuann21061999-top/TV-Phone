@@ -266,7 +266,8 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
         specs: specsObj,
         detailedSpecs: form.detailedSpecs,
         highlights: form.highlights.filter(h => h.trim() !== ""), // Bỏ dòng trống
-        variants: variantsToSave
+        variants: variantsToSave,
+        conditionLevel: form.condition === "new" ? [] : form.conditionLevel
       };
 
       console.log("frontend detailImages submitting:", updatedDetailImages);

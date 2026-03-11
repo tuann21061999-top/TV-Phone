@@ -10,7 +10,7 @@ const storageOptions = ["64GB", "128GB", "256GB", "512GB", "1TB", "2TB"];
 
 const emptyForm = {
   name: "", brand: "", description: "", productType: "device",
-  categoryName: "", condition: "new", conditionLevel: ["99%"],
+  categoryName: "Điện thoại", condition: "new", conditionLevel: ["99%"],
   colorImages: [{ colorName: "", imageUrl: "", isDefault: true, imageFile: null }],
   detailImages: [],
   highlights: [""], isFeatured: false, isActive: true,
@@ -188,14 +188,12 @@ export default function ManagePhone() {
                     </div>
                     <div className="field">
                       <label>Danh mục sản phẩm *</label>
-                      <input value={form.categoryName} onChange={(e) => setForm({ ...form, categoryName: e.target.value })} required placeholder="Nhập tên danh mục (vd: iPhone)" />
-                    </div>
-                    <div className="field">
-                      <label>Phân loại</label>
-                      <select value={form.productType} onChange={(e) => setForm({ ...form, productType: e.target.value })}>
-                        <option value="device">Thiết bị (Điện thoại/Tablet)</option>
-                        <option value="electronic">Điện tử (Tai nghe/Đồng hồ)</option>
-                        <option value="accessory">Phụ kiện (Ốp/Sạc)</option>
+                      <select
+                        value={form.categoryName}
+                        onChange={(e) => setForm({ ...form, categoryName: e.target.value })}
+                      >
+                        <option value="Điện thoại">Điện thoại</option>
+                        <option value="Tablet">Tablet</option>
                       </select>
                     </div>
                     <div className="field">
