@@ -6,14 +6,6 @@ const { validateProduct } = require("../middleware/productMiddleware");
 const { protect, admin } = require("../middleware/authMiddleware");
 
 /* ===============================
-   TOOL DỌN DẸP (CHẠY 1 LẦN RỒI XÓA DÒNG NÀY)
-   Phải đặt lên trên cùng để không bị /:id nuốt
-=============================== */
-// Thêm tạm dòng này để chạy dọn dẹp
-router.get("/cleanup-condition", productController.cleanUpConditionLevel);
-router.get("/cleanup-categories", productController.cleanUpCategories);
-
-/* ===============================
    CREATE
 =============================== */
 router.post("/", validateProduct, productController.createProduct);
