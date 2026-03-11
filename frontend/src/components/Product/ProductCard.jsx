@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Star, ShoppingCart, HeartPlus } from "lucide-react";
+import { Star, ShoppingCart, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import axios from "axios";
@@ -31,7 +31,7 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
       setLiked(data.isFavorited);
       toast.success(data.message);
       if (onFavoriteToggle) onFavoriteToggle(product._id, data.isFavorited);
-    } catch (error) {
+    } catch {
       toast.error("Lỗi khi thực hiện yêu thích!");
     } finally {
       setLoadingLike(false);
@@ -98,7 +98,7 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
           onClick={handleToggleFavorite}
           title={liked ? "Bỏ yêu thích" : "Yêu thích"}
         >
-          <HeartPlus size={18} stroke={liked ? "#ef4444" : "#6b7280"} fill="none" />
+          <Heart size={18} color={liked ? "#ef4444" : "#6b7280"} fill={liked ? "#ef4444" : "none"} />
         </button>
 
         <img

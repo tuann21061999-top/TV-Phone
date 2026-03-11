@@ -40,12 +40,12 @@ exports.getAllProducts = async (req, res) => {
     if (brand) filter.brand = brand;
     if (condition) filter.condition = condition;
 
-    // SEARCH name, brand, highlights
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
         { brand: { $regex: search, $options: "i" } },
         { highlights: { $elemMatch: { $regex: search, $options: "i" } } },
+        { description: { $regex: search, $options: "i" } },
       ];
     }
 

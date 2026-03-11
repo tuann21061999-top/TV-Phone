@@ -711,13 +711,16 @@ function ProductDetail() {
           </div>
 
           {/* Nút xem chi tiết thông số */}
-          {product.detailedSpecs && Object.keys(product.detailedSpecs).length > 0 && (
+          {(product.detailedSpecs && 
+           Object.keys(product.detailedSpecs).length > 0 && 
+           Object.values(product.detailedSpecs).some(val => val !== null && val !== "" && (typeof val !== 'object' || Object.keys(val).length > 0))) || 
+           (product.specs && Object.keys(product.specs).length > 0) ? (
             <div className="view-detailed-specs-action" style={{ marginTop: '20px', textAlign: 'center' }}>
-              <Link to={`/product/${slug}/specs`} className="btn-view-spec-detail">
+              <Link to={`/product/${product.slug || product._id}/specs`} className="btn-view-spec-detail">
                 <Cpu size={18} /> Xem cấu hình chi tiết
               </Link>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
       <Footer />
