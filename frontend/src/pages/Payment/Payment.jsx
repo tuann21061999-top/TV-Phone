@@ -23,24 +23,37 @@ const Payment = () => {
     }
   }, [orderId, navigate]);
 
-  const handleSimulatedPayment = async () => {
+  const handlePayment = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
 
-      // GỌI API CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG THÀNH "PAID"
-      await axios.put(
-        `http://localhost:5000/api/orders/${orderId}/pay`,
-        {}, // body để trống vì API chỉ cần ID trên URL
+      if (!activePaymentMethod) {
+        toast.error("Vui lòng chọn phương thức thanh toán!");
+        setLoading(false);
+        return;
+      }
+
+      const { data } = await axios.post(
+        "http://localhost:5000/api/payments/create-payment",
+        {
+          orderId,
+          paymentMethod: activePaymentMethod
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success("Thanh toán thành công!");
-      navigate("/"); // Hoặc bạn có thể tạo một trang "/thank-you" và navigate về đó
+      if (data && data.checkoutUrl) {
+        // Redirection logic to Gateway (VNPay/MoMo)
+        toast.success("Đang chuyển hướng đến trang thanh toán...");
+        window.location.href = data.checkoutUrl;
+      } else {
+        toast.error("Không nhận được đường dẫn thanh toán. Vui lòng thử lại!");
+      }
 
     } catch (error) {
-      console.error("Payment Simulation Error:", error);
-      toast.error("Lỗi xác nhận thanh toán, vui lòng thử lại!");
+      console.error("Payment Creation Error:", error);
+      toast.error("Lỗi khi tạo giao dịch thanh toán, vui lòng thử lại!");
     } finally {
       setLoading(false);
     }
@@ -61,7 +74,7 @@ const Payment = () => {
           <div className="payment-icon-wrapper">
             <Lock size={32} className="lock-icon" />
           </div>
-          <h1>Mô phỏng Thanh toán</h1>
+          <h1>Đang chuyển hướng Cổng Thanh Toán</h1>
           <div className="amount-display">
             <span>Tổng tiền thanh toán:</span>
             <h2>{totalAmount?.toLocaleString()}đ</h2>
@@ -69,78 +82,19 @@ const Payment = () => {
         </div>
 
         <div className="payment-simulation-content">
-          {/* Cột trái: Hiển thị QR Code giả lập */}
-          <div className="qr-section">
-            <h3>Quét mã QR để thanh toán</h3>
-            <div className={`qr-placeholder ${activePaymentMethod?.toLowerCase()}`}>
-              <QrCode size={120} />
-              <p>Mã QR {activePaymentMethod}</p>
-            </div>
-          </div>
-
-          {/* Cột phải: Thông tin thẻ Test */}
-          <div className="card-input-section">
-            <h3>Thông tin thẻ Test</h3>
-
-            {activePaymentMethod === 'MOMO' && (
-              <div className="momo-test-form">
-                <div className="form-group">
-                  <label>Ngân hàng</label>
-                  <input type="text" value="NCB" readOnly />
-                </div>
-                <div className="form-group">
-                  <label>Số thẻ</label>
-                  <input type="text" placeholder="9704198526191432198" />
-                </div>
-                <div className="form-group">
-                  <label>Tên chủ thẻ</label>
-                  <input type="text" placeholder="NGUYEN VAN A" />
-                </div>
-                <div className="form-group">
-                  <label>Ngày phát hành</label>
-                  <input type="text" placeholder="07/15" />
-                </div>
-                <div className="form-group">
-                  <label>Mật khẩu OTP</label>
-                  <input type="text" placeholder="123456" />
-                </div>
-              </div>
-            )}
-
-            {activePaymentMethod === 'VNPAY' && (
-              <div className="vnpay-test-form">
-                <div className="form-group">
-                  <label>Ngân hàng Test</label>
-                  <select>
-                    <option value="NCB">NCB</option>
-                    <option value="VNPAYQR">VNPAYQR</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Số thẻ Test (Thành công)</label>
-                  <input type="text" placeholder="9704 0000 0000 0018" />
-                </div>
-                <div className="form-group">
-                  <label>Tên chủ thẻ</label>
-                  <input type="text" placeholder="NGUYEN VAN A" />
-                </div>
-                <div className="form-group">
-                  <label>Ngày phát hành</label>
-                  <input type="text" placeholder="03/07" />
-                </div>
-                <div className="form-group">
-                  <label>OTP</label>
-                  <input type="text" placeholder="123456" />
-                </div>
-              </div>
-            )}
-
+          <div className="gateway-info-section" style={{ textAlign: "center", padding: "40px" }}>
+            <h3>Bạn đã chọn thanh toán qua {activePaymentMethod}</h3>
+            <p style={{ margin: "20px 0", color: "#666" }}>
+              Khi bấm xác nhận, bạn sẽ được hệ thống chuyển hướng tự động sang cổng thanh toán quét mã QR của {activePaymentMethod === 'MOMO' ? 'MoMo' : 'VNPay'}.
+            </p>
+            
             <button
               className="btn-simulate-payment"
-              onClick={handleSimulatedPayment}
+              onClick={handlePayment}
               disabled={loading}
+              style={{ padding: "12px 30px", fontSize: "16px", background: activePaymentMethod === 'MOMO' ? '#a50064' : '#005baa' }}
             >
-              {loading ? <Loader2 className="spinner" /> : "Xác nhận Thanh toán Test"}
+              {loading ? <Loader2 className="spinner" /> : `Thanh toán ngay qua ${activePaymentMethod}`}
             </button>
           </div>
         </div>

@@ -128,17 +128,33 @@ exports.getProductById = async (req, res) => {
         productGroup: product.productGroup,
         _id: { $ne: product._id },
         isActive: true,
-      }).select("name slug colorImages productGroup productType");
+      }).select("name slug colorImages productGroup productType variants");
     }
 
     // Lấy các sản phẩm liên quan (cùng category, khác _id)
-    const relatedProducts = await Product.find({
+    const nameParts = product.name.split(" ");
+    const searchKeyword = nameParts.slice(0, 2).join(" "); // Ví dụ "Củ sạc", "Đồng hồ"
+    
+    let relatedProducts = await Product.find({
       categoryId: product.categoryId,
+      name: { $regex: searchKeyword, $options: "i" },
       _id: { $ne: product._id },
       isActive: true,
     })
       .limit(8)
       .select("-description -specs -detailImages -createdAt -updatedAt");
+
+    // Nếu ít quá thì lấy thêm các sản phẩm cùng danh mục
+    if (relatedProducts.length < 8) {
+      const moreProducts = await Product.find({
+        categoryId: product.categoryId,
+        _id: { $ne: product._id, $nin: relatedProducts.map(p => p._id) },
+        isActive: true,
+      })
+        .limit(8 - relatedProducts.length)
+        .select("-description -specs -detailImages -createdAt -updatedAt");
+      relatedProducts = [...relatedProducts, ...moreProducts];
+    }
 
     const productObj = product.toObject();
     productObj.siblings = siblings;

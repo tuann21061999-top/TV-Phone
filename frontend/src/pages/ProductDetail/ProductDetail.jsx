@@ -57,9 +57,34 @@ function ProductDetail() {
         setProduct(data);
 
         // reset lựa chọn
-        setSelectedColor("");
-        setSelectedMem("");
-        setSelectedCondition("");
+        // Tự động chọn Option đầu tiên có sẵn
+        if (data && data.variants && data.variants.length > 0) {
+          const firstValidVariant = data.variants.find(v => v.isActive && v.quantity > 0 && (data.condition !== "used" || (data.conditionLevel && v.condition === data.conditionLevel[0])));
+          if (firstValidVariant) {
+             setSelectedColor(firstValidVariant.colorName || "");
+             
+             const needsOpt = data.productType === "device" || data.variants.some(v => v.storage && v.storage.trim() !== "" && v.storage !== "Phiên bản mặc định" && v.storage !== "N/A");
+             if (needsOpt) {
+               const memStr = firstValidVariant.size ? `${firstValidVariant.size}/${firstValidVariant.storage}` : firstValidVariant.storage;
+               setSelectedMem(memStr || "");
+             } else {
+               setSelectedMem("");
+             }
+
+             if (data.condition === "used" && data.conditionLevel?.length > 0) {
+               setSelectedCondition(data.conditionLevel[0]);
+             }
+          } else {
+             setSelectedColor("");
+             setSelectedMem("");
+             setSelectedCondition("");
+          }
+        } else {
+          setSelectedColor("");
+          setSelectedMem("");
+          setSelectedCondition("");
+        }
+        
         setActiveImage(null);
 
         // Ghi nhận lịch sử xem sản phẩm nếu user đã đăng nhập
@@ -501,62 +526,91 @@ function ProductDetail() {
                     </div>
                   )}
 
-                {/* 🌟 PHIÊN BẢN (SIBLING PRODUCTS) */}
-                {product.productType !== "device" && product.siblings && product.siblings.length > 0 && (
+                {/* 🌟 PHIÊN BẢN (SIBLING PRODUCTS) & TÙY CHỌN NỘI BỘ */}
+                {product.productType !== "device" && product.siblings && product.siblings.length > 0 ? (
                   <div className="selection-group">
-                    <label>Phiên bản:</label>
+                    <label>Phân loại:</label>
                     <div className="options-grid">
-                      <button className="opt-btn active" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span>{product.name}</span>
-                      </button>
-                      {product.siblings.map(sib => (
-                        <button
-                          key={sib._id}
-                          className="opt-btn"
-                          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-                          onClick={() => {
-                            setLoading(true);
-                            navigate(`/product/${sib.slug}`);
-                          }}
-                        >
-                          {sib.colorImages && sib.colorImages[0] && (
-                            <img src={sib.colorImages[0].imageUrl} alt={sib.name} style={{ width: '20px', height: '20px', objectFit: 'cover', borderRadius: '4px' }} />
-                          )}
-                          <span>{sib.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* TÙY CHỌN (Option nội bộ) */}
-                {needsOptionSelection && (
-                  <div className="selection-group">
-                    <label>{product.productType === "device" ? "RAM/ROM:" : "Phân loại:"}</label>
-                    <div className="options-grid">
-                      {filterOptions.allMemories.map(mem => {
-                        const isValid =
-                          filterOptions.validMemories.includes(mem);
-
+                      {/* Current Product Options */}
+                      {needsOptionSelection ? filterOptions.allMemories.map(mem => {
+                        const isValid = filterOptions.validMemories.includes(mem);
                         return (
                           <button
-                            key={mem}
+                            key={`local-${mem}`}
                             className={`opt-btn
                               ${selectedMem === mem ? "active" : ""}
                               ${!isValid ? "disabled" : ""}
                             `}
-                            onClick={() =>
-                              setSelectedMem(
-                                selectedMem === mem ? "" : mem
-                              )
-                            }
+                            onClick={() => setSelectedMem(selectedMem === mem ? "" : mem)}
                           >
                             {mem}
                           </button>
                         );
+                      }) : (
+                        <button className="opt-btn active">
+                          {product.variants?.[0]?.storage && product.variants[0].storage !== "Phiên bản mặc định" ? product.variants[0].storage : "Mặc định"}
+                        </button>
+                      )}
+
+                      {/* Sibling Options */}
+                      {product.siblings.map(sib => {
+                         const sibVari = sib.variants || [];
+                         const sibOpts = [...new Set(sibVari.map(v => v.size ? `${v.size}/${v.storage}` : v.storage).filter(o => o && o !== "Phiên bản mặc định"))];
+                         
+                         if (sibOpts.length > 0) {
+                           return sibOpts.map((opt, idx) => (
+                             <button
+                               key={`sib-${sib._id}-${idx}`}
+                               className="opt-btn"
+                               onClick={() => {
+                                 setLoading(true);
+                                 navigate(`/product/${sib.slug}`);
+                               }}
+                             >
+                               {opt}
+                             </button>
+                           ));
+                         } else {
+                           return (
+                             <button
+                               key={`sib-${sib._id}`}
+                               className="opt-btn"
+                               onClick={() => {
+                                 setLoading(true);
+                                 navigate(`/product/${sib.slug}`);
+                               }}
+                             >
+                               {sib.name}
+                             </button>
+                           );
+                         }
                       })}
                     </div>
                   </div>
+                ) : (
+                  /* TÙY CHỌN (Option nội bộ) thông thường (cho Điện thoại HOẶC sp không có sibling) */
+                  needsOptionSelection && (
+                    <div className="selection-group">
+                      <label>{product.productType === "device" ? "RAM/ROM:" : "Phân loại:"}</label>
+                      <div className="options-grid">
+                        {filterOptions.allMemories.map(mem => {
+                          const isValid = filterOptions.validMemories.includes(mem);
+                          return (
+                            <button
+                              key={mem}
+                              className={`opt-btn
+                                ${selectedMem === mem ? "active" : ""}
+                                ${!isValid ? "disabled" : ""}
+                              `}
+                              onClick={() => setSelectedMem(selectedMem === mem ? "" : mem)}
+                            >
+                              {mem}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )
                 )}
 
                 {/* COLOR */}

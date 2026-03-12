@@ -28,6 +28,7 @@ import ManageAccessory from "./components/ManageProduct/ManageAccessory";
 import AddressModal from "./components/Profile/AddressModal";
 import CheckoutPage from "./pages/CheckoutPage/CheckoutPage";
 import Payment from "./pages/Payment/Payment";
+import PaymentResult from "./pages/PaymentResult/PaymentResult";
 import ManageOrder from "./components/ManageOrder/ManageOrder";
 import OrderDetail from "./pages/OrderDetail/OrderDetail";
 import GlobalDeliveryConfirm from "./components/GlobalDeliveryConfirm/GlobalDeliveryConfirm";
@@ -78,6 +79,7 @@ function App() {
           <Route path="/profile/address" element={<PageTransition><AddressModal /></PageTransition>} />
           <Route path="/checkout" element={<PageTransition><CheckoutPage /></PageTransition>} />
           <Route path="/payment" element={<PageTransition><Payment /></PageTransition>} />
+          <Route path="/payment-result" element={<PageTransition><PaymentResult /></PageTransition>} />
           <Route path="/admin/orders" element={<AdminRoute><PageTransition><ManageOrder /></PageTransition></AdminRoute>} />
           <Route path="/order/:id" element={<PageTransition><OrderDetail /></PageTransition>} />
         </Routes>
