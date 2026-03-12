@@ -15,9 +15,9 @@ const accessorySpecsConfig = {
 };
 
 const emptyFormAccessory = {
-  name: "", brand: "", description: "Phụ kiện cao cấp chính hãng", productType: "accessory", categoryName: "Ốp lưng", condition: "new",
+  name: "", brand: "", productGroup: "", description: "Phụ kiện cao cấp chính hãng", productType: "accessory", categoryName: "Ốp lưng", condition: "new",
   colorImages: [{ colorName: "Mặc định", imageUrl: "", isDefault: true, imageFile: null }], detailImages: [], highlights: [""], isFeatured: false, isActive: true,
-  specs: [], variants: [{ sku: "", colorName: "Mặc định", size: "Standard", storage: "N/A", price: 0, importPrice: 0, quantity: 0 }]
+  specs: [], variants: [{ sku: "", storage: "Phiên bản mặc định", size: "", price: 0, importPrice: 0, colors: [{ colorName: "Mặc định", quantity: 0 }] }]
 };
 
 export default function ManageAccessory() {
@@ -112,6 +112,10 @@ export default function ManageAccessory() {
                     <div className="form-group">
                       <label>Hãng</label>
                       <input value={form.brand} onChange={e => setForm({ ...form, brand: e.target.value })} placeholder="Apple, Samsung, Hoco..." />
+                    </div>
+                    <div className="form-group">
+                      <label>Nhóm SP Liên kết (Tùy chọn)</label>
+                      <input value={form.productGroup} onChange={e => setForm({ ...form, productGroup: e.target.value })} placeholder="VD: GRP-GT6" />
                     </div>
                     <div className="form-group-full">
                       <label>Mô tả chi tiết</label>
@@ -247,46 +251,79 @@ export default function ManageAccessory() {
                 {/* 5. PHÂN LOẠI & GIÁ BÁN */}
                 <div className="form-card">
                   <div className="card-header-form"><Layers size={18} color="#8b5cf6" /> Phân loại & Giá bán</div>
-                  {form.variants.map((v, i) => (
-                    <div key={`variant-${i}`} className="variant-block" style={{ padding: '15px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', marginBottom: '10px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gap: '15px', alignItems: 'end' }}>
-                        <div className="form-group">
-                          <label>Màu sắc</label>
-                          <select
-                            value={v.colorName}
-                            onChange={e => { const u = [...form.variants]; u[i].colorName = e.target.value; setForm({ ...form, variants: u }); }}
-                            required
-                          >
-                            <option value="">- Chọn màu -</option>
-                            {form.colorImages
-                              // 👇 THÊM DÒNG FILTER NÀY ĐỂ ẨN ĐI CÁC MÀU CHƯA NHẬP TÊN
-                              .filter(c => c.colorName && c.colorName.trim() !== "")
-                              .map((c, idx) => (
-                                <option key={`opt-color-${idx}-${c.colorName}`} value={c.colorName}>
-                                  {c.colorName}
-                                </option>
-                              ))
-                            }
-                          </select>
+                  <div className="variants-wrapper">
+                    {form.variants.map((v, i) => (
+                      <div key={`variant-${i}`} className="variant-block" style={{ padding: '15px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', marginBottom: '10px' }}>
+                        <div className="v-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+                          <div className="v-title" style={{ fontWeight: 'bold', color: '#8b5cf6' }}>Tùy chọn #{i + 1}</div>
+                          <button type="button" className="remove-icon-btn" onClick={() => removeField("variants", i)}><Trash2 size={18} color="#ef4444" /></button>
                         </div>
-                        <div className="form-group">
-                          <label>Giá nhập</label>
-                          <input type="number" value={v.importPrice} onChange={e => { const u = [...form.variants]; u[i].importPrice = e.target.value; setForm({ ...form, variants: u }); }} />
+                        <div className="v-body-inputs" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                          <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                            <div className="v-field" style={{ flex: '1 1 45%' }}>
+                              <label>Phân loại (Vd: Dây da, 30W...)</label>
+                              <input value={v.storage} onChange={(e) => { const u = [...form.variants]; u[i].storage = e.target.value; setForm({ ...form, variants: u }) }} required placeholder="Nhập tên phân loại" />
+                            </div>
+                            <div className="v-field" style={{ flex: '1 1 45%' }}>
+                              <label style={{ color: '#8b5cf6' }}>Giá bán (đ)</label>
+                              <input type="number" style={{ fontWeight: 'bold', color: '#8b5cf6' }} value={v.price} onChange={(e) => { const u = [...form.variants]; u[i].price = Number(e.target.value); setForm({ ...form, variants: u }) }} required />
+                            </div>
+                            <div className="v-field" style={{ flex: '1 1 45%' }}>
+                              <label>Giá nhập (đ)</label>
+                              <input type="number" value={v.importPrice} onChange={(e) => { const u = [...form.variants]; u[i].importPrice = Number(e.target.value); setForm({ ...form, variants: u }) }} />
+                            </div>
+                          </div>
+
+                          <div className="colors-section" style={{ background: '#fff', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0', marginTop: '10px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                              <label style={{ margin: 0, fontWeight: '600', color: '#334155' }}>Màu sắc & Số lượng</label>
+                            </div>
+
+                            {v.colors?.map((c, cIdx) => (
+                              <div key={`color-${i}-${cIdx}`} style={{ display: 'flex', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
+                                <select value={c.colorName} onChange={(e) => { const u = [...form.variants]; u[i].colors[cIdx].colorName = e.target.value; setForm({ ...form, variants: u }) }} style={{ flex: 1.5 }} required>
+                                  <option value="">-- Chọn màu --</option>
+                                  {form.colorImages
+                                    .filter(img => {
+                                      const isSelectedElsewhere = v.colors.some((vc, idx) => idx !== cIdx && vc.colorName === img.colorName);
+                                      return !isSelectedElsewhere && img.colorName && img.colorName.trim() !== "";
+                                    })
+                                    .map((img, idx) => (
+                                      <option key={`opt-${idx}-${img.colorName}`} value={img.colorName}>
+                                        {img.colorName}
+                                      </option>
+                                    ))}
+                                </select>
+                                <input type="number" placeholder="Số lượng" value={c.quantity} onChange={(e) => { const u = [...form.variants]; u[i].colors[cIdx].quantity = Number(e.target.value); setForm({ ...form, variants: u }) }} style={{ flex: 1 }} min="0" required />
+                                <button type="button" className="remove-icon-btn" style={{ color: '#ef4444' }} onClick={() => {
+                                  const u = [...form.variants];
+                                  if (u[i].colors.length > 1) {
+                                    u[i].colors.splice(cIdx, 1);
+                                    setForm({ ...form, variants: u });
+                                  } else {
+                                    toast.error("Phải có ít nhất 1 màu cho mỗi tùy chọn!");
+                                  }
+                                }}>
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            ))}
+
+                            <button type="button" onClick={() => {
+                              const u = [...form.variants];
+                              if (!u[i].colors) u[i].colors = [];
+                              u[i].colors.push({ colorName: "", quantity: 0 });
+                              setForm({ ...form, variants: u });
+                            }} style={{ background: 'transparent', border: '1px dashed #cbd5e1', color: '#8b5cf6', padding: '8px', width: '100%', borderRadius: '6px', cursor: 'pointer', fontWeight: '500', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
+                              <Plus size={16} /> Thêm màu sắc
+                            </button>
+                          </div>
                         </div>
-                        <div className="form-group">
-                          <label style={{ color: '#8b5cf6' }}>Giá bán</label>
-                          <input type="number" style={{ fontWeight: 'bold', color: '#8b5cf6' }} value={v.price} onChange={e => { const u = [...form.variants]; u[i].price = e.target.value; setForm({ ...form, variants: u }); }} required />
-                        </div>
-                        <div className="form-group">
-                          <label>Tồn kho</label>
-                          <input type="number" value={v.quantity} onChange={e => { const u = [...form.variants]; u[i].quantity = e.target.value; setForm({ ...form, variants: u }); }} required />
-                        </div>
-                        <button type="button" className="remove-icon-btn" onClick={() => removeField("variants", i)}><Trash2 size={18} /></button>
                       </div>
-                    </div>
-                  ))}
-                  <button type="button" className="btn-add-variant-big" style={{ background: '#f3e8ff', color: '#7e22ce' }} onClick={() => addField("variants", { sku: "", colorName: "Mặc định", size: "Standard", storage: "N/A", price: 0, importPrice: 0, quantity: 0 })}>
-                    + Thêm biến thể giá mới
+                    ))}
+                  </div>
+                  <button type="button" className="btn-add-variant-big" style={{ background: '#f3e8ff', color: '#7e22ce' }} onClick={() => addField("variants", { sku: "", storage: "Tùy chọn mới", size: "", price: 0, importPrice: 0, colors: [{ colorName: "Mặc định", quantity: 0 }] })}>
+                    + Thêm tùy chọn mới
                   </button>
                 </div>
               </div>

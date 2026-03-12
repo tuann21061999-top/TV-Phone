@@ -209,6 +209,12 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
 
+    productGroup: {
+      type: String,
+      default: "",
+      index: true,
+    },
+
     isActive: {
       type: Boolean,
       default: true,

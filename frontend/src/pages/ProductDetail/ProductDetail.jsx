@@ -4,6 +4,7 @@ import axios from "axios";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import ProductReview from "../../components/Review/ProductReview";
+import ProductCard from "../../components/Product/ProductCard";
 import { toast } from "sonner";
 import {
   Cpu,
@@ -118,9 +119,11 @@ function ProductDetail() {
      ✅ Kiểm tra sản phẩm có cần chọn RAM/ROM không
      (device = điện thoại → cần, accessory/electronic → không cần)
   ============================== */
-  const needsMemorySelection = useMemo(() => {
-    if (!product) return true; // Mặc định cần
-    return product.productType === "device";
+  const needsOptionSelection = useMemo(() => {
+    if (!product) return true;
+    if (product.productType === "device") return true;
+    // Phụ kiện / Điện tử: Cần chọn Option nếu có option tuỳ chỉnh khác mặc định
+    return product.variants.some(v => v.storage && v.storage.trim() !== "" && v.storage !== "Phiên bản mặc định" && v.storage !== "N/A");
   }, [product]);
 
   // Khi đổi màu sắc, reset activeImage về null để hiện ảnh màu
@@ -150,38 +153,44 @@ function ProductDetail() {
      2️⃣ Variant hiện tại
      ✅ Cập nhật logic: phụ kiện/electronic chỉ cần chọn màu
   ============================== */
+  // 2️⃣ Variant hiện tại
   const currentVariant = useMemo(() => {
     if (!product || !selectedColor) return null;
 
-    // Phụ kiện / Đồ điện tử: chỉ cần chọn MÀU → tìm variant theo color
-    if (!needsMemorySelection) {
+    if (!needsOptionSelection) {
       return product.variants.find(
         v => v.colorName === selectedColor && v.isActive && v.quantity > 0
       );
     }
 
-    // Điện thoại: cần chọn cả MÀU + RAM/ROM
     if (!selectedMem) return null;
 
-    const [size, storage] = selectedMem
-      .split("/")
-      .map(s => s.trim());
+    let size = "";
+    let storage = "";
+    if (selectedMem.includes("/")) {
+      const parts = selectedMem.split("/");
+      size = parts[0].trim();
+      storage = parts[1].trim();
+    } else {
+      storage = selectedMem.trim();
+    }
 
     return product.variants.find(
       v =>
         v.colorName === selectedColor &&
-        v.size.trim() === size &&
-        v.storage.trim() === storage &&
+        (size === "" || (v.size || "").trim() === size) &&
+        (v.storage || "").trim() === storage &&
         (product.condition !== "used" || v.condition === selectedCondition) &&
         v.isActive &&
         v.quantity > 0
     );
-  }, [product, selectedColor, selectedMem, selectedCondition, needsMemorySelection]);
+  }, [product, selectedColor, selectedMem, selectedCondition, needsOptionSelection]);
 
   /* ==============================
      3️⃣ Filter 2 chiều
      ✅ Cập nhật: chỉ tạo memory options cho device (phone)
   ============================== */
+  // 3️⃣ Filter 2 chiều
   const filterOptions = useMemo(() => {
     if (!product)
       return {
@@ -198,8 +207,7 @@ function ProductDetail() {
 
     const allColors = product.colorImages.map(c => c.colorName);
 
-    // Phụ kiện/Electronic: không cần memory options
-    if (!needsMemorySelection) {
+    if (!needsOptionSelection) {
       const validColors = validVariants.map(v => v.colorName);
       return {
         allColors,
@@ -209,9 +217,8 @@ function ProductDetail() {
       };
     }
 
-    // Device (phone): logic filter 2 chiều bình thường
     const allMemories = [
-      ...new Set(validVariants.map(v => `${v.size}/${v.storage}`))
+      ...new Set(validVariants.map(v => v.size ? `${v.size}/${v.storage}` : v.storage))
     ];
 
     if (!selectedColor && !selectedMem) {
@@ -226,7 +233,7 @@ function ProductDetail() {
     if (selectedColor && !selectedMem) {
       const validMemories = validVariants
         .filter(v => v.colorName === selectedColor)
-        .map(v => `${v.size}/${v.storage}`);
+        .map(v => v.size ? `${v.size}/${v.storage}` : v.storage);
 
       return {
         allColors,
@@ -238,7 +245,7 @@ function ProductDetail() {
 
     if (!selectedColor && selectedMem) {
       const validColors = validVariants
-        .filter(v => `${v.size}/${v.storage}` === selectedMem)
+        .filter(v => (v.size ? `${v.size}/${v.storage}` : v.storage) === selectedMem)
         .map(v => v.colorName);
 
       return {
@@ -251,10 +258,10 @@ function ProductDetail() {
 
     const validMemories = validVariants
       .filter(v => v.colorName === selectedColor)
-      .map(v => `${v.size}/${v.storage}`);
+      .map(v => v.size ? `${v.size}/${v.storage}` : v.storage);
 
     const validColors = validVariants
-      .filter(v => `${v.size}/${v.storage}` === selectedMem)
+      .filter(v => (v.size ? `${v.size}/${v.storage}` : v.storage) === selectedMem)
       .map(v => v.colorName);
 
     return {
@@ -263,7 +270,7 @@ function ProductDetail() {
       validColors,
       validMemories
     };
-  }, [product, selectedColor, selectedMem, selectedCondition, needsMemorySelection]);
+  }, [product, selectedColor, selectedMem, selectedCondition, needsOptionSelection]);
 
   if (loading) return <div className="loading-state">Đang tải...</div>;
   if (!product)
@@ -272,7 +279,7 @@ function ProductDetail() {
   /* ==============================
      ✅ canBuy: cho phụ kiện/electronic, chỉ cần chọn color
   ============================== */
-  const canBuy = needsMemorySelection
+  const canBuy = needsOptionSelection
     ? currentVariant && (product.condition !== "used" || selectedCondition)
     : currentVariant && (product.condition !== "used" || selectedCondition);
 
@@ -299,11 +306,11 @@ function ProductDetail() {
   const priceData = getActivePrice();
 
   const priceDisplay = () => {
-    if (!needsMemorySelection) {
+    if (!needsOptionSelection) {
       if (!selectedColor) return "Vui lòng chọn màu sắc";
       if (!currentVariant) return "Hết hàng";
     } else {
-      if (!selectedColor || !selectedMem) return "Vui lòng chọn cấu hình";
+      if (!selectedColor || !selectedMem) return "Vui lòng chọn phân loại";
       if (product.condition === "used" && !selectedCondition) return "Vui lòng chọn tình trạng";
       if (!currentVariant) return "Hết hàng";
     }
@@ -494,10 +501,38 @@ function ProductDetail() {
                     </div>
                   )}
 
-                {/* RAM/ROM — Chỉ hiển thị cho DEVICE (điện thoại) */}
-                {needsMemorySelection && (
+                {/* 🌟 PHIÊN BẢN (SIBLING PRODUCTS) */}
+                {product.productType !== "device" && product.siblings && product.siblings.length > 0 && (
                   <div className="selection-group">
-                    <label>RAM/ROM:</label>
+                    <label>Phiên bản:</label>
+                    <div className="options-grid">
+                      <button className="opt-btn active" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span>{product.name}</span>
+                      </button>
+                      {product.siblings.map(sib => (
+                        <button
+                          key={sib._id}
+                          className="opt-btn"
+                          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                          onClick={() => {
+                            setLoading(true);
+                            navigate(`/product/${sib.slug}`);
+                          }}
+                        >
+                          {sib.colorImages && sib.colorImages[0] && (
+                            <img src={sib.colorImages[0].imageUrl} alt={sib.name} style={{ width: '20px', height: '20px', objectFit: 'cover', borderRadius: '4px' }} />
+                          )}
+                          <span>{sib.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* TÙY CHỌN (Option nội bộ) */}
+                {needsOptionSelection && (
+                  <div className="selection-group">
+                    <label>{product.productType === "device" ? "RAM/ROM:" : "Phân loại:"}</label>
                     <div className="options-grid">
                       {filterOptions.allMemories.map(mem => {
                         const isValid =
@@ -723,6 +758,25 @@ function ProductDetail() {
           ) : null}
         </div>
       </div>
+
+      {/* SẢN PHẨM LIÊN QUAN */}
+      {product.relatedProducts && product.relatedProducts.length > 0 && (
+        <div className="related-products-section" style={{ padding: '40px 0', maxWidth: '1200px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px', marginLeft: '16px' }}>
+            Sản phẩm liên quan
+          </h2>
+          <div className="related-products-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gap: '16px',
+            padding: '0 16px'
+          }}>
+            {product.relatedProducts.map(rp => (
+              <ProductCard key={rp._id} product={rp} />
+            ))}
+          </div>
+        </div>
+      )}
       <Footer />
     </div >
   );

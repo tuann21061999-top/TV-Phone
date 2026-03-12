@@ -81,9 +81,8 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
 
     let processedVariants = p.variants?.map(v => ({ ...v, importPrice: v.importPrice || 0 })) || [];
 
-    // ✅ FIX LỖI: Chỉ áp dụng logic gom nhóm "colors" cho ĐIỆN THOẠI (device)
-    // Các loại khác (accessory, electronic) giữ nguyên cấu trúc phẳng.
-    if (productType === "device" && emptyFormTemplate?.variants?.[0]?.colors !== undefined) {
+    // ✅ Áp dụng logic gom nhóm "colors" cho TẤT CẢ các loại sản phẩm (device, accessory, electronic)
+    if (emptyFormTemplate?.variants?.[0]?.colors !== undefined) {
       const groups = {};
       processedVariants.forEach(v => {
         const key = `${v.size || ''}_${v.storage || ''}_${v.condition || ''}_${v.price || 0}_${v.importPrice || 0}`;

@@ -121,7 +121,30 @@ exports.getProductById = async (req, res) => {
       product.variants = product.variants.filter(v => v.isActive !== false);
     }
 
-    res.json(product);
+    // Lấy các sản phẩm anh em cùng productGroup
+    let siblings = [];
+    if (product.productGroup) {
+      siblings = await Product.find({
+        productGroup: product.productGroup,
+        _id: { $ne: product._id },
+        isActive: true,
+      }).select("name slug colorImages productGroup productType");
+    }
+
+    // Lấy các sản phẩm liên quan (cùng category, khác _id)
+    const relatedProducts = await Product.find({
+      categoryId: product.categoryId,
+      _id: { $ne: product._id },
+      isActive: true,
+    })
+      .limit(8)
+      .select("-description -specs -detailImages -createdAt -updatedAt");
+
+    const productObj = product.toObject();
+    productObj.siblings = siblings;
+    productObj.relatedProducts = relatedProducts;
+
+    res.json(productObj);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

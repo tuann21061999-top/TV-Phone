@@ -9,7 +9,7 @@ const sizeOptions = ["6GB", "8GB", "12GB", "16GB", "18GB", "24GB", "28GB", "32GB
 const storageOptions = ["64GB", "128GB", "256GB", "512GB", "1TB", "2TB"];
 
 const emptyForm = {
-  name: "", brand: "", description: "", productType: "device",
+  name: "", brand: "", productGroup: "", description: "", productType: "device",
   categoryName: "Điện thoại", condition: "new", conditionLevel: ["99%"],
   colorImages: [{ colorName: "", imageUrl: "", isDefault: true, imageFile: null }],
   detailImages: [],
@@ -185,6 +185,10 @@ export default function ManagePhone() {
                     <div className="field">
                       <label>Thương hiệu</label>
                       <input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} placeholder="Apple" />
+                    </div>
+                    <div className="field">
+                      <label>Nhóm SP Liên kết (Tùy chọn)</label>
+                      <input value={form.productGroup} onChange={(e) => setForm({ ...form, productGroup: e.target.value })} placeholder="VD: GRP-IPHONE15" />
                     </div>
                     <div className="field">
                       <label>Danh mục sản phẩm *</label>
