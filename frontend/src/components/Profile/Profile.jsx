@@ -218,8 +218,8 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/orders/admin/${orderId}/status`,
-        { status: "cancelled" },
+        `http://localhost:5000/api/orders/${orderId}/cancel`,
+        {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Đã hủy đơn hàng thành công.");

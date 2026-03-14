@@ -10,6 +10,7 @@ router.get("/notifications/pending-delivery", protect, orderController.getPendin
 router.get("/:id", protect, orderController.getOrderDetail);
 router.put("/:id/confirm-delivery", protect, orderController.confirmDelivery);
 router.put("/:id/pay", protect, orderController.markOrderAsPaid);
+router.put("/:id/cancel", protect, orderController.cancelOrder);
 
 // ADMIN
 router.get("/admin/all", protect, admin, orderController.getAllOrdersAdmin);

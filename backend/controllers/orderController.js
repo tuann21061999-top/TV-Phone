@@ -165,6 +165,40 @@ const orderController = {
     }
   },
 
+  // Khách hàng tự hủy đơn
+  cancelOrder: async (req, res) => {
+    try {
+      const order = await Order.findById(req.params.id);
+      if (!order) return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+
+      // Bảo mật: Đơn hàng phải thuộc về user đang đăng nhập
+      if (order.userId.toString() !== req.user.id) {
+        return res.status(403).json({ message: "Bạn không có quyền thực hiện việc này" });
+      }
+
+      // Chỉ được thao tác Hủy khi hàng chưa giao / đóng gói
+      const canCancel = ["waiting_approval", "pending", "paid"].includes(order.status);
+      if (!canCancel) {
+        return res.status(400).json({ message: "Không thể hủy khi đơn hàng đang được xử lý hoặc giao hàng." });
+      }
+
+      const oldStatus = order.status;
+      order.status = "cancelled";
+      
+      // Nếu trạng thái trước đó chưa bị trừ kho thì tùy thuộc logic của bạn. 
+      // Nhưng theo logic createOrder của bạn, khi "waiting_approval" (COD) hoặc "paid" thì kho đã bị trừ.
+      // Dù trạng thái cũ là gì, miễn là nó chưa phải "cancelled" hoặc "returned" thì ta cứ hoàn kho:
+      if (oldStatus !== "cancelled" && oldStatus !== "returned") {
+        await updateInventory(order.items, "increase");
+      }
+
+      await order.save();
+      res.status(200).json({ message: "Hủy đơn hàng thành công", order });
+    } catch (error) {
+      res.status(500).json({ message: "Lỗi hệ thống", error: error.message });
+    }
+  },
+
   confirmDelivery: async (req, res) => {
     try {
       const { isAccepted } = req.body;
