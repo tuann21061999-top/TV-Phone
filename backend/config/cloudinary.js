@@ -14,7 +14,7 @@ const agent = new https.Agent({ family: 4 });
 
 // Override the default API network request to use this agent
 const originalUpload = cloudinary.uploader.upload;
-cloudinary.uploader.upload = function (file, options, callback) {
+cloudinary.uploader.upload = function(file, options, callback) {
   const mergedOptions = { ...options, agent };
   return originalUpload.call(this, file, mergedOptions, callback);
 };

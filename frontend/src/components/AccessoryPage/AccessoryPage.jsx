@@ -115,27 +115,7 @@ function AccessoriesPage() {
     }
   };
 
-  /* ================= NORMALIZE ================= */
 
-  const normalizeText = (text) => {
-    if (!text) return "";
-
-    return text
-      .toString()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
-  };
-
-  const getFirstTwoWords = (text) => {
-    const normalized = normalizeText(text);
-    if (!normalized) return "";
-
-    const words = normalized.split(" ");
-    return words.slice(0, 2).join(" ");
-  };
 
   /* ================= HELPERS ================= */
 

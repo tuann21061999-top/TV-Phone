@@ -64,9 +64,11 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
     }
 
     // Upload lên Cloudinary
+    console.log("Attempting Cloudinary upload for:", req.file.path);
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "tv-phone-test",
     });
+    console.log("Cloudinary upload success:", result.secure_url);
 
     // Xóa file tạm sau khi upload
     fs.unlinkSync(req.file.path);
@@ -76,8 +78,8 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
       imageUrl: result.secure_url,
     });
   } catch (error) {
-    console.error("UPLOAD ERROR:", error);
-    res.status(500).json({ message: error.message });
+    console.error("UPLOAD ERROR DETAILS:", error);
+    res.status(500).json({ message: error.message, stack: error.stack, fullError: error });
   }
 });
 // Lên lịch chạy ngầm: Cứ mỗi 5 phút hệ thống sẽ tự động quét 1 lần

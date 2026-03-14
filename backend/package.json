@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.9.0",
     "cors": "^2.8.6",
@@ -24,6 +25,7 @@
     "nodemailer": "^8.0.1",
     "slugify": "^1.6.6",
     "socket.io": "^4.8.3",
+    "url": "^0.11.4",
     "vnpay": "^2.4.4"
   },
   "devDependencies": {

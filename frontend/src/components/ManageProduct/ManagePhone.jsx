@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
 import React from "react";
-import { Plus, Trash2, Save, X, Edit3, Eye, EyeOff, Search, Settings, ImageIcon, Layers, Zap, ListPlus } from "lucide-react";
+import { Plus, Trash2, Save, X, Edit3, Eye, EyeOff, Search, Settings, ImageIcon, Layers, Zap, ListPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { useProductManager } from "./useProductManager";
 import "./ManageProduct.css";
@@ -102,6 +101,25 @@ export default function ManagePhone() {
     addField, removeField, handleImageFileChange, handleDetailImageChange, openModalForAdd, openModalForEdit, closeModal, handleDelete, toggleActive, handleSubmit
   } = useProductManager("device", emptyForm);
 
+  const [activeTab, setActiveTab] = React.useState("Tất cả");
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const itemsPerPage = 10;
+
+  const filteredProducts = products.filter(p => {
+    const matchSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const cat = p.categoryId?.name || p.categoryName || "Điện thoại";
+    const matchTab = activeTab === "Tất cả" || cat === activeTab;
+    return matchSearch && matchTab;
+  });
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const currentProducts = filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="manage-product">
       <Toaster position="top-right" richColors />
@@ -112,12 +130,35 @@ export default function ManagePhone() {
           <h2>Kho Điện Thoại</h2>
           <div className="search-box">
             <Search size={18} color="#64748b" />
-            <input placeholder="Tìm theo tên..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <input placeholder="Tìm theo tên..." value={searchTerm} onChange={handleSearch} />
           </div>
         </div>
         <button className="btn-add-main" onClick={openModalForAdd}>
           <Plus size={20} /> Thêm điện thoại mới
         </button>
+      </div>
+
+      {/* TABS PHÂN LOẠI */}
+      <div className="category-tabs" style={{ display: 'flex', gap: '10px', marginBottom: '20px', overflowX: 'auto', paddingBottom: '5px' }}>
+        {["Tất cả", "Điện thoại", "Tablet"].map(tab => (
+          <button
+            key={tab}
+            onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '20px',
+              border: 'none',
+              background: activeTab === tab ? '#2563eb' : '#f1f5f9',
+              color: activeTab === tab ? '#fff' : '#64748b',
+              fontWeight: '600',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.2s'
+            }}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
       {/* TABLE */}
@@ -127,7 +168,7 @@ export default function ManagePhone() {
             <tr><th>Sản phẩm</th><th>Loại</th><th>Giá sàn</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th></tr>
           </thead>
           <tbody>
-            {products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase())).map((p) => (
+            {currentProducts.map((p) => (
               <tr key={p._id} className={!p.isActive ? "row-disabled" : ""}>
                 <td>
                   <div className="product-info-cell">
@@ -158,6 +199,31 @@ export default function ManagePhone() {
           </tbody>
         </table>
       </div>
+
+      {/* PHÂN TRANG */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button 
+            type="button"
+            className="page-btn"
+            disabled={currentPage === 1} 
+            onClick={() => setCurrentPage(prev => prev - 1)}
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <span className="page-info">
+            Trang {currentPage} / {totalPages}
+          </span>
+          <button 
+            type="button"
+            className="page-btn"
+            disabled={currentPage === totalPages} 
+            onClick={() => setCurrentPage(prev => prev + 1)}
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      )}
 
       {/* MODAL */}
       {showModal && (

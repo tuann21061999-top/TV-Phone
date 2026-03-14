@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
 import React from "react";
-import { Plus, Trash2, Save, X, Edit3, Eye, EyeOff, Search, Settings, ImageIcon, Layers, Zap, Smartphone, ShieldCheck, Cpu, Link as LinkIcon, ListPlus } from "lucide-react";
+import { Plus, Trash2, Save, X, Edit3, Eye, EyeOff, Search, Settings, ImageIcon, Layers, Zap, Smartphone, ShieldCheck, Cpu, Link as LinkIcon, ListPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { useProductManager } from "./useProductManager";
 import "./ManageProduct.css";
@@ -26,6 +25,25 @@ export default function ManageAccessory() {
     addField, removeField, handleImageFileChange, handleDetailImageChange, openModalForAdd, openModalForEdit, closeModal, handleDelete, toggleActive, handleSubmit
   } = useProductManager("accessory", emptyFormAccessory, accessorySpecsConfig);
 
+  const [activeTab, setActiveTab] = React.useState("Tất cả");
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const itemsPerPage = 10;
+
+  const filteredProducts = products.filter(p => {
+    const matchSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const cat = p.categoryId?.name || p.categoryName || "Phụ kiện";
+    const matchTab = activeTab === "Tất cả" || cat === activeTab;
+    return matchSearch && matchTab;
+  });
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const currentProducts = filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="manage-product">
       <Toaster position="top-right" richColors />
@@ -36,12 +54,35 @@ export default function ManageAccessory() {
           <h2>Kho Phụ Kiện</h2>
           <div className="search-box">
             <Search size={18} color="#64748b" />
-            <input placeholder="Tìm ốp, sạc, cáp..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <input placeholder="Tìm ốp, sạc, cáp..." value={searchTerm} onChange={handleSearch} />
           </div>
         </div>
         <button className="btn-add-main" style={{ backgroundColor: '#8b5cf6' }} onClick={openModalForAdd}>
           <Plus size={20} /> Thêm phụ kiện
         </button>
+      </div>
+
+      {/* TABS PHÂN LOẠI */}
+      <div className="category-tabs" style={{ display: 'flex', gap: '10px', marginBottom: '20px', overflowX: 'auto', paddingBottom: '5px' }}>
+        {["Tất cả", ...Object.keys(accessorySpecsConfig)].map(tab => (
+          <button
+            key={tab}
+            onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '20px',
+              border: 'none',
+              background: activeTab === tab ? '#8b5cf6' : '#f1f5f9',
+              color: activeTab === tab ? '#fff' : '#64748b',
+              fontWeight: '600',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.2s'
+            }}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
 
       {/* DANH SÁCH SẢN PHẨM */}
@@ -51,7 +92,7 @@ export default function ManageAccessory() {
             <tr><th>Tên phụ kiện</th><th>Loại</th><th>Giá nhập</th><th>Giá bán</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th></tr>
           </thead>
           <tbody>
-            {products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase())).map((p) => (
+            {currentProducts.map((p) => (
               <tr key={p._id} className={!p.isActive ? "row-disabled" : ""}>
                 <td>
                   <strong>{p.name}</strong><br />
@@ -79,6 +120,31 @@ export default function ManageAccessory() {
           </tbody>
         </table>
       </div>
+
+      {/* PHÂN TRANG */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button 
+            type="button"
+            className="page-btn"
+            disabled={currentPage === 1} 
+            onClick={() => setCurrentPage(prev => prev - 1)}
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <span className="page-info">
+            Trang {currentPage} / {totalPages}
+          </span>
+          <button 
+            type="button"
+            className="page-btn"
+            disabled={currentPage === totalPages} 
+            onClick={() => setCurrentPage(prev => prev + 1)}
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      )}
 
       {/* MODAL THÊM / SỬA */}
       {showModal && (
