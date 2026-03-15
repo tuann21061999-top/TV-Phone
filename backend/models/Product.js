@@ -184,6 +184,13 @@ const productSchema = new mongoose.Schema(
       },
     ],
 
+    tags: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tag",
+      },
+    ],
+
     isFeatured: {
       type: Boolean,
       default: false,

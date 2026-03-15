@@ -2,6 +2,9 @@ import React from "react";
 import { Plus, Trash2, Save, X, Edit3, Eye, EyeOff, Search, Settings, ImageIcon, Layers, Zap, ListPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { useProductManager } from "./useProductManager";
+import BulkActionsPanel from "./BulkActionsPanel";
+import TagSelector from "./TagSelector";
+import CompatibleProductSelector from "./CompatibleProductSelector";
 import "./ManageProduct.css";
 
 const sizeOptions = ["6GB", "8GB", "12GB", "16GB", "18GB", "24GB", "28GB", "32GB"];
@@ -9,9 +12,10 @@ const storageOptions = ["64GB", "128GB", "256GB", "512GB", "1TB", "2TB"];
 
 const emptyForm = {
   name: "", brand: "", productGroup: "", description: "", productType: "device",
-  categoryName: "Điện thoại", condition: "new", conditionLevel: ["99%"],
   colorImages: [{ colorName: "", imageUrl: "", isDefault: true, imageFile: null }],
   detailImages: [],
+  tags: [],
+  compatibleWith: [],
   highlights: [""], isFeatured: false, isActive: true,
   specs: [
     { key: "Màn hình", value: "" },
@@ -97,7 +101,8 @@ const emptyForm = {
 
 export default function ManagePhone() {
   const {
-    products, form, setForm, showModal, isEditing, searchTerm, setSearchTerm,
+    products, allProducts, form, setForm, showModal, isEditing, searchTerm, setSearchTerm, tagsList,
+    selectedIds, handleSelectAll, handleSelectOne, clearSelection, refreshData,
     addField, removeField, handleImageFileChange, handleDetailImageChange, openModalForAdd, openModalForEdit, closeModal, handleDelete, toggleActive, handleSubmit
   } = useProductManager("device", emptyForm);
 
@@ -161,15 +166,40 @@ export default function ManagePhone() {
         ))}
       </div>
 
+      <BulkActionsPanel 
+        selectedIds={selectedIds} 
+        clearSelection={clearSelection} 
+        refreshData={refreshData} 
+        products={products} 
+        allProducts={allProducts}
+        tagsList={tagsList} 
+      />
+
       {/* TABLE */}
       <div className="table-container">
         <table>
           <thead>
-            <tr><th>Sản phẩm</th><th>Loại</th><th>Giá sàn</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th></tr>
+            <tr>
+              <th style={{ width: '40px' }}>
+                <input 
+                  type="checkbox" 
+                  onChange={(e) => handleSelectAll(e, currentProducts)} 
+                  checked={selectedIds.length === currentProducts.length && currentProducts.length > 0} 
+                />
+              </th>
+              <th>Sản phẩm</th><th>Loại</th><th>Giá sàn</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th>
+            </tr>
           </thead>
           <tbody>
             {currentProducts.map((p) => (
               <tr key={p._id} className={!p.isActive ? "row-disabled" : ""}>
+                <td>
+                  <input 
+                    type="checkbox" 
+                    checked={selectedIds.includes(p._id)} 
+                    onChange={() => handleSelectOne(p._id)} 
+                  />
+                </td>
                 <td>
                   <div className="product-info-cell">
                     <strong>{p.name}</strong>
@@ -272,6 +302,26 @@ export default function ManagePhone() {
                         <option value="new">Mới nguyên seal (New)</option>
                         <option value="used">Đã qua sử dụng (Used)</option>
                       </select>
+                    </div>
+
+                    <div className="form-group-full">
+                      <label>Tags (Thẻ đánh dấu):</label>
+                      <TagSelector 
+                        tagsList={tagsList} 
+                        selectedTags={form.tags} 
+                        onChange={(newTags) => setForm({ ...form, tags: newTags })} 
+                      />
+                    </div>
+
+                    {/* SẢN PHẨM TƯƠNG THÍCH */}
+                    <div className="form-group-full">
+                      <label>Gán sản phẩm tương thích (Phụ kiện đi kèm):</label>
+                      <CompatibleProductSelector 
+                        products={allProducts} 
+                        selectedIds={form.compatibleWith} 
+                        currentProductId={form._id} 
+                        onChange={(newCompatible) => setForm({ ...form, compatibleWith: newCompatible })} 
+                      />
                     </div>
 
                     {form.condition === "used" && (

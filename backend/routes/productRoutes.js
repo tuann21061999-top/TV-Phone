@@ -21,6 +21,12 @@ router.get("/", productController.getAllProducts);
 router.get("/:id", productController.getProductById);
 
 /* ===============================
+   BULK ACTIONS - (Cần đặt trước /:id)
+=============================== */
+router.put("/bulk-update", protect, admin, productController.bulkUpdateProducts);
+router.delete("/bulk-delete", protect, admin, productController.bulkDeleteProducts);
+
+/* ===============================
    UPDATE STATUS (Ẩn/Hiện) - Đặt lên trước /:id
 =============================== */
 router.put("/:id/status", protect, admin, productController.toggleProductStatus);

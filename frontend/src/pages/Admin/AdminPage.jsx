@@ -12,6 +12,7 @@ import ManageChat from "../../components/ManageChat/ManageChat";
 import ManageVoucher from "../../components/ManageVoucher/ManageVoucher";
 import ManagePromotions from "../../components/ManagePromotions/ManagePromotions";
 import ManageNews from "../../components/ManageNews/ManageNews";
+import ManageTags from "../../components/ManageTags/ManageTags";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import axios from "axios";
@@ -23,7 +24,7 @@ import {
   ShoppingBag, FileText, Users, BarChart3,
   Package, Smartphone, MousePointer2, Settings,
   LogOut, LayoutDashboard, MessageSquare, Ticket, Flame,
-  Newspaper
+  Newspaper, Tag
 } from "lucide-react";
 
 function AdminPage() {
@@ -101,6 +102,7 @@ function AdminPage() {
       case "vouchers": return "Quản lý Voucher";
       case "promotions": return "Khuyến mãi (Variant Cấu hình)";
       case "news": return "Quản lý Tin tức";
+      case "tags": return "Quản lý Tags";
       default: return "Bảng điều khiển";
     }
   };
@@ -152,6 +154,9 @@ function AdminPage() {
             </button>
             <button className={activeTab === "accessories" ? "active" : ""} onClick={() => handleTabClick("accessories")}>
               <MousePointer2 size={18} /> Phụ kiện
+            </button>
+            <button className={activeTab === "tags" ? "active" : ""} onClick={() => handleTabClick("tags")}>
+              <Tag size={18} /> Quản lý Tags
             </button>
 
             <hr className="sidebar-divider" />
@@ -212,6 +217,7 @@ function AdminPage() {
             {activeTab === "vouchers" && <ManageVoucher />}
             {activeTab === "promotions" && <ManagePromotions />}
             {activeTab === "news" && <ManageNews />}
+            {activeTab === "tags" && <ManageTags />}
 
             {/* EMPTY STATES CHO CÁC TAB CHƯA LÀM */}
             {(activeTab === "users") && (

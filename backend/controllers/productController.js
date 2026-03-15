@@ -237,3 +237,82 @@ exports.toggleProductStatus = async (req, res) => {
     res.status(500).json({ message: "Lỗi server khi cập nhật trạng thái" });
   }
 };
+
+/* =====================================
+   BULK ACTION CHUNG (UPDATE)
+===================================== */
+exports.bulkUpdateProducts = async (req, res) => {
+  try {
+    const { productIds, updateData } = req.body;
+
+    if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
+      return res.status(400).json({ message: "Không có sản phẩm nào được chọn" });
+    }
+
+    if (!updateData || Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: "Không có dữ liệu cập nhật" });
+    }
+
+    let updateQuery = {};
+    
+    // Nếu UI muốn append thay vì replace tag, có thể dùng $addToSet với $each.
+    // Ở đây ta theo đúng thiết kế, sẽ merge/thay thế các field.
+    if ('tags' in updateData) {
+      if (!updateQuery.$set) updateQuery.$set = {};
+      // Nối mảng (addToSet) thay vì đè lên mảng cũ để an toàn theo yêu cầu UI
+      updateQuery.$addToSet = { tags: { $each: updateData.tags || [] } };
+    }
+    
+    if ('isActive' in updateData) {
+      if (!updateQuery.$set) updateQuery.$set = {};
+      updateQuery.$set.isActive = updateData.isActive;
+    }
+    
+    if ('compatibleWith' in updateData) {
+      if (!updateQuery.$addToSet) updateQuery.$addToSet = {};
+      updateQuery.$addToSet.compatibleWith = { $each: updateData.compatibleWith || [] };
+    }
+
+    if (Object.keys(updateQuery).length === 0) {
+      return res.status(400).json({ message: "Lỗi tạo updateQuery" });
+    }
+
+    const result = await Product.updateMany(
+      { _id: { $in: productIds } },
+      updateQuery
+    );
+
+    res.json({
+      message: `Đã cập nhật hàng loạt thành công. Số SP ảnh hưởng: ${result.modifiedCount}`,
+      modifiedCount: result.modifiedCount
+    });
+
+  } catch (error) {
+    console.error("Bulk Update Products Error:", error.message);
+    res.status(500).json({ message: "Lỗi server khi cập nhật hàng loạt" });
+  }
+};
+
+/* =====================================
+   BULK DELETE PRODUCTS
+===================================== */
+exports.bulkDeleteProducts = async (req, res) => {
+  try {
+    const { productIds } = req.body;
+
+    if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
+      return res.status(400).json({ message: "Không có sản phẩm nào được chọn để xóa" });
+    }
+
+    const result = await Product.deleteMany({ _id: { $in: productIds } });
+
+    res.json({
+      message: `Đã xóa hàng loạt thành công. Số SP đã xóa: ${result.deletedCount}`,
+      deletedCount: result.deletedCount
+    });
+
+  } catch (error) {
+    console.error("Bulk Delete Products Error:", error.message);
+    res.status(500).json({ message: "Lỗi server khi xóa hàng loạt" });
+  }
+};

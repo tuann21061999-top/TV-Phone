@@ -2,6 +2,9 @@ import React from "react";
 import { Plus, Trash2, Save, X, Edit3, Eye, EyeOff, Search, Settings, ImageIcon, Layers, Zap, Smartphone, ShieldCheck, Cpu, Link as LinkIcon, ListPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { useProductManager } from "./useProductManager";
+import BulkActionsPanel from "./BulkActionsPanel";
+import TagSelector from "./TagSelector";
+import CompatibleProductSelector from "./CompatibleProductSelector";
 import "./ManageProduct.css";
 
 // Cấu hình thông số tự động cho Phụ kiện
@@ -15,13 +18,14 @@ const accessorySpecsConfig = {
 
 const emptyFormAccessory = {
   name: "", brand: "", productGroup: "", description: "Phụ kiện cao cấp chính hãng", productType: "accessory", categoryName: "Ốp lưng", condition: "new",
-  colorImages: [{ colorName: "Mặc định", imageUrl: "", isDefault: true, imageFile: null }], detailImages: [], highlights: [""], isFeatured: false, isActive: true,
+  colorImages: [{ colorName: "Mặc định", imageUrl: "", isDefault: true, imageFile: null }], detailImages: [], tags: [], compatibleWith: [], highlights: [""], isFeatured: false, isActive: true,
   specs: [], variants: [{ sku: "", storage: "Phiên bản mặc định", size: "", price: 0, importPrice: 0, colors: [{ colorName: "Mặc định", quantity: 0 }] }]
 };
 
 export default function ManageAccessory() {
   const {
-    products, form, setForm, showModal, isEditing, searchTerm, setSearchTerm,
+    products, allProducts, form, setForm, showModal, isEditing, searchTerm, setSearchTerm, tagsList,
+    selectedIds, handleSelectAll, handleSelectOne, clearSelection, refreshData,
     addField, removeField, handleImageFileChange, handleDetailImageChange, openModalForAdd, openModalForEdit, closeModal, handleDelete, toggleActive, handleSubmit
   } = useProductManager("accessory", emptyFormAccessory, accessorySpecsConfig);
 
@@ -85,15 +89,40 @@ export default function ManageAccessory() {
         ))}
       </div>
 
+      <BulkActionsPanel 
+        selectedIds={selectedIds} 
+        clearSelection={clearSelection} 
+        refreshData={refreshData} 
+        products={products} 
+        allProducts={allProducts}
+        tagsList={tagsList} 
+      />
+
       {/* DANH SÁCH SẢN PHẨM */}
       <div className="table-container">
         <table>
           <thead>
-            <tr><th>Tên phụ kiện</th><th>Loại</th><th>Giá nhập</th><th>Giá bán</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th></tr>
+            <tr>
+              <th style={{ width: '40px' }}>
+                <input 
+                  type="checkbox" 
+                  onChange={(e) => handleSelectAll(e, currentProducts)} 
+                  checked={selectedIds.length === currentProducts.length && currentProducts.length > 0} 
+                />
+              </th>
+              <th>Tên phụ kiện</th><th>Loại</th><th>Giá nhập</th><th>Giá bán</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th>
+            </tr>
           </thead>
           <tbody>
             {currentProducts.map((p) => (
               <tr key={p._id} className={!p.isActive ? "row-disabled" : ""}>
+                <td>
+                  <input 
+                    type="checkbox" 
+                    checked={selectedIds.includes(p._id)} 
+                    onChange={() => handleSelectOne(p._id)} 
+                  />
+                </td>
                 <td>
                   <strong>{p.name}</strong><br />
                   <small className="brand-tag">{p.brand}</small>
@@ -183,6 +212,26 @@ export default function ManageAccessory() {
                       <label>Nhóm SP Liên kết (Tùy chọn)</label>
                       <input value={form.productGroup} onChange={e => setForm({ ...form, productGroup: e.target.value })} placeholder="VD: GRP-GT6" />
                     </div>
+                    
+                    <div className="form-group-full">
+                <label>Tags (Thẻ đánh dấu):</label>
+                <TagSelector 
+                  tagsList={tagsList} 
+                  selectedTags={form.tags} 
+                  onChange={(newTags) => setForm({ ...form, tags: newTags })} 
+                />
+              </div>
+
+              {/* SẢN PHẨM TƯƠNG THÍCH */}
+              <div className="form-group-full">
+                <label>Gán sản phẩm tương thích (Phụ kiện đi kèm):</label>
+                <CompatibleProductSelector 
+                  products={allProducts} 
+                  selectedIds={form.compatibleWith} 
+                  currentProductId={form._id} 
+                  onChange={(newCompatible) => setForm({ ...form, compatibleWith: newCompatible })} 
+                />
+              </div>
                     <div className="form-group-full">
                       <label>Mô tả chi tiết</label>
                       <textarea rows="6" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Mô tả chung về sản phẩm..." style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', resize: 'vertical' }} />

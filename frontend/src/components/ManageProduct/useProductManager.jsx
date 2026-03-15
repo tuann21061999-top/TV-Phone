@@ -4,11 +4,14 @@ import { toast } from "sonner";
 
 export const useProductManager = (productType, emptyFormTemplate, specsConfig = null) => {
   const [products, setProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [form, setForm] = useState(emptyFormTemplate);
+  const [tagsList, setTagsList] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   const token = localStorage.getItem("token");
   const api = axios.create({
@@ -19,12 +22,26 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
   const fetchProducts = async () => {
     try {
       const res = await api.get("?admin=true");
+      setAllProducts(res.data);
       setProducts(res.data.filter((p) => p.productType === productType));
       // eslint-disable-next-line no-unused-vars
-    } catch (err) { console.error("Lỗi tải dữ liệu"); }
+    } catch (err) { console.error("Lỗi tải dữ liệu sản phẩm"); }
   };
 
-  useEffect(() => { fetchProducts(); }, []);
+  const fetchTags = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/tags");
+      setTagsList(res.data.filter(t => t.isActive));
+    } catch (err) {
+      console.error("Lỗi tải tags", err);
+    }
+  };
+
+  useEffect(() => { 
+    fetchProducts(); 
+    fetchTags();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!isEditing && specsConfig && specsConfig[form.categoryName]) {
@@ -116,6 +133,9 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
       imageFile: null
     }));
 
+    const processedTags = (p.tags || []).map(t => t._id || t);
+    const processedCompatibleWith = (p.compatibleWith || []).map(cp => cp._id || cp);
+
     setForm({
       ...p,
       categoryName: p.categoryId?.name || p.categoryId || p.categoryName || "",
@@ -123,7 +143,9 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
       detailedSpecs: p.detailedSpecs || JSON.parse(JSON.stringify(emptyFormTemplate.detailedSpecs || {})),
       variants: processedVariants.length > 0 ? processedVariants : [JSON.parse(JSON.stringify(emptyFormTemplate.variants[0]))],
       conditionLevel: p.conditionLevel || ["99%"],
-      detailImages: processedDetailImages
+      detailImages: processedDetailImages,
+      tags: processedTags,
+      compatibleWith: processedCompatibleWith
     });
     setShowModal(true);
     document.body.style.overflow = "hidden";
@@ -166,6 +188,24 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
       console.error(err);
     }
   };
+
+  const handleSelectAll = (e, currentProductList) => {
+    if (e.target.checked) {
+      const ids = currentProductList.map(p => p._id);
+      setSelectedIds(prev => Array.from(new Set([...prev, ...ids])));
+    } else {
+      const idsToRemove = currentProductList.map(p => p._id);
+      setSelectedIds(prev => prev.filter(id => !idsToRemove.includes(id)));
+    }
+  };
+
+  const handleSelectOne = (id) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  const clearSelection = () => setSelectedIds([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -266,7 +306,9 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
         detailedSpecs: form.detailedSpecs,
         highlights: form.highlights.filter(h => h.trim() !== ""), // Bỏ dòng trống
         variants: variantsToSave,
-        conditionLevel: form.condition === "new" ? [] : form.conditionLevel
+        conditionLevel: form.condition === "new" ? [] : form.conditionLevel,
+        tags: form.tags || [],
+        compatibleWith: form.compatibleWith || []
       };
 
       console.log("frontend detailImages submitting:", updatedDetailImages);
@@ -286,7 +328,8 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
   };
 
   return {
-    products, form, setForm, showModal, isEditing, searchTerm, setSearchTerm,
+    products, allProducts, form, setForm, showModal, isEditing, searchTerm, setSearchTerm, tagsList,
+    selectedIds, setSelectedIds, handleSelectAll, handleSelectOne, clearSelection, refreshData: fetchProducts,
     addField, removeField, handleImageFileChange, handleDetailImageChange, openModalForAdd, openModalForEdit, closeModal,
     handleDelete, toggleActive, handleSubmit
   };
