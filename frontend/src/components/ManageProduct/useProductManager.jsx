@@ -37,10 +37,10 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
     }
   };
 
-  useEffect(() => { 
-    fetchProducts(); 
+  useEffect(() => {
+    fetchProducts();
     fetchTags();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -142,7 +142,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
       specs: specsArr.length > 0 ? specsArr : [{ key: "", value: "" }],
       detailedSpecs: p.detailedSpecs || JSON.parse(JSON.stringify(emptyFormTemplate.detailedSpecs || {})),
       variants: processedVariants.length > 0 ? processedVariants : [JSON.parse(JSON.stringify(emptyFormTemplate.variants[0]))],
-      conditionLevel: p.conditionLevel || ["99%"],
+      conditionLevel: (p.conditionLevel && p.conditionLevel.length > 0) ? p.conditionLevel : ["99%"],
       detailImages: processedDetailImages,
       tags: processedTags,
       compatibleWith: processedCompatibleWith
@@ -200,7 +200,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
   };
 
   const handleSelectOne = (id) => {
-    setSelectedIds(prev => 
+    setSelectedIds(prev =>
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     );
   };
@@ -242,17 +242,19 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
 
       // 2. Xử lý Category
       let finalCategoryId = "";
+      // Lấy categoryName, nếu undefined thì mặc định là "Điện thoại" để không bị lỗi trim
+      const safeCategoryName = form.categoryName || "Điện thoại";
+
       try {
         const catRes = await axios.post("http://localhost:5000/api/categories",
-          { name: form.categoryName.trim() },
+          { name: safeCategoryName.trim() },
           { headers: { Authorization: `Bearer ${token}` } }
         );
         finalCategoryId = catRes.data._id;
-        // eslint-disable-next-line no-unused-vars
       } catch (err) {
         // Nếu đã tồn tại, lấy ID từ danh sách
         const list = await axios.get("http://localhost:5000/api/categories");
-        const found = list.data.find(c => c.name.toLowerCase() === form.categoryName.trim().toLowerCase());
+        const found = list.data.find(c => c.name.toLowerCase() === safeCategoryName.trim().toLowerCase());
         if (found) finalCategoryId = found._id;
         else throw new Error("Không thể xác định danh mục");
       }

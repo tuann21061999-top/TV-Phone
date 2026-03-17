@@ -220,8 +220,8 @@ function ChatWidget() {
                                 <div
                                     key={msg._id || idx}
                                     className={`chat-msg ${msg.senderId === currentUser._id || msg.senderId?._id === currentUser._id
-                                            ? "sent"
-                                            : "received"
+                                        ? "sent"
+                                        : "received"
                                         }`}
                                 >
                                     {msg.content}

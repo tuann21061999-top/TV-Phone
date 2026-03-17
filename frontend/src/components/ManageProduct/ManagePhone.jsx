@@ -12,7 +12,10 @@ const storageOptions = ["64GB", "128GB", "256GB", "512GB", "1TB", "2TB"];
 
 const emptyForm = {
   name: "", brand: "", productGroup: "", description: "", productType: "device",
+  categoryName: "Điện thoại",
   colorImages: [{ colorName: "", imageUrl: "", isDefault: true, imageFile: null }],
+  condition: "new",
+  conditionLevel: ["99%"],
   detailImages: [],
   tags: [],
   compatibleWith: [],
@@ -166,13 +169,13 @@ export default function ManagePhone() {
         ))}
       </div>
 
-      <BulkActionsPanel 
-        selectedIds={selectedIds} 
-        clearSelection={clearSelection} 
-        refreshData={refreshData} 
-        products={products} 
+      <BulkActionsPanel
+        selectedIds={selectedIds}
+        clearSelection={clearSelection}
+        refreshData={refreshData}
+        products={products}
         allProducts={allProducts}
-        tagsList={tagsList} 
+        tagsList={tagsList}
       />
 
       {/* TABLE */}
@@ -181,10 +184,10 @@ export default function ManagePhone() {
           <thead>
             <tr>
               <th style={{ width: '40px' }}>
-                <input 
-                  type="checkbox" 
-                  onChange={(e) => handleSelectAll(e, currentProducts)} 
-                  checked={selectedIds.length === currentProducts.length && currentProducts.length > 0} 
+                <input
+                  type="checkbox"
+                  onChange={(e) => handleSelectAll(e, currentProducts)}
+                  checked={selectedIds.length === currentProducts.length && currentProducts.length > 0}
                 />
               </th>
               <th>Sản phẩm</th><th>Loại</th><th>Giá sàn</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th>
@@ -194,10 +197,10 @@ export default function ManagePhone() {
             {currentProducts.map((p) => (
               <tr key={p._id} className={!p.isActive ? "row-disabled" : ""}>
                 <td>
-                  <input 
-                    type="checkbox" 
-                    checked={selectedIds.includes(p._id)} 
-                    onChange={() => handleSelectOne(p._id)} 
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(p._id)}
+                    onChange={() => handleSelectOne(p._id)}
                   />
                 </td>
                 <td>
@@ -233,10 +236,10 @@ export default function ManagePhone() {
       {/* PHÂN TRANG */}
       {totalPages > 1 && (
         <div className="pagination">
-          <button 
+          <button
             type="button"
             className="page-btn"
-            disabled={currentPage === 1} 
+            disabled={currentPage === 1}
             onClick={() => setCurrentPage(prev => prev - 1)}
           >
             <ChevronLeft size={20} />
@@ -244,10 +247,10 @@ export default function ManagePhone() {
           <span className="page-info">
             Trang {currentPage} / {totalPages}
           </span>
-          <button 
+          <button
             type="button"
             className="page-btn"
-            disabled={currentPage === totalPages} 
+            disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(prev => prev + 1)}
           >
             <ChevronRight size={20} />
@@ -303,27 +306,6 @@ export default function ManagePhone() {
                         <option value="used">Đã qua sử dụng (Used)</option>
                       </select>
                     </div>
-
-                    <div className="form-group-full">
-                      <label>Tags (Thẻ đánh dấu):</label>
-                      <TagSelector 
-                        tagsList={tagsList} 
-                        selectedTags={form.tags} 
-                        onChange={(newTags) => setForm({ ...form, tags: newTags })} 
-                      />
-                    </div>
-
-                    {/* SẢN PHẨM TƯƠNG THÍCH */}
-                    <div className="form-group-full">
-                      <label>Gán sản phẩm tương thích (Phụ kiện đi kèm):</label>
-                      <CompatibleProductSelector 
-                        products={allProducts} 
-                        selectedIds={form.compatibleWith} 
-                        currentProductId={form._id} 
-                        onChange={(newCompatible) => setForm({ ...form, compatibleWith: newCompatible })} 
-                      />
-                    </div>
-
                     {form.condition === "used" && (
                       <div className="field full animate-fade-in">
                         <label>Các mức độ tình trạng hiện có (Condition Levels)</label>
@@ -350,6 +332,26 @@ export default function ManagePhone() {
                         </div>
                       </div>
                     )}
+
+                    <div className="form-group-full">
+                      <label>Tags (Thẻ đánh dấu):</label>
+                      <TagSelector
+                        tagsList={tagsList}
+                        selectedTags={form.tags}
+                        onChange={(newTags) => setForm({ ...form, tags: newTags })}
+                      />
+                    </div>
+
+                    {/* SẢN PHẨM TƯƠNG THÍCH */}
+                    <div className="form-group-full">
+                      <label>Gán sản phẩm tương thích (Phụ kiện đi kèm):</label>
+                      <CompatibleProductSelector
+                        products={allProducts}
+                        selectedIds={form.compatibleWith}
+                        currentProductId={form._id}
+                        onChange={(newCompatible) => setForm({ ...form, compatibleWith: newCompatible })}
+                      />
+                    </div>
 
                     <div className="field full">
                       <label>Mô tả chi tiết</label>
@@ -486,7 +488,7 @@ export default function ManagePhone() {
                               <div className="v-field" style={{ flex: '1 1 45%' }}>
                                 <label>Tình trạng</label>
                                 <select value={v.condition} onChange={(e) => { const u = [...form.variants]; u[i].condition = e.target.value; setForm({ ...form, variants: u }) }} required>
-                                  {form.conditionLevel.map(lvl => <option key={`cond-${lvl}`} value={lvl}>{lvl}</option>)}
+                                  {form.conditionLevel.map((lvl, idx) => <option key={`cond-${idx}-${lvl}`} value={lvl}>{lvl}</option>)}
                                 </select>
                               </div>
                             )}

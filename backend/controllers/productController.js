@@ -37,7 +37,7 @@ exports.getAllProducts = async (req, res) => {
       filter.isFeatured = true;
     } else if (type) {
       filter.productType = type;
-      filter.isFeatured = { $ne: true }; // Loại trừ sản phẩm hot khỏi danh sách thường
+      // Đã xóa dòng filter.isFeatured = { $ne: true } để trả về ĐẦY ĐỦ sản phẩm
     }
     if (brand) filter.brand = brand;
     if (condition) filter.condition = condition;
@@ -134,7 +134,7 @@ exports.getProductById = async (req, res) => {
     // Lấy các sản phẩm liên quan (cùng category, khác _id)
     const nameParts = product.name.split(" ");
     const searchKeyword = nameParts.slice(0, 2).join(" "); // Ví dụ "Củ sạc", "Đồng hồ"
-    
+
     let relatedProducts = await Product.find({
       categoryId: product.categoryId,
       name: { $regex: searchKeyword, $options: "i" },
@@ -254,7 +254,7 @@ exports.bulkUpdateProducts = async (req, res) => {
     }
 
     let updateQuery = {};
-    
+
     // Nếu UI muốn append thay vì replace tag, có thể dùng $addToSet với $each.
     // Ở đây ta theo đúng thiết kế, sẽ merge/thay thế các field.
     if ('tags' in updateData) {
@@ -262,12 +262,12 @@ exports.bulkUpdateProducts = async (req, res) => {
       // Nối mảng (addToSet) thay vì đè lên mảng cũ để an toàn theo yêu cầu UI
       updateQuery.$addToSet = { tags: { $each: updateData.tags || [] } };
     }
-    
+
     if ('isActive' in updateData) {
       if (!updateQuery.$set) updateQuery.$set = {};
       updateQuery.$set.isActive = updateData.isActive;
     }
-    
+
     if ('compatibleWith' in updateData) {
       if (!updateQuery.$addToSet) updateQuery.$addToSet = {};
       updateQuery.$addToSet.compatibleWith = { $each: updateData.compatibleWith || [] };

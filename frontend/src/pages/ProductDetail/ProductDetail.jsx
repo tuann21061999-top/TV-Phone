@@ -61,30 +61,30 @@ function ProductDetail() {
         if (data && data.variants && data.variants.length > 0) {
           const firstValidVariant = data.variants.find(v => v.isActive && v.quantity > 0 && (data.condition !== "used" || (data.conditionLevel && v.condition === data.conditionLevel[0])));
           if (firstValidVariant) {
-             setSelectedColor(firstValidVariant.colorName || "");
-             
-             const needsOpt = data.productType === "device" || data.variants.some(v => v.storage && v.storage.trim() !== "" && v.storage !== "Phiên bản mặc định" && v.storage !== "N/A");
-             if (needsOpt) {
-               const memStr = firstValidVariant.size ? `${firstValidVariant.size}/${firstValidVariant.storage}` : firstValidVariant.storage;
-               setSelectedMem(memStr || "");
-             } else {
-               setSelectedMem("");
-             }
+            setSelectedColor(firstValidVariant.colorName || "");
 
-             if (data.condition === "used" && data.conditionLevel?.length > 0) {
-               setSelectedCondition(data.conditionLevel[0]);
-             }
+            const needsOpt = data.productType === "device" || data.variants.some(v => v.storage && v.storage.trim() !== "" && v.storage !== "Phiên bản mặc định" && v.storage !== "N/A");
+            if (needsOpt) {
+              const memStr = firstValidVariant.size ? `${firstValidVariant.size}/${firstValidVariant.storage}` : firstValidVariant.storage;
+              setSelectedMem(memStr || "");
+            } else {
+              setSelectedMem("");
+            }
+
+            if (data.condition === "used" && data.conditionLevel?.length > 0) {
+              setSelectedCondition(data.conditionLevel[0]);
+            }
           } else {
-             setSelectedColor("");
-             setSelectedMem("");
-             setSelectedCondition("");
+            setSelectedColor("");
+            setSelectedMem("");
+            setSelectedCondition("");
           }
         } else {
           setSelectedColor("");
           setSelectedMem("");
           setSelectedCondition("");
         }
-        
+
         setActiveImage(null);
 
         // Ghi nhận lịch sử xem sản phẩm nếu user đã đăng nhập
@@ -405,7 +405,7 @@ function ProductDetail() {
             </div>
             <div className="sticky-nav">
               <span className="nav-link active">Tổng quan</span>
-              <Link to={`/product/${slug}/specs`} className="nav-link">Thông số kỹ thuật</Link>
+              <Link to={`/product/${slug}/specs`} className="nav-link">Thông số kỹ thuật chi tiết</Link>
               <Link to={`/product/${slug}/reviews`} className="nav-link">Đánh giá</Link>
             </div>
           </div>
@@ -554,36 +554,36 @@ function ProductDetail() {
 
                       {/* Sibling Options */}
                       {product.siblings.map(sib => {
-                         const sibVari = sib.variants || [];
-                         const sibOpts = [...new Set(sibVari.map(v => v.size ? `${v.size}/${v.storage}` : v.storage).filter(o => o && o !== "Phiên bản mặc định"))];
-                         
-                         if (sibOpts.length > 0) {
-                           return sibOpts.map((opt, idx) => (
-                             <button
-                               key={`sib-${sib._id}-${idx}`}
-                               className="opt-btn"
-                               onClick={() => {
-                                 setLoading(true);
-                                 navigate(`/product/${sib.slug}`);
-                               }}
-                             >
-                               {opt}
-                             </button>
-                           ));
-                         } else {
-                           return (
-                             <button
-                               key={`sib-${sib._id}`}
-                               className="opt-btn"
-                               onClick={() => {
-                                 setLoading(true);
-                                 navigate(`/product/${sib.slug}`);
-                               }}
-                             >
-                               {sib.name}
-                             </button>
-                           );
-                         }
+                        const sibVari = sib.variants || [];
+                        const sibOpts = [...new Set(sibVari.map(v => v.size ? `${v.size}/${v.storage}` : v.storage).filter(o => o && o !== "Phiên bản mặc định"))];
+
+                        if (sibOpts.length > 0) {
+                          return sibOpts.map((opt, idx) => (
+                            <button
+                              key={`sib-${sib._id}-${idx}`}
+                              className="opt-btn"
+                              onClick={() => {
+                                setLoading(true);
+                                navigate(`/product/${sib.slug}`);
+                              }}
+                            >
+                              {opt}
+                            </button>
+                          ));
+                        } else {
+                          return (
+                            <button
+                              key={`sib-${sib._id}`}
+                              className="opt-btn"
+                              onClick={() => {
+                                setLoading(true);
+                                navigate(`/product/${sib.slug}`);
+                              }}
+                            >
+                              {sib.name}
+                            </button>
+                          );
+                        }
                       })}
                     </div>
                   </div>
@@ -800,10 +800,10 @@ function ProductDetail() {
           </div>
 
           {/* Nút xem chi tiết thông số */}
-          {(product.detailedSpecs && 
-           Object.keys(product.detailedSpecs).length > 0 && 
-           Object.values(product.detailedSpecs).some(val => val !== null && val !== "" && (typeof val !== 'object' || Object.keys(val).length > 0))) || 
-           (product.specs && Object.keys(product.specs).length > 0) ? (
+          {(product.detailedSpecs &&
+            Object.keys(product.detailedSpecs).length > 0 &&
+            Object.values(product.detailedSpecs).some(val => val !== null && val !== "" && (typeof val !== 'object' || Object.keys(val).length > 0))) ||
+            (product.specs && Object.keys(product.specs).length > 0) ? (
             <div className="view-detailed-specs-action" style={{ marginTop: '20px', textAlign: 'center' }}>
               <Link to={`/product/${product.slug || product._id}/specs`} className="btn-view-spec-detail">
                 <Cpu size={18} /> Xem cấu hình chi tiết

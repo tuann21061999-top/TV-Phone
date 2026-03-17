@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
@@ -20,8 +20,14 @@ const ICONS = {
 
 function SpecDetail() {
     const { slug } = useParams();
+    const navigate = useNavigate();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    // Search for compare state
+    const [searchCompare, setSearchCompare] = useState('');
+    const [compareResults, setCompareResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -38,6 +44,29 @@ function SpecDetail() {
         fetchProduct();
     }, [slug]);
 
+    useEffect(() => {
+        let debounceTimer;
+        if (searchCompare.length > 1) {
+            setIsSearching(true);
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const typeParam = product?.productType === 'device' ? '&type=device' : '';
+                    const res = await axios.get(`http://localhost:5000/api/products?search=${searchCompare}${typeParam}`);
+                    // Filter out the current product from search results, increase limit to 15
+                    const filtered = (res.data || []).filter(p => p.slug !== slug).slice(0, 15);
+                    setCompareResults(filtered);
+                } catch (error) {
+                    console.error("Search error:", error);
+                } finally {
+                    setIsSearching(false);
+                }
+            }, 300);
+        } else {
+            setCompareResults([]);
+        }
+        return () => clearTimeout(debounceTimer);
+    }, [searchCompare, slug]);
+
     const mainImage = useMemo(() => {
         if (!product) return "";
         const defaultColor = product.colorImages?.find(c => c.isDefault);
@@ -52,9 +81,9 @@ function SpecDetail() {
     if (loading) return <div className="loading-state">Đang tải cấu hình chi tiết...</div>;
     if (!product) return <div className="error-state">Không tìm thấy sản phẩm</div>;
 
-    const hasDetailedSpecs = product.detailedSpecs && 
-                             Object.keys(product.detailedSpecs).length > 0 &&
-                             Object.values(product.detailedSpecs).some(val => val !== null && val !== "" && (typeof val !== 'object' || Object.keys(val).length > 0));
+    const hasDetailedSpecs = product.detailedSpecs &&
+        Object.keys(product.detailedSpecs).length > 0 &&
+        Object.values(product.detailedSpecs).some(val => val !== null && val !== "" && (typeof val !== 'object' || Object.keys(val).length > 0));
     const hasBasicSpecs = product.specs && Object.keys(product.specs).length > 0;
 
     return (
@@ -73,7 +102,7 @@ function SpecDetail() {
                     </div>
                     <div className="sticky-nav">
                         <Link to={`/product/${product.slug}`} className="nav-link">Tổng quan</Link>
-                        <span className="nav-link active">Thông số kỹ thuật</span>
+                        <span className="nav-link active">Thông số kỹ thuật chi tiết</span>
                         <Link to={`/product/${product.slug}/reviews`} className="nav-link">Đánh giá</Link>
                     </div>
                 </div>
@@ -85,9 +114,37 @@ function SpecDetail() {
                     <div className="sidebar-card">
                         <h3>So sánh cấu hình</h3>
                         <p className="sidebar-desc">Chọn thiết bị khác để xem sự khác biệt về cấu hình.</p>
-                        <div className="compare-search">
-                            <input type="text" placeholder="Tìm sản phẩm..." disabled />
-                            <span className="plus-icon">+</span>
+                        <div className="compare-search-dropdown-wrapper" style={{ position: 'relative' }}>
+                            <div className="compare-search">
+                                <input 
+                                    type="text" 
+                                    placeholder="Tìm sản phẩm..." 
+                                    value={searchCompare}
+                                    onChange={(e) => setSearchCompare(e.target.value)}
+                                />
+                                <span className="plus-icon">{isSearching ? '...' : '+'}</span>
+                            </div>
+                            
+                            {compareResults.length > 0 && (
+                                <div className="compare-search-results" style={{
+                                    position: 'absolute', top: '100%', left: 0, right: 0, 
+                                    background: 'white', border: '1px solid #ddd', borderRadius: '8px', 
+                                    zIndex: 10, marginTop: '5px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                    maxHeight: '300px', overflowY: 'auto'
+                                }}>
+                                    {compareResults.map(p => (
+                                        <div 
+                                            key={p._id} 
+                                            className="search-result-item"
+                                            style={{ padding: '10px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', borderBottom: '1px solid #eee' }}
+                                            onClick={() => navigate(`/compare?p1=${product.slug}&p2=${p.slug}`)}
+                                        >
+                                            <img src={p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl} alt={p.name} style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
+                                            <div style={{ flex: 1, fontSize: '13px', fontWeight: 500, color: '#333' }}>{p.name}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -110,7 +167,7 @@ function SpecDetail() {
                         <div className="detailed-specs-list">
                             {Object.entries(product.detailedSpecs).map(([groupName, specsArr], idx) => {
                                 // Bỏ qua nhóm nếu không có dữ liệu thực tế
-                                const validSpecs = specsArr.filter(s => s.value && s.value.trim() !== "");
+                                const validSpecs = Array.isArray(specsArr) ? specsArr.filter(s => s.value && String(s.value).trim() !== "") : [];
                                 if (validSpecs.length === 0) return null;
 
                                 return (
@@ -126,7 +183,7 @@ function SpecDetail() {
                                             {validSpecs.map((spec, sIdx) => (
                                                 <div key={sIdx} className="spec-item-cell">
                                                     <div className="spec-item-key">{spec.key}</div>
-                                                    <div className="spec-item-value" dangerouslySetInnerHTML={{ __html: spec.value.replace(/\n/g, '<br/>') }} />
+                                                    <div className="spec-item-value" dangerouslySetInnerHTML={{ __html: String(spec.value).replace(/\n/g, '<br/>') }} />
                                                 </div>
                                             ))}
                                         </div>

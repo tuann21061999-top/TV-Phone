@@ -15,6 +15,7 @@ import NewsDetail from "./pages/NewsDetail/NewsDetail";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
 import SearchPage from "./pages/SearchPage/SearchPage";
 import SpecDetail from "./pages/SpecDetail/SpecDetail";
+import ProductCompare from "./pages/ProductCompare/ProductCompare";
 import ReviewPage from "./pages/ReviewPage/ReviewPage";
 import Cart from "./components/Cart/Cart";
 import LoginPage from "./components/LoginPages/LoginPage";
@@ -71,6 +72,7 @@ function App() {
           <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
           <Route path="/product/:slug" element={<PageTransition><ProductDetail /></PageTransition>} />
           <Route path="/product/:slug/specs" element={<PageTransition><SpecDetail /></PageTransition>} />
+          <Route path="/compare" element={<PageTransition><ProductCompare /></PageTransition>} />
           <Route path="/product/:slug/reviews" element={<PageTransition><ReviewPage /></PageTransition>} />
           <Route path="/admin" element={<AdminRoute><PageTransition><AdminPage /></PageTransition></AdminRoute>} />
           <Route path="/admin/products" element={<AdminRoute><PageTransition><ManageProduct /></PageTransition></AdminRoute>} />

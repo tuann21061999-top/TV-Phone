@@ -13,7 +13,7 @@ import {
   BatteryPlus,
   Watch,
   Fan,
-  Heart,
+  HeartPlus,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
@@ -40,7 +40,7 @@ function ElectronicPage() {
     { name: "Tất cả", icon: null },
     { name: "Tai nghe", icon: <Headphones size={16} /> },
     { name: "Sạc dự phòng", icon: <BatteryPlus size={16} /> },
-    { name: "Đồng hồ", icon: <Watch size={16} /> },
+    { name: "Đồng hồ thông minh", icon: <Watch size={16} /> },
     { name: "Quạt tản nhiệt", icon: <Fan size={16} /> }
   ];
 
@@ -109,7 +109,24 @@ function ElectronicPage() {
     }
   };
 
+  /* ================= NORMALIZE ================= */
 
+  const normalizeText = (text) => {
+    if (!text) return "";
+    return text
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  };
+
+  const getFirstTwoWords = (text) => {
+    const normalized = normalizeText(text);
+    if (!normalized) return "";
+    return normalized.split(" ").slice(0, 2).join(" ");
+  };
 
   /* ================= HELPERS ================= */
 
@@ -153,20 +170,11 @@ function ElectronicPage() {
 
   /* ================= GET BRANDS ================= */
 
-  const categoryProducts = useMemo(() => {
-    if (activeCategory === "Tất cả") return products;
-    return products.filter(p => p.categoryId?.name === activeCategory);
-  }, [products, activeCategory]);
-
   const brands = useMemo(() => {
     return [
-      ...new Set(categoryProducts.map((p) => p.brand).filter(Boolean))
+      ...new Set(products.map((p) => p.brand).filter(Boolean))
     ];
-  }, [categoryProducts]);
-
-  const hasRatedProducts = useMemo(() => {
-    return categoryProducts.some(p => (p.averageRating || 0) > 0);
-  }, [categoryProducts]);
+  }, [products]);
 
   /* ================= FILTER LOGIC ================= */
 
@@ -175,8 +183,11 @@ function ElectronicPage() {
 
     /* 1️⃣ CATEGORY */
     if (activeCategory !== "Tất cả") {
+      const categoryKey = getFirstTwoWords(activeCategory);
+
       filtered = filtered.filter((product) => {
-        return product.categoryId?.name === activeCategory;
+        const productKey = getFirstTwoWords(product.name);
+        return productKey === categoryKey;
       });
     }
 
@@ -310,10 +321,8 @@ function ElectronicPage() {
                       ? "category-btn active"
                       : "category-btn"
                   }
-                  onClick={() => {
-                    setActiveCategory(cat.name);
-                    setBrandFilter("all");
-                  }
+                  onClick={() =>
+                    setActiveCategory(cat.name)
                   }
                 >
                   {cat.icon} {cat.name}
@@ -343,22 +352,20 @@ function ElectronicPage() {
               </select>
             </div>
 
-            {/* RATING - chỉ hiện khi có sản phẩm có review */}
-            {hasRatedProducts && (
-              <div className="filter-group">
-                <h4>Đánh giá</h4>
-                <select
-                  value={ratingFilter}
-                  onChange={(e) =>
-                    setRatingFilter(e.target.value)
-                  }
-                >
-                  <option value="all">Tất cả</option>
-                  <option value="4">4★ trở lên</option>
-                  <option value="3">3★ trở lên</option>
-                </select>
-              </div>
-            )}
+            {/* RATING */}
+            <div className="filter-group">
+              <h4>Đánh giá</h4>
+              <select
+                value={ratingFilter}
+                onChange={(e) =>
+                  setRatingFilter(e.target.value)
+                }
+              >
+                <option value="all">Tất cả</option>
+                <option value="4">4★ trở lên</option>
+                <option value="3">3★ trở lên</option>
+              </select>
+            </div>
 
             {/* BRAND */}
             <div className="filter-group">
@@ -434,7 +441,7 @@ function ElectronicPage() {
                             onClick={(e) => handleToggleFavorite(e, product._id)}
                             title={favoriteIds.has(product._id) ? "Bỏ yêu thích" : "Yêu thích"}
                           >
-                            <Heart size={18} color={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"} fill={favoriteIds.has(product._id) ? "#ef4444" : "none"} />
+                            <HeartPlus size={18} fill="none" stroke={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"} />
                           </button>
                           <img
                             src={
