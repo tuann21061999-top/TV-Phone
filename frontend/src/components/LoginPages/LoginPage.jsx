@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, User, Smartphone } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "../../api/authService";
+import { loginUser, googleLogin } from "../../api/authService";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
@@ -61,8 +62,31 @@ const LoginPage = () => {
     toast.info(`Tính năng đăng nhập bằng ${platform} đang được phát triển!`);
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setLoading(true);
+      const res = await googleLogin({ googleToken: credentialResponse.credential });
+      const { token, user } = res.data;
+      if (token && user) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        toast.success(`Chào mừng ${user.name}!`);
+        setTimeout(() => {
+          if (user.role === "admin") navigate("/admin");
+          else navigate("/profile");
+          window.location.reload();
+        }, 100);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Đăng nhập Google thất bại!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="login-page">
+    <GoogleOAuthProvider clientId="250807668016-8p2k3cisiadd70rclj8graue584iechr.apps.googleusercontent.com">
+      <div className="login-page">
       <Header />
       <div className="container">
         <div className="login-wrapper">
@@ -127,15 +151,11 @@ const LoginPage = () => {
                 <span>HOẶC ĐĂNG NHẬP VỚI</span>
               </div>
 
-              <div className="social-login">
-                <button type="button" className="social-btn google" onClick={() => handleSocialLogin("Google")}>
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" />
-                  Đăng nhập bằng Google
-                </button>
-                <button type="button" className="social-btn facebook" onClick={() => handleSocialLogin("Facebook")}>
-                  <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_2023.png" alt="Facebook" />
-                  Đăng nhập bằng Facebook
-                </button>
+              <div className="social-login" style={{ display: 'flex', justifyContent: 'center' }}>
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => toast.error("Đăng nhập Google thất bại!")}
+                />
               </div>
             </form>
 
@@ -147,6 +167,7 @@ const LoginPage = () => {
       </div>
       <Footer />
     </div>
+    </GoogleOAuthProvider>
   );
 };
 

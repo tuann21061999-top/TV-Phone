@@ -15,6 +15,11 @@ function ChatWidget() {
     const [isTyping, setIsTyping] = useState(false);
     const [hasUnread, setHasUnread] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [chatMode, setChatMode] = useState("admin"); // 'admin' hoặc 'ai'
+    const [aiMessages, setAiMessages] = useState([
+        { _id: "1", content: "Chào bạn! Mình là Trợ lý ảo AI của TechStore, mình có thể gợi ý điện thoại gì cho bạn hôm nay?", senderId: "ai", createdAt: new Date().toISOString() }
+    ]);
+    const [aiLoading, setAiLoading] = useState(false);
 
     const socketRef = useRef(null);
     const messagesEndRef = useRef(null);
@@ -112,11 +117,51 @@ function ChatWidget() {
     // ─── Auto-scroll xuống cuối ───────────────────────────────────
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-    }, [messages, isTyping]);
+    }, [messages, isTyping, aiMessages, aiLoading, chatMode]);
 
     // ─── Gửi tin nhắn ────────────────────────────────────────────
-    const handleSend = () => {
-        if (!inputMsg.trim() || !adminId || !socketRef.current) return;
+    const handleSend = async () => {
+        if (!inputMsg.trim()) return;
+
+        if (chatMode === "ai") {
+            const userMsg = inputMsg.trim();
+            setInputMsg("");
+            
+            const newAiMessages = [
+                ...aiMessages, 
+                { _id: Date.now().toString(), content: userMsg, senderId: currentUser._id, createdAt: new Date().toISOString() }
+            ];
+            setAiMessages(newAiMessages);
+            setAiLoading(true);
+
+            try {
+                const history = newAiMessages.slice(1, -1).map(m => ({ // Bỏ câu chào đầu để tiết kiệm token
+                    role: m.senderId === "ai" ? "model" : "user",
+                    text: m.content
+                }));
+                
+                const res = await axios.post("http://localhost:5000/api/ai/chat", {
+                    message: userMsg,
+                    history: history
+                });
+                
+                setAiMessages(prev => [
+                    ...prev, 
+                    { _id: Date.now().toString(), content: res.data.reply, senderId: "ai", createdAt: new Date().toISOString() }
+                ]);
+            } catch (error) {
+                setAiMessages(prev => [
+                    ...prev, 
+                    { _id: Date.now().toString(), content: "Xin lỗi, Hệ thống AI đang bận hoặc vượt quá giới hạn API. Vui lòng thử lại sau!", senderId: "ai", createdAt: new Date().toISOString() }
+                ]);
+            } finally {
+                setAiLoading(false);
+            }
+            return;
+        }
+
+        // Logic Chat Admin (Socket)
+        if (!adminId || !socketRef.current) return;
 
         socketRef.current.emit("send_message", {
             senderId: currentUser._id,
@@ -149,7 +194,7 @@ function ChatWidget() {
     const handleInputChange = (e) => {
         setInputMsg(e.target.value);
 
-        if (socketRef.current && adminId) {
+        if (chatMode === "admin" && socketRef.current && adminId) {
             socketRef.current.emit("typing", {
                 senderId: currentUser._id,
                 receiverId: adminId,
@@ -198,8 +243,21 @@ function ChatWidget() {
                                 <Headphones size={18} />
                             </div>
                             <div className="chat-header-text">
-                                <h4>Hỗ trợ TechNova</h4>
-                                <p>Thường trả lời trong vài phút</p>
+                                <h4>Hỗ trợ TechStore</h4>
+                                <div style={{ display: 'flex', gap: '5px', marginTop: '4px' }}>
+                                    <button 
+                                        onClick={() => setChatMode("admin")}
+                                        style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '10px', border: 'none', background: chatMode === "admin" ? '#fff' : 'rgba(255,255,255,0.3)', color: chatMode === "admin" ? '#2563eb' : '#fff', cursor: 'pointer', fontWeight: 600 }}
+                                    >
+                                        CSKH
+                                    </button>
+                                    <button 
+                                        onClick={() => setChatMode("ai")}
+                                        style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '10px', border: 'none', background: chatMode === "ai" ? '#fff' : 'rgba(255,255,255,0.3)', color: chatMode === "ai" ? '#2563eb' : '#fff', cursor: 'pointer', fontWeight: 600 }}
+                                    >
+                                        AI Tư vấn
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <button className="chat-close-btn" onClick={() => setIsOpen(false)}>
@@ -209,27 +267,48 @@ function ChatWidget() {
 
                     {/* Messages */}
                     <div className="chat-widget-messages">
-                        {loading ? (
-                            <div className="chat-loading">Đang tải lịch sử chat...</div>
-                        ) : messages.length === 0 ? (
-                            <div className="chat-empty">
-                                <p>👋 Xin chào! Hãy gửi tin nhắn để được hỗ trợ nhé.</p>
-                            </div>
+                        {chatMode === "admin" ? (
+                            <>
+                                {loading ? (
+                                    <div className="chat-loading">Đang tải lịch sử chat...</div>
+                                ) : messages.length === 0 ? (
+                                    <div className="chat-empty">
+                                        <p>👋 Xin chào! Hãy gửi tin nhắn để gặp chuyên viên hỗ trợ.</p>
+                                    </div>
+                                ) : (
+                                    messages.map((msg, idx) => (
+                                        <div
+                                            key={msg._id || idx}
+                                            className={`chat-msg ${msg.senderId === currentUser._id || msg.senderId?._id === currentUser._id
+                                                ? "sent"
+                                                : "received"
+                                                }`}
+                                        >
+                                            {msg.content}
+                                            <span className="chat-msg-time">{formatTime(msg.createdAt)}</span>
+                                        </div>
+                                    ))
+                                )}
+                                {isTyping && <div className="chat-typing">Admin đang nhập...</div>}
+                            </>
                         ) : (
-                            messages.map((msg, idx) => (
-                                <div
-                                    key={msg._id || idx}
-                                    className={`chat-msg ${msg.senderId === currentUser._id || msg.senderId?._id === currentUser._id
-                                        ? "sent"
-                                        : "received"
-                                        }`}
-                                >
-                                    {msg.content}
-                                    <span className="chat-msg-time">{formatTime(msg.createdAt)}</span>
-                                </div>
-                            ))
+                            <>
+                                {aiMessages.map((msg, idx) => (
+                                        <div
+                                            key={msg._id || idx}
+                                            className={`chat-msg ${msg.senderId === currentUser._id
+                                                ? "sent"
+                                                : "received"
+                                                }`}
+                                        >
+                                            <div style={{ whiteSpace: 'pre-line' }}>{msg.content}</div>
+                                            <span className="chat-msg-time">{formatTime(msg.createdAt)}</span>
+                                        </div>
+                                ))}
+                                {aiLoading && <div className="chat-typing">AI đang suy nghĩ...</div>}
+                            </>
                         )}
-                        {isTyping && <div className="chat-typing">Admin đang nhập...</div>}
+                        
                         <div ref={messagesEndRef} />
                     </div>
 

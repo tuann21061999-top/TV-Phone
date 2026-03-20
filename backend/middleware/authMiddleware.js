@@ -38,4 +38,22 @@ const admin = (req, res, next) => {
   }
 };
 
-module.exports = { protect, admin };
+// Lớp 3: Tuỳ chọn đăng nhập (Dành cho chức năng Guest)
+const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "bi_mat_quan_su");
+      const currentUser = await User.findById(decoded.id).select("-password");
+      if (currentUser) {
+        req.user = currentUser;
+      }
+    }
+  } catch (error) {
+    // Không làm gì nếu token sai, coi như guest
+  }
+  next();
+};
+
+module.exports = { protect, admin, optionalAuth };

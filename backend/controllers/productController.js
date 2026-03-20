@@ -131,34 +131,64 @@ exports.getProductById = async (req, res) => {
       }).select("name slug colorImages productGroup productType variants");
     }
 
-    // Lấy các sản phẩm liên quan (cùng category, khác _id)
-    const nameParts = product.name.split(" ");
-    const searchKeyword = nameParts.slice(0, 2).join(" "); // Ví dụ "Củ sạc", "Đồng hồ"
-
+    // MỤC 1: SẢN PHẨM LIÊN QUAN (Cùng Brand)
     let relatedProducts = await Product.find({
       categoryId: product.categoryId,
-      name: { $regex: searchKeyword, $options: "i" },
+      brand: product.brand,
       _id: { $ne: product._id },
       isActive: true,
     })
-      .limit(8)
+      .sort({ totalSold: -1 })
+      .limit(5)
       .select("-description -specs -detailImages -createdAt -updatedAt");
 
-    // Nếu ít quá thì lấy thêm các sản phẩm cùng danh mục
-    if (relatedProducts.length < 8) {
-      const moreProducts = await Product.find({
+    if (relatedProducts.length < 5) {
+      const genericProducts = await Product.find({
         categoryId: product.categoryId,
         _id: { $ne: product._id, $nin: relatedProducts.map(p => p._id) },
         isActive: true,
       })
-        .limit(8 - relatedProducts.length)
+        .sort({ totalSold: -1 })
+        .limit(5 - relatedProducts.length)
         .select("-description -specs -detailImages -createdAt -updatedAt");
-      relatedProducts = [...relatedProducts, ...moreProducts];
+      relatedProducts = [...relatedProducts, ...genericProducts];
+    }
+
+    // MỤC 2: CÓ THỂ BẠN SẼ THÍCH (Ưu tiên trùng nhiều Tag nhất)
+    let recommendedProducts = [];
+    if (product.tags && product.tags.length > 0) {
+      const targetTags = product.tags.map(t => t.toString());
+      
+      let candidateProducts = await Product.find({
+        isActive: true,
+        _id: { $ne: product._id },
+        tags: { $in: product.tags }
+      }).select("-description -specs -detailImages -createdAt -updatedAt");
+
+      // Tính điểm trùng khớp Tag
+      const scoredProducts = candidateProducts.map(p => {
+        let score = 0;
+        if (p.tags) {
+          p.tags.forEach(t => {
+            if (targetTags.includes(t.toString())) score++;
+          });
+        }
+        return { product: p, score };
+      });
+
+      // Sắp xếp: Ưu tiên trùng nhiều tag nhất -> Bằng nhau mới so totalSold
+      scoredProducts.sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return (b.product.totalSold || 0) - (a.product.totalSold || 0);
+      });
+
+      recommendedProducts = scoredProducts.slice(0, 5).map(item => item.product);
     }
 
     const productObj = product.toObject();
     productObj.siblings = siblings;
     productObj.relatedProducts = relatedProducts;
+    productObj.recommendedProducts = recommendedProducts;
 
     res.json(productObj);
   } catch (error) {

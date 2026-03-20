@@ -3,13 +3,68 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const OTP = require("../models/OTP");
 const sendEmail = require("../utils/sendEmail");
+const { OAuth2Client } = require("google-auth-library");
 
-// ĐĂNG KÝ
+const googleClient = new OAuth2Client("250807668016-8p2k3cisiadd70rclj8graue584iechr.apps.googleusercontent.com");
+
+// ĐĂNG KÝ (GỬI OTP)
+exports.sendRegisterOTP = async (req, res) => {
+  try {
+    const { email, phone } = req.body;
+    
+    // Kiểm tra trùng
+    const userExists = await User.findOne({ $or: [{ email }, { phone }] });
+    if (userExists) {
+      if (userExists.email === email) return res.status(400).json({ message: "Email này đã được đăng ký!" });
+      if (userExists.phone === phone) return res.status(400).json({ message: "Số điện thoại này đã được đăng ký!" });
+    }
+
+    // Xóa OTP đăng ký cũ của email này
+    await OTP.deleteMany({ email, type: "register" });
+
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const newOTP = new OTP({
+      email,
+      code: otpCode,
+      type: "register",
+      expireAt: new Date(Date.now() + 5 * 60 * 1000)
+    });
+    await newOTP.save();
+
+    const emailOptions = {
+        to: email,
+        subject: "Mã Xác nhận Đăng ký tài khoản TechStore",
+        html: `<h2>Xác nhận Đăng ký</h2><p>Mã OTP của bạn là: <b>${otpCode}</b>. Mã có hiệu lực trong 5 phút.</p>`
+    };
+    await sendEmail(emailOptions);
+
+    res.status(200).json({ message: "Đã gửi mã OTP đến email của bạn!" });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi hệ thống: " + error.message });
+  }
+};
+
+// ĐĂNG KÝ (TẠO TÀI KHOẢN KHI ĐÃ VERIFY)
 exports.register = async (req, res) => {
   try {
-    const { fullName, email, phone, password } = req.body;
+    const { fullName, email, phone, password, otp } = req.body;
+    
+    if (!otp) return res.status(400).json({ message: "Vui lòng cung cấp mã OTP rừ Email!" });
 
-    // 1. Kiểm tra email hoặc sđt đã tồn tại chưa
+    // Validate OTP
+    const validOTP = await OTP.findOne({
+      email,
+      code: otp,
+      type: "register",
+      isUsed: false,
+      expireAt: { $gt: new Date() }
+    });
+
+    if (!validOTP) {
+      return res.status(400).json({ message: "Mã OTP không hợp lệ hoặc đã hết hạn!" });
+    }
+
+    // 1. Kiểm tra lại lần cuối
     const userExists = await User.findOne({
       $or: [{ email }, { phone }]
     });
@@ -37,6 +92,8 @@ exports.register = async (req, res) => {
     });
 
     await newUser.save();
+    await OTP.deleteOne({ _id: validOTP._id });
+
     res.status(201).json({ message: "Tạo tài khoản thành công!" });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống: " + error.message });
@@ -86,6 +143,58 @@ exports.login = async (req, res) => {
   }
 };
 
+// ĐĂNG NHẬP BẰNG GOOGLE
+exports.googleLogin = async (req, res) => {
+  try {
+    const { googleToken } = req.body;
+    const ticket = await googleClient.verifyIdToken({
+      idToken: googleToken,
+      audience: "250807668016-8p2k3cisiadd70rclj8graue584iechr.apps.googleusercontent.com",
+    });
+    
+    const payload = ticket.getPayload();
+    const { email, name, picture } = payload;
+    
+    let user = await User.findOne({ email });
+    
+    if (!user) {
+      const randomPassword = Math.random().toString(36).slice(-10) + "T1!"; 
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(randomPassword, salt);
+      
+      user = new User({
+          name,
+          email,
+          avatar: picture,
+          password: hashedPassword,
+          role: "user"
+      });
+      await user.save();
+    }
+    
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET || "bi_mat_quan_su",
+      { expiresIn: '24h' }
+    );
+    
+    res.status(200).json({
+      message: "Đăng nhập Google thành công!",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        avatar: user.avatar
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi đăng nhập Google: " + error.message });
+  }
+};
+
 // ============================
 // QUÊN MẬT KHẨU (Gửi OTP qua Email)
 // ============================
@@ -117,16 +226,17 @@ exports.forgotPassword = async (req, res) => {
     });
     await newOTP.save();
 
-    // BỎ QUA GỬI EMAIL - TRẢ TRỰC TIẾP OTP VỀ FRONTEND ĐỂ TEST NHANH
-    console.log(`\n================================`);
-    console.log(`[DEV MODE] MÃ OTP DÀNH CHO MẬT KHẨU:`);
-    console.log(`User Email: ${user.email}`);
-    console.log(`MÃ OTP: ${otpCode}`);
-    console.log(`================================\n`);
+    // SỬ DỤNG HÀM GỬI EMAIL THẬT SỰ
+    const emailOptions = {
+        to: email,
+        subject: "Mã Khôi phục Mật khẩu TechStore",
+        html: `<h2>Khôi phục mật khẩu</h2><p>Mã OTP của bạn là: <b>${otpCode}</b>. Mã có hiệu lực trong 5 phút.</p>`
+    };
+    await sendEmail(emailOptions);
 
     res.status(200).json({
-      message: `Đã tạo mã OTP thành công! (Mã OTP của bạn là: ${otpCode})`,
-      otp: otpCode
+      message: `Đã gửi mã OTP đến hòm thư email của bạn!`,
+      // Bỏ ẩn mã OTP trên production
     });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống: " + error.message });

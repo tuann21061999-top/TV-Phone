@@ -5,6 +5,7 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import ProductReview from "../../components/Review/ProductReview";
 import ProductCard from "../../components/Product/ProductCard";
+
 import { toast } from "sonner";
 import {
   Cpu,
@@ -813,7 +814,9 @@ function ProductDetail() {
         </div>
       </div>
 
-      {/* SẢN PHẨM LIÊN QUAN */}
+
+
+      {/* SẢN PHẨM LIÊN QUAN (Khớp Brand) */}
       {product.relatedProducts && product.relatedProducts.length > 0 && (
         <div className="related-products-section" style={{ padding: '40px 0', maxWidth: '1200px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px', marginLeft: '16px' }}>
@@ -826,6 +829,25 @@ function ProductDetail() {
             padding: '0 16px'
           }}>
             {product.relatedProducts.map(rp => (
+              <ProductCard key={rp._id} product={rp} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* CÓ THỂ BẠN SẼ THÍCH (Khớp Tags) */}
+      {product.recommendedProducts && product.recommendedProducts.length > 0 && (
+        <div className="recommended-products-section" style={{ padding: '0 0 40px 0', maxWidth: '1200px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px', marginLeft: '16px' }}>
+            Có thể bạn sẽ thích
+          </h2>
+          <div className="recommended-products-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gap: '16px',
+            padding: '0 16px'
+          }}>
+            {product.recommendedProducts.map(rp => (
               <ProductCard key={rp._id} product={rp} />
             ))}
           </div>
