@@ -302,7 +302,15 @@ const CheckoutPage = () => {
             <span>TechNova</span>
           </Link>
           <div className="checkout-steps">
-            <Link to="/cart">Giỏ hàng</Link> <ChevronRight size={14} />
+            {location.state?.isBuyNow ? (
+              <>
+                <Link to="#" onClick={(e) => { e.preventDefault(); navigate(-1); }}>Sản phẩm</Link> <ChevronRight size={14} />
+              </>
+            ) : (
+              <>
+                <Link to="/cart">Giỏ hàng</Link> <ChevronRight size={14} />
+              </>
+            )}
             <span className="active">Thanh toán</span> <ChevronRight size={14} />
             <span>Hoàn tất</span>
           </div>

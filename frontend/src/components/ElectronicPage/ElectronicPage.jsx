@@ -40,7 +40,7 @@ function ElectronicPage() {
     { name: "Tất cả", icon: null },
     { name: "Tai nghe", icon: <Headphones size={16} /> },
     { name: "Sạc dự phòng", icon: <BatteryPlus size={16} /> },
-    { name: "Đồng hồ thông minh", icon: <Watch size={16} /> },
+    { name: "Đồng hồ", icon: <Watch size={16} /> },
     { name: "Quạt tản nhiệt", icon: <Fan size={16} /> }
   ];
 
@@ -183,11 +183,11 @@ function ElectronicPage() {
 
     /* 1️⃣ CATEGORY */
     if (activeCategory !== "Tất cả") {
-      const categoryKey = getFirstTwoWords(activeCategory);
-
       filtered = filtered.filter((product) => {
-        const productKey = getFirstTwoWords(product.name);
-        return productKey === categoryKey;
+        // Lấy đúng tên danh mục của sản phẩm từ Database
+        const catName = product.categoryId?.name || product.categoryName || "";
+        // So sánh tuyệt đối (bỏ qua chữ hoa/thường và khoảng trắng)
+        return catName.trim().toLowerCase() === activeCategory.trim().toLowerCase();
       });
     }
 
@@ -299,6 +299,11 @@ function ElectronicPage() {
       <Header />
 
       <div className="electronics-container">
+        <nav className="breadcrumb" style={{ paddingBottom: "15px" }}>
+          <Link to="/">Trang chủ</Link>
+          <ChevronRight size={14} />
+          <span>Đồ điện tử</span>
+        </nav>
         <div className="electronics-header">
           <h1>Đồ điện tử</h1>
           <p>Tìm thấy {filteredProducts.length} sản phẩm</p>

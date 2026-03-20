@@ -63,6 +63,7 @@ const chatController = {
                         _id: "$partnerId",
                         lastMessage: { $first: "$content" },
                         lastMessageTime: { $first: "$createdAt" },
+                        isArchived: { $first: "$isArchived" },
                         unreadCount: {
                             $sum: {
                                 $cond: [
@@ -78,6 +79,11 @@ const chatController = {
                             },
                         },
                     },
+                },
+                {
+                    $match: {
+                        isArchived: req.query.tab === "archived" ? true : { $ne: true }
+                    }
                 },
                 { $sort: { lastMessageTime: -1 } },
             ]);
@@ -133,6 +139,32 @@ const chatController = {
             const admins = await User.find({ role: "admin" }).select("_id name email");
             res.status(200).json(admins);
         } catch (error) {
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+
+    /* =====================================================
+       ADMIN: KẾT THÚC TRÒ CHUYỆN (Lưu trữ lịch sử chat)
+       DELETE /api/chat/admin/conversation/:userId
+       ===================================================== */
+    endConversation: async (req, res) => {
+        try {
+            const adminId = req.user.id;
+            const partnerId = req.params.userId;
+
+            await Message.updateMany(
+                {
+                    $or: [
+                        { senderId: adminId, receiverId: partnerId },
+                        { senderId: partnerId, receiverId: adminId },
+                    ],
+                },
+                { $set: { isArchived: true } }
+            );
+
+            res.status(200).json({ message: "Đã kết thúc cuộc trò chuyện và lưu vào lịch sử" });
+        } catch (error) {
+            console.error("Lỗi xóa/lưu trữ lịch sử chat:", error);
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }
     },

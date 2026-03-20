@@ -294,6 +294,11 @@ function AccessoriesPage() {
       <Header />
 
       <div className="accessories-container">
+        <nav className="breadcrumb" style={{ paddingBottom: "15px" }}>
+          <Link to="/">Trang chủ</Link>
+          <ChevronRight size={14} />
+          <span>Phụ kiện Công nghệ</span>
+        </nav>
         <div className="accessories-header">
           <h1>Phụ kiện Công nghệ</h1>
           <p>Tìm thấy {filteredProducts.length} sản phẩm</p>

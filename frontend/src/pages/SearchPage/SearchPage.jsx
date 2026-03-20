@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import ProductCard from "../../components/Product/ProductCard";
+import { ChevronRight } from "lucide-react";
 import "./SearchPage.css";
 
 function SearchPage() {
@@ -42,6 +43,11 @@ function SearchPage() {
     <div className="search-page-container">
       <Header />
       <div className="search-content">
+        <nav className="breadcrumb" style={{ paddingBottom: "15px" }}>
+          <Link to="/">Trang chủ</Link>
+          <ChevronRight size={14} />
+          <span>Tìm kiếm</span>
+        </nav>
         <h1 className="search-title">Kết quả tìm kiếm cho: "{query}"</h1>
         <p className="search-subtitle">Tìm thấy {products.length} sản phẩm phù hợp</p>
 

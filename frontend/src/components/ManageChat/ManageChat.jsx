@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
-import { Search, Send, MessageSquare, User } from "lucide-react";
+import { Search, Send, MessageSquare, User, XCircle } from "lucide-react";
+import { toast } from "sonner";
 import "./ManageChat.css";
 
 const SOCKET_URL = "http://localhost:5000";
@@ -14,6 +15,7 @@ function ManageChat() {
     const [messages, setMessages] = useState([]);
     const [inputMsg, setInputMsg] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
+    const [activeTab, setActiveTab] = useState("active");
     const [isTyping, setIsTyping] = useState(false);
     const [adminId, setAdminId] = useState(null);
 
@@ -58,7 +60,6 @@ function ManageChat() {
         };
 
         init();
-        fetchConversations();
 
         return () => {
             if (socketRef.current) socketRef.current.disconnect();
@@ -66,11 +67,15 @@ function ManageChat() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        if (adminId) fetchConversations(activeTab);
+    }, [activeTab, adminId]);
+
     // ─── Fetch danh sách conversations ────────────────────────────
-    const fetchConversations = async () => {
+    const fetchConversations = async (tabStr = activeTab) => {
         try {
             const { data } = await axios.get(
-                "http://localhost:5000/api/chat/admin/conversations",
+                `http://localhost:5000/api/chat/admin/conversations?tab=${tabStr}`,
                 { headers }
             );
             setConversations(data);
@@ -104,9 +109,28 @@ function ManageChat() {
         }
     };
 
+    // ─── Kết thúc trò chuyện ──────────────────────────────────────
+    const handleEndChat = async () => {
+        if (!selectedUserId) return;
+        if (!window.confirm("Bạn có chắc chắn muốn kết thúc và xóa toàn bộ dữ liệu trò chuyện này?")) return;
+
+        try {
+            await axios.delete(`http://localhost:5000/api/chat/admin/conversation/${selectedUserId}`, { headers });
+            toast.success("Đã xóa và kết thúc trò chuyện thành công");
+            setSelectedUserId(null);
+            setSelectedUserName("");
+            setSelectedUserEmail("");
+            setMessages([]);
+            fetchConversations();
+        } catch (error) {
+            console.error("Lỗi kết thúc trò chuyện:", error);
+            toast.error("Không thể kết thúc trò chuyện: " + (error.response?.data?.message || error.message));
+        }
+    };
+
     // ─── Auto-scroll ──────────────────────────────────────────────
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }, [messages, isTyping]);
 
     // ─── Gửi tin nhắn ────────────────────────────────────────────
@@ -199,6 +223,20 @@ function ManageChat() {
             <div className="mc-sidebar">
                 <div className="mc-sidebar-header">
                     <h3>💬 Tin nhắn</h3>
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                        <button
+                            onClick={() => setActiveTab("active")}
+                            style={{ flex: 1, padding: '6px', fontSize: '13px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #E2E8F0', background: activeTab === 'active' ? '#E2E8F0' : '#fff' }}
+                        >
+                            Đang hoạt động
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("archived")}
+                            style={{ flex: 1, padding: '6px', fontSize: '13px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #E2E8F0', background: activeTab === 'archived' ? '#E2E8F0' : '#fff' }}
+                        >
+                            Lịch sử
+                        </button>
+                    </div>
                     <div className="mc-sidebar-search">
                         <Search size={14} color="#94A3B8" />
                         <input
@@ -252,13 +290,21 @@ function ManageChat() {
                     <>
                         {/* Chat Header */}
                         <div className="mc-chat-header">
-                            <div className="mc-conv-avatar" style={{ width: 36, height: 36, fontSize: 14 }}>
-                                {getInitials(selectedUserName)}
+                            <div className="mc-header-left">
+                                <div className="mc-conv-avatar" style={{ width: 36, height: 36, fontSize: 14 }}>
+                                    {getInitials(selectedUserName)}
+                                </div>
+                                <div>
+                                    <p className="mc-chat-user-name">{selectedUserName}</p>
+                                    <p className="mc-chat-user-email">{selectedUserEmail}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="mc-chat-user-name">{selectedUserName}</p>
-                                <p className="mc-chat-user-email">{selectedUserEmail}</p>
-                            </div>
+                            {activeTab !== "archived" && (
+                                <button className="mc-end-chat-btn" onClick={handleEndChat} title="Kết thúc trò chuyện">
+                                    <XCircle size={16} />
+                                    <span>Kết thúc</span>
+                                </button>
+                            )}
                         </div>
 
                         {/* Messages */}
@@ -299,7 +345,7 @@ function ManageChat() {
                                 onClick={handleSend}
                                 disabled={!inputMsg.trim()}
                             >
-                                <Send size={16} />
+                                <Send size={20} color="#ffffff" strokeWidth={2.5} />
                             </button>
                         </div>
                     </>

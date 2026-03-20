@@ -11,7 +11,7 @@ import {
   RotateCcw,
   Heart,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -205,6 +205,11 @@ function PhonePage() {
       <Header />
 
       <div className="phone-container">
+        <nav className="breadcrumb" style={{ paddingBottom: "15px" }}>
+          <Link to="/">Trang chủ</Link>
+          <ChevronRight size={14} />
+          <span>Điện thoại Di động</span>
+        </nav>
         <div className="phone-header">
           <h1>Điện thoại Di động</h1>
           <p>Tìm thấy {filteredProducts.length} sản phẩm</p>

@@ -111,7 +111,7 @@ function ChatWidget() {
 
     // ─── Auto-scroll xuống cuối ───────────────────────────────────
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }, [messages, isTyping]);
 
     // ─── Gửi tin nhắn ────────────────────────────────────────────
@@ -247,7 +247,7 @@ function ChatWidget() {
                             onClick={handleSend}
                             disabled={!inputMsg.trim()}
                         >
-                            <Send size={16} />
+                            <Send size={20} color="#ffffff" strokeWidth={2.5} />
                         </button>
                     </div>
                 </div>
