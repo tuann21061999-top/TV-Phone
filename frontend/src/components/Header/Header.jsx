@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import "./Header.css";
 import Navbar from "../Navbar/Navbar";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, Search, Smartphone } from "lucide-react";
+import { ShoppingCart, User, Search, Smartphone, Bell } from "lucide-react";
 import axios from "axios";
 
 function Header() {
   const [cartCount, setCartCount] = useState(0);
+  const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -79,7 +80,20 @@ function Header() {
       }
     };
 
+    const fetchUserProfile = async () => {
+      if (!token) return;
+      try {
+        const { data } = await axios.get("http://localhost:5000/api/users/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(data);
+      } catch (error) {
+        console.error("Lỗi lấy profile user:", error);
+      }
+    };
+
     fetchCartCount();
+    fetchUserProfile();
     
     // Lắng nghe sự kiện "cartUpdated" nếu bạn phát đi từ trang Product/Cart
     window.addEventListener("cartUpdated", fetchCartCount);
@@ -87,7 +101,7 @@ function Header() {
   }, [token]);
 
   return (
-    <>
+    <header className="main-header">
       <div className="top-header">
         <div className="container header-content">
           <Link to="/" className="logo">
@@ -156,14 +170,35 @@ function Header() {
               )}
             </Link>
 
-            <Link to="/profile" className="icon-btn">
-              <User size={20} />
+            {/* Icon Thông báo */}
+            <div className="icon-btn notification-wrapper" style={{ cursor: "pointer" }} title="Thông báo">
+              <Bell size={20} />
+            </div>
+
+            <Link to="/profile" className="icon-btn user-wrapper" title={user ? user.name : "Tài khoản"}>
+              {user ? (
+                <div className="avatar-container">
+                  {user.avatar ? (
+                    <img src={user.avatar} alt="Avatar" className="header-avatar" />
+                  ) : (
+                    <img 
+                      src={`https://ui-avatars.com/api/?name=${user.name}&background=0D9488&color=fff&size=128`} 
+                      alt="Default Avatar" 
+                      className="header-avatar"
+                    />
+                  )}
+                  {/* Chấm xanh biểu thị online */}
+                  <span className="status-dot"></span>
+                </div>
+              ) : (
+                <User size={20} />
+              )}
             </Link>
           </div>
         </div>
       </div>
       <Navbar />
-    </>
+    </header>
   );
 }
 

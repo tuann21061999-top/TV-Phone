@@ -6,7 +6,9 @@ import './ManageTags.css';
 
 const ManageTags = () => {
   const [tags, setTags] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('');
   const [loading, setLoading] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,7 +16,8 @@ const ManageTags = () => {
   const [formData, setFormData] = useState({
     name: '',
     type: 'Feature',
-    isActive: true
+    isActive: true,
+    applicableCategories: []
   });
 
   const fetchTags = async () => {
@@ -30,8 +33,18 @@ const ManageTags = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/categories');
+      setCategories(res.data);
+    } catch (error) {
+      console.error('Lỗi tải categories:', error);
+    }
+  };
+
   useEffect(() => {
     fetchTags();
+    fetchCategories();
   }, []);
 
   const handleOpenModal = (tag = null) => {
@@ -40,14 +53,16 @@ const ManageTags = () => {
       setFormData({
         name: tag.name,
         type: tag.type,
-        isActive: tag.isActive
+        isActive: tag.isActive,
+        applicableCategories: tag.applicableCategories ? tag.applicableCategories.map(c => c._id || c) : []
       });
     } else {
       setEditingTag(null);
       setFormData({
         name: '',
         type: 'Feature',
-        isActive: true
+        isActive: true,
+        applicableCategories: []
       });
     }
     setIsModalOpen(true);
@@ -101,9 +116,17 @@ const ManageTags = () => {
     }
   };
 
-  const filteredTags = tags.filter(tag => 
-    tag.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTags = tags.filter(tag => {
+    const matchSearch = tag.name.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (!selectedCategoryFilter) return matchSearch;
+
+    if (selectedCategoryFilter === 'global') {
+      return matchSearch && (!tag.applicableCategories || tag.applicableCategories.length === 0);
+    }
+
+    return matchSearch && tag.applicableCategories && tag.applicableCategories.some(c => (c._id || c) === selectedCategoryFilter);
+  });
 
   const getTypeClass = (type) => {
     switch (type) {
@@ -117,7 +140,19 @@ const ManageTags = () => {
   return (
     <div className="manage-tags-container">
       <div className="header-actions">
-        <div className="search-add-group">
+        <div className="search-add-group" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <select 
+            className="search-input" 
+            style={{ width: 'auto', minWidth: '200px' }}
+            value={selectedCategoryFilter}
+            onChange={(e) => setSelectedCategoryFilter(e.target.value)}
+          >
+            <option value="">Tất cả (Không lọc)</option>
+            <option value="global">Tags Global (Dùng chung)</option>
+            {categories.map(c => (
+              <option key={c._id} value={c._id}>Lọc theo: {c.name}</option>
+            ))}
+          </select>
           <input 
             type="text" 
             placeholder="Tìm kiếm tag..." 
@@ -139,6 +174,7 @@ const ManageTags = () => {
               <th>Loại Tag</th>
               <th>Slug</th>
               <th>Trạng thái</th>
+              <th>Danh mục áp dụng</th>
               <th>Thao tác</th>
             </tr>
           </thead>
@@ -161,6 +197,13 @@ const ManageTags = () => {
                     <span className={`status-badge ${tag.isActive ? 'active' : 'inactive'}`}>
                       {tag.isActive ? 'Hoạt động' : 'Đã ẩn'}
                     </span>
+                  </td>
+                  <td>
+                    <div style={{ fontSize: '12px', color: '#64748b', maxWidth: '200px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {!tag.applicableCategories || tag.applicableCategories.length === 0 
+                        ? 'Tất cả (Global)' 
+                        : tag.applicableCategories.map(c => c.name).join(', ')}
+                    </div>
                   </td>
                   <td>
                     <div className="action-buttons">
@@ -203,6 +246,25 @@ const ManageTags = () => {
                   <option value="Usage">Usage (Nhu cầu sử dụng)</option>
                   <option value="Price Segment">Price Segment (Phân khúc giá)</option>
                 </select>
+              </div>
+
+              <div className="tag-form-group">
+                <label>Thuộc Danh mục (Để trống nếu dùng cho mọi sản phẩm)</label>
+                <div className="categories-checkbox-list" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', maxHeight: '150px', overflowY: 'auto', padding: '10px', border: '1px solid #cbd5e1', borderRadius: '8px' }}>
+                  {categories.map(cat => (
+                    <label key={cat._id} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', cursor: 'pointer' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.applicableCategories.includes(cat._id)}
+                        onChange={(e) => {
+                          if (e.target.checked) setFormData({ ...formData, applicableCategories: [...formData.applicableCategories, cat._id] });
+                          else setFormData({ ...formData, applicableCategories: formData.applicableCategories.filter(id => id !== cat._id) });
+                        }}
+                      />
+                      {cat.name}
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <div className="tag-form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px' }}>

@@ -5,7 +5,7 @@ const Tag = require("../models/Tag");
 // @access  Public/Private (depending on requirements, usually public for frontend viewing)
 exports.getTags = async (req, res) => {
   try {
-    const tags = await Tag.find({});
+    const tags = await Tag.find({}).populate('applicableCategories', 'name');
     res.json(tags);
   } catch (error) {
     console.error("Error fetching tags:", error);
@@ -19,7 +19,7 @@ exports.getTags = async (req, res) => {
 exports.getTagsByType = async (req, res) => {
   try {
     const { type } = req.params;
-    const tags = await Tag.find({ type, isActive: true });
+    const tags = await Tag.find({ type, isActive: true }).populate('applicableCategories', 'name');
     res.json(tags);
   } catch (error) {
     console.error("Error fetching tags by type:", error);
@@ -32,7 +32,7 @@ exports.getTagsByType = async (req, res) => {
 // @access  Private/Admin
 exports.createTag = async (req, res) => {
   try {
-    const { name, type, isActive } = req.body;
+    const { name, type, isActive, applicableCategories } = req.body;
 
     const tagExists = await Tag.findOne({ name, type });
     if (tagExists) {
@@ -43,6 +43,7 @@ exports.createTag = async (req, res) => {
       name,
       type,
       isActive: isActive !== undefined ? isActive : true,
+      applicableCategories: applicableCategories || [],
     });
 
     res.status(201).json(tag);
@@ -57,7 +58,7 @@ exports.createTag = async (req, res) => {
 // @access  Private/Admin
 exports.updateTag = async (req, res) => {
   try {
-    const { name, type, isActive } = req.body;
+    const { name, type, isActive, applicableCategories } = req.body;
     const tag = await Tag.findById(req.params.id);
 
     if (tag) {
@@ -66,6 +67,10 @@ exports.updateTag = async (req, res) => {
       
       if (isActive !== undefined) {
           tag.isActive = isActive;
+      }
+      
+      if (applicableCategories !== undefined) {
+          tag.applicableCategories = applicableCategories;
       }
 
       const updatedTag = await tag.save();

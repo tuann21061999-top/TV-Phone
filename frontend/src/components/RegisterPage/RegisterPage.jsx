@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom"; // 1. Thêm navigate để chuy�
 import { registerUser, sendRegisterOTP } from "../../api/authService"; // 2. Import hàm gọi API đã tạo ở bước trước
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
+import Hero from "../Hero/Hero"; // Nhúng banner home
 import { toast, Toaster } from "sonner";
 import "./RegisterPage.css";
 
@@ -85,8 +86,13 @@ const RegisterPage = () => {
   return (
     <div className="register-page">
       <Header />
-      <div className="container">
-        <div className="register-wrapper">
+      <div className="auth-container">
+        <div className="auth-banner-side">
+          <Hero />
+        </div>
+        
+        <div className="auth-form-side">
+          <div className="register-wrapper">
           <div className="register-card">
             <div className="register-header">
               <h1>Tạo tài khoản mới</h1>
@@ -260,6 +266,7 @@ const RegisterPage = () => {
                 Đã có tài khoản? <a href="/login">Đăng nhập</a>
               </div>
             )}
+            </div>
           </div>
         </div>
       </div>

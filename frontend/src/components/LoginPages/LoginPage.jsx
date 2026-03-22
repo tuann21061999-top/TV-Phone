@@ -6,6 +6,7 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
+import Hero from "../Hero/Hero"; // Nhúng banner home
 import "./LoginPage.css";
 
 const LoginPage = () => {
@@ -57,10 +58,7 @@ const LoginPage = () => {
     }
   };
 
-  // Hàm xử lý đăng nhập MXH (Giao diện)
-  const handleSocialLogin = (platform) => {
-    toast.info(`Tính năng đăng nhập bằng ${platform} đang được phát triển!`);
-  };
+
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
@@ -88,8 +86,13 @@ const LoginPage = () => {
     <GoogleOAuthProvider clientId="250807668016-8p2k3cisiadd70rclj8graue584iechr.apps.googleusercontent.com">
       <div className="login-page">
       <Header />
-      <div className="container">
-        <div className="login-wrapper">
+      <div className="auth-container">
+        <div className="auth-banner-side">
+          <Hero />
+        </div>
+        
+        <div className="auth-form-side">
+          <div className="login-wrapper">
           <div className="login-card">
             <div className="login-header">
               <div className="login-logo">
@@ -161,6 +164,7 @@ const LoginPage = () => {
 
             <div className="login-footer">
               Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
+            </div>
             </div>
           </div>
         </div>

@@ -120,18 +120,25 @@ export default function BulkActionsPanel({ selectedIds, clearSelection, refreshD
                 </div>
               )}
 
-              {actionType === 'tags' && (
-                <div className="form-group-full">
-                  <label>Chọn các Tags muốn gán cho {selectedIds.length} sản phẩm:</label>
-                  <div style={{ marginTop: '10px' }}>
-                    <TagSelector 
-                      tagsList={tagsList} 
-                      selectedTags={selectedTags} 
-                      onChange={setSelectedTags} 
-                    />
+              {actionType === 'tags' && (() => {
+                const selectedCategoryIds = [...new Set(products.filter(p => selectedIds.includes(p._id)).map(p => p.categoryId._id || p.categoryId))];
+                const filteredBulkTags = tagsList.filter(tag => {
+                  if (!tag.applicableCategories || tag.applicableCategories.length === 0) return true;
+                  return tag.applicableCategories.some(c => selectedCategoryIds.includes(c._id || c));
+                });
+                return (
+                  <div className="form-group-full">
+                    <label>Chọn các Tags muốn gán cho {selectedIds.length} sản phẩm:</label>
+                    <div style={{ marginTop: '10px' }}>
+                      <TagSelector 
+                        tagsList={filteredBulkTags} 
+                        selectedTags={selectedTags} 
+                        onChange={setSelectedTags} 
+                      />
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {actionType === 'compatible' && (
                 <div className="form-group-full">

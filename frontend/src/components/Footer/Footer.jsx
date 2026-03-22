@@ -1,25 +1,30 @@
 import "./Footer.css";
-import { Twitter, Instagram, Linkedin, Send, Zap } from "lucide-react";
+import { Twitter, Instagram, Linkedin, Zap, Smartphone, MapPin, Phone, Mail } from "lucide-react";
 
 function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-container">
+      {/* Vành đai ánh sáng (Aesthetic Glow) */}
+      <div className="footer-glow-left"></div>
+      <div className="footer-glow-right"></div>
 
+      {/* Trang trí điện thoại lơ lửng góc phải (Abstract) */}
+      <div className="floating-phone-wrapper">
+        <Smartphone className="floating-phone-icon" strokeWidth={1} />
+      </div>
+
+      <div className="footer-container">
         <div className="footer-grid">
 
-          {/* Column 1 */}
-          <div className="footer-col">
+          {/* Cột 1: Thông tin thương hiệu */}
+          <div className="footer-col brand-col">
             <div className="footer-logo">
-              <Zap size={22} />
+              <Zap size={24} />
               <span>TechNova</span>
             </div>
-
             <p className="footer-desc">
-              Điểm đến tin cậy cho các thiết bị công nghệ và phụ kiện mới nhất.
-              TechNova mang tương lai công nghệ đến gần bạn hơn.
+              Tương lai công nghệ trong tầm tay bạn. Khám phá các thiết bị di động và đồ điện tử đẳng cấp nhất cùng TechNova.
             </p>
-
             <div className="socials">
               <a href="#"><Twitter size={18} /></a>
               <a href="#"><Instagram size={18} /></a>
@@ -27,50 +32,43 @@ function Footer() {
             </div>
           </div>
 
-          {/* Column 2 */}
+          {/* Cột 2: Khám phá */}
           <div className="footer-col">
-            <h3>Liên kết nhanh</h3>
-            <a href="#">Về chúng tôi</a>
-            <a href="#">Liên hệ</a>
-            <a href="#">Tuyển dụng</a>
-            <a href="#">Tin tức</a>
+            <h3>Khám phá siêu phẩm</h3>
+            <a href="/phones">Điện thoại di động</a>
+            <a href="/electronics">Máy tính & Đồ điện tử</a>
+            <a href="/accessories">Phụ kiện công nghệ</a>
+            <a href="/promotions">Săn sale chớp nhoáng</a>
           </div>
 
-          {/* Column 3 */}
+          {/* Cột 3: Liên hệ */}
           <div className="footer-col">
-            <h3>Thông tin công ty</h3>
-            <a href="#">Câu hỏi thường gặp</a>
-            <a href="#">Chính sách đổi trả</a>
-            <a href="#">Thông tin giao hàng</a>
-            <a href="#">Theo dõi đơn hàng</a>
-          </div>
-
-          {/* Column 4 */}
-          <div className="footer-col">
-            <h3>Cập nhật tin tức</h3>
-            <p className="footer-desc">
-              Đăng ký bản tin để nhận các ưu đãi độc quyền.
-            </p>
-
-            <div className="newsletter">
-              <input type="email" placeholder="Email của bạn" />
-              <button>
-                <Send size={18} />
-              </button>
+            <h3>Kết nối với chúng tôi</h3>
+            <div className="contact-info">
+              <div className="contact-item">
+                <MapPin size={18} />
+                <span>123 Đường Công Nghệ, Quận 1, TP.HCM</span>
+              </div>
+              <div className="contact-item">
+                <Phone size={18} />
+                <span>Hotline: 1900 1234 (Miễn phí)</span>
+              </div>
+              <div className="contact-item">
+                <Mail size={18} />
+                <span>Email: contact@technova.vn</span>
+              </div>
             </div>
           </div>
 
         </div>
 
         <div className="footer-bottom">
-          <p>© 2024 TechNova Inc. Bảo lưu mọi quyền.</p>
-          <div>
+          <p>© 2024 TechNova Inc. All rights reserved.</p>
+          <div className="footer-bottom-links">
             <a href="#">Chính sách bảo mật</a>
-            <a href="#">Điều khoản dịch vụ</a>
-            <a href="#">Cài đặt Cookie</a>
+            <a href="#">Điều khoản bảo hành</a>
           </div>
         </div>
-
       </div>
     </footer>
   );

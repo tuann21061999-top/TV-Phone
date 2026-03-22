@@ -1,9 +1,7 @@
 .navbar {
-  /* Thay màu nền cũ thành cùng mã màu xanh với Header */
-  background: #2152d9; 
-  
-  /* Bỏ viền dưới đi để giao diện trông sạch sẽ hơn */
-  border-bottom: none; 
+  /* Để trong suốt để ăn theo dải màu của .main-header ở file Header.css */
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
 }
 
 .navbar-content {
@@ -29,7 +27,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 /* ========================================================= */
@@ -61,6 +59,7 @@
 .navbar a.active,
 .dropdown:hover .dropdown-title {
   color: #FACC15;
+  transform: translateY(-2px);
 }
 
 /* Xoay mũi tên 180 độ khi mở Dropdown */

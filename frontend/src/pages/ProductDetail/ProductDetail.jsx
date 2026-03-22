@@ -834,6 +834,25 @@ function ProductDetail() {
         </div>
       </div>
 
+      {/* SẢN PHẨM TƯƠNG THÍCH / PHỤ KIỆN ĐI KÈM */}
+      {product.compatibleWith && product.compatibleWith.length > 0 && (
+        <div className="compatible-products-section" style={{ padding: '40px 0', maxWidth: '1200px', margin: '0 auto', borderBottom: '1px solid #e2e8f0' }}>
+          <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px', marginLeft: '16px' }}>
+            Phụ kiện đi kèm / Tương thích
+          </h2>
+          <div className="related-products-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gap: '16px',
+            padding: '0 16px'
+          }}>
+            {product.compatibleWith.map(cp => (
+              <ProductCard key={cp._id} product={cp} />
+            ))}
+          </div>
+        </div>
+      )}
+
 
 
       {/* SẢN PHẨM LIÊN QUAN (Khớp Brand) */}

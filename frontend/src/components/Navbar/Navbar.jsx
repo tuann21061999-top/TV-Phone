@@ -1,6 +1,6 @@
 import "./Navbar.css";
 import { NavLink } from "react-router-dom";
-import { ChevronDown } from "lucide-react"; // Thêm mũi tên cho đẹp
+import { ChevronDown, Home, LayoutGrid, Tag, Newspaper, Phone } from "lucide-react";
 
 function Navbar() {
   return (
@@ -8,13 +8,13 @@ function Navbar() {
       <div className="container navbar-content">
 
         <NavLink to="/" end>
-          Trang chủ
+          <Home size={18} /> Trang chủ
         </NavLink>
 
         {/* 🔥 DROPDOWN DANH MỤC */}
         <div className="dropdown">
           <span className="dropdown-title">
-            Danh mục <ChevronDown size={16} strokeWidth={2.5} />
+            <LayoutGrid size={18} /> Danh mục <ChevronDown size={16} strokeWidth={2.5} className="chevron" />
           </span>
 
           <div className="dropdown-menu">
@@ -25,15 +25,15 @@ function Navbar() {
         </div>
 
         <NavLink to="/promotions">
-          Khuyến mãi
+          <Tag size={18} /> Khuyến mãi
         </NavLink>
 
         <NavLink to="/news">
-          Tin tức
+          <Newspaper size={18} /> Tin tức
         </NavLink>
 
         <NavLink to="/contact">
-          Liên hệ
+          <Phone size={18} /> Liên hệ
         </NavLink>
 
       </div>

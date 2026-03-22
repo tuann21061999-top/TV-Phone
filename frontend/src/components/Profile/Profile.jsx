@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import {
   User, Package, MapPin, Tag, LogOut, Plus,
   Trash2, CreditCard, Edit, Heart, Search, Eye,
-  Camera, XCircle, Loader2, AlertCircle, Star
+  Camera, XCircle, Loader2, AlertCircle, Star, DollarSign
 } from "lucide-react";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
@@ -19,6 +19,9 @@ const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("info");
+
+  const [isEditingInfo, setIsEditingInfo] = useState(false);
+  const [editFormData, setEditFormData] = useState({ name: "", phone: "" });
 
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -110,27 +113,6 @@ const Profile = () => {
             alt="Default Avatar"
           />
         )}
-
-        {/* Nút Đổi ảnh đại diện */}
-        <button
-          className="avatar-upload-btn"
-          onClick={() => fileInputRef.current.click()}
-          disabled={isUploading}
-          title="Đổi ảnh đại diện"
-        >
-          {isUploading ? <Loader2 className="spinner" size={16} /> : <Camera size={16} />}
-        </button>
-
-        {/* Nút Xóa ảnh đại diện (Chỉ hiện khi đã có ảnh) */}
-        {user.avatar && (
-          <button
-            className="avatar-delete-btn"
-            onClick={removeAvatar}
-            title="Xóa ảnh hiện tại"
-          >
-            <Trash2 size={14} />
-          </button>
-        )}
       </div>
 
       <input
@@ -160,6 +142,7 @@ const Profile = () => {
         return;
       }
       setUser(userData);
+      setEditFormData({ name: userData.name || "", phone: userData.phone || "" });
 
       setLoadingOrders(true);
       const { data: orderData } = await axios.get("http://localhost:5000/api/orders/my-orders", tokenHeader);
@@ -209,6 +192,27 @@ const Profile = () => {
     localStorage.clear();
     navigate("/login");
     window.location.reload();
+  };
+
+  const handleUpdateInfo = async () => {
+    if (!editFormData.name.trim()) {
+      toast.error("Tên không được để trống!");
+      return;
+    }
+    const loadingToast = toast.loading("Đang cập nhật...");
+    try {
+      const token = localStorage.getItem("token");
+      const { data } = await axios.put(
+        "http://localhost:5000/api/users/update",
+        editFormData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUser(data.user);
+      setIsEditingInfo(false);
+      toast.success("Cập nhật thông tin thành công", { id: loadingToast });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Lỗi cập nhật", { id: loadingToast });
+    }
   };
 
   // ✅ THÊM MỚI: Hàm xử lý Khách hàng tự Hủy đơn
@@ -351,11 +355,107 @@ const Profile = () => {
 
             {/* TAB INFO */}
             {activeTab === "info" && (
-              <div className="card-section">
-                <h2>Thông tin cá nhân</h2>
-                <div className="info-content">
-                  <p><strong>Họ và tên:</strong> {user.name}</p>
-                  <p><strong>Email:</strong> {user.email}</p>
+              <div className="card-section info-dashboard" style={{ background: 'transparent', boxShadow: 'none', padding: 0 }}>
+                <div className="welcome-banner">
+                  <div>
+                    <h2 className="welcome-title">Xin chào, {user.name}!</h2>
+                    <p className="welcome-subtitle">Quản lý thông tin cá nhân và bảo mật tài khoản của bạn tại đây.</p>
+                  </div>
+                </div>
+
+                <div className="profile-stats-grid">
+                  <div className="stat-card">
+                    <div className="stat-icon-wrapper bg-blue-100 text-blue-600">
+                      <Package size={24} />
+                    </div>
+                    <div className="stat-info">
+                      <h3>{orders.filter(o => o.status === 'done').length}</h3>
+                      <p>Đơn hàng đã giao</p>
+                    </div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-icon-wrapper bg-green-100 text-green-600">
+                      <DollarSign size={24} />
+                    </div>
+                    <div className="stat-info">
+                      <h3>{orders.filter(o => o.status === 'done').reduce((sum, o) => sum + o.total, 0).toLocaleString()}đ</h3>
+                      <p>Tổng chi tiêu</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="info-card-container">
+                  <div className="section-header-flex">
+                    <h2>Thông tin liên hệ</h2>
+                    {!isEditingInfo && (
+                      <button className="btn-outline-small" onClick={() => setIsEditingInfo(true)}>
+                        <Edit size={16} /> Chỉnh sửa
+                      </button>
+                    )}
+                  </div>
+
+                  {isEditingInfo ? (
+                    <div className="edit-info-form">
+                      {/* Avatar Edit Section */}
+                      <div className="edit-avatar-section">
+                        <img 
+                          src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=0D9488&color=fff&size=128`} 
+                          alt="Avatar" 
+                          className="edit-avatar-preview"
+                        />
+                        <div className="edit-avatar-actions">
+                          <button className="btn-outline-small" onClick={() => fileInputRef.current.click()} disabled={isUploading}>
+                            {isUploading ? <Loader2 className="spinner" size={16} /> : <Camera size={16} />} 
+                            {user.avatar ? " Đổi ảnh" : " Thêm ảnh"}
+                          </button>
+                          {user.avatar && (
+                            <button className="btn-danger-small" style={{marginTop: 0}} onClick={removeAvatar}>
+                              <Trash2 size={16} /> Xóa ảnh
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="form-group-row">
+                        <div className="form-group focus-group">
+                          <label>Họ và tên</label>
+                          <input type="text" value={editFormData.name} onChange={(e) => setEditFormData({...editFormData, name: e.target.value})} className="input-field" />
+                        </div>
+                        <div className="form-group focus-group">
+                          <label>Số điện thoại</label>
+                          <input type="text" value={editFormData.phone} onChange={(e) => setEditFormData({...editFormData, phone: e.target.value})} placeholder="Thêm số điện thoại..." className="input-field" />
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label>Email (Không thể thay đổi)</label>
+                        <input type="email" value={user.email} disabled className="input-field disabled-input" />
+                      </div>
+                      
+                      <div className="edit-form-actions" style={{display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '20px'}}>
+                        <button className="btn-secondary" onClick={() => {
+                          setIsEditingInfo(false);
+                          setEditFormData({ name: user.name, phone: user.phone || "" });
+                        }}>Hủy</button>
+                        <button className="btn-primary" onClick={handleUpdateInfo}>Lưu thay đổi</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="info-content-grid">
+                      <div className="info-item">
+                        <p className="info-label">Họ và tên</p>
+                        <p className="info-value">{user.name}</p>
+                      </div>
+                      <div className="info-item">
+                        <p className="info-label">Email</p>
+                        <p className="info-value">{user.email}</p>
+                      </div>
+                      <div className="info-item">
+                        <p className="info-label">Số điện thoại</p>
+                        <p className="info-value">{user.phone || <em className="text-muted">Chưa cập nhật</em>}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

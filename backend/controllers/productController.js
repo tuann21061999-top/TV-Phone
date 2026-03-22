@@ -101,14 +101,20 @@ exports.getProductById = async (req, res) => {
     if (mongoose.Types.ObjectId.isValid(id)) {
       product = await Product.findById(id)
         .populate("categoryId")
-        .populate("compatibleWith", "name slug colorImages");
+        .populate({
+          path: "compatibleWith",
+          select: "-description -specs -detailImages -createdAt -updatedAt"
+        });
     }
 
     // Nếu không tìm thấy → tìm theo slug
     if (!product) {
       product = await Product.findOne({ slug: id })
         .populate("categoryId")
-        .populate("compatibleWith", "name slug colorImages");
+        .populate({
+          path: "compatibleWith",
+          select: "-description -specs -detailImages -createdAt -updatedAt"
+        });
     }
 
     // Nếu không có sp, HOẶC sp đã bị ẩn (isActive = false)

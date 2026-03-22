@@ -336,7 +336,7 @@ export default function ManagePhone() {
                     <div className="form-group-full">
                       <label>Tags (Thẻ đánh dấu):</label>
                       <TagSelector
-                        tagsList={tagsList}
+                        tagsList={tagsList.filter(tag => !tag.applicableCategories || tag.applicableCategories.length === 0 || tag.applicableCategories.some(c => (c._id || c) === form.categoryId))}
                         selectedTags={form.tags}
                         onChange={(newTags) => setForm({ ...form, tags: newTags })}
                       />

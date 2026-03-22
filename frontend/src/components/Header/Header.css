@@ -1,13 +1,24 @@
 /* ========================================================= */
-/* HEADER BACKGROUND (MÀU XANH DƯƠNG CHỦ ĐẠO)                */
+/* HEADER BACKGROUND (GRADIENT & GLASSMORPHISM)              */
 /* ========================================================= */
+.main-header {
+  background: linear-gradient(135deg, #0f172a, #1e40af, #3b82f6, #0ea5e9, #0f172a);
+  background-size: 300% 300%;
+  animation: gradientFlow 12s ease infinite;
+  width: 100%;
+  position: relative;
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .top-header {
-  background: #1D4ED8;
-  /* Đổi thành màu xanh dương chủ đạo của bạn */
-  /* Thay đường viền xám bằng viền trắng mờ để ngăn cách nhẹ nhàng với Navbar */
+  background: transparent;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0 16px 16px 16px;
-  /* Thêm padding dưới để tạo khoảng cách với Navbar */
   height: 100px;
 }
 
@@ -15,9 +26,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  max-width: 1600px;
-  padding: 0 40px;
+  max-width: 1200px;
+  width: 90%;
   margin: 0 auto;
 }
 
@@ -34,6 +44,11 @@
   color: #FFFFFF;
   /* Chữ màu trắng */
   letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+}
+
+.logo:hover {
+  color: #FACC15; /* Màu vàng đồng nhất */
 }
 
 /* ========================================================= */
@@ -48,18 +63,25 @@
 .search {
   width: 100%;
   padding: 12px 40px 12px 16px;
-  border-radius: 8px;
-  border: none;
-  /* Bỏ viền vì nền trắng đã đủ nổi bật trên nền xanh */
+  border-radius: 12px; /* Bo góc mềm hơn */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Viền mờ */
+  background: rgba(255, 255, 255, 0.1); /* Nền kính */
+  backdrop-filter: blur(12px); /* Hiệu ứng mờ */
+  -webkit-backdrop-filter: blur(12px);
+  color: #ffffff; /* Chữ màu trắng */
   outline: none;
   font-size: 14px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  /* Thêm bóng đổ nhẹ */
+  transition: all 0.3s ease;
+}
+
+.search::placeholder {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .search:focus {
-  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.5);
-  /* Đổi màu viền focus sang vàng cho tone-sur-tone */
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); /* Glow sáng xanh thay vì vàng */
 }
 
 .search-icon {
@@ -67,8 +89,13 @@
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #64748B;
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
+  transition: color 0.2s;
+}
+
+.search-icon:hover {
+  color: #fff;
 }
 
 /* SEARCH DROPDOWN */
@@ -201,7 +228,53 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Viền của badge phải cùng màu với nền xanh của Header để tạo cảm giác "khoét lỗ" */
-  border: 2px solid #1D4ED8;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
   padding: 2px;
+}
+
+/* ========================================================= */
+/* NOTIFICATION VÀ USER AVATAR                               */
+/* ========================================================= */
+
+.notification-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-container {
+  position: relative;
+  display: inline-flex;
+}
+
+.header-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  transition: border-color 0.2s;
+}
+
+.user-wrapper:hover .header-avatar {
+  border-color: #FACC15;
+}
+
+.status-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  background-color: #10B981; /* Màu xanh lá (Tailwind emerald-500) */
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
 }

@@ -26,3 +26,7 @@ dist-ssr
 
 **/.ENV
 backend/debug_logs.txt
+
+.agent/
+.agents/
+skills-lock.json
