@@ -15,12 +15,11 @@ exports.chatWithAI = async (req, res) => {
             return res.status(500).json({ message: "Thiếu GEMINI_API_KEY trong file .env" });
         }
 
-        // 1. Kéo nhanh dữ liệu Product đang Active từ Database (giới hạn 50 mẫu hot)
+        // 1. Kéo nhanh dữ liệu Product đang Active từ Database (cho phép đọc toàn bộ danh mục)
         const products = await Product.find({ isActive: true })
-            .select("name variants promotion")
-            .limit(50);
+            .select("name variants promotion");
         
-        let productContextStr = "DANH SÁCH SẢN PHẨM ĐIỆN THOẠI HIỆN CÓ TẠI CỬA HÀNG:\n";
+        let productContextStr = "DANH SÁCH SẢN PHẨM HIỆN CÓ TẠI CỬA HÀNG:\n";
         products.forEach(p => {
             if (p.variants && p.variants.length > 0) {
                 const v = p.variants[0];
@@ -35,7 +34,12 @@ exports.chatWithAI = async (req, res) => {
                      salePrice = price * (1 - v.discountValue / 100);
                 }
                 
-                productContextStr += `- ${p.name} (RAM ${v.size || "8GB"} - ROM ${v.storage}): Giá bán khoảng ${salePrice.toLocaleString('vi-VN')} đ.\n`;
+                let specStr = "";
+                if (v.size || v.storage) {
+                    specStr = `(${v.size ? 'RAM ' + v.size : ''}${v.size && v.storage ? ' - ' : ''}${v.storage ? 'ROM ' + v.storage : ''})`;
+                }
+
+                productContextStr += `- ${p.name} ${specStr}: Giá bán khoảng ${salePrice.toLocaleString('vi-VN')} đ.\n`;
             }
         });
 

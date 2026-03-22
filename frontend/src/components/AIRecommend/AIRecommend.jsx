@@ -7,6 +7,7 @@ import './AIRecommend.css';
 const AIRecommend = () => {
     const [recommendations, setRecommendations] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [favoriteIds, setFavoriteIds] = useState(new Set()); // Thêm state lưu tim
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -23,7 +24,25 @@ const AIRecommend = () => {
         };
 
         fetchRecommendations();
+
+        // Lấy danh sách yêu thích nếu đã đăng nhập
+        if (token) {
+            axios.get("http://localhost:5000/api/favorites", {
+                headers: { Authorization: `Bearer ${token}` }
+            }).then(res => {
+                const ids = new Set(res.data.map(p => p._id));
+                setFavoriteIds(ids);
+            }).catch(() => {});
+        }
     }, [token]);
+
+    const handleFavoriteToggle = (productId, isLiked) => {
+        setFavoriteIds(prev => {
+            const next = new Set(prev);
+            isLiked ? next.add(productId) : next.delete(productId);
+            return next;
+        });
+    };
 
     if (loading || recommendations.length === 0) return null;
 
@@ -43,7 +62,11 @@ const AIRecommend = () => {
                     if (!item.product) return null;
                     return (
                         <div key={idx} className="ai-product-item">
-                            <ProductCard product={item.product} />
+                            <ProductCard 
+                                product={item.product} 
+                                isFavorited={favoriteIds.has(item.product._id)}
+                                onFavoriteToggle={handleFavoriteToggle}
+                            />
                             <div className="ai-reason-box">
                                 <div className="ai-reason-text">"{item.reason}"</div>
                             </div>

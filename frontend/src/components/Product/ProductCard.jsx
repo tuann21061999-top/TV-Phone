@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Star, ShoppingCart, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -9,6 +9,11 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
   const navigate = useNavigate();
   const [liked, setLiked] = useState(isFavorited);
   const [loadingLike, setLoadingLike] = useState(false);
+
+  // Sync internal state if parent fetches favorite data asynchronously
+  useEffect(() => {
+    setLiked(isFavorited);
+  }, [isFavorited]);
 
   const handleToggleFavorite = async (e) => {
     e.stopPropagation();

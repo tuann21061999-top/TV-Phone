@@ -35,7 +35,8 @@ function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedMem, setSelectedMem] = useState("");
   const [selectedCondition, setSelectedCondition] = useState("");
-  const [isFavorited, setIsFavorited] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState(new Set()); // Lưu mọi ID yêu thích
+  const [isFavorited, setIsFavorited] = useState(false); // Lưu riêng cho sản phẩm chính
   const [activeImage, setActiveImage] = useState(null);
 
   const thumbnailsRef = useRef(null);
@@ -115,8 +116,9 @@ function ProductDetail() {
       axios.get("http://localhost:5000/api/favorites", {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
-        const favIds = res.data.map(p => p._id);
-        setIsFavorited(favIds.includes(product._id));
+        const favIds = new Set(res.data.map(p => p._id));
+        setFavoriteIds(favIds);
+        setIsFavorited(favIds.has(product._id));
       }).catch(() => { });
     }
   }, [product]);
@@ -134,11 +136,29 @@ function ProductDetail() {
         { productId: product._id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      
+      // Update cả UI chính lẫn tập favoriteIds
       setIsFavorited(data.isFavorited);
+      setFavoriteIds(prev => {
+        const next = new Set(prev);
+        data.isFavorited ? next.add(product._id) : next.delete(product._id);
+        return next;
+      });
       toast.success(data.message);
     } catch {
       toast.error("Lỗi khi thực hiện yêu thích!");
     }
+  };
+
+  const handleCardFavoriteToggle = (productId, isLiked) => {
+    setFavoriteIds(prev => {
+      const next = new Set(prev);
+      isLiked ? next.add(productId) : next.delete(productId);
+      if (product && productId === product._id) {
+        setIsFavorited(isLiked);
+      }
+      return next;
+    });
   };
 
   /* ==============================
@@ -829,7 +849,12 @@ function ProductDetail() {
             padding: '0 16px'
           }}>
             {product.relatedProducts.map(rp => (
-              <ProductCard key={rp._id} product={rp} />
+              <ProductCard 
+                key={rp._id} 
+                product={rp} 
+                isFavorited={favoriteIds.has(rp._id)}
+                onFavoriteToggle={handleCardFavoriteToggle}
+              />
             ))}
           </div>
         </div>
@@ -848,7 +873,12 @@ function ProductDetail() {
             padding: '0 16px'
           }}>
             {product.recommendedProducts.map(rp => (
-              <ProductCard key={rp._id} product={rp} />
+              <ProductCard 
+                key={rp._id} 
+                product={rp} 
+                isFavorited={favoriteIds.has(rp._id)}
+                onFavoriteToggle={handleCardFavoriteToggle}
+              />
             ))}
           </div>
         </div>

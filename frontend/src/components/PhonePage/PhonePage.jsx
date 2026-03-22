@@ -26,7 +26,9 @@ function PhonePage() {
   // Filter states
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [selectedStorages, setSelectedStorages] = useState([]);
+  const [selectedRams, setSelectedRams] = useState([]);
   const [batteryRange, setBatteryRange] = useState("all");
+  const [priceRange, setPriceRange] = useState("all");
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -149,6 +151,12 @@ function PhonePage() {
       );
     }
 
+    if (selectedRams.length > 0) {
+      result = result.filter((p) =>
+        p.variants?.some((v) => selectedRams.includes(v.size))
+      );
+    }
+
     if (batteryRange !== "all") {
       result = result.filter((p) => {
         const mah = extractBatteryValue(p);
@@ -159,8 +167,20 @@ function PhonePage() {
       });
     }
 
+    if (priceRange !== "all") {
+      result = result.filter((p) => {
+        const { finalPrice } = getPricingInfo(p);
+        if (priceRange === "under2") return finalPrice > 0 && finalPrice < 2000000;
+        if (priceRange === "2to5") return finalPrice >= 2000000 && finalPrice <= 5000000;
+        if (priceRange === "5to10") return finalPrice > 5000000 && finalPrice <= 10000000;
+        if (priceRange === "10to20") return finalPrice > 10000000 && finalPrice <= 20000000;
+        if (priceRange === "above20") return finalPrice > 20000000;
+        return true;
+      });
+    }
+
     return result;
-  }, [products, selectedBrands, selectedStorages, batteryRange]);
+  }, [products, selectedBrands, selectedStorages, selectedRams, batteryRange, priceRange]);
 
   /* ================= PAGINATION ================= */
   const indexOfLast = currentPage * productsPerPage;
@@ -186,7 +206,7 @@ function PhonePage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedBrands, selectedStorages, batteryRange]);
+  }, [selectedBrands, selectedStorages, selectedRams, batteryRange, priceRange]);
 
   /* ================= DERIVED DATA ================= */
   const availableBrands = useMemo(() => {
@@ -198,6 +218,13 @@ function PhonePage() {
       p.variants?.map((v) => v.storage).filter(Boolean)
     );
     return [...new Set(allStorages)].sort((a, b) => parseInt(a) - parseInt(b));
+  }, [products]);
+
+  const availableRams = useMemo(() => {
+    const allRams = products.flatMap((p) =>
+      p.variants?.map((v) => v.size).filter(Boolean)
+    );
+    return [...new Set(allRams)].sort((a, b) => parseInt(a) - parseInt(b));
   }, [products]);
 
   return (
@@ -225,7 +252,7 @@ function PhonePage() {
 
             <div className="filter-group">
               <h3>Thương hiệu</h3>
-              <div className="filter-options">
+              <div className="filter-options" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                 {availableBrands.map((brand) => (
                   <label key={brand}>
                     <input
@@ -246,8 +273,54 @@ function PhonePage() {
             </div>
 
             <div className="filter-group">
-              <h3>Bộ nhớ trong</h3>
+              <h3>Mức giá</h3>
               <div className="filter-options">
+                {[
+                  { id: "all", label: "Tất cả" },
+                  { id: "under2", label: "Dưới 2 triệu" },
+                  { id: "2to5", label: "Từ 2 - 5 triệu" },
+                  { id: "5to10", label: "Từ 5 - 10 triệu" },
+                  { id: "10to20", label: "Từ 10 - 20 triệu" },
+                  { id: "above20", label: "Trên 20 triệu" }
+                ].map((range) => (
+                  <label key={range.id}>
+                    <input
+                      type="radio"
+                      name="priceRange"
+                      checked={priceRange === range.id}
+                      onChange={() => setPriceRange(range.id)}
+                    />
+                    {range.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="filter-group">
+              <h3>RAM</h3>
+              <div className="filter-options" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                {availableRams.map((ram) => (
+                  <label key={ram}>
+                    <input
+                      type="checkbox"
+                      checked={selectedRams.includes(ram)}
+                      onChange={() =>
+                        setSelectedRams((prev) =>
+                          prev.includes(ram)
+                            ? prev.filter((r) => r !== ram)
+                            : [...prev, ram]
+                        )
+                      }
+                    />
+                    {ram}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="filter-group">
+              <h3>Bộ nhớ trong</h3>
+              <div className="filter-options" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                 {availableStorages.map((storage) => (
                   <label key={storage}>
                     <input
@@ -292,7 +365,9 @@ function PhonePage() {
               onClick={() => {
                 setSelectedBrands([]);
                 setSelectedStorages([]);
+                setSelectedRams([]);
                 setBatteryRange("all");
+                setPriceRange("all");
               }}
             >
               <RotateCcw size={16} />

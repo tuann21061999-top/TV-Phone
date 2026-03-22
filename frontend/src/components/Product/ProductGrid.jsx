@@ -6,6 +6,7 @@ import axios from "axios";
 function ProductGrid() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [favoriteIds, setFavoriteIds] = useState(new Set()); // Thêm state lưu tim
 
   // Trạng thái cho bộ lọc và phân trang
   const [activeTab, setActiveTab] = useState("all");
@@ -29,6 +30,17 @@ function ProductGrid() {
       }
     };
     fetchProducts();
+
+    // Lấy danh sách yêu thích nếu đã đăng nhập
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.get("http://localhost:5000/api/favorites", {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(res => {
+        const ids = new Set(res.data.map(p => p._id));
+        setFavoriteIds(ids);
+      }).catch(() => {});
+    }
   }, []);
 
   // Lọc sản phẩm theo Tab (Tất cả, Điện thoại, Điện tử, Phụ kiện)
@@ -50,6 +62,14 @@ function ProductGrid() {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setVisibleCount(6); // Quay về hiển thị 6 cái đầu tiên của tab mới
+  };
+
+  const handleFavoriteToggle = (productId, isLiked) => {
+    setFavoriteIds(prev => {
+      const next = new Set(prev);
+      isLiked ? next.add(productId) : next.delete(productId);
+      return next;
+    });
   };
 
   if (loading) return <div className="loading">Đang tải sản phẩm...</div>;
@@ -74,14 +94,12 @@ function ProductGrid() {
           >
             Điện thoại
           </button>
-          {/* Đã đổi từ Âm thanh sang Điện tử */}
           <button
             className={`filter-btn ${activeTab === "electronic" ? "active" : ""}`}
             onClick={() => handleTabChange("electronic")}
           >
             Điện tử
           </button>
-          {/* Đã thêm tab Phụ kiện */}
           <button
             className={`filter-btn ${activeTab === "accessory" ? "active" : ""}`}
             onClick={() => handleTabChange("accessory")}
@@ -93,7 +111,12 @@ function ProductGrid() {
 
       <div className="grid-container">
         {displayedProducts.map((p) => (
-          <ProductCard key={p._id} product={p} />
+          <ProductCard 
+            key={p._id} 
+            product={p} 
+            isFavorited={favoriteIds.has(p._id)} 
+            onFavoriteToggle={handleFavoriteToggle} 
+          />
         ))}
       </div>
 

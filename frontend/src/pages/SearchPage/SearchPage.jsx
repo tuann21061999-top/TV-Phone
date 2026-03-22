@@ -14,6 +14,20 @@ function SearchPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [favoriteIds, setFavoriteIds] = useState(new Set()); // Thêm state lưu tim
+
+  useEffect(() => {
+    // Lấy danh sách yêu thích khi load trang Search
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.get("http://localhost:5000/api/favorites", {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(res => {
+        const ids = new Set(res.data.map(p => p._id));
+        setFavoriteIds(ids);
+      }).catch(() => {});
+    }
+  }, []);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -39,6 +53,14 @@ function SearchPage() {
     fetchSearchResults();
   }, [query]);
 
+  const handleFavoriteToggle = (productId, isLiked) => {
+    setFavoriteIds(prev => {
+      const next = new Set(prev);
+      isLiked ? next.add(productId) : next.delete(productId);
+      return next;
+    });
+  };
+
   return (
     <div className="search-page-container">
       <Header />
@@ -58,7 +80,12 @@ function SearchPage() {
         ) : products.length > 0 ? (
           <div className="search-grid">
             {products.map((product) => (
-              <ProductCard key={product._id} product={product} />
+              <ProductCard 
+                key={product._id} 
+                product={product} 
+                isFavorited={favoriteIds.has(product._id)}
+                onFavoriteToggle={handleFavoriteToggle}
+              />
             ))}
           </div>
         ) : (
