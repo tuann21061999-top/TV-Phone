@@ -17,6 +17,7 @@ const ManagePromotions = () => {
     const [discountValue, setDiscountValue] = useState("");
     const [promotionEnd, setPromotionEnd] = useState("");
     const [isShockDeal, setIsShockDeal] = useState(false);
+    const [quantityLimit, setQuantityLimit] = useState("");
     const [projectedPrice, setProjectedPrice] = useState(null);
     const [projectedProfit, setProjectedProfit] = useState(null);
 
@@ -71,6 +72,7 @@ const ManagePromotions = () => {
         }
 
         setIsShockDeal(product.isShockDeal || false);
+        setQuantityLimit(product.quantityLimit || "");
         setShowModal(true);
     };
 
@@ -90,7 +92,7 @@ const ManagePromotions = () => {
             // Gọi API cấp sản phẩm (không có variantId nữa)
             const res = await axios.put(
                 `http://localhost:5000/api/promotions/admin/promotions/${selectedProduct.productId}`,
-                { discountType, discountValue: Number(discountValue), promotionEnd, isShockDeal },
+                { discountType, discountValue: Number(discountValue), promotionEnd, isShockDeal, quantityLimit: Number(quantityLimit) || 0 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -306,6 +308,19 @@ const ManagePromotions = () => {
                                             Đánh dấu là Flash Sale / Shock Deal
                                         </label>
                                     </div>
+
+                                    {isShockDeal && (
+                                        <div className="form-group">
+                                            <label>Số lượng giới hạn (Bỏ trống hoặc 0 if không giới hạn)</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={quantityLimit}
+                                                onChange={e => setQuantityLimit(e.target.value)}
+                                                placeholder="VD: 50"
+                                            />
+                                        </div>
+                                    )}
 
                                     <div className="projection-box">
                                         <p>Giá thấp nhất sau KM dự tính: <strong>{projectedPrice?.toLocaleString()}đ</strong></p>

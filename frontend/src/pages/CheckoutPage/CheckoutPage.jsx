@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import {
   MapPin, Truck, CreditCard, ShieldCheck, ChevronRight,
-  CheckCircle2, Plus, Phone, Home, User, Wallet, Shield
+  CheckCircle2, Plus, Phone, Home, User, Wallet, Shield, Ticket
 } from "lucide-react";
 import axios from "axios";
 import Header from "../../components/Header/Header";
@@ -51,6 +51,8 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [discountCode, setDiscountCode] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [myVouchers, setMyVouchers] = useState([]);
+  const [showVoucherList, setShowVoucherList] = useState(false);
 
   // State Bảo hành
   const [selectedWarranty, setSelectedWarranty] = useState(warrantyOptions[0]);
@@ -88,6 +90,19 @@ const CheckoutPage = () => {
     }
   };
 
+  const fetchMyVouchers = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const { data } = await axios.get("http://localhost:5000/api/vouchers/my-vouchers", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMyVouchers(data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
@@ -102,6 +117,7 @@ const CheckoutPage = () => {
         const headers = { Authorization: `Bearer ${token}` };
 
         await fetchUserProfile(token);
+        await fetchMyVouchers();
 
         if (location.state?.isBuyNow) {
           setCheckoutItems(location.state.items);
@@ -113,6 +129,14 @@ const CheckoutPage = () => {
             return;
           }
           setCheckoutItems(cartRes.data.items);
+        }
+
+        // Pre-fill voucher from Cart if passed
+        const passedVoucher = location.state?.appliedVoucher;
+        if (passedVoucher) {
+          setDiscountCode(passedVoucher.voucherCode);
+          setDiscountAmount(passedVoucher.discountAmount);
+          setAppliedVoucherCode(passedVoucher.voucherCode);
         }
       } catch (error) {
         console.error("Lỗi tải trang thanh toán:", error);
@@ -190,8 +214,9 @@ const CheckoutPage = () => {
 
   const [appliedVoucherCode, setAppliedVoucherCode] = useState(null);
 
-  const handleApplyVoucher = async () => {
-    if (!discountCode.trim()) {
+  const handleApplyVoucher = async (codeParam) => {
+    const code = codeParam || discountCode.trim();
+    if (!code) {
       toast.error("Vui lòng nhập mã giảm giá!");
       return;
     }
@@ -200,12 +225,13 @@ const CheckoutPage = () => {
       const token = localStorage.getItem("token");
       const res = await axios.post(
         "http://localhost:5000/api/vouchers/apply",
-        { code: discountCode.trim(), orderTotal: subTotal },
+        { code, orderTotal: subTotal },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setDiscountAmount(res.data.discountAmount);
       setAppliedVoucherCode(res.data.voucherCode);
+      setDiscountCode(res.data.voucherCode);
       toast.success(res.data.message);
     } catch (error) {
       const msg = error.response?.data?.message || "Mã không hợp lệ!";
@@ -481,6 +507,28 @@ const CheckoutPage = () => {
               </div>
               {appliedVoucherCode && (
                 <p className="voucher-applied-msg">✅ Đã áp dụng mã: <strong>{appliedVoucherCode}</strong></p>
+              )}
+
+              {myVouchers.length > 0 && !appliedVoucherCode && (
+                <div className="checkout-wallet-vouchers">
+                  <button className="btn-show-wallet" onClick={() => setShowVoucherList(!showVoucherList)}>
+                    <Ticket size={16} /> Mã giảm giá của bạn {showVoucherList ? '▲' : '▼'}
+                  </button>
+                  {showVoucherList && (
+                    <div className="wallet-dropdown">
+                      {myVouchers.map(v => (
+                        <div key={v._id} className="wallet-voucher-item">
+                          <div>
+                            <strong>{v.code}</strong>
+                            <span>{v.discountType === "percentage" ? `Giảm ${v.value}%` : `Giảm ${v.value.toLocaleString()}đ`}</span>
+                            {v.minOrderValue > 0 && <span className="min-order">Đơn tối thiểu {v.minOrderValue.toLocaleString()}đ</span>}
+                          </div>
+                          <button onClick={() => { setShowVoucherList(false); handleApplyVoucher(v.code); }}>Dùng</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 

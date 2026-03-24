@@ -72,7 +72,7 @@ const promotionController = {
     updateDiscount: async (req, res) => {
         try {
             const { productId } = req.params;
-            const { discountType, discountValue, promotionEnd, isShockDeal } = req.body;
+            const { discountType, discountValue, promotionEnd, isShockDeal, quantityLimit } = req.body;
 
             if (!["fixed", "percentage", "none"].includes(discountType)) {
                 return res.status(400).json({ message: "Loại giảm giá không hợp lệ" });
@@ -141,6 +141,7 @@ const promotionController = {
                     discountValue: discountValue || 0,
                     promotionEnd: promotionEnd || null,
                     isShockDeal: isShockDeal || false,
+                    quantityLimit: quantityLimit || 0,
                     isActive: discountType !== "none",
                     originalPrice: lowestOriginalPrice === Infinity ? 0 : lowestOriginalPrice,
                     discountedPrice: lowestDiscountedPrice === Infinity ? null : lowestDiscountedPrice,
@@ -148,6 +149,25 @@ const promotionController = {
                 },
                 { upsert: true, new: true }
             );
+
+            // Gửi thông báo giảm giá cho những người đã yêu thích
+            if (discountType !== "none" && lowestDiscountedPrice !== Infinity) {
+                try {
+                    const favorites = await Favorite.find({ productId: product._id });
+                    if (favorites.length > 0) {
+                        const notifications = favorites.map(f => ({
+                            userId: f.userId,
+                            title: "💸 Sản Phẩm Yêu Thích Ở Mức Giá Hời!",
+                            message: `${product.name} đang giảm giá sâu. Tới xem ngay!`,
+                            type: "promotion",
+                            link: `/product/${product.slug || product._id}`
+                        }));
+                        await Notification.insertMany(notifications);
+                    }
+                } catch (err) {
+                    console.error("Lỗi gửi thông báo giảm giá:", err);
+                }
+            }
 
             res.status(200).json({
                 message: "Đã áp dụng khuyến mãi cho toàn bộ phiên bản của sản phẩm!",
@@ -233,6 +253,49 @@ const promotionController = {
             res.status(200).json(filteredProducts);
         } catch (error) {
             console.error("Lỗi get public promotions:", error);
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+
+    /* =====================================================
+       PUBLIC: Lấy sản phẩm khuyến mãi khủng nhất (cho Banner Home)
+       GET /api/promotions/public/best
+    ===================================================== */
+    getBestPromotion: async (req, res) => {
+        try {
+            const now = new Date();
+            const activePromos = await PromotionModel.find({
+                isActive: true,
+                promotionEnd: { $gt: now },
+                discountedPrice: { $ne: null }
+            }).lean();
+
+            if (!activePromos || activePromos.length === 0) {
+                return res.status(200).json(null);
+            }
+
+            // Tìm sản phẩm có phần trăm giảm cao nhất
+            let bestPromo = activePromos[0];
+            let maxPercent = 0;
+
+            activePromos.forEach(p => {
+                const percent = p.originalPrice > 0 ? ((p.originalPrice - p.discountedPrice) / p.originalPrice) * 100 : 0;
+                const bestPercent = bestPromo.originalPrice > 0 ? ((bestPromo.originalPrice - bestPromo.discountedPrice) / bestPromo.originalPrice) * 100 : 0;
+                
+                if (percent > bestPercent) {
+                    bestPromo = p;
+                }
+            });
+
+            // Chèn thêm slug để UI điều hướng đúng
+            const product = await Product.findById(bestPromo.productId).select("slug");
+            if (product) {
+                bestPromo.slug = product.slug;
+            }
+
+            res.status(200).json(bestPromo);
+        } catch (error) {
+            console.error("Lỗi get best promotion:", error);
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }
     }

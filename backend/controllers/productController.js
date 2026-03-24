@@ -208,13 +208,17 @@ exports.getProductById = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     const updateData = { ...req.body };
+    const imagesToDelete = req.body.imagesToDelete || [];
+    
+    // Xóa khỏi updateData để database không bị lạ
+    delete updateData.imagesToDelete;
+
     if (req.body.detailImages) {
       updateData.detailImages = req.body.detailImages;
     }
 
     console.log("Update Product Payload:", updateData);
 
-    // ✅ FIX LỖI 2: Thêm $set để đảm bảo Mongoose chỉ cập nhật đúng trường gửi lên (vd: isActive: false)
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       { $set: updateData },
@@ -226,6 +230,25 @@ exports.updateProduct = async (req, res) => {
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Tiến hành xoá ảnh cũ trên Cloudinary
+    if (imagesToDelete.length > 0) {
+      const cloudinary = require("../config/cloudinary");
+      for (const url of imagesToDelete) {
+        try {
+          if (url && url.includes("tv-phone-test/")) {
+            const parts = url.split("tv-phone-test/");
+            if (parts.length === 2) {
+              const publicId = parts[1].split(".")[0];
+              await cloudinary.uploader.destroy(`tv-phone-test/${publicId}`);
+              console.log("Deleted old image from Cloudinary:", `tv-phone-test/${publicId}`);
+            }
+          }
+        } catch (e) {
+          console.error("Lỗi xóa ảnh Cloudinary:", e.message);
+        }
+      }
     }
 
     res.json(product);
@@ -240,10 +263,36 @@ exports.updateProduct = async (req, res) => {
 ===================================== */
 exports.deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+    // Thu thập tất cả ảnh cần xoá
+    const imagesToDelete = [];
+    if (product.images) imagesToDelete.push(...product.images);
+    if (product.detailImages) imagesToDelete.push(...product.detailImages);
+    if (product.colorImages) {
+      product.colorImages.forEach(c => c.imageUrl && imagesToDelete.push(c.imageUrl));
+    }
+
+    await Product.findByIdAndDelete(req.params.id);
+
+    // Tiến hành xoá ảnh trên Cloudinary
+    if (imagesToDelete.length > 0) {
+      const cloudinary = require("../config/cloudinary");
+      for (const url of imagesToDelete) {
+        try {
+          if (url && url.includes("tv-phone-test/")) {
+            const parts = url.split("tv-phone-test/");
+            if (parts.length === 2) {
+              const publicId = parts[1].split(".")[0];
+              await cloudinary.uploader.destroy(`tv-phone-test/${publicId}`);
+              console.log("Deleted product image from Cloudinary:", `tv-phone-test/${publicId}`);
+            }
+          }
+        } catch (e) {
+          console.error("Lỗi xóa ảnh Cloudinary:", e.message);
+        }
+      }
     }
 
     res.json({ message: "Product deleted successfully" });

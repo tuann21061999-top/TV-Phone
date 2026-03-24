@@ -12,6 +12,9 @@ function Header() {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadNotifyCount, setUnreadNotifyCount] = useState(0);
+  const [isNotifyOpen, setIsNotifyOpen] = useState(false);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -58,6 +61,9 @@ function Header() {
       if (!event.target.closest(".search-wrapper")) {
         setIsSearchOpen(false);
       }
+      if (!event.target.closest(".notification-wrapper")) {
+        setIsNotifyOpen(false);
+      }
     };
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
@@ -92,13 +98,45 @@ function Header() {
       }
     };
 
+    const fetchNotifications = async () => {
+      if (!token) return;
+      try {
+        const { data } = await axios.get("http://localhost:5000/api/notifications", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setNotifications(data.notifications || []);
+        setUnreadNotifyCount(data.unreadCount || 0);
+      } catch (error) {
+        console.error("Lỗi tải thông báo:", error);
+      }
+    };
+
     fetchCartCount();
     fetchUserProfile();
+    fetchNotifications();
     
     // Lắng nghe sự kiện "cartUpdated" nếu bạn phát đi từ trang Product/Cart
     window.addEventListener("cartUpdated", fetchCartCount);
     return () => window.removeEventListener("cartUpdated", fetchCartCount);
   }, [token]);
+
+  const handleNotificationClick = async (notif) => {
+    try {
+      if (!notif.isRead) {
+        await axios.put(`http://localhost:5000/api/notifications/${notif._id}/read`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUnreadNotifyCount(prev => Math.max(0, prev - 1));
+        setNotifications(prev => prev.map(n => n._id === notif._id ? { ...n, isRead: true } : n));
+      }
+      setIsNotifyOpen(false);
+      if (notif.link) {
+        navigate(notif.link);
+      }
+    } catch (e) {
+      console.error("Lỗi click thông báo:", e);
+    }
+  };
 
   return (
     <header className="main-header">
@@ -171,8 +209,37 @@ function Header() {
             </Link>
 
             {/* Icon Thông báo */}
-            <div className="icon-btn notification-wrapper" style={{ cursor: "pointer" }} title="Thông báo">
-              <Bell size={20} />
+            <div className="icon-btn notification-wrapper" style={{ cursor: "pointer", position: "relative" }} title="Thông báo">
+              <Bell size={20} onClick={() => setIsNotifyOpen(!isNotifyOpen)} />
+              {unreadNotifyCount > 0 && (
+                <span className="cart-badge notify-badge" style={{ right: "-2px", top: "-2px" }}>{unreadNotifyCount}</span>
+              )}
+
+              {/* Box Thông báo */}
+              {isNotifyOpen && (
+                <div className="notify-dropdown" style={{ position: "absolute", top: "120%", right: "-10px", width: "320px", background: "white", borderRadius: "8px", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", zIndex: 1000, padding: "15px", maxHeight: "400px", overflowY: "auto", cursor: "default" }}>
+                  <h4 style={{ margin: "0 0 10px", fontSize: "16px", fontWeight: "600", color: "#333", borderBottom: "1px solid #eee", paddingBottom: "10px", textAlign: "left" }}>Thông báo</h4>
+                  {notifications.length > 0 ? (
+                    notifications.map(notif => (
+                      <div 
+                        key={notif._id} 
+                        onClick={() => handleNotificationClick(notif)}
+                        style={{ padding: "10px", borderRadius: "6px", background: notif.isRead ? "" : "#eef2ff", marginBottom: "8px", cursor: "pointer", transition: "0.2s", textAlign: "left" }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = notif.isRead ? "#f9fafb" : "#e0e7ff"}
+                        onMouseLeave={(e) => e.currentTarget.style.background = notif.isRead ? "" : "#eef2ff"}
+                      >
+                        <h5 style={{ margin: "0 0 4px", fontSize: "14px", color: "#111" }}>{notif.title}</h5>
+                        <p style={{ margin: 0, fontSize: "12px", color: "#555", lineHeight: "1.4" }}>{notif.message}</p>
+                        <span style={{ fontSize: "10px", color: "#888", display: "block", marginTop: "4px" }}>
+                          {new Date(notif.createdAt).toLocaleDateString('vi-VN')}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ textAlign: "center", color: "#888", padding: "20px 0", fontSize: "14px" }}>Chưa có thông báo nào.</div>
+                  )}
+                </div>
+              )}
             </div>
 
             <Link to="/profile" className="icon-btn user-wrapper" title={user ? user.name : "Tài khoản"}>

@@ -102,3 +102,88 @@
     padding-left: 10px;
     border-left: 3px solid #f43f5e;
 }
+
+/* CAROUSEL CONTROLS */
+.ai-carousel-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ai-carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    color: #334155;
+    transition: all 0.2s ease;
+}
+
+.ai-carousel-btn:hover {
+    background: #f8fafc;
+    color: #e11d48;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.ai-carousel-btn.left {
+    left: -20px;
+}
+
+.ai-carousel-btn.right {
+    right: -20px;
+}
+
+.ai-recommend-grid {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 20px;
+    padding-top: 10px;
+    scroll-behavior: smooth;
+    align-items: stretch;
+    width: 100%;
+    scroll-snap-type: x mandatory;
+}
+
+.ai-product-item {
+    scroll-snap-align: start;
+    min-width: 280px;
+    max-width: 300px;
+    border-radius: 12px;
+    background: #fff;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.ai-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ai-dot.active {
+    background: #e11d48;
+    width: 24px;
+    border-radius: 12px;
+}

@@ -14,6 +14,8 @@ const INITIAL_FORM = {
     usageLimit: "100",
     description: "",
     isActive: true,
+    isPublic: true,
+    isShocking: false,
 };
 
 function ManageVoucher() {
@@ -68,6 +70,8 @@ function ManageVoucher() {
             usageLimit: voucher.usageLimit?.toString() || "100",
             description: voucher.description || "",
             isActive: voucher.isActive,
+            isPublic: voucher.isPublic !== false,
+            isShocking: false,
         });
         setEditingId(voucher._id);
         setShowModal(true);
@@ -89,6 +93,8 @@ function ManageVoucher() {
             usageLimit: Number(form.usageLimit) || 100,
             description: form.description,
             isActive: form.isActive,
+            isPublic: form.isPublic,
+            isShocking: form.isShocking,
         };
 
         try {
@@ -325,6 +331,30 @@ function ManageVoucher() {
                                 />
                                 <label style={{ margin: 0, cursor: "pointer" }}>Kích hoạt ngay</label>
                             </div>
+
+                            <div className="mv-form-group" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <input
+                                    type="checkbox"
+                                    name="isPublic"
+                                    checked={form.isPublic}
+                                    onChange={handleChange}
+                                    style={{ width: "auto" }}
+                                />
+                                <label style={{ margin: 0, cursor: "pointer" }}>Phát công khai (mọi khách hàng đều thấy mã này)</label>
+                            </div>
+
+                            {!editingId && (
+                                <div className="mv-form-group" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <input
+                                        type="checkbox"
+                                        name="isShocking"
+                                        checked={form.isShocking}
+                                        onChange={handleChange}
+                                        style={{ width: "auto" }}
+                                    />
+                                    <label style={{ margin: 0, cursor: "pointer" }}>🔔 Thông báo mã giảm giá sốc (đẩy thông báo tới tất cả khách hàng)</label>
+                                </div>
+                            )}
                         </div>
 
                         <div className="mv-modal-footer">

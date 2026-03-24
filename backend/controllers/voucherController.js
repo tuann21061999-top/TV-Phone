@@ -1,4 +1,5 @@
 const Voucher = require("../models/Voucher");
+const Notification = require("../models/Notification");
 
 /* =====================================================
    HÀM TIỆN ÍCH: TÍNH SỐ TIỀN GIẢM GIÁ
@@ -66,7 +67,7 @@ const voucherController = {
        ===================================================== */
     createVoucher: async (req, res) => {
         try {
-            const { code, discountType, value, minOrderValue, maxDiscountAmount, expiryDate, usageLimit, description } = req.body;
+            const { code, discountType, value, minOrderValue, maxDiscountAmount, expiryDate, usageLimit, description, isPublic, isShocking } = req.body;
 
             if (!code || !discountType || value === undefined || !expiryDate) {
                 return res.status(400).json({ message: "Thiếu thông tin bắt buộc (code, discountType, value, expiryDate)!" });
@@ -87,7 +88,22 @@ const voucherController = {
                 expiryDate,
                 usageLimit: usageLimit || 100,
                 description: description || "",
+                isPublic: isPublic !== false, // Mặc định true
             });
+
+            // Chỉ phát thông báo toàn hệ thống nếu Admin check chọn "Thông báo mã giảm giá sốc"
+            if (isShocking) {
+                try {
+                    await Notification.create({
+                        title: "🎁 Mã Giảm Giá Sốc",
+                        message: `TechStore vừa phát hành mã giảm giá ${code.toUpperCase()}. Nhanh tay kẻo lỡ số lượng có hạn!`,
+                        type: "promotion",
+                        link: "/vouchers" // Dẫn khách tới trang danh sách mã
+                    });
+                } catch (err) {
+                    console.error("Lỗi tạo thông báo voucher:", err);
+                }
+            }
 
             res.status(201).json({ message: "Tạo voucher thành công!", voucher });
         } catch (error) {
@@ -120,7 +136,7 @@ const voucherController = {
 
             const allowedFields = [
                 "code", "discountType", "value", "minOrderValue",
-                "maxDiscountAmount", "expiryDate", "usageLimit", "isActive", "description",
+                "maxDiscountAmount", "expiryDate", "usageLimit", "isActive", "description", "isPublic"
             ];
 
             allowedFields.forEach((field) => {
@@ -192,6 +208,37 @@ const voucherController = {
             });
         } catch (error) {
             console.error("Lỗi áp dụng voucher:", error);
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+
+    /* =====================================================
+       USER: LẤY VÍ VOUCHER KHẢ DỤNG (CỦA TÔI)
+       Lọc các mã public hoặc được cấp cho User này, chưa hết hạn, và đặc biệt User chưa dùng
+       ===================================================== */
+    getUserVouchers: async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const now = new Date();
+
+            const filter = {
+                isActive: true,
+                expiryDate: { $gt: now },
+                $expr: { $lt: ["$usedCount", "$usageLimit"] },
+                $or: [
+                    { isPublic: true },
+                    { targetUsers: userId }
+                ]
+            };
+
+            const activeVouchers = await Voucher.find(filter).sort({ expiryDate: 1 });
+
+            // Lọc ra các voucher user này CHƯA DÙNG
+            const validForMe = activeVouchers.filter(v => !v.usedBy.includes(userId));
+
+            res.status(200).json(validForMe);
+        } catch (error) {
+            console.error("Lỗi lấy voucher my wallet:", error);
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }
     },

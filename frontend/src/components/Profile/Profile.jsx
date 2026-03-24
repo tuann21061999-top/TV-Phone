@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import {
   User, Package, MapPin, Tag, LogOut, Plus,
   Trash2, CreditCard, Edit, Heart, Search, Eye,
-  Camera, XCircle, Loader2, AlertCircle, Star, DollarSign
+  Camera, XCircle, Loader2, AlertCircle, Star, DollarSign,
+  Ticket, Truck, Percent, Gift, Clock, Copy, CheckCircle
 } from "lucide-react";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
@@ -38,6 +39,12 @@ const Profile = () => {
 
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = React.useRef(null);
+
+  // Voucher Wallet states
+  const [myVouchers, setMyVouchers] = useState([]);
+  const [loadingVouchers, setLoadingVouchers] = useState(false);
+  const [voucherInput, setVoucherInput] = useState("");
+  const [copiedCode, setCopiedCode] = useState(null);
 
   const filterOrderTabs = [
     { id: "all", label: "Tất cả" },
@@ -180,6 +187,85 @@ const Profile = () => {
       fetchFavorites();
     }
   }, [activeTab]);
+
+  // Fetch vouchers khi chuyển tab
+  useEffect(() => {
+    if (activeTab === "vouchers") {
+      const fetchVouchers = async () => {
+        setLoadingVouchers(true);
+        try {
+          const token = localStorage.getItem("token");
+          const { data } = await axios.get("http://localhost:5000/api/vouchers/my-vouchers", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setMyVouchers(data);
+        } catch (error) {
+          console.error("Error fetching vouchers:", error);
+        } finally {
+          setLoadingVouchers(false);
+        }
+      };
+      fetchVouchers();
+    }
+  }, [activeTab]);
+
+  const handleApplyVoucherCode = async () => {
+    if (!voucherInput.trim()) {
+      toast.error("Vui lòng nhập mã giảm giá!");
+      return;
+    }
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post("http://localhost:5000/api/vouchers/apply", {
+        code: voucherInput.trim(),
+        orderTotal: 999999999
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      toast.success(`Mã ${voucherInput.toUpperCase()} hợp lệ! Hãy sử dụng khi mua hàng.`);
+      setVoucherInput("");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Mã không hợp lệ!");
+    }
+  };
+
+  const handleCopyCode = (code) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    toast.success(`Đã sao chép mã ${code}`);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  const getVoucherColor = (index) => {
+    const colors = [
+      { bg: "#eef2ff", border: "#6366f1", icon: "#6366f1" },
+      { bg: "#fef3c7", border: "#f59e0b", icon: "#f59e0b" },
+      { bg: "#ecfdf5", border: "#10b981", icon: "#10b981" },
+      { bg: "#fce7f3", border: "#ec4899", icon: "#ec4899" },
+      { bg: "#e0f2fe", border: "#0ea5e9", icon: "#0ea5e9" },
+      { bg: "#fef2f2", border: "#ef4444", icon: "#ef4444" },
+    ];
+    return colors[index % colors.length];
+  };
+
+  const getVoucherIcon = (voucher, index) => {
+    const icons = [Truck, Percent, Gift, Ticket, Tag, Package];
+    const Icon = icons[index % icons.length];
+    return Icon;
+  };
+
+  const getVoucherLabel = (index) => {
+    const labels = ["FREESHIP", "GIẢM GIÁ", "QUÀ TẶNG", "KHUYẾN MÃI", "PHỤ KIỆN", "ĐỐI TÁC"];
+    return labels[index % labels.length];
+  };
+
+  const getDaysLeft = (expiryDate) => {
+    const now = new Date();
+    const expiry = new Date(expiryDate);
+    const diffTime = expiry - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays <= 0) return "Hết hạn hôm nay";
+    if (diffDays === 1) return "Còn 1 ngày";
+    return `Còn ${diffDays} ngày`;
+  };
 
   // Khi user bỏ yêu thích trong tab favorites → xóa khỏi danh sách
   const handleFavoriteToggle = (productId, isFavorited) => {
@@ -654,14 +740,113 @@ const Profile = () => {
               </div>
             )}
 
-            {/* TAB VOUCHERS */}
+            {/* TAB VOUCHERS - KHO VOUCHER */}
             {activeTab === "vouchers" && (
-              <div className="card-section">
-                <div className="section-header-flex"><h2>Mã giảm giá của bạn</h2></div>
-                <div className="empty-state-container">
-                  <Tag size={48} className="empty-icon" />
-                  <p>Bạn hiện chưa lưu mã giảm giá nào.</p>
+              <div className="card-section" style={{ background: 'transparent', boxShadow: 'none', padding: 0 }}>
+                {/* Header */}
+                <div className="voucher-page-header">
+                  <div>
+                    <h2 className="voucher-page-title">Kho Voucher của tôi</h2>
+                    <p className="voucher-page-subtitle">Lưu và sử dụng mã giảm giá khi mua hàng</p>
+                  </div>
+                  <div className="voucher-input-section">
+                    <div className="voucher-apply-box">
+                      <Tag size={16} className="apply-icon" />
+                      <input
+                        type="text"
+                        placeholder="Nhập mã khuyến mãi tại đây"
+                        value={voucherInput}
+                        onChange={(e) => setVoucherInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleApplyVoucherCode()}
+                      />
+                      <button className="btn-apply-voucher" onClick={handleApplyVoucherCode}>Áp dụng</button>
+                    </div>
+                  </div>
                 </div>
+
+                {/* Voucher Grid */}
+                {loadingVouchers ? (
+                  <div style={{ textAlign: "center", padding: "60px", color: "#64748B" }}>
+                    <Loader2 className="spinner" size={32} style={{ margin: '0 auto 12px' }} />
+                    <p>Đang tải kho voucher...</p>
+                  </div>
+                ) : myVouchers.length === 0 ? (
+                  <div className="voucher-empty-state">
+                    <Ticket size={64} strokeWidth={1} />
+                    <h3>Chưa có voucher nào</h3>
+                    <p>Các mã giảm giá sẽ xuất hiện tại đây khi có chương trình khuyến mãi mới.</p>
+                  </div>
+                ) : (
+                  <div className="voucher-card-grid">
+                    {myVouchers.map((voucher, index) => {
+                      const colorScheme = getVoucherColor(index);
+                      const VoucherIcon = getVoucherIcon(voucher, index);
+                      const daysLeft = getDaysLeft(voucher.expiryDate);
+                      const isExpiringSoon = daysLeft.includes("1 ng\u00e0y") || daysLeft.includes("h\u00f4m nay");
+
+                      return (
+                        <div
+                          key={voucher._id}
+                          className="voucher-card"
+                          style={{ borderLeftColor: colorScheme.border }}
+                        >
+                          {/* Left Icon Section */}
+                          <div className="voucher-card-icon" style={{ backgroundColor: colorScheme.bg }}>
+                            <VoucherIcon size={32} color={colorScheme.icon} />
+                            <span className="voucher-type-label" style={{ color: colorScheme.icon }}>
+                              {getVoucherLabel(index)}
+                            </span>
+                          </div>
+
+                          {/* Content */}
+                          <div className="voucher-card-content">
+                            <h3 className="voucher-card-title">
+                              {voucher.discountType === "percentage"
+                                ? `Giảm ${voucher.value}%`
+                                : `Giảm ${voucher.value.toLocaleString()}đ`
+                              }
+                              {voucher.maxDiscountAmount && voucher.discountType === "percentage" &&
+                                ` (tối đa ${voucher.maxDiscountAmount.toLocaleString()}đ)`
+                              }
+                            </h3>
+                            <p className="voucher-card-desc">{voucher.description || `Áp dụng cho đơn hàng từ ${voucher.minOrderValue.toLocaleString()}đ`}</p>
+                            
+                            <div className="voucher-card-tags">
+                              {voucher.minOrderValue > 0 && (
+                                <span className="voucher-tag">Đơn tối thiểu {voucher.minOrderValue.toLocaleString()}đ</span>
+                              )}
+                            </div>
+
+                            <div className="voucher-card-footer">
+                              <div className="voucher-expiry">
+                                <Clock size={13} />
+                                <span className={isExpiringSoon ? "expiry-warning" : ""}>
+                                  {daysLeft}
+                                </span>
+                              </div>
+                              <div className="voucher-card-actions">
+                                <button
+                                  className="btn-copy-code"
+                                  onClick={() => handleCopyCode(voucher.code)}
+                                  title="Sao chép mã"
+                                >
+                                  {copiedCode === voucher.code ? <CheckCircle size={14} /> : <Copy size={14} />}
+                                  {voucher.code}
+                                </button>
+                                <button
+                                  className="btn-use-voucher"
+                                  onClick={() => navigate('/cart')}
+                                >
+                                  Dùng ngay
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
 

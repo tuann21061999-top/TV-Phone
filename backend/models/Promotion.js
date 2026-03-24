@@ -23,6 +23,8 @@ const promotionSchema = new mongoose.Schema(
 
     // Trạng thái
     isActive: { type: Boolean, default: true },
+    quantityLimit: { type: Number, default: 0 },
+    soldQuantity: { type: Number, default: 0 },
 
     // Dữ liệu snapshot: mức giá đại diện cho sản phẩm (variant rẻ nhất có giảm)
     originalPrice: { type: Number, default: 0 },

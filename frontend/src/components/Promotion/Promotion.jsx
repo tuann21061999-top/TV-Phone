@@ -52,42 +52,17 @@ function Promotion() {
   useEffect(() => {
     const fetchBestPromotion = async () => {
       try {
-        const { data } = await axios.get("http://localhost:5000/api/products");
-        const productList = Array.isArray(data) ? data : data.products;
-        
-        if (productList && productList.length > 0) {
-          let best = null;
-          let bestPriceObj = null;
-
-          productList.forEach(p => {
-            const pricing = getProductPricing(p);
-            
-            if (pricing.discountPercent > 0) {
-              if (!best) {
-                best = p;
-                bestPriceObj = pricing;
-              } else if (pricing.discountPercent > bestPriceObj.discountPercent) {
-                best = p;
-                bestPriceObj = pricing;
-              } else if (pricing.discountPercent === bestPriceObj.discountPercent) {
-                if (pricing.finalPrice < bestPriceObj.finalPrice) {
-                  best = p;
-                  bestPriceObj = pricing;
-                }
-              }
-            }
+        const { data } = await axios.get("http://localhost:5000/api/promotions/public/best");
+        if (data) {
+          setBestProduct(data);
+          
+          const percent = Math.round(((data.originalPrice - data.discountedPrice) / data.originalPrice) * 100);
+          setBestPricing({
+            basePrice: data.originalPrice,
+            finalPrice: data.discountedPrice,
+            discountPercent: percent,
+            targetEnd: data.promotionEnd ? new Date(data.promotionEnd) : null
           });
-
-          // FALLBACK TỰ ĐỘNG CHỌN SP BÁN CHẠY NHẤT NẾU KHÔNG CÓ SP NÀO ĐANG GIẢM GIÁ
-          if (!best && productList.length > 0) {
-            best = productList.reduce((prev, current) => {
-              return (prev.totalSold || 0) > (current.totalSold || 0) ? prev : current;
-            }, productList[0]);
-            bestPriceObj = getProductPricing(best);
-          }
-
-          setBestProduct(best);
-          setBestPricing(bestPriceObj);
         }
       } catch (error) {
         console.error("Lỗi khi tải sản phẩm khuyến mãi:", error);
@@ -110,7 +85,12 @@ function Promotion() {
   // Nếu không có sản phẩm nào
   if (!bestProduct || !bestPricing) return null;
 
-  const displayImage = bestProduct.images?.[0] || bestProduct.colorImages?.[0]?.imageUrl || "/no-image.png";
+  const displayImage = bestProduct.productImage || "/no-image.png";
+  
+  // Tính thẻ progress bar
+  const hasLimit = bestProduct.quantityLimit > 0;
+  const soldQty = bestProduct.soldQuantity || 0;
+  const progressPercent = hasLimit ? Math.min((soldQty / bestProduct.quantityLimit) * 100, 100) : 0;
 
   return (
     <section className="promotion">
@@ -119,20 +99,35 @@ function Promotion() {
       
       <div className="promo-content">
         <div className="promo-badge">HOT DEAL MỖI NGÀY</div>
-        <h2 className="promo-title">{bestPricing.discountPercent > 0 ? "Giảm Giá Khủng" : "Sản Phẩm Đỉnh Cao"}</h2>
+        <h2 className="promo-title">
+            {bestProduct.isShockDeal ? "FLASH SALE CHỚP NHOÁNG" : bestPricing.discountPercent > 0 ? "Giảm Giá Khủng" : "Sản Phẩm Đỉnh Cao"}
+        </h2>
         
         <div className="promo-product-info">
-          <h3 className="promo-product-name">{bestProduct.name}</h3>
+          <h3 className="promo-product-name">{bestProduct.productName}</h3>
           <div className="promo-pricing">
              <span className="promo-price-new">{bestPricing.finalPrice.toLocaleString()}đ</span>
              {bestPricing.discountPercent > 0 && <span className="promo-price-old">{bestPricing.basePrice.toLocaleString()}đ</span>}
           </div>
         </div>
 
+        {/* Cột mốc Flash Sale */}
+        {hasLimit && (
+            <div className="flash-sale-progress-container" style={{ margin: "15px 0" }}>
+                <div className="flash-sale-progress-bar" style={{ width: "100%", height: "8px", background: "#e2e8f0", borderRadius: "4px", overflow: "hidden" }}>
+                    <div className="flash-sale-progress-fill" style={{ width: `${progressPercent}%`, height: "100%", background: "linear-gradient(90deg, #ff416c, #ff4b2b)", borderRadius: "4px" }}></div>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "#64748b", marginTop: "5px" }}>
+                    <span>Đã bán: {soldQty}</span>
+                    <span>Giới hạn: {bestProduct.quantityLimit}</span>
+                </div>
+            </div>
+        )}
+
         {/* Nếu ko có giảm giá thì ko hiện countdown */}
         {bestPricing.discountPercent > 0 && <Countdown />}
 
-        <Link to={`/product/${bestProduct.slug || bestProduct._id}`} className="view-btn">
+        <Link to={`/product/${bestProduct.slug || bestProduct.productId}`} className="view-btn">
           Xem ngay kẻo lỡ
         </Link>
       </div>
@@ -140,7 +135,7 @@ function Promotion() {
       <div className="promo-image-wrapper">
         <div className="promo-image-stage">
           {bestPricing.discountPercent > 0 && <div className="promo-discount-badge">-{bestPricing.discountPercent}%</div>}
-          <img src={displayImage} alt={bestProduct.name} className="promo-image" />
+          <img src={displayImage} alt={bestProduct.productName} className="promo-image" />
         </div>
       </div>
     </section>

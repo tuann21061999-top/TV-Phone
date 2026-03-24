@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trash2, Plus, Minus, ShoppingCart, ArrowLeft, ShieldCheck, Truck } from "lucide-react";
-import Header from "../Header/Header"; // Giữ lại Header nếu bạn cần
-import Footer from "../Footer/Footer"; // Giữ lại Footer nếu bạn cần
+import { Trash2, Plus, Minus, ShoppingCart, ArrowLeft, ShieldCheck, Truck, Ticket } from "lucide-react";
+import axios from "axios";
+import { toast } from "sonner";
+import Header from "../Header/Header";
+import Footer from "../Footer/Footer";
 import "./Cart.css";
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [voucherCode, setVoucherCode] = useState("");
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
+  const [myVouchers, setMyVouchers] = useState([]);
+  const [showVoucherList, setShowVoucherList] = useState(false);
+  const [applying, setApplying] = useState(false);
+
   const navigate = useNavigate();
 
   const fetchOptions = {
@@ -29,9 +37,52 @@ const Cart = () => {
     }
   };
 
+  const fetchMyVouchers = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      const { data } = await axios.get("http://localhost:5000/api/vouchers/my-vouchers", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMyVouchers(data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     fetchCart();
+    fetchMyVouchers();
   }, []);
+
+  const handleApplyVoucher = async (codeToApply) => {
+    const code = codeToApply || voucherCode;
+    if (!code) return;
+    setApplying(true);
+    try {
+        const { data } = await axios.post("http://localhost:5000/api/vouchers/apply", {
+            code,
+            orderTotal: cart.total
+        }, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
+        
+        setAppliedVoucher(data);
+        setVoucherCode(code);
+        setShowVoucherList(false);
+        toast.success(data.message);
+    } catch (error) {
+        toast.error(error.response?.data?.message || "Mã giảm giá không hợp lệ");
+        setAppliedVoucher(null);
+    } finally {
+        setApplying(false);
+    }
+  };
+
+  const handleRemoveVoucher = () => {
+      setAppliedVoucher(null);
+      setVoucherCode("");
+  };
 
   const handleUpdateQuantity = async (itemId, newQty) => {
     if (newQty < 1) return;
@@ -140,26 +191,63 @@ const Cart = () => {
             <div className="summary-details">
               <div className="sum-row">
                 <span>Tạm tính</span>
-                <span>{cart.total.toLocaleString()} $</span>
+                <span>{cart.total.toLocaleString()} đ</span>
               </div>
               <div className="sum-row">
                 <span>Phí vận chuyển</span>
-                <span>0,00 $</span>
+                <span>0 đ</span>
               </div>
-              <div className="sum-row">
-                <span>Thuế dự kiến</span>
-                <span>{(cart.total * 0.08).toLocaleString()} $</span>
-              </div>
+              {appliedVoucher && (
+                <div className="sum-row discount-row" style={{ color: '#10b981', fontWeight: 600 }}>
+                  <span>Giảm giá ({appliedVoucher.voucherCode})</span>
+                  <span>-{appliedVoucher.discountAmount.toLocaleString()} đ</span>
+                </div>
+              )}
             </div>
 
-            <div className="promo-code-box">
-              <input type="text" placeholder="Mã giảm giá" />
-              <button>Áp dụng</button>
+            <div className="voucher-section-wrapper">
+              <div className="promo-code-box">
+                <input 
+                  type="text" 
+                  placeholder="Mã giảm giá" 
+                  value={voucherCode}
+                  onChange={(e) => setVoucherCode(e.target.value)}
+                  disabled={appliedVoucher !== null}
+                />
+                {!appliedVoucher ? (
+                  <button onClick={() => handleApplyVoucher()} disabled={applying}>
+                    {applying ? "..." : "Áp dụng"}
+                  </button>
+                ) : (
+                  <button onClick={handleRemoveVoucher} style={{ color: 'red', borderColor: 'red' }}>Hủy</button>
+                )}
+              </div>
+
+              {myVouchers.length > 0 && !appliedVoucher && (
+                <div className="wallet-vouchers">
+                  <button className="btn-show-vouchers" onClick={() => setShowVoucherList(!showVoucherList)}>
+                    <Ticket size={16} /> Mã giảm giá của bạn {showVoucherList ? '▲' : '▼'}
+                  </button>
+                  {showVoucherList && (
+                    <div className="vouchers-dropdown">
+                      {myVouchers.map(v => (
+                        <div key={v._id} className="voucher-item-mini">
+                          <div className="voucher-info-mini">
+                            <strong>{v.code}</strong>
+                            <span>{v.discountType === "percentage" ? `Giảm ${v.value}%` : `Giảm ${v.value.toLocaleString()}đ`}</span>
+                          </div>
+                          <button onClick={() => handleApplyVoucher(v.code)}>Dùng</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="sum-row grand-total">
               <span>Tổng cộng</span>
-              <span>{(cart.total * 1.08).toLocaleString()} $</span>
+              <span>{Math.max(0, cart.total - (appliedVoucher ? appliedVoucher.discountAmount : 0)).toLocaleString()} đ</span>
             </div>
 
             <button 
@@ -167,7 +255,8 @@ const Cart = () => {
               onClick={() => navigate('/checkout', { 
                 state: { 
                   items: cart.items, 
-                  isBuyNow: false 
+                  isBuyNow: false,
+                  appliedVoucher 
                 } 
               })}
             >

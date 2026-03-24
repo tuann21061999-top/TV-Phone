@@ -2,6 +2,8 @@ const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
 const Voucher = require("../models/Voucher");
+const PromotionModel = require("../models/Promotion");
+const Notification = require("../models/Notification");
 const { validateVoucher, calculateDiscount } = require("./voucherController");
 
 // Hàm bổ trợ cập nhật kho báu
@@ -19,6 +21,11 @@ const updateInventory = async (items, type) => {
           totalSold: soldMultiplier * item.quantity
         }
       }
+    );
+
+    await PromotionModel.updateOne(
+      { productId: item.productId, isActive: true },
+      { $inc: { soldQuantity: soldMultiplier * item.quantity } }
     );
   }
 };
@@ -159,6 +166,25 @@ const orderController = {
 
       order.status = status;
       await order.save();
+
+      // Emit Notification
+      const statusMap = {
+        pending: "Chờ lấy hàng",
+        shipping: "Đang giao hàng",
+        done: "Giao thành công",
+        cancelled: "Đã bị hủy",
+        returned: "Đã hoàn trả"
+      };
+      
+      const viStatus = statusMap[status] || status;
+      await Notification.create({
+        userId: order.userId,
+        title: "Cập nhật đơn hàng",
+        message: `Đơn hàng #${order._id.toString().substring(0, 6).toUpperCase()} của bạn đã chuyển trạng thái: ${viStatus}.`,
+        type: "order",
+        link: "/account"
+      });
+
       res.status(200).json({ message: "Cập nhật thành công", order });
     } catch (error) {
       res.status(500).json({ message: "Lỗi cập nhật", error: error.message });

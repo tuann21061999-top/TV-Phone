@@ -19,6 +19,9 @@ router.delete("/admin/:id", protect, admin, voucherController.deleteVoucher);
 
 /* ================= USER ROUTES ================= */
 
+// Lấy danh sách Voucher khả dụng của User
+router.get("/my-vouchers", protect, voucherController.getUserVouchers);
+
 // Áp dụng mã giảm giá (kiểm tra + tính tiền)
 router.post("/apply", protect, voucherController.applyVoucher);
 

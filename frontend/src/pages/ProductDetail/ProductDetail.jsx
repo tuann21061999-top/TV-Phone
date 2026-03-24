@@ -436,7 +436,15 @@ function ProductDetail() {
       <div className="product-detail-container">
         <nav className="breadcrumb">
           <Link to="/">Trang chủ</Link> <ChevronRight size={14} />
-          <span>{product.brand}</span> <ChevronRight size={14} />
+          
+          {product.productType === "device" && <><Link to="/phones">Điện thoại</Link> <ChevronRight size={14} /></>}
+          {product.productType === "electronic" && <><Link to="/electronics">Đồ điện tử</Link> <ChevronRight size={14} /></>}
+          {product.productType === "accessory" && <><Link to="/accessories">Phụ kiện</Link> <ChevronRight size={14} /></>}
+          
+          <Link to={`/${product.productType === "device" ? "phones" : product.productType === "electronic" ? "electronics" : "accessories"}?brand=${encodeURIComponent(product.brand)}`}>
+            {product.brand}
+          </Link> <ChevronRight size={14} />
+          
           <span className="current">{product.name}</span>
         </nav>
 

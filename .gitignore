@@ -30,3 +30,6 @@ backend/debug_logs.txt
 .agent/
 .agents/
 skills-lock.json
+
+# Documentation
+system_architecture.md

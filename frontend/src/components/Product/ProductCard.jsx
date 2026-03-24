@@ -148,14 +148,7 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
             )}
           </div>
 
-          <button
-            className={`cart-btn-grid ${isDiscounted ? "primary" : "secondary"}`}
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <ShoppingCart size={18} />
-          </button>
+
         </div>
       </div>
     </div>

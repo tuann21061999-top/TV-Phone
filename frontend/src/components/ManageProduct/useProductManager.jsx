@@ -12,6 +12,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
   const [form, setForm] = useState(emptyFormTemplate);
   const [tagsList, setTagsList] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [imagesToDelete, setImagesToDelete] = useState([]);
 
   const token = localStorage.getItem("token");
   const api = axios.create({
@@ -53,7 +54,10 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
   const addField = (field, template) => setForm({ ...form, [field]: [...form[field], template] });
 
   const removeField = (field, index) => {
-    if (form[field].length <= 1 && !['specs', 'highlights'].includes(field)) return;
+    if (field === "detailImages" && form[field][index]?.imageUrl?.includes("res.cloudinary.com")) {
+      setImagesToDelete(prev => [...prev, form[field][index].imageUrl]);
+    }
+    if (form[field].length <= 1 && !['specs', 'highlights', 'detailImages'].includes(field)) return;
     const updated = [...form[field]];
     updated.splice(index, 1);
     setForm({ ...form, [field]: updated });
@@ -61,9 +65,12 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
 
   const handleImageFileChange = (index, file) => {
     if (!file) return;
+    const oldUrl = form.colorImages[index]?.imageUrl;
     // Dọn dẹp URL cũ nếu có để tránh tràn bộ nhớ
-    if (form.colorImages[index].imageUrl?.startsWith('blob:')) {
-      URL.revokeObjectURL(form.colorImages[index].imageUrl);
+    if (oldUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(oldUrl);
+    } else if (oldUrl?.includes('res.cloudinary.com')) {
+      setImagesToDelete(prev => [...prev, oldUrl]);
     }
     const previewUrl = URL.createObjectURL(file);
     const updated = [...form.colorImages];
@@ -74,8 +81,11 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
 
   const handleDetailImageChange = (index, file) => {
     if (!file) return;
-    if (form.detailImages[index].imageUrl?.startsWith('blob:')) {
-      URL.revokeObjectURL(form.detailImages[index].imageUrl);
+    const oldUrl = form.detailImages[index]?.imageUrl;
+    if (oldUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(oldUrl);
+    } else if (oldUrl?.includes('res.cloudinary.com')) {
+      setImagesToDelete(prev => [...prev, oldUrl]);
     }
     const previewUrl = URL.createObjectURL(file);
     const updated = [...form.detailImages];
@@ -310,7 +320,8 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
         variants: variantsToSave,
         conditionLevel: form.condition === "new" ? [] : form.conditionLevel,
         tags: form.tags || [],
-        compatibleWith: form.compatibleWith || []
+        compatibleWith: form.compatibleWith || [],
+        imagesToDelete
       };
 
       console.log("frontend detailImages submitting:", updatedDetailImages);

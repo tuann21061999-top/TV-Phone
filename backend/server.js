@@ -37,6 +37,7 @@ const favoriteRoutes = require("./routes/favoriteRoutes");
 const newsRoutes = require("./routes/newsRoutes");
 const viewHistoryRoutes = require("./routes/viewHistoryRoutes");
 const tagRoutes = require("./routes/tagRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -170,6 +171,7 @@ app.use("/api/favorites", favoriteRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/view-history", viewHistoryRoutes);
 app.use("/api/tags", tagRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 app.use(errorHandler);
 
