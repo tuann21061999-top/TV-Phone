@@ -32,6 +32,16 @@ function ElectronicPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const brandQuery = params.get("brand");
+    if (brandQuery) {
+      setBrandFilter(brandQuery);
+    } else {
+      setBrandFilter("all");
+    }
+  }, [location.search]);
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 9;
@@ -109,24 +119,7 @@ function ElectronicPage() {
     }
   };
 
-  /* ================= NORMALIZE ================= */
 
-  const normalizeText = (text) => {
-    if (!text) return "";
-    return text
-      .toString()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
-  };
-
-  const getFirstTwoWords = (text) => {
-    const normalized = normalizeText(text);
-    if (!normalized) return "";
-    return normalized.split(" ").slice(0, 2).join(" ");
-  };
 
   /* ================= HELPERS ================= */
 

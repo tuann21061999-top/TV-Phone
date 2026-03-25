@@ -1,4 +1,5 @@
 import "./Footer.css";
+import { Link } from "react-router-dom";
 import { Twitter, Instagram, Linkedin, Zap, Smartphone, MapPin, Phone, Mail } from "lucide-react";
 
 function Footer() {
@@ -65,8 +66,8 @@ function Footer() {
         <div className="footer-bottom">
           <p>© 2024 TechNova Inc. All rights reserved.</p>
           <div className="footer-bottom-links">
-            <a href="#">Chính sách bảo mật</a>
-            <a href="#">Điều khoản bảo hành</a>
+            <Link to="/privacy-policy">Chính sách bảo mật</Link>
+            <Link to="/terms-of-service">Điều khoản bảo hành</Link>
           </div>
         </div>
       </div>

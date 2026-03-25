@@ -11,7 +11,7 @@ import {
   RotateCcw,
   Heart,
 } from "lucide-react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -29,6 +29,17 @@ function PhonePage() {
   const [selectedRams, setSelectedRams] = useState([]);
   const [batteryRange, setBatteryRange] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const brandQuery = params.get("brand");
+    if (brandQuery) {
+      setSelectedBrands([brandQuery]);
+    } else {
+      setSelectedBrands([]);
+    }
+  }, [location.search]);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);

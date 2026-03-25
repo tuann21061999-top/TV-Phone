@@ -2,6 +2,8 @@
   /* Để trong suốt để ăn theo dải màu của .main-header ở file Header.css */
   background: transparent;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+  position: relative;
+  z-index: 10000;
 }
 
 .navbar-content {
@@ -90,7 +92,7 @@
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); /* Hiệu ứng nảy nhẹ */
-  z-index: 1000;
+  z-index: 99999;
   border: 1px solid #F1F5F9;
 }
 
@@ -138,9 +140,170 @@
   font-weight: 600;
 }
 
-/* Hover hiện Dropdown */
-.dropdown:hover .dropdown-menu {
+/* ========================================================= */
+/* MEGA MENU NÂNG CẤP                                        */
+/* ========================================================= */
+
+.dropdown-menu.mega-menu-container {
+  padding: 0;
+  min-width: 260px;
+  transform: translateY(15px);
+  left: 0; /* Default aligned to container left instead of transform -50% */
+}
+
+.dropdown:hover .dropdown-menu.mega-menu-container {
   opacity: 1;
   visibility: visible;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
+}
+
+.dropdown-menu.mega-menu-container::before {
+  left: 20px; /* Di chuyển mũi tên tam giác về bên trái khớp nút "Danh mục" */
+  transform: rotate(45deg);
+}
+
+.mega-menu-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.mega-menu-item {
+  position: static; /* Let absolute panel align relative to mega-menu-container */
+}
+
+.cat-link {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px !important;
+  font-weight: 500;
+  border-bottom: 1px solid #F1F5F9;
+  border-radius: 0 !important;
+}
+
+.mega-menu-item:first-child .cat-link {
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+}
+
+.mega-menu-item:last-child .cat-link {
+  border-bottom: none;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
+
+.cat-link:hover {
+  background: #F8FAFC !important;
+  padding-left: 20px !important; /* bỏ thụt lề cho main category link */
+}
+
+.cat-icon {
+  color: #94A3B8;
+  transition: transform 0.2s;
+}
+
+.mega-menu-item:hover .cat-icon {
+  color: #2563EB;
+  transform: translateX(3px);
+}
+
+/* Panel Brands bay ra */
+.mega-submenu-panel {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  min-height: 100%; /* Ít nhất bằng với menu cha */
+  height: max-content; /* Giãn chiều cao theo danh sách brand thực tế */
+  background: #FFFFFF;
+  border-radius: 0 12px 12px 0;
+  border-left: 1px solid #F1F5F9;
+  box-shadow: 10px 10px 30px rgba(0,0,0,0.06);
+  padding: 24px;
+  width: max-content;
+  min-width: 320px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(-10px);
+  z-index: 90; 
+  cursor: default;
+}
+
+.mega-menu-item:hover .mega-submenu-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  z-index: 100;
+}
+
+.mega-submenu-panel h4 {
+  font-size: 13px;
+  color: #64748B;
+  margin-top: 0;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.brand-item {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px !important;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px !important;
+  background: #F8FAFC;
+  transition: all 0.2s ease !important;
+  text-decoration: none;
+}
+
+.brand-item:hover {
+  background: #FFFFFF !important;
+  border-color: #3B82F6;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+  transform: translateY(-2px);
+  padding-left: 12px !important; /* Ghi đè lại luật hover cũ */
+}
+
+.brand-logo-wrapper {
+  width: 44px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-logo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.brand-logo.text-avatar {
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+}
+
+.brand-name {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #1E293B;
+  text-align: center;
+}
+
+.no-brand {
+  font-size: 13px;
+  color: #94A3B8;
+  font-style: italic;
 }

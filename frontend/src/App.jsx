@@ -33,6 +33,8 @@ import PaymentResult from "./pages/PaymentResult/PaymentResult";
 import ManageOrder from "./components/ManageOrder/ManageOrder";
 import OrderDetail from "./pages/OrderDetail/OrderDetail";
 import ReviewOrder from "./pages/ReviewOrder/ReviewOrder";
+import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService/TermsOfService";
 import GlobalDeliveryConfirm from "./components/GlobalDeliveryConfirm/GlobalDeliveryConfirm";
 import ChatWidget from "./components/ChatWidget/ChatWidget";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
@@ -86,6 +88,8 @@ function App() {
           <Route path="/admin/orders" element={<AdminRoute><PageTransition><ManageOrder /></PageTransition></AdminRoute>} />
           <Route path="/order/:id" element={<PageTransition><OrderDetail /></PageTransition>} />
           <Route path="/review-order/:id" element={<PageTransition><ReviewOrder /></PageTransition>} />
+          <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+          <Route path="/terms-of-service" element={<PageTransition><TermsOfService /></PageTransition>} />
         </Routes>
       </AnimatePresence>
     </>

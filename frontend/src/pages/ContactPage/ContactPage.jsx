@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import { toast } from "sonner";
 import "./ContactPage.css";
 import {
-  Search, MapPin, Phone, Mail, Send, Navigation, Plus, Minus, Clock,
+  MapPin, Phone, Mail, Send, Clock,
   MessageSquare, History, CheckCircle, Info, AlertCircle
 } from "lucide-react";
 
@@ -19,13 +19,7 @@ function ContactPage() {
   // Lấy token mỗi khi component render
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    if (activeTab === "history" && token) {
-      fetchMyFeedbacks();
-    }
-  }, [activeTab, token]);
-
-  const fetchMyFeedbacks = async () => {
+  const fetchMyFeedbacks = useCallback(async () => {
     try {
       setLoadingHistory(true);
       const res = await axios.get("http://localhost:5000/api/feedbacks/mine", {
@@ -38,7 +32,13 @@ function ContactPage() {
     } finally {
       setLoadingHistory(false);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (activeTab === "history" && token) {
+      fetchMyFeedbacks();
+    }
+  }, [activeTab, token, fetchMyFeedbacks]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -198,7 +198,7 @@ function ContactPage() {
                 <div className="icon-box"><MapPin size={20} color="#1D4ED8"/></div>
                 <div>
                   <h3>Địa chỉ Showroom</h3>
-                  <p>123 Đường Lê Lợi, Quận 1, TP.HCM</p>
+                  <p>12 Nguyễn Văn Bảo, Gò Vấp, Hồ Chí Minh</p>
                 </div>
               </div>
               <div className="card-item">
@@ -219,20 +219,18 @@ function ContactPage() {
 
             <div className="map-wrapper shadow-box">
               <h3>Vị trí trên bản đồ</h3>
-              <div className="map-search">
-                <Search size={14} />
-                <input placeholder="Tìm cửa hàng gần nhất..." />
+              <div className="map-container" style={{ width: "100%", height: "300px", borderRadius: "12px", overflow: "hidden", marginTop: "16px" }}>
+                <iframe 
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.858237986036!2d106.6842704153344!3d10.822158861314486!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174deb3ef536f31%3A0x8b7bb8b7c956157b!2sIndustrial%20University%20of%20Ho%20Chi%20Minh%20City!5e0!3m2!1sen!2s!4v1680000000000!5m2!1svn!2s"
+                  width="100%" 
+                  height="100%" 
+                  style={{ border: 0 }} 
+                  allowFullScreen="" 
+                  loading="lazy" 
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Google Map IUH"
+                ></iframe>
               </div>
-              <div className="map-controls">
-                <button><Plus size={16} /></button>
-                <button><Minus size={16} /></button>
-                <button><Navigation size={16} /></button>
-              </div>
-              <div className="map-card">
-                <div className="status"><span className="dot"></span> Đang mở cửa</div>
-                <p><Clock size={12} /> 08:00 - 21:00 hàng ngày</p>
-              </div>
-              <div className="map-marker">TechNova Center</div>
             </div>
 
           </div>

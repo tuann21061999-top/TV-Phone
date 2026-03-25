@@ -33,6 +33,16 @@ function AccessoriesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const brandQuery = params.get("brand");
+    if (brandQuery) {
+      setBrandFilter(brandQuery);
+    } else {
+      setBrandFilter("all");
+    }
+  }, [location.search]);
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 9;
