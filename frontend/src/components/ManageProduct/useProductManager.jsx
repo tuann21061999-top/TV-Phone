@@ -287,7 +287,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
               price: Number(v.price) || 0,
               importPrice: Number(v.importPrice) || 0,
               storage: v.storage || "N/A",
-              condition: v.condition || "",
+              condition: form.condition === "new" ? "100%" : (v.condition || ""),
               sku: c.sku || v.sku || `${productType.substring(0, 3).toUpperCase()}-${Date.now()}-${idx}-${cIdx}`
             };
             delete newVar.colors;
@@ -300,6 +300,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
             importPrice: Number(v.importPrice) || 0,
             quantity: Number(v.quantity) || 0,
             storage: v.storage || "N/A",
+            condition: form.condition === "new" ? "100%" : (v.condition || ""),
             sku: v.sku || `${productType.substring(0, 3).toUpperCase()}-${Date.now()}-${idx}`
           });
         }

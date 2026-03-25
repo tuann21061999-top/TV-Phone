@@ -3,10 +3,12 @@ import { io } from "socket.io-client";
 import axios from "axios";
 import { MessageCircle, X, Send, Headphones } from "lucide-react";
 import "./ChatWidget.css";
+import { useNavigate } from "react-router-dom";
 
 const SOCKET_URL = "http://localhost:5000";
 
 function ChatWidget() {
+    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
     const [inputMsg, setInputMsg] = useState("");
@@ -126,9 +128,9 @@ function ChatWidget() {
         if (chatMode === "ai") {
             const userMsg = inputMsg.trim();
             setInputMsg("");
-            
+
             const newAiMessages = [
-                ...aiMessages, 
+                ...aiMessages,
                 { _id: Date.now().toString(), content: userMsg, senderId: currentUser._id, createdAt: new Date().toISOString() }
             ];
             setAiMessages(newAiMessages);
@@ -139,19 +141,19 @@ function ChatWidget() {
                     role: m.senderId === "ai" ? "model" : "user",
                     text: m.content
                 }));
-                
+
                 const res = await axios.post("http://localhost:5000/api/ai/chat", {
                     message: userMsg,
                     history: history
                 });
-                
+
                 setAiMessages(prev => [
-                    ...prev, 
+                    ...prev,
                     { _id: Date.now().toString(), content: res.data.reply, senderId: "ai", createdAt: new Date().toISOString() }
                 ]);
             } catch (error) {
                 setAiMessages(prev => [
-                    ...prev, 
+                    ...prev,
                     { _id: Date.now().toString(), content: "Xin lỗi, Hệ thống AI đang bận hoặc vượt quá giới hạn API. Vui lòng thử lại sau!", senderId: "ai", createdAt: new Date().toISOString() }
                 ]);
             } finally {
@@ -224,7 +226,19 @@ function ChatWidget() {
 
     // ─── Không render nếu chưa login hoặc là admin ───────────────
     if (!currentUser) return null;
+    // Hàm xử lý khi người dùng bấm vào link do AI tạo ra
+    const handleAiLinkClick = (e) => {
+        // Kiểm tra xem thẻ bị click có phải là thẻ <a> không
+        if (e.target.tagName === 'A') {
+            e.preventDefault(); // Chặn tải lại trang
+            const href = e.target.getAttribute('href');
 
+            if (href) {
+                setIsOpen(false); // Đóng khung chat lại cho gọn (tuỳ chọn, bạn có thể xóa dòng này nếu muốn giữ chat mở)
+                navigate(href);   // Chuyển sang trang sản phẩm cực mượt
+            }
+        }
+    };
     return (
         <>
             {/* Nút mở chat */}
@@ -245,13 +259,13 @@ function ChatWidget() {
                             <div className="chat-header-text">
                                 <h4>Hỗ trợ TechStore</h4>
                                 <div style={{ display: 'flex', gap: '5px', marginTop: '4px' }}>
-                                    <button 
+                                    <button
                                         onClick={() => setChatMode("admin")}
                                         style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '10px', border: 'none', background: chatMode === "admin" ? '#fff' : 'rgba(255,255,255,0.3)', color: chatMode === "admin" ? '#2563eb' : '#fff', cursor: 'pointer', fontWeight: 600 }}
                                     >
                                         CSKH
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={() => setChatMode("ai")}
                                         style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '10px', border: 'none', background: chatMode === "ai" ? '#fff' : 'rgba(255,255,255,0.3)', color: chatMode === "ai" ? '#2563eb' : '#fff', cursor: 'pointer', fontWeight: 600 }}
                                     >
@@ -294,21 +308,30 @@ function ChatWidget() {
                         ) : (
                             <>
                                 {aiMessages.map((msg, idx) => (
-                                        <div
-                                            key={msg._id || idx}
-                                            className={`chat-msg ${msg.senderId === currentUser._id
-                                                ? "sent"
-                                                : "received"
-                                                }`}
-                                        >
+                                    <div
+                                        key={msg._id || idx}
+                                        className={`chat-msg ${msg.senderId === currentUser._id
+                                            ? "sent"
+                                            : "received"
+                                            }`}
+                                    >
+                                        {/* Phân tách: Nếu là AI thì render HTML để có Link, nếu là User thì in text thường để chống hack */}
+                                        {msg.senderId === "ai" ? (
+                                            <div
+                                                style={{ whiteSpace: 'pre-line' }}
+                                                dangerouslySetInnerHTML={{ __html: msg.content }}
+                                                onClick={handleAiLinkClick}
+                                            />
+                                        ) : (
                                             <div style={{ whiteSpace: 'pre-line' }}>{msg.content}</div>
-                                            <span className="chat-msg-time">{formatTime(msg.createdAt)}</span>
-                                        </div>
+                                        )}
+                                        <span className="chat-msg-time">{formatTime(msg.createdAt)}</span>
+                                    </div>
                                 ))}
                                 {aiLoading && <div className="chat-typing">AI đang suy nghĩ...</div>}
                             </>
                         )}
-                        
+
                         <div ref={messagesEndRef} />
                     </div>
 

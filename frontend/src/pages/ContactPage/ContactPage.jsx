@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 function ContactPage() {
-  const [activeTab, setActiveTab] = useState("form"); 
+  const [activeTab, setActiveTab] = useState("form");
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [myFeedbacks, setMyFeedbacks] = useState([]);
@@ -57,7 +57,7 @@ function ContactPage() {
       await axios.post("http://localhost:5000/api/feedbacks", formData, config);
       toast.success("Gửi lời nhắn thành công. Chúng tôi sẽ sớm liên hệ!");
       setFormData({ name: "", email: "", subject: "", message: "" });
-      
+
       if (token) {
         setActiveTab("history");
         fetchMyFeedbacks(); // Cập nhật lại list ngay lập tức
@@ -71,9 +71,9 @@ function ContactPage() {
 
   const getStatusDisplay = (status) => {
     switch (status) {
-      case "new": return <span className="status-badge new"><Clock size={12}/> Chờ xử lý</span>;
-      case "read": return <span className="status-badge read"><Info size={12}/> Đang xử lý</span>;
-      case "resolved": return <span className="status-badge resolved"><CheckCircle size={12}/> Đã giải quyết</span>;
+      case "new": return <span className="status-badge new"><Clock size={12} /> Chờ xử lý</span>;
+      case "read": return <span className="status-badge read"><Info size={12} /> Đang xử lý</span>;
+      case "resolved": return <span className="status-badge resolved"><CheckCircle size={12} /> Đã giải quyết</span>;
       default: return null;
     }
   };
@@ -91,7 +91,7 @@ function ContactPage() {
         <div className="contact-layout">
           {/* ======================= CỘT TRÁI: FORM & LỊCH SỬ ======================= */}
           <div className="contact-left">
-            
+
             {/* TAB ĐIỀU HƯỚNG */}
             <div className="contact-tabs">
               <button className={`tab-btn ${activeTab === "form" ? "active" : ""}`} onClick={() => setActiveTab("form")}>
@@ -106,7 +106,7 @@ function ContactPage() {
 
             {/* NỘI DUNG TABS */}
             <div className="contact-content-area">
-              
+
               {/* TAB 1: FORM */}
               {activeTab === "form" ? (
                 <div className="contact-form-box fade-in">
@@ -136,7 +136,7 @@ function ContactPage() {
                   </form>
                 </div>
               ) : (
-                
+
                 /* TAB 2: LỊCH SỬ PHẢN HỒI */
                 <div className="contact-history-box fade-in">
                   <div className="history-header-title">
@@ -161,8 +161,8 @@ function ContactPage() {
                             <h4>{fb.subject}</h4>
                             {getStatusDisplay(fb.status)}
                           </div>
-                          <span className="hc-date"><Clock size={12}/> {new Date(fb.createdAt).toLocaleString('vi-VN')}</span>
-                          
+                          <span className="hc-date"><Clock size={12} /> {new Date(fb.createdAt).toLocaleString('vi-VN')}</span>
+
                           <div className="hc-message">
                             <strong>Nội dung gửi:</strong>
                             <p>{fb.message}</p>
@@ -171,7 +171,7 @@ function ContactPage() {
                           {/* PHẢN HỒI TỪ ADMIN */}
                           {fb.adminNote ? (
                             <div className="hc-admin-reply">
-                              <div className="reply-title"><CheckCircle size={14}/> TechNova phản hồi:</div>
+                              <div className="reply-title"><CheckCircle size={14} /> TechNova phản hồi:</div>
                               <p>{fb.adminNote}</p>
                             </div>
                           ) : (
@@ -192,24 +192,24 @@ function ContactPage() {
 
           {/* ======================= CỘT PHẢI: THÔNG TIN & MAP ======================= */}
           <div className="contact-right">
-            
+
             <div className="contact-cards-compact">
               <div className="card-item">
-                <div className="icon-box"><MapPin size={20} color="#1D4ED8"/></div>
+                <div className="icon-box"><MapPin size={20} color="#1D4ED8" /></div>
                 <div>
                   <h3>Địa chỉ Showroom</h3>
                   <p>12 Nguyễn Văn Bảo, Gò Vấp, Hồ Chí Minh</p>
                 </div>
               </div>
               <div className="card-item">
-                <div className="icon-box"><Phone size={20} color="#1D4ED8"/></div>
+                <div className="icon-box"><Phone size={20} color="#1D4ED8" /></div>
                 <div>
                   <h3>Hotline Hỗ Trợ</h3>
                   <p><strong>1900 1234 567</strong> (24/7)</p>
                 </div>
               </div>
               <div className="card-item">
-                <div className="icon-box"><Mail size={20} color="#1D4ED8"/></div>
+                <div className="icon-box"><Mail size={20} color="#1D4ED8" /></div>
                 <div>
                   <h3>Email Liên Hệ</h3>
                   <p>support@technova.vn</p>
@@ -220,13 +220,13 @@ function ContactPage() {
             <div className="map-wrapper shadow-box">
               <h3>Vị trí trên bản đồ</h3>
               <div className="map-container" style={{ width: "100%", height: "300px", borderRadius: "12px", overflow: "hidden", marginTop: "16px" }}>
-                <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.858237986036!2d106.6842704153344!3d10.822158861314486!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174deb3ef536f31%3A0x8b7bb8b7c956157b!2sIndustrial%20University%20of%20Ho%20Chi%20Minh%20City!5e0!3m2!1sen!2s!4v1680000000000!5m2!1svn!2s"
-                  width="100%" 
-                  height="100%" 
-                  style={{ border: 0 }} 
-                  allowFullScreen="" 
-                  loading="lazy" 
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.858237841926!2d106.68427047460395!3d10.822158889329432!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174deb3ef536f31%3A0x8b7bb8b7c956157b!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBDw7RuZyBuZ2hp4buHcCBUUC5IQ00!5e0!3m2!1svi!2s"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Google Map IUH"
                 ></iframe>

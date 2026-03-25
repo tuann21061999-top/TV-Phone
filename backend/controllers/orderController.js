@@ -182,7 +182,7 @@ const orderController = {
         title: "Cập nhật đơn hàng",
         message: `Đơn hàng #${order._id.toString().substring(0, 6).toUpperCase()} của bạn đã chuyển trạng thái: ${viStatus}.`,
         type: "order",
-        link: "/profile?tab=orders"
+        link: `/order/${order._id}`
       });
 
       res.status(200).json({ message: "Cập nhật thành công", order });

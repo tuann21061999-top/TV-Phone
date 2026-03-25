@@ -164,7 +164,7 @@ exports.getProductById = async (req, res) => {
     let recommendedProducts = [];
     if (product.tags && product.tags.length > 0) {
       const targetTags = product.tags.map(t => t.toString());
-      
+
       let candidateProducts = await Product.find({
         isActive: true,
         _id: { $ne: product._id },
@@ -209,7 +209,7 @@ exports.updateProduct = async (req, res) => {
   try {
     const updateData = { ...req.body };
     const imagesToDelete = req.body.imagesToDelete || [];
-    
+
     // Xóa khỏi updateData để database không bị lạ
     delete updateData.imagesToDelete;
 

@@ -227,14 +227,19 @@ const Profile = () => {
     }
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:5000/api/vouchers/apply", {
-        code: voucherInput.trim(),
-        orderTotal: 999999999
+      await axios.post("http://localhost:5000/api/vouchers/save", {
+        code: voucherInput.trim()
       }, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success(`Mã ${voucherInput.toUpperCase()} hợp lệ! Hãy sử dụng khi mua hàng.`);
+      toast.success(`Lưu mã ${voucherInput.toUpperCase()} thành công!`);
       setVoucherInput("");
+      
+      // Tải lại danh sách voucher để hiển thị mã vừa lưu
+      const { data } = await axios.get("http://localhost:5000/api/vouchers/my-vouchers", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMyVouchers(data);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Mã không hợp lệ!");
+      toast.error(error.response?.data?.message || "Lỗi lưu mã!");
     }
   };
 

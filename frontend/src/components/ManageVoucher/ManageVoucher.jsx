@@ -343,18 +343,18 @@ function ManageVoucher() {
                                 <label style={{ margin: 0, cursor: "pointer" }}>Phát công khai (mọi khách hàng đều thấy mã này)</label>
                             </div>
 
-                            {!editingId && (
-                                <div className="mv-form-group" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                    <input
-                                        type="checkbox"
-                                        name="isShocking"
-                                        checked={form.isShocking}
-                                        onChange={handleChange}
-                                        style={{ width: "auto" }}
-                                    />
-                                    <label style={{ margin: 0, cursor: "pointer" }}>🔔 Thông báo mã giảm giá sốc (đẩy thông báo tới tất cả khách hàng)</label>
-                                </div>
-                            )}
+                            <div className="mv-form-group" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <input
+                                    type="checkbox"
+                                    name="isShocking"
+                                    checked={form.isShocking}
+                                    onChange={handleChange}
+                                    style={{ width: "auto" }}
+                                />
+                                <label style={{ margin: 0, cursor: "pointer" }}>
+                                    🔔 Thông báo mã giảm giá sốc (đẩy thông báo tới tất cả khách hàng)
+                                </label>
+                            </div>
                         </div>
 
                         <div className="mv-modal-footer">

@@ -25,4 +25,10 @@ router.get("/my-vouchers", protect, voucherController.getUserVouchers);
 // Áp dụng mã giảm giá (kiểm tra + tính tiền)
 router.post("/apply", protect, voucherController.applyVoucher);
 
+// Lưu mã giảm giá vào ví (nếu chưa có)
+router.post("/save", protect, voucherController.saveVoucher);
+
+// Lấy chi tiết mã giảm giá theo code (Dùng cho trang Voucher Detail)
+router.get("/:code", voucherController.getVoucherByCode);
+
 module.exports = router;

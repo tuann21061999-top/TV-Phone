@@ -220,7 +220,7 @@ function Header() {
 
               {/* Box Thông báo */}
               {isNotifyOpen && (
-                <div className="notify-dropdown" style={{ position: "absolute", top: "120%", right: "-10px", width: "320px", background: "white", borderRadius: "8px", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", zIndex: 1000, padding: "15px", maxHeight: "400px", overflowY: "auto", cursor: "default" }}>
+                <div className="notify-dropdown" style={{ position: "absolute", top: "120%", right: "-10px", width: "320px", background: "white", borderRadius: "8px", boxShadow: "0 4px 12px rgba(0,0,0,0.15)", zIndex: 99999, padding: "15px", maxHeight: "400px", overflowY: "auto", cursor: "default" }}>
                   <h4 style={{ margin: "0 0 10px", fontSize: "16px", fontWeight: "600", color: "#333", borderBottom: "1px solid #eee", paddingBottom: "10px", textAlign: "left" }}>Thông báo</h4>
                   {notifications.length > 0 ? (
                     notifications.map(notif => (

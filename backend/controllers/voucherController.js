@@ -98,7 +98,7 @@ const voucherController = {
                         title: "🎁 Mã Giảm Giá Sốc",
                         message: `TechStore vừa phát hành mã giảm giá ${code.toUpperCase()}. Nhanh tay kẻo lỡ số lượng có hạn!`,
                         type: "promotion",
-                        link: "/profile?tab=vouchers" // Dẫn khách tới trang danh sách mã
+                        link: `/voucher/${code.toUpperCase()}`
                     });
                 } catch (err) {
                     console.error("Lỗi tạo thông báo voucher:", err);
@@ -134,6 +134,14 @@ const voucherController = {
                 return res.status(404).json({ message: "Không tìm thấy voucher!" });
             }
 
+            // Nếu admin đổi mã sang một mã đã tồn tại
+            if (req.body.code && req.body.code.toUpperCase() !== voucher.code) {
+                const existing = await Voucher.findOne({ code: req.body.code.toUpperCase() });
+                if (existing) {
+                    return res.status(400).json({ message: "Mã voucher mới này đã bị trùng với một mã khác!" });
+                }
+            }
+
             const allowedFields = [
                 "code", "discountType", "value", "minOrderValue",
                 "maxDiscountAmount", "expiryDate", "usageLimit", "isActive", "description", "isPublic"
@@ -146,9 +154,26 @@ const voucherController = {
             });
 
             await voucher.save();
+
+            // Cho phép bắn lại thông báo mã sốc nếu tick
+            if (req.body.isShocking) {
+                try {
+                    await Notification.create({
+                        title: "🎁 Nhắc lại: Mã Giảm Giá Sốc",
+                        message: `Mã giảm giá cực khủng ${voucher.code} vừa được cập nhật. Nhanh tay săn ngay!`,
+                        type: "promotion",
+                        link: `/voucher/${voucher.code}`
+                    });
+                } catch (err) { }
+            }
+
             res.status(200).json({ message: "Cập nhật voucher thành công!", voucher });
         } catch (error) {
-            res.status(500).json({ message: "Lỗi server", error: error.message });
+            console.error("Lỗi cập nhật voucher:", error);
+            if (error.code === 11000) {
+                return res.status(400).json({ message: "Mã voucher đã tồn tại!" });
+            }
+            res.status(500).json({ message: "Lỗi lưu dữ liệu!", error: error.message });
         }
     },
 
@@ -213,6 +238,24 @@ const voucherController = {
     },
 
     /* =====================================================
+       USER: LẤY CHI TIẾT MỘT VOUCHER (THEO MÃ)
+       ===================================================== */
+    getVoucherByCode: async (req, res) => {
+        try {
+            const { code } = req.params;
+            const voucher = await Voucher.findOne({ code: code.toUpperCase() });
+
+            if (!voucher) {
+                return res.status(404).json({ message: "Mã giảm giá không tồn tại!" });
+            }
+
+            res.status(200).json(voucher);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+
+    /* =====================================================
        USER: LẤY VÍ VOUCHER KHẢ DỤNG (CỦA TÔI)
        Lọc các mã public hoặc được cấp cho User này, chưa hết hạn, và đặc biệt User chưa dùng
        ===================================================== */
@@ -239,6 +282,45 @@ const voucherController = {
             res.status(200).json(validForMe);
         } catch (error) {
             console.error("Lỗi lấy voucher my wallet:", error);
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+
+    /* =====================================================
+       USER: LƯU MÃ VÀO VÍ VOUCHER
+       ===================================================== */
+    saveVoucher: async (req, res) => {
+        try {
+            const { code } = req.body;
+            const userId = req.user.id;
+
+            if (!code) return res.status(400).json({ message: "Vui lòng nhập mã!" });
+
+            const voucher = await Voucher.findOne({ code: code.toUpperCase() });
+            if (!voucher) return res.status(404).json({ message: "Mã giảm giá không tồn tại!" });
+
+            if (!voucher.isActive) return res.status(400).json({ message: "Mã này đã bị vô hiệu hóa!" });
+            if (new Date() > new Date(voucher.expiryDate)) return res.status(400).json({ message: "Mã này đã hết hạn!" });
+            if (voucher.usedCount >= voucher.usageLimit) return res.status(400).json({ message: "Mã này đã hết lượt lưu/sử dụng!" });
+
+            // Kiểm tra đã lưu hay dùng chưa
+            if (voucher.usedBy.includes(userId)) return res.status(400).json({ message: "Bạn đã sử dụng mã này rồi!" });
+            
+            if (voucher.isPublic) {
+                return res.status(200).json({ message: "Mã này đã có sẵn trong ví của bạn!" });
+            }
+
+            if (voucher.targetUsers.includes(userId)) {
+                return res.status(200).json({ message: "Mã này đã nằm trong ví của bạn!" });
+            }
+
+            // Lưu vào list targetUsers để hiện vào ví
+            voucher.targetUsers.push(userId);
+            await voucher.save();
+
+            res.status(200).json({ message: "Đã lưu mã vào ví voucher của bạn!" });
+        } catch (error) {
+            console.error("Lỗi lưu voucher vào ví:", error);
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }
     },
