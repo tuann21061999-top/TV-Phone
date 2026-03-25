@@ -103,8 +103,13 @@ const CheckoutPage = () => {
     }
   };
 
+  const hasFetchedRef = React.useRef(false);
+
   useEffect(() => {
     const fetchData = async () => {
+      if (hasFetchedRef.current) return;
+      hasFetchedRef.current = true;
+
       const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Vui lòng đăng nhập để thanh toán!");
@@ -146,8 +151,9 @@ const CheckoutPage = () => {
       }
     };
     fetchData();
+    // Không thêm location vào deps để tránh chạy lại lúc AnimatePresence exit
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location, navigate]);
+  }, []);
 
   /* ================= CALCULATIONS ================= */
   const subTotal = checkoutItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -156,7 +162,6 @@ const CheckoutPage = () => {
   const total = subTotal + shippingFee + selectedWarranty.price - discountAmount;
 
   /* ================= HANDLERS ================= */
-  // eslint-disable-next-line no-unused-vars
   const getEstimatedDeliveryDate = (province, shippingFee) => {
     if (!province) return "Vui lòng chọn địa chỉ";
 
@@ -294,7 +299,7 @@ const CheckoutPage = () => {
       // 2. Điều hướng sau khi tạo đơn thành công
       if (paymentMethod === "COD") {
         toast.success("Đặt hàng thành công!");
-        navigate("/profile"); // Nên về trang đơn hàng của tôi để khách theo dõi
+        navigate("/review-order/" + createdOrder._id);
       } else {
         // NẾU LÀ ONLINE (VNPAY/MOMO)
         // Thông thường ở đây bạn sẽ gọi API lấy URL thanh toán

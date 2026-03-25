@@ -182,7 +182,7 @@ const orderController = {
         title: "Cập nhật đơn hàng",
         message: `Đơn hàng #${order._id.toString().substring(0, 6).toUpperCase()} của bạn đã chuyển trạng thái: ${viStatus}.`,
         type: "order",
-        link: "/account"
+        link: "/profile?tab=orders"
       });
 
       res.status(200).json({ message: "Cập nhật thành công", order });
@@ -382,7 +382,7 @@ const orderController = {
       const order = await Order.findByIdAndUpdate(
         req.params.id,
         { isDeliveryConfirming: true },
-        { new: true }
+        { returnDocument: 'after' }
       );
       res.status(200).json({ message: "Đã gửi thông báo cho khách", order });
     } catch (error) {

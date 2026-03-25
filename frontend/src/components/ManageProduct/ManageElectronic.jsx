@@ -93,8 +93,8 @@ export default function ManageElectronic() {
         clearSelection={clearSelection} 
         refreshData={refreshData} 
         products={products} 
-        allProducts={allProducts}
-        tagsList={tagsList} 
+        tagsList={tagsList}
+        defaultCategoryName={Object.keys(electronicSpecsConfig)[0]}
       />
 
       {/* DANH SÁCH SẢN PHẨM */}
@@ -208,8 +208,17 @@ export default function ManageElectronic() {
                     <div className="form-group-full">
                       <label>Tags (Thẻ đánh dấu):</label>
                       <TagSelector 
-                        tagsList={tagsList.filter(tag => !tag.applicableCategories || tag.applicableCategories.length === 0 || tag.applicableCategories.some(c => c.name === form.categoryName || (c._id || c) === form.categoryId))} 
-                        selectedTags={form.tags} 
+                        tagsList={tagsList.filter(tag => {
+                          if (!tag.applicableCategories || tag.applicableCategories.length === 0) return true;
+                          const safeCategoryName = (form.categoryName || Object.keys(electronicSpecsConfig)[0] || "").trim().toLowerCase();
+                          const safeCategoryId = (form.categoryId?._id || form.categoryId || "").toString();
+                          return tag.applicableCategories.some(c => {
+                            const cName = (c.name || "").trim().toLowerCase();
+                            const cId = (c._id || c || "").toString();
+                            return (cName && cName === safeCategoryName) || (cId && cId === safeCategoryId);
+                          });
+                        })}
+                        selectedTags={form.tags}
                         onChange={(newTags) => setForm({ ...form, tags: newTags })} 
                       />
                     </div>

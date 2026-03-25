@@ -14,6 +14,7 @@ const notificationSchema = new mongoose.Schema(
       enum: ["order", "promotion", "system"]
     },
     isRead: { type: Boolean, default: false },
+    readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     link: String,
     metadata: Object
   },

@@ -1,26 +1,47 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./Countdown.css";
 
-function Countdown() {
-  const [time, setTime] = useState(3600);
+function Countdown({ targetDate }) {
+  const calculateTimeLeft = useCallback(() => {
+    if (!targetDate) return {};
+    const difference = +new Date(targetDate) - +new Date();
+    let left = {};
+
+    if (difference > 0) {
+        left = {
+            days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+            hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+            minutes: Math.floor((difference / 1000 / 60) % 60),
+            seconds: Math.floor((difference / 1000) % 60),
+        };
+    }
+    return left;
+  }, [targetDate]);
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
 
   useEffect(() => {
+    if (!targetDate) return;
+    
     const timer = setInterval(() => {
-      setTime((prev) => (prev > 0 ? prev - 1 : 0));
+      setTimeLeft(calculateTimeLeft());
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [targetDate, calculateTimeLeft]);
 
-  const hours = Math.floor(time / 3600);
-  const minutes = Math.floor((time % 3600) / 60);
-  const seconds = time % 60;
+  if (Object.keys(timeLeft).length === 0) {
+      return <span className="expired-text">Đã kết thúc</span>;
+  }
 
   return (
-    <div className="countdown">
-      <div>{hours} Giờ</div>
-      <div>{minutes} Phút</div>
-      <div>{seconds} Giây</div>
+    <div className="countdown-timer">
+        {timeLeft.days > 0 && <div className="time-box"><span>{timeLeft.days}</span><span>Ngày</span></div>}
+        <div className="time-box"><span>{timeLeft.hours.toString().padStart(2, '0')}</span><span>Giờ</span></div>
+        <span className="colon">:</span>
+        <div className="time-box"><span>{timeLeft.minutes.toString().padStart(2, '0')}</span><span>Phút</span></div>
+        <span className="colon">:</span>
+        <div className="time-box"><span>{timeLeft.seconds.toString().padStart(2, '0')}</span><span>Giây</span></div>
     </div>
   );
 }

@@ -147,7 +147,7 @@ const promotionController = {
                     discountedPrice: lowestDiscountedPrice === Infinity ? null : lowestDiscountedPrice,
                     createdBy: req.user?.id || null,
                 },
-                { upsert: true, new: true }
+                { upsert: true, returnDocument: 'after' }
             );
 
             // Gửi thông báo giảm giá cho những người đã yêu thích
@@ -205,7 +205,7 @@ const promotionController = {
             await PromotionModel.findOneAndUpdate(
                 { productId: product._id },
                 { isActive: false, discountType: "none", discountValue: 0, promotionEnd: null, discountedPrice: null },
-                { new: true }
+                { returnDocument: 'after' }
             );
 
             res.status(200).json({ message: "Đã hủy khuyến mãi cho toàn bộ thiết bị này!" });

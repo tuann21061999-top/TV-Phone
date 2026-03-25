@@ -53,7 +53,7 @@ const recordView = async (req, res) => {
                     }
                 }
             },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         res.status(200).json({ message: 'Đã cập nhật lịch sử xem', history: updatedHistory });

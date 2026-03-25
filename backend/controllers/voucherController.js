@@ -98,7 +98,7 @@ const voucherController = {
                         title: "🎁 Mã Giảm Giá Sốc",
                         message: `TechStore vừa phát hành mã giảm giá ${code.toUpperCase()}. Nhanh tay kẻo lỡ số lượng có hạn!`,
                         type: "promotion",
-                        link: "/vouchers" // Dẫn khách tới trang danh sách mã
+                        link: "/profile?tab=vouchers" // Dẫn khách tới trang danh sách mã
                     });
                 } catch (err) {
                     console.error("Lỗi tạo thông báo voucher:", err);

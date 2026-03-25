@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
+import AIRecommend from "../AIRecommend/AIRecommend";
 import "./Cart.css";
 
 const Cart = () => {
@@ -25,34 +26,35 @@ const Cart = () => {
     },
   };
 
-  const fetchCart = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/cart", fetchOptions);
-      const data = await res.json();
-      setCart(data);
-    } catch (err) {
-      console.error("Lỗi lấy giỏ hàng:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchMyVouchers = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      const { data } = await axios.get("http://localhost:5000/api/vouchers/my-vouchers", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setMyVouchers(data || []);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/cart", fetchOptions);
+        const data = await res.json();
+        setCart(data);
+      } catch (err) {
+        console.error("Lỗi lấy giỏ hàng:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchMyVouchers = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const { data } = await axios.get("http://localhost:5000/api/vouchers/my-vouchers", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setMyVouchers(data || []);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
     fetchCart();
     fetchMyVouchers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleApplyVoucher = async (codeToApply) => {
@@ -119,10 +121,18 @@ const Cart = () => {
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="cart-empty-state">
-        <ShoppingCart size={80} strokeWidth={1} />
-        <h2>Giỏ hàng của bạn đang trống</h2>
-        <button className="btn-return" onClick={() => navigate(-1)}>Quay lại cửa hàng</button>
+      <div className="cart-page-wrapper">
+        <Header />
+        <main className="cart-main-content" style={{ display: 'block', paddingBottom: '40px' }}>
+          <div className="cart-empty-state" style={{ margin: '40px auto 60px' }}>
+            <ShoppingCart size={80} strokeWidth={1} color="#cbd5e1" />
+            <h2 style={{ marginTop: '20px' }}>Giỏ hàng của bạn đang trống</h2>
+            <p style={{ color: '#64748b', marginBottom: '30px' }}>Hãy xem qua các sản phẩm gợi ý dành riêng cho bạn bên dưới nhé!</p>
+            <button className="btn-return" onClick={() => navigate("/")}>Quay lại trang chủ</button>
+          </div>
+          <AIRecommend />
+        </main>
+        <Footer />
       </div>
     );
   }

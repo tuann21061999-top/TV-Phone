@@ -131,7 +131,7 @@ const reviewController = {
           adminReply: reply, 
           adminReplyDate: new Date() 
         },
-        { new: true }
+        { returnDocument: 'after' }
       );
       res.status(200).json({ message: "Đã trả lời đánh giá", review });
     } catch (error) {

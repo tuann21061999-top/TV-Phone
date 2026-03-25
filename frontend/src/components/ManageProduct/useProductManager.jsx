@@ -262,6 +262,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
         );
         finalCategoryId = catRes.data._id;
       } catch (err) {
+        console.log(err);
         // Nếu đã tồn tại, lấy ID từ danh sách
         const list = await axios.get("http://localhost:5000/api/categories");
         const found = list.data.find(c => c.name.toLowerCase() === safeCategoryName.trim().toLowerCase());

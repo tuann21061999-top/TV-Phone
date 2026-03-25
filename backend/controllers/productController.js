@@ -223,7 +223,7 @@ exports.updateProduct = async (req, res) => {
       req.params.id,
       { $set: updateData },
       {
-        new: true,
+        returnDocument: 'after',
         runValidators: true,
       }
     );
@@ -309,7 +309,7 @@ exports.toggleProductStatus = async (req, res) => {
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       { $set: { isActive: isActive } },
-      { new: true } // Trả về doc sau khi update
+      { returnDocument: 'after' } // Trả về doc sau khi update
     );
 
     if (!product) {

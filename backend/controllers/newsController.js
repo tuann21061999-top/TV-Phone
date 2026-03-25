@@ -62,7 +62,7 @@ const getNewsBySlug = async (req, res) => {
         const news = await News.findOneAndUpdate(
             { slug },
             { $inc: { views: 1 } },
-            { new: true }
+            { returnDocument: 'after' }
         ).populate("relatedProduct", "name slug colorImages variants highlights productType");
 
         if (!news) {

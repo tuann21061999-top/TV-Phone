@@ -6,7 +6,7 @@ import TagSelector from './TagSelector';
 import CompatibleProductSelector from './CompatibleProductSelector';
 import './ManageProduct.css';
 
-export default function BulkActionsPanel({ selectedIds, clearSelection, refreshData, products, allProducts, tagsList }) {
+export default function BulkActionsPanel({ selectedIds, clearSelection, refreshData, products, allProducts, tagsList, defaultCategoryName }) {
   const [actionType, setActionType] = useState(null); // 'status', 'tags', 'compatible', 'delete'
   const [statusVal, setStatusVal] = useState(true);
   const [selectedTags, setSelectedTags] = useState([]);
@@ -121,10 +121,15 @@ export default function BulkActionsPanel({ selectedIds, clearSelection, refreshD
               )}
 
               {actionType === 'tags' && (() => {
-                const selectedCategoryIds = [...new Set(products.filter(p => selectedIds.includes(p._id)).map(p => p.categoryId._id || p.categoryId))];
+                const selectedCategoryIds = [...new Set(products.filter(p => selectedIds.includes(p._id)).map(p => (p.categoryId?._id || p.categoryId || "").toString()))];
                 const filteredBulkTags = tagsList.filter(tag => {
                   if (!tag.applicableCategories || tag.applicableCategories.length === 0) return true;
-                  return tag.applicableCategories.some(c => selectedCategoryIds.includes(c._id || c));
+                  return tag.applicableCategories.some(c => {
+                    const cId = (c._id || c || "").toString();
+                    const cName = (c.name || "").trim().toLowerCase();
+                    const hasNoCategory = selectedCategoryIds.includes("");
+                    return selectedCategoryIds.includes(cId) || (hasNoCategory && defaultCategoryName && cName === defaultCategoryName.trim().toLowerCase());
+                  });
                 });
                 return (
                   <div className="form-group-full">

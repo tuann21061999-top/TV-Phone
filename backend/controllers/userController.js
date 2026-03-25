@@ -52,7 +52,7 @@ exports.updateProfile = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.user.id,
       { $set: updateFields },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     ).select("-password");
 
     res.status(200).json({ message: "Cập nhật thành công", user });
@@ -304,7 +304,7 @@ exports.updateUserRoleAdmin = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { role },
-      { new: true }
+      { returnDocument: 'after' }
     ).select("-password");
 
     res.status(200).json({ message: "Cập nhật quyền thành công", user });

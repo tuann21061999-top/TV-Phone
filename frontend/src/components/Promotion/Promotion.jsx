@@ -5,44 +5,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
-// Helper function to extract pricing logic from variants
-const getProductPricing = (product) => {
-  if (!product.variants?.length) return { basePrice: 0, finalPrice: 0, discountPercent: 0, targetEnd: null };
-  
-  let bestBasePrice = Infinity;
-  let bestFinalPrice = Infinity;
-  let bestDiscountPercent = 0;
-  let bestPromotionEnd = null;
-
-  product.variants.forEach(v => {
-    const now = new Date();
-    let currentActivePrice = v.price;
-    let currentDiscountPercent = 0;
-
-    if (v.discountPrice != null && v.promotionEnd && new Date(v.promotionEnd) > now) {
-      currentActivePrice = v.discountPrice;
-      if (v.discountType === "percentage") {
-        currentDiscountPercent = v.discountValue;
-      } else if (v.discountType === "fixed") {
-        currentDiscountPercent = Math.round((v.discountValue / v.price) * 100);
-      }
-    }
-
-    if (currentActivePrice < bestFinalPrice) {
-      bestFinalPrice = currentActivePrice;
-      bestBasePrice = v.price;
-      bestDiscountPercent = currentDiscountPercent;
-      bestPromotionEnd = v.promotionEnd ? new Date(v.promotionEnd) : null;
-    }
-  });
-
-  return {
-    basePrice: bestBasePrice === Infinity ? 0 : bestBasePrice,
-    finalPrice: bestFinalPrice === Infinity ? 0 : bestFinalPrice,
-    discountPercent: bestDiscountPercent,
-    targetEnd: bestPromotionEnd
-  };
-};
+// Xóa bỏ getProductPricing do không được sử dụng
 
 function Promotion() {
   const [bestProduct, setBestProduct] = useState(null);
@@ -125,7 +88,7 @@ function Promotion() {
         )}
 
         {/* Nếu ko có giảm giá thì ko hiện countdown */}
-        {bestPricing.discountPercent > 0 && <Countdown />}
+        {bestPricing.discountPercent > 0 && <Countdown targetDate={bestPricing.targetEnd} />}
 
         <Link to={`/product/${bestProduct.slug || bestProduct.productId}`} className="view-btn">
           Xem ngay kẻo lỡ

@@ -130,8 +130,11 @@ function Header() {
         setNotifications(prev => prev.map(n => n._id === notif._id ? { ...n, isRead: true } : n));
       }
       setIsNotifyOpen(false);
-      if (notif.link) {
-        navigate(notif.link);
+      let targetLink = notif.link;
+      if (targetLink === "/account") targetLink = "/profile?tab=orders";
+      if (targetLink === "/vouchers") targetLink = "/profile?tab=vouchers";
+      if (targetLink) {
+        navigate(targetLink);
       }
     } catch (e) {
       console.error("Lỗi click thông báo:", e);

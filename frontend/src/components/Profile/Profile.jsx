@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import {
   User, Package, MapPin, Tag, LogOut, Plus,
@@ -18,8 +18,19 @@ import "./Profile.css";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const tabFromUrl = queryParams.get("tab");
+  
   const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState("info");
+  const [activeTab, setActiveTab] = useState(tabFromUrl || "info");
+
+  useEffect(() => {
+    const tabParam = new URLSearchParams(location.search).get("tab");
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [location.search]);
 
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [editFormData, setEditFormData] = useState({ name: "", phone: "" });

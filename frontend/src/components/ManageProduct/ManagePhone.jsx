@@ -176,6 +176,7 @@ export default function ManagePhone() {
         products={products}
         allProducts={allProducts}
         tagsList={tagsList}
+        defaultCategoryName="Điện thoại"
       />
 
       {/* TABLE */}
@@ -336,7 +337,16 @@ export default function ManagePhone() {
                     <div className="form-group-full">
                       <label>Tags (Thẻ đánh dấu):</label>
                       <TagSelector
-                        tagsList={tagsList.filter(tag => !tag.applicableCategories || tag.applicableCategories.length === 0 || tag.applicableCategories.some(c => c.name === form.categoryName || (c._id || c) === form.categoryId))}
+                        tagsList={tagsList.filter(tag => {
+                          if (!tag.applicableCategories || tag.applicableCategories.length === 0) return true;
+                          const safeCategoryName = (form.categoryName || "Điện thoại").trim().toLowerCase();
+                          const safeCategoryId = (form.categoryId?._id || form.categoryId || "").toString();
+                          return tag.applicableCategories.some(c => {
+                            const cName = (c.name || "").trim().toLowerCase();
+                            const cId = (c._id || c || "").toString();
+                            return (cName && cName === safeCategoryName) || (cId && cId === safeCategoryId);
+                          });
+                        })}
                         selectedTags={form.tags}
                         onChange={(newTags) => setForm({ ...form, tags: newTags })}
                       />
