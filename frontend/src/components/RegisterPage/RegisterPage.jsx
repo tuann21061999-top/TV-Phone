@@ -14,7 +14,6 @@ import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import Hero from "../Hero/Hero"; // Nhúng banner home
 import { toast, Toaster } from "sonner";
-import "./RegisterPage.css";
 
 const RegisterPage = () => {
   const navigate = useNavigate(); // Khởi tạo điều hướng
@@ -84,195 +83,231 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="register-page">
-      <Header />
-      <div className="auth-container">
-        <div className="auth-banner-side">
+  <div className="bg-slate-50 min-h-screen">
+    <Header />
+
+    <div className="flex max-w-[1400px] mx-auto items-center justify-center px-5 py-10 gap-12 min-h-[calc(100vh-80px)]">
+      
+      {/* LEFT BANNER */}
+      <div className="hidden lg:block flex-[1.2] animate-[fadeInHalf_0.8s_ease-out_forwards]">
+        <div className="p-10">
           <Hero />
         </div>
-        
-        <div className="auth-form-side">
-          <div className="register-wrapper">
-          <div className="register-card">
-            <div className="register-header">
-              <h1>Tạo tài khoản mới</h1>
-              <p>Cùng khám phá hàng ngàn sản phẩm công nghệ mới nhất.</p>
-            </div>
+      </div>
 
-            {step === 1 && (
-              <form onSubmit={handleRequestOTP} className="register-form">
-                {/* Họ tên */}
-                <div className="form-group">
-                  <label>Họ và Tên</label>
-                  <div className="input-wrapper">
-                    <input
-                      type="text"
-                      required
-                      placeholder="Nguyễn Văn A"
-                      value={formData.fullName} // Nên thêm value để control input
-                      onChange={(e) =>
-                        setFormData({ ...formData, fullName: e.target.value })
-                      }
-                    />
-                    <User size={18} />
-                  </div>
-                </div>
-
-                <div className="grid-2">
-
-                  {/* Email */}
-                  <div className="form-group">
-                    <label>Email</label>
-                    <div className="input-wrapper">
-                      <input
-                        type="email"
-                        required
-                        maxLength={50} // Giới hạn tối đa 50 ký tự
-                        placeholder="example@gmail.com"
-                        value={formData.email}
-                        onChange={(e) =>
-                          setFormData({ ...formData, email: e.target.value })
-                        }
-                      />
-                      <Mail size={18} />
-                    </div>
-                    {/* Hiển thị đếm số ký tự (Tùy chọn) */}
-                    <small style={{ textAlign: 'right', display: 'block', color: '#666' }}>
-                      {formData.email.length}/50
-                    </small>
-                  </div>
-
-                  {/* Số điện thoại */}
-                  <div className="form-group">
-                    <label>Số điện thoại</label>
-                    <div className="input-wrapper">
-                      <input
-                        type="tel"
-                        required
-                        placeholder="0xxx xxx xxx"
-                        value={formData.phone}
-                        onChange={(e) => {
-                          // Chỉ cho phép nhập số và tối đa 10 số
-                          const value = e.target.value.replace(/\D/g, "");
-                          if (value.length <= 10) {
-                            setFormData({ ...formData, phone: value });
-                          }
-                        }}
-                      />
-                      <Smartphone size={18} />
-                    </div>
-                    <small style={{ textAlign: 'right', display: 'block', color: '#666' }}>
-                      {formData.phone.length}/10
-                    </small>
-                  </div>
-                </div>
-
-                {/* Password */}
-                <div className="form-group">
-                  <label>Mật khẩu</label>
-                  <div className="input-wrapper">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      required
-                      placeholder="Tối thiểu 8 ký tự"
-                      value={formData.password}
-                      onChange={(e) =>
-                        setFormData({ ...formData, password: e.target.value })
-                      }
-                    />
-                    <button
-                      type="button"
-                      className="eye-btn"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Confirm Password */}
-                <div className="form-group">
-                  <label>Xác nhận mật khẩu</label>
-                  <div className="input-wrapper">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      required
-                      placeholder="Nhập lại mật khẩu"
-                      value={formData.confirmPassword}
-                      onChange={(e) =>
-                        setFormData({ ...formData, confirmPassword: e.target.value })
-                      }
-                    />
-                    <ShieldCheck size={18} />
-                  </div>
-                </div>
-
-                <div className="terms">
-                  <input
-                    type="checkbox"
-                    required
-                    checked={formData.agreeTerms}
-                    onChange={(e) =>
-                      setFormData({ ...formData, agreeTerms: e.target.checked })
-                    }
-                  />
-                  <span>
-                    Tôi đồng ý với <a href="#">Điều khoản dịch vụ</a> và{" "}
-                    <a href="#">Chính sách bảo mật</a>.
-                  </span>
-                </div>
-
-                <button type="submit" className="register-btn" disabled={loading}>
-                  {loading ? "Đang gửi OTP..." : "Đăng ký tài khoản"}
-                </button>
-              </form>
-            )}
-
-            {step === 2 && (
-              <form onSubmit={handleVerifyAndRegister} className="register-form">
-                <div className="form-group">
-                  <label>Mã OTP Verification</label>
-                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '10px' }}>
-                    Chúng tôi vừa gửi mã OTP 6 số đến <b>{formData.email}</b>. Vui lòng kiểm tra hộp thư đến (hoặc hòm thư rác).
-                  </p>
-                  <div className="input-wrapper">
-                    <input
-                      type="text"
-                      required
-                      maxLength={6}
-                      placeholder="Nhập mã 6 chữ số"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      style={{ letterSpacing: '2px', textAlign: 'center', fontWeight: 'bold' }}
-                    />
-                    <Key size={18} className="input-icon" />
-                  </div>
-                </div>
-                
-                <button type="submit" className="register-btn" disabled={loading} style={{ marginTop: '20px' }}>
-                  {loading ? "Đang xử lý..." : "Xác nhận & Hoàn tất"}
-                </button>
-                
-                <div className="register-footer" style={{ marginTop: '20px' }}>
-                  <span onClick={() => setStep(1)} style={{ cursor: 'pointer', color: '#2563eb', fontWeight: 500 }}>
-                    Trở lại sửa thông tin
-                  </span>
-                </div>
-              </form>
-            )}
-
-            {step === 1 && (
-              <div className="register-footer">
-                Đã có tài khoản? <a href="/login">Đăng nhập</a>
-              </div>
-            )}
-            </div>
+      {/* RIGHT FORM */}
+      <div className="flex-1 flex justify-center w-full">
+        <div className="w-full max-w-[520px] bg-white rounded-[20px] shadow-[0_10px_30px_rgba(0,0,0,0.05)] overflow-hidden">
+          
+          {/* HEADER */}
+          <div className="p-8 text-center">
+            <h1 className="text-2xl font-bold mb-2">Tạo tài khoản mới</h1>
+            <p className="text-sm text-slate-500">
+              Cùng khám phá hàng ngàn sản phẩm công nghệ mới nhất.
+            </p>
           </div>
+
+          {/* FORM */}
+          {step === 1 && (
+            <form onSubmit={handleRequestOTP} className="px-8 pb-8">
+              
+              {/* NAME */}
+              <div className="mb-5">
+                <label className="block mb-1.5 font-medium">Họ và Tên</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nguyễn Văn A"
+                    value={formData.fullName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, fullName: e.target.value })
+                    }
+                    className="w-full p-3 pr-10 rounded-xl border border-slate-200 focus:border-blue-500 outline-none"
+                  />
+                  <User size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+              </div>
+
+              {/* GRID */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                {/* EMAIL */}
+                <div>
+                  <label className="block mb-1.5 font-medium">Email</label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      required
+                      maxLength={50}
+                      placeholder="example@gmail.com"
+                      value={formData.email}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
+                      className="w-full p-3 pr-10 rounded-xl border border-slate-200 focus:border-blue-500 outline-none"
+                    />
+                    <Mail size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  </div>
+                  <p className="text-xs text-right text-slate-500 mt-1">
+                    {formData.email.length}/50
+                  </p>
+                </div>
+
+                {/* PHONE */}
+                <div>
+                  <label className="block mb-1.5 font-medium">Số điện thoại</label>
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      required
+                      placeholder="0xxx xxx xxx"
+                      value={formData.phone}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, "");
+                        if (value.length <= 10) {
+                          setFormData({ ...formData, phone: value });
+                        }
+                      }}
+                      className="w-full p-3 pr-10 rounded-xl border border-slate-200 focus:border-blue-500 outline-none"
+                    />
+                    <Smartphone size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  </div>
+                  <p className="text-xs text-right text-slate-500 mt-1">
+                    {formData.phone.length}/10
+                  </p>
+                </div>
+              </div>
+
+              {/* PASSWORD */}
+              <div className="mt-5">
+                <label className="block mb-1.5 font-medium">Mật khẩu</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    placeholder="Tối thiểu 8 ký tự"
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                    className="w-full p-3 pr-10 rounded-xl border border-slate-200 focus:border-blue-500 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* CONFIRM */}
+              <div className="mt-5">
+                <label className="block mb-1.5 font-medium">Xác nhận mật khẩu</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    placeholder="Nhập lại mật khẩu"
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      setFormData({ ...formData, confirmPassword: e.target.value })
+                    }
+                    className="w-full p-3 pr-10 rounded-xl border border-slate-200 focus:border-blue-500 outline-none"
+                  />
+                  <ShieldCheck size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                </div>
+              </div>
+
+              {/* TERMS */}
+              <div className="flex items-start gap-2 text-sm mt-4">
+                <input
+                  type="checkbox"
+                  required
+                  checked={formData.agreeTerms}
+                  onChange={(e) =>
+                    setFormData({ ...formData, agreeTerms: e.target.checked })
+                  }
+                />
+                <span>
+                  Tôi đồng ý với{" "}
+                  <a href="#" className="text-blue-600 font-medium">
+                    Điều khoản dịch vụ
+                  </a>{" "}
+                  và{" "}
+                  <a href="#" className="text-blue-600 font-medium">
+                    Chính sách bảo mật
+                  </a>
+                </span>
+              </div>
+
+              {/* BUTTON */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-5 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
+              >
+                {loading ? "Đang gửi OTP..." : "Đăng ký tài khoản"}
+              </button>
+            </form>
+          )}
+
+          {/* OTP STEP */}
+          {step === 2 && (
+            <form onSubmit={handleVerifyAndRegister} className="px-8 pb-8">
+              <label className="block mb-1.5 font-medium">Mã OTP</label>
+              <p className="text-sm text-slate-500 mb-3">
+                Mã đã gửi đến <b>{formData.email}</b>
+              </p>
+
+              <div className="relative">
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="w-full p-3 text-center tracking-widest font-bold rounded-xl border border-slate-200 focus:border-blue-500 outline-none"
+                />
+                <Key size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-5 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
+              >
+                {loading ? "Đang xử lý..." : "Xác nhận & Hoàn tất"}
+              </button>
+
+              <div className="text-center mt-4">
+                <span
+                  onClick={() => setStep(1)}
+                  className="text-blue-600 font-medium cursor-pointer"
+                >
+                  Trở lại sửa thông tin
+                </span>
+              </div>
+            </form>
+          )}
+
+          {/* FOOTER */}
+          {step === 1 && (
+            <div className="bg-slate-50 text-center py-5 text-sm">
+              Đã có tài khoản?{" "}
+              <a href="/login" className="text-blue-600 font-semibold">
+                Đăng nhập
+              </a>
+            </div>
+          )}
         </div>
       </div>
-      <Footer />
     </div>
-  );
+
+    <Footer />
+  </div>
+);
 };
 
 export default RegisterPage;

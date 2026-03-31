@@ -4,7 +4,6 @@ import axios from 'axios';
 import { ChevronRight, X, Search, Phone as PhoneIcon, MapPin, ShieldCheck, Mail } from 'lucide-react';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
-import './ProductCompare.css';
 
 function ProductCompare() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -155,92 +154,98 @@ function ProductCompare() {
     }
   };
 
-  if (loading) return <div className="loading-state">Đang tải dữ liệu so sánh...</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center py-20 text-slate-500 font-medium animate-pulse">
+      Đang tải dữ liệu so sánh...
+    </div>
+  );
 
   const hasProducts = product1 || product2;
 
   return (
-    <div className="product-compare-page">
+    <div className="bg-slate-50 min-h-screen font-sans">
       <Header />
 
-      <div className="compare-container">
-        <nav className="breadcrumb">
-          <Link to="/">Trang chủ</Link> <ChevronRight size={14} />
-          <Link to="/phones">Điện thoại</Link> <ChevronRight size={14} />
-          <span className="current">So sánh sản phẩm</span>
+      <div className="max-w-[1200px] mx-auto px-6 py-6">
+        {/* BREADCRUMB */}
+        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-8 flex-wrap">
+          <Link to="/" className="hover:text-blue-600 transition-colors">Trang chủ</Link> 
+          <ChevronRight size={14} />
+          <Link to="/phones" className="hover:text-blue-600 transition-colors">Điện thoại</Link> 
+          <ChevronRight size={14} />
+          <span className="text-slate-900 font-semibold">So sánh sản phẩm</span>
         </nav>
 
-        <div className="compare-header-title">
-          <h1>So sánh chi tiết</h1>
-          <p>Đối chiếu thông số kỹ thuật giữa các siêu phẩm công nghệ hàng đầu.</p>
+        <div className="mb-8">
+          <h1 className="text-3xl font-extrabold text-slate-800 mb-2">So sánh chi tiết</h1>
+          <p className="text-slate-500 text-[15px]">Đối chiếu thông số kỹ thuật giữa các siêu phẩm công nghệ hàng đầu.</p>
         </div>
 
         {hasProducts ? (
-          <div className="compare-content">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            
             {/* STICKY HEADER CHO CÁC SẢN PHẨM */}
-            <div className="compare-products-header sticky-compare-bar">
-              <div className="compare-header-cell label-cell">
-                <div className="compare-instruction">
-                  <h3>Thông số so sánh</h3>
-                  <p>Chọn tối đa 2 sản phẩm để so sánh</p>
+            <div className="flex items-stretch bg-slate-50 border-b border-slate-200 sticky top-[70px] z-[100] p-5 gap-5">
+              <div className="flex-[0.8] hidden md:flex items-center">
+                <div>
+                  <h3 className="text-blue-700 font-bold text-lg mb-1">Thông số so sánh</h3>
+                  <p className="text-slate-400 text-[13px] m-0">Chọn tối đa 2 sản phẩm để so sánh</p>
                 </div>
               </div>
 
               {/* PRODUCT 1 */}
-              <div className="compare-header-cell product-cell">
+              <div className="flex-1 flex justify-center">
                 {product1 ? (
-                  <div className="product-compare-card">
-                    <button className="btn-remove-product" onClick={() => handleRemoveProduct(true)}>
+                  <div className="bg-white rounded-xl p-5 text-center relative w-full max-w-[250px] shadow-sm border border-slate-100 flex flex-col items-center transition-all hover:shadow-md">
+                    <button 
+                      className="absolute top-2 right-2 bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 border-none rounded-full w-7 h-7 flex items-center justify-center cursor-pointer transition-colors" 
+                      onClick={() => handleRemoveProduct(true)}
+                    >
                       <X size={16} />
                     </button>
-                    <img src={getMainImage(product1)} alt={product1.name} className="compare-product-img" />
-                    <h3 className="compare-product-name">{product1.name}</h3>
-                    <div className="compare-product-price">{getMinPrice(product1).toLocaleString()}đ</div>
-                    <Link to={`/product/${product1.slug}`} className="btn-buy-now">Mua ngay</Link>
+                    <img src={getMainImage(product1)} alt={product1.name} className="w-24 h-24 md:w-36 md:h-36 object-contain mb-4" />
+                    <h3 className="text-sm md:text-base font-bold text-slate-800 mb-2 line-clamp-2 h-10 md:h-12">{product1.name}</h3>
+                    <div className="text-blue-600 font-extrabold text-base md:text-lg mb-4">{getMinPrice(product1).toLocaleString()}đ</div>
+                    <Link to={`/product/${product1.slug}`} className="bg-blue-600 text-white py-2 px-4 rounded-lg font-bold text-[13px] w-full text-center transition-colors hover:bg-blue-700">Mua ngay</Link>
                   </div>
                 ) : (
-                  <div className="empty-product-slot">
+                  <div className="bg-white border-2 border-dashed border-slate-200 rounded-xl w-full max-w-[250px] flex flex-col items-center justify-center p-8 md:p-10 text-slate-400">
                     {!activeSearchSlot || activeSearchSlot !== 'p1' ? (
                       <>
-                        <div className="empty-slot-icon">+</div>
-                        <p>Thêm sản phẩm</p>
-                        <button className="btn-outline-primary" style={{ marginTop: '15px', padding: '8px 16px', fontSize: '13px' }} onClick={() => setActiveSearchSlot('p1')}>
+                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-2xl mb-3 text-slate-300">+</div>
+                        <p className="text-sm font-medium mb-4">Thêm sản phẩm</p>
+                        <button className="bg-white border border-blue-600 text-blue-600 py-2 px-4 rounded-lg text-xs font-bold transition-colors hover:bg-blue-50" onClick={() => setActiveSearchSlot('p1')}>
                           Tìm kiếm
                         </button>
                       </>
                     ) : (
-                      <div className="inline-compare-search" style={{ width: '100%', position: 'relative' }}>
-                        <div className="compare-search" style={{ width: '100%' }}>
+                      <div className="w-full relative">
+                        <div className="w-full">
                           <input 
                             type="text" 
-                            placeholder="Nhập tên điện thoại..." 
+                            placeholder="Nhập tên..." 
                             value={searchCompare}
                             onChange={(e) => setSearchCompare(e.target.value)}
                             autoFocus
-                            style={{ width: '100%', padding: '10px 15px', borderRadius: '6px', border: '1px solid #ddd' }}
+                            className="w-full p-2.5 px-4 border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-800"
                           />
-                          {isSearching && <span style={{ position: 'absolute', right: '10px', top: '10px', fontSize: '12px', color: '#888' }}>...</span>}
+                          {isSearching && <span className="absolute right-3 top-3 text-[10px] text-slate-400 animate-pulse">...</span>}
                         </div>
                         {compareResults.length > 0 && (
-                          <div className="compare-search-results" style={{
-                            position: 'absolute', top: '100%', left: 0, right: 0, 
-                            background: 'white', border: '1px solid #ddd', borderRadius: '8px', 
-                            zIndex: 10, marginTop: '5px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            maxHeight: '250px', overflowY: 'auto', textAlign: 'left'
-                          }}>
+                          <div className="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-xl z-50 mt-2 shadow-2xl max-h-[250px] overflow-y-auto">
                               {compareResults.map(p => (
-                                  <div 
-                                      key={p._id} 
-                                      style={{ padding: '10px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', borderBottom: '1px solid #eee' }}
-                                      onClick={() => handleSelectProduct(p.slug)}
-                                  >
-                                      <img src={p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl} alt={p.name} style={{ width: '30px', height: '30px', objectFit: 'contain' }} />
-                                      <div style={{ flex: 1, fontSize: '12px', fontWeight: 500, color: '#333' }}>{p.name}</div>
-                                  </div>
+                                <div 
+                                  key={p._id} 
+                                  className="p-3 flex items-center gap-3 cursor-pointer border-b border-slate-50 last:border-none hover:bg-slate-50 transition-colors"
+                                  onClick={() => handleSelectProduct(p.slug)}
+                                >
+                                  <img src={p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl} alt={p.name} className="w-8 h-8 object-contain" />
+                                  <div className="flex-1 text-[13px] font-semibold text-slate-700 truncate">{p.name}</div>
+                                </div>
                               ))}
                           </div>
                         )}
-                        <button style={{ marginTop: '10px', fontSize: '12px', background: 'none', border: 'none', color: '#888', cursor: 'pointer' }} onClick={() => { setActiveSearchSlot(null); setSearchCompare(''); }}>Hủy</button>
+                        <button className="mt-3 text-xs bg-transparent border-none text-slate-400 cursor-pointer hover:text-slate-600 w-full" onClick={() => { setActiveSearchSlot(null); setSearchCompare(''); }}>Hủy</button>
                       </div>
                     )}
                   </div>
@@ -248,60 +253,58 @@ function ProductCompare() {
               </div>
 
               {/* PRODUCT 2 */}
-              <div className="compare-header-cell product-cell">
+              <div className="flex-1 flex justify-center">
                 {product2 ? (
-                  <div className="product-compare-card">
-                    <button className="btn-remove-product" onClick={() => handleRemoveProduct(false)}>
+                  <div className="bg-white rounded-xl p-5 text-center relative w-full max-w-[250px] shadow-sm border border-slate-100 flex flex-col items-center transition-all hover:shadow-md">
+                    <button 
+                      className="absolute top-2 right-2 bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 border-none rounded-full w-7 h-7 flex items-center justify-center cursor-pointer transition-colors" 
+                      onClick={() => handleRemoveProduct(false)}
+                    >
                       <X size={16} />
                     </button>
-                    <img src={getMainImage(product2)} alt={product2.name} className="compare-product-img" />
-                    <h3 className="compare-product-name">{product2.name}</h3>
-                    <div className="compare-product-price">{getMinPrice(product2).toLocaleString()}đ</div>
-                    <Link to={`/product/${product2.slug}`} className="btn-buy-now">Mua ngay</Link>
+                    <img src={getMainImage(product2)} alt={product2.name} className="w-24 h-24 md:w-36 md:h-36 object-contain mb-4" />
+                    <h3 className="text-sm md:text-base font-bold text-slate-800 mb-2 line-clamp-2 h-10 md:h-12">{product2.name}</h3>
+                    <div className="text-blue-600 font-extrabold text-base md:text-lg mb-4">{getMinPrice(product2).toLocaleString()}đ</div>
+                    <Link to={`/product/${product2.slug}`} className="bg-blue-600 text-white py-2 px-4 rounded-lg font-bold text-[13px] w-full text-center transition-colors hover:bg-blue-700">Mua ngay</Link>
                   </div>
                 ) : (
-                  <div className="empty-product-slot">
+                  <div className="bg-white border-2 border-dashed border-slate-200 rounded-xl w-full max-w-[250px] flex flex-col items-center justify-center p-8 md:p-10 text-slate-400">
                     {!activeSearchSlot || activeSearchSlot !== 'p2' ? (
                       <>
-                        <div className="empty-slot-icon">+</div>
-                        <p>Thêm sản phẩm để so sánh</p>
-                        <button className="btn-outline-primary" style={{ marginTop: '15px', padding: '8px 16px', fontSize: '13px' }} onClick={() => setActiveSearchSlot('p2')}>
+                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-2xl mb-3 text-slate-300">+</div>
+                        <p className="text-sm font-medium mb-4">Thêm sản phẩm</p>
+                        <button className="bg-white border border-blue-600 text-blue-600 py-2 px-4 rounded-lg text-xs font-bold transition-colors hover:bg-blue-50" onClick={() => setActiveSearchSlot('p2')}>
                           Tìm kiếm
                         </button>
                       </>
                     ) : (
-                      <div className="inline-compare-search" style={{ width: '100%', position: 'relative' }}>
-                        <div className="compare-search" style={{ width: '100%' }}>
+                      <div className="w-full relative">
+                        <div className="w-full">
                           <input 
                             type="text" 
-                            placeholder="Nhập tên điện thoại..." 
+                            placeholder="Nhập tên..." 
                             value={searchCompare}
                             onChange={(e) => setSearchCompare(e.target.value)}
                             autoFocus
-                            style={{ width: '100%', padding: '10px 15px', borderRadius: '6px', border: '1px solid #ddd' }}
+                            className="w-full p-2.5 px-4 border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-800"
                           />
-                          {isSearching && <span style={{ position: 'absolute', right: '10px', top: '10px', fontSize: '12px', color: '#888' }}>...</span>}
+                          {isSearching && <span className="absolute right-3 top-3 text-[10px] text-slate-400 animate-pulse">...</span>}
                         </div>
                         {compareResults.length > 0 && (
-                          <div className="compare-search-results" style={{
-                            position: 'absolute', top: '100%', left: 0, right: 0, 
-                            background: 'white', border: '1px solid #ddd', borderRadius: '8px', 
-                            zIndex: 10, marginTop: '5px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            maxHeight: '250px', overflowY: 'auto', textAlign: 'left'
-                          }}>
+                          <div className="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-xl z-50 mt-2 shadow-2xl max-h-[250px] overflow-y-auto">
                               {compareResults.map(p => (
-                                  <div 
-                                      key={p._id} 
-                                      style={{ padding: '10px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', borderBottom: '1px solid #eee' }}
-                                      onClick={() => handleSelectProduct(p.slug)}
-                                  >
-                                      <img src={p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl} alt={p.name} style={{ width: '30px', height: '30px', objectFit: 'contain' }} />
-                                      <div style={{ flex: 1, fontSize: '12px', fontWeight: 500, color: '#333' }}>{p.name}</div>
-                                  </div>
+                                <div 
+                                  key={p._id} 
+                                  className="p-3 flex items-center gap-3 cursor-pointer border-b border-slate-50 last:border-none hover:bg-slate-50 transition-colors"
+                                  onClick={() => handleSelectProduct(p.slug)}
+                                >
+                                  <img src={p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl} alt={p.name} className="w-8 h-8 object-contain" />
+                                  <div className="flex-1 text-[13px] font-semibold text-slate-700 truncate">{p.name}</div>
+                                </div>
                               ))}
                           </div>
                         )}
-                        <button style={{ marginTop: '10px', fontSize: '12px', background: 'none', border: 'none', color: '#888', cursor: 'pointer' }} onClick={() => { setActiveSearchSlot(null); setSearchCompare(''); }}>Hủy</button>
+                        <button className="mt-3 text-xs bg-transparent border-none text-slate-400 cursor-pointer hover:text-slate-600 w-full" onClick={() => { setActiveSearchSlot(null); setSearchCompare(''); }}>Hủy</button>
                       </div>
                     )}
                   </div>
@@ -310,24 +313,24 @@ function ProductCompare() {
             </div>
 
             {/* BẢNG SO SÁNH */}
-            <div className="compare-table-wrapper">
-              <div className="compare-table-row table-header-labels">
-                <div className="compare-cell bold-text">Thông số kỹ thuật</div>
-                <div className="compare-cell bold-text">{product1?.name || "-"}</div>
-                <div className="compare-cell bold-text">{product2?.name || "-"}</div>
+            <div className="p-0 md:p-5 md:pb-10 bg-white">
+              <div className="flex bg-slate-50 border-b-2 border-slate-200 py-4 font-bold text-slate-800 text-sm md:text-base">
+                <div className="flex-[0.8] px-5 text-left">Thông số kỹ thuật</div>
+                <div className="flex-1 px-5 text-center truncate">{product1?.name || "-"}</div>
+                <div className="flex-1 px-5 text-center truncate">{product2?.name || "-"}</div>
               </div>
 
               {combinedSpecs.map((group, gIdx) => (
-                <div key={gIdx} className="compare-group-section">
-                  <div className="compare-group-title">
-                    {group.groupName.toUpperCase()}
+                <div key={gIdx} className="w-full">
+                  <div className="bg-blue-50/50 text-blue-700 font-extrabold text-[12px] md:text-[13px] py-3 px-5 uppercase tracking-wider">
+                    {group.groupName}
                   </div>
                   
                   {group.items.map((item, iIdx) => (
-                    <div key={iIdx} className="compare-table-row">
-                      <div className="compare-cell spec-label">{item.key}</div>
-                      <div className="compare-cell spec-value" dangerouslySetInnerHTML={{ __html: item.p1Value.replace(/\n/g, '<br/>') }}></div>
-                      <div className="compare-cell spec-value" dangerouslySetInnerHTML={{ __html: item.p2Value.replace(/\n/g, '<br/>') }}></div>
+                    <div key={iIdx} className="flex border-b border-slate-100 transition-colors hover:bg-slate-50/50">
+                      <div className="flex-[0.8] px-5 py-4 text-[13px] md:text-sm text-slate-500 font-medium">{item.key}</div>
+                      <div className="flex-1 px-5 py-4 text-[13px] md:text-sm text-slate-800 font-semibold text-center leading-relaxed" dangerouslySetInnerHTML={{ __html: item.p1Value.replace(/\n/g, '<br/>') }}></div>
+                      <div className="flex-1 px-5 py-4 text-[13px] md:text-sm text-slate-800 font-semibold text-center leading-relaxed" dangerouslySetInnerHTML={{ __html: item.p2Value.replace(/\n/g, '<br/>') }}></div>
                     </div>
                   ))}
                 </div>
@@ -335,23 +338,23 @@ function ProductCompare() {
             </div>
 
             {/* Support Footer Banner */}
-            <div className="compare-support-banner">
-              <div className="support-banner-content">
-                <div className="support-text">
-                  <h3>Vẫn còn phân vân?</h3>
-                  <p>Liên hệ đội ngũ tư vấn viên của TechNova để được hỗ trợ tốt nhất.</p>
+            <div className="bg-slate-100/80 p-8 md:p-10 m-5 rounded-2xl border border-slate-200">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="text-center md:text-left">
+                  <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-1">Vẫn còn phân vân?</h3>
+                  <p className="text-slate-500 m-0">Liên hệ đội ngũ tư vấn viên của TechNova để được hỗ trợ tốt nhất.</p>
                 </div>
-                <div className="support-actions">
-                  <Link to="/contact" className="btn-outline-primary">Chat với chuyên gia</Link>
-                  <a href="tel:18001234" className="btn-primary-solid">Gọi 1800 1234</a>
+                <div className="flex gap-4 w-full md:w-auto">
+                  <Link to="/contact" className="flex-1 md:flex-none text-center border border-blue-600 text-blue-600 bg-white py-3 px-6 rounded-xl font-bold transition-all hover:bg-blue-50">Chat với chuyên gia</Link>
+                  <a href="tel:18001234" className="flex-1 md:flex-none text-center bg-blue-600 text-white py-3 px-6 rounded-xl font-bold transition-all hover:bg-blue-700 shadow-lg shadow-blue-600/20">Gọi 1800 1234</a>
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="empty-compare-state">
-            <p>Vui lòng chọn sản phẩm để so sánh.</p>
-            <Link to="/phones" className="btn-primary-solid">Xem danh sách điện thoại</Link>
+          <div className="text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <p className="text-slate-500 mb-6 text-lg">Vui lòng chọn sản phẩm để so sánh.</p>
+            <Link to="/phones" className="inline-block bg-blue-600 text-white py-3 px-8 rounded-xl font-bold transition-all hover:bg-blue-700 shadow-lg shadow-blue-600/20">Xem danh sách điện thoại</Link>
           </div>
         )}
       </div>

@@ -1,7 +1,7 @@
+import React from "react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import { Shield, Lock, Eye, Database, Bell, UserCheck, RefreshCw, Mail } from "lucide-react";
-import "./PrivacyPolicy.css";
 
 const sections = [
   {
@@ -63,43 +63,71 @@ const sections = [
 
 function PrivacyPolicy() {
   return (
-    <div className="policy-page">
+    <div className="bg-slate-50 min-h-screen font-sans">
       <Header />
-      <div className="policy-hero">
-        <div className="policy-hero-content">
-          <div className="policy-hero-icon"><Shield size={40} /></div>
-          <h1>Chính sách Bảo mật</h1>
-          <p>Tại TechNova, chúng tôi đặt sự riêng tư và bảo mật thông tin của bạn lên hàng đầu. Trang này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu cá nhân của bạn.</p>
-          <span className="policy-updated">Cập nhật lần cuối: 25 tháng 3, 2025</span>
+      
+      {/* HERO SECTION */}
+      <div className="py-12 px-5 text-center border-b border-slate-200 bg-slate-50 text-slate-900">
+        <div className="max-w-[700px] mx-auto">
+          <div className="inline-flex items-center justify-center bg-blue-50 text-blue-600 border border-blue-200 rounded-2xl w-[72px] h-[72px] mb-5">
+            <Shield size={40} />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-extrabold mb-4 text-slate-900">Chính sách Bảo mật</h1>
+          <p className="text-base md:text-lg text-slate-600 leading-relaxed mb-5">
+            Tại TechNova, chúng tôi đặt sự riêng tư và bảo mật thông tin của bạn lên hàng đầu. 
+            Trang này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu cá nhân của bạn.
+          </p>
+          <span className="inline-block bg-blue-50 border border-blue-200 rounded-full px-4 py-1.5 text-[13px] text-blue-600 font-medium">
+            Cập nhật lần cuối: 25 tháng 3, 2025
+          </span>
         </div>
       </div>
 
-      <div className="policy-container">
-        <div className="policy-intro-card">
-          <p>Bằng cách sử dụng website <strong>technova.vn</strong>, bạn đồng ý với các điều khoản được mô tả trong chính sách này. Chúng tôi cam kết tuân thủ Luật An toàn thông tin mạng và các quy định bảo vệ dữ liệu cá nhân hiện hành của Việt Nam.</p>
+      <div className="max-w-[860px] mx-auto py-12 px-6 md:py-16 md:px-8">
+        
+        {/* INTRO CARD */}
+        <div className="bg-blue-50 border border-blue-200 border-l-4 border-l-blue-600 rounded-xl p-5 md:p-6 mb-8 text-[15px] text-slate-800 leading-relaxed">
+          <p className="m-0">
+            Bằng cách sử dụng website <strong className="text-blue-900 font-bold">technova.vn</strong>, bạn đồng ý với các điều khoản được mô tả trong chính sách này. 
+            Chúng tôi cam kết tuân thủ Luật An toàn thông tin mạng và các quy định bảo vệ dữ liệu cá nhân hiện hành của Việt Nam.
+          </p>
         </div>
 
-        <div className="policy-sections">
+        {/* SECTIONS */}
+        <div className="flex flex-col gap-5">
           {sections.map((sec, idx) => (
-            <div key={idx} className="policy-section-card">
-              <div className="policy-section-header">
-                <div className="policy-icon-box">{sec.icon}</div>
-                <h2>{sec.title}</h2>
+            <div key={idx} className="bg-white rounded-2xl p-7 md:p-8 shadow-sm border border-slate-200 transition-shadow hover:shadow-md">
+              <div className="flex items-center gap-3.5 mb-4.5">
+                <div className="bg-blue-50 text-blue-600 rounded-xl p-2.5 flex shrink-0">
+                  {sec.icon}
+                </div>
+                <h2 className="text-lg font-bold text-slate-900 m-0">{sec.title}</h2>
               </div>
-              <ul className="policy-list">
+              <ul className="list-none p-0 m-0 flex flex-col gap-3">
                 {sec.content.map((item, i) => (
-                  <li key={i} dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />
+                  <li 
+                    key={i} 
+                    className="relative pl-5 text-[15px] text-slate-600 leading-relaxed 
+                               before:content-['●'] before:absolute before:left-0 before:text-blue-500 before:text-[10px] before:top-[2px]"
+                    dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} 
+                  />
                 ))}
               </ul>
             </div>
           ))}
         </div>
 
-        <div className="policy-contact-card">
-          <Mail size={28} />
+        {/* CONTACT CARD */}
+        <div className="flex flex-col md:flex-row items-start gap-5 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-2xl p-7 md:p-8 mt-8 shadow-lg">
+          <Mail size={28} className="shrink-0 text-blue-200" />
           <div>
-            <h3>Liên hệ về vấn đề bảo mật</h3>
-            <p>Nếu bạn có bất kỳ câu hỏi nào liên quan đến chính sách này, vui lòng gửi email cho chúng tôi tại <a href="mailto:privacy@technova.vn">privacy@technova.vn</a> hoặc gọi hotline <strong>1900 1234</strong>.</p>
+            <h3 className="text-lg font-bold m-0 mb-2">Liên hệ về vấn đề bảo mật</h3>
+            <p className="m-0 text-[15px] leading-relaxed text-blue-50/90">
+              Nếu bạn có bất kỳ câu hỏi nào liên quan đến chính sách này, vui lòng gửi email cho chúng tôi tại 
+              <a href="mailto:privacy@technova.vn" className="text-yellow-400 font-semibold underline ml-1 hover:text-yellow-300 transition-colors">
+                privacy@technova.vn
+              </a> hoặc gọi hotline <strong className="text-white">1900 1234</strong>.
+            </p>
           </div>
         </div>
       </div>

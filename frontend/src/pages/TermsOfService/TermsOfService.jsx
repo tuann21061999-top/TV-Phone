@@ -69,43 +69,66 @@ const sections = [
 
 function TermsOfService() {
   return (
-    <div className="terms-page">
+    <div className="bg-slate-50 min-h-screen font-sans">
       <Header />
-      <div className="terms-hero">
-        <div className="terms-hero-content">
-          <div className="terms-hero-icon"><FileText size={40} /></div>
-          <h1>Điều khoản Dịch vụ</h1>
-          <p>Vui lòng đọc kỹ các điều khoản và điều kiện này trước khi sử dụng dịch vụ của TechNova. Bằng cách truy cập hoặc sử dụng website, bạn đồng ý bị ràng buộc bởi các điều khoản này.</p>
-          <span className="terms-updated">Cập nhật lần cuối: 25 tháng 3, 2025</span>
+      
+      {/* HERO SECTION */}
+      <div className="bg-slate-50 border-b border-slate-200 py-12 px-5 text-center text-slate-900">
+        <div className="max-w-[700px] mx-auto">
+          <div className="inline-flex items-center justify-center bg-emerald-50 text-emerald-600 border-[1.5px] border-emerald-200 rounded-2xl w-[72px] h-[72px] mb-5">
+            <FileText size={40} />
+          </div>
+          <h1 className="text-3xl md:text-4xl font-extrabold m-0 mb-4 text-slate-900">Điều khoản Dịch vụ</h1>
+          <p className="text-base text-slate-600 leading-relaxed m-0 mb-5">
+            Vui lòng đọc kỹ các điều khoản và điều kiện này trước khi sử dụng dịch vụ của TechNova. Bằng cách truy cập hoặc sử dụng website, bạn đồng ý bị ràng buộc bởi các điều khoản này.
+          </p>
+          <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-full py-1.5 px-4 text-[13px] text-emerald-600 font-medium">
+            Cập nhật lần cuối: 25 tháng 3, 2025
+          </span>
         </div>
       </div>
 
-      <div className="terms-container">
-        <div className="terms-intro-card">
-          <p>Các điều khoản này áp dụng cho tất cả người dùng của website <strong>technova.vn</strong>, bao gồm khách truy cập, người mua hàng và bất kỳ người nào tương tác với nội dung hoặc dịch vụ của chúng tôi.</p>
+      {/* CONTAINER */}
+      <div className="max-w-[860px] mx-auto py-12 px-6 md:px-8 pb-16">
+        
+        {/* INTRO CARD */}
+        <div className="bg-emerald-50 border border-emerald-200 border-l-4 border-l-emerald-600 rounded-xl py-5 px-6 mb-8 text-emerald-900 text-[15px] leading-relaxed">
+          <p className="m-0">
+            Các điều khoản này áp dụng cho tất cả người dùng của website <strong className="font-bold">technova.vn</strong>, bao gồm khách truy cập, người mua hàng và bất kỳ người nào tương tác với nội dung hoặc dịch vụ của chúng tôi.
+          </p>
         </div>
 
-        <div className="terms-sections">
+        {/* SECTIONS */}
+        <div className="flex flex-col gap-5">
           {sections.map((sec, idx) => (
-            <div key={idx} className="terms-section-card">
-              <div className="terms-section-header">
-                <div className="terms-icon-box">{sec.icon}</div>
-                <h2>{sec.title}</h2>
+            <div key={idx} className="bg-white rounded-2xl p-6 md:p-8 shadow-[0_2px_12px_rgba(0,0,0,0.04)] border border-slate-200 transition-shadow hover:shadow-md">
+              <div className="flex items-center gap-3.5 mb-4">
+                <div className="bg-emerald-50 text-emerald-600 rounded-xl p-2.5 flex items-center justify-center shrink-0">
+                  {sec.icon}
+                </div>
+                <h2 className="text-lg text-slate-900 m-0 font-bold">{sec.title}</h2>
               </div>
-              <ul className="terms-list">
+              <ul className="list-none p-0 m-0 flex flex-col gap-3">
                 {sec.content.map((item, i) => (
-                  <li key={i} dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} />
+                  <li 
+                    key={i} 
+                    className="relative pl-5 text-[15px] text-slate-700 leading-relaxed before:content-['●'] before:absolute before:left-0 before:text-emerald-500 before:text-[10px] before:top-[7px]"
+                    dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} 
+                  />
                 ))}
               </ul>
             </div>
           ))}
         </div>
 
-        <div className="terms-contact-card">
-          <Phone size={28} />
+        {/* CONTACT CARD */}
+        <div className="flex flex-col md:flex-row items-start gap-5 bg-gradient-to-br from-emerald-800 to-emerald-600 text-white rounded-2xl p-6 md:p-8 mt-8 shadow-lg">
+          <Phone size={28} className="shrink-0 text-emerald-200" />
           <div>
-            <h3>Cần hỗ trợ thêm?</h3>
-            <p>Nếu bạn có thắc mắc về điều khoản dịch vụ, hãy liên hệ với chúng tôi qua email <a href="mailto:support@technova.vn">support@technova.vn</a> hoặc gọi <strong>1900 1234</strong> (miễn phí, 8:00–21:00 hàng ngày).</p>
+            <h3 className="text-lg m-0 mb-2 font-bold">Cần hỗ trợ thêm?</h3>
+            <p className="m-0 text-[15px] leading-relaxed text-white/90">
+              Nếu bạn có thắc mắc về điều khoản dịch vụ, hãy liên hệ với chúng tôi qua email <a href="mailto:support@technova.vn" className="text-yellow-400 font-semibold underline hover:text-yellow-300 transition-colors">support@technova.vn</a> hoặc gọi <strong className="font-bold text-white">1900 1234</strong> (miễn phí, 8:00–21:00 hàng ngày).
+            </p>
           </div>
         </div>
       </div>

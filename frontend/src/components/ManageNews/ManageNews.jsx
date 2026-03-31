@@ -5,7 +5,6 @@ import {
     Plus, Edit, Trash2, Search, X, Image as ImageIcon,
     Type, ArrowUp, ArrowDown, Link2
 } from "lucide-react";
-import "./ManageNews.css";
 
 const API = "http://localhost:5000/api";
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -205,49 +204,69 @@ function ManageNews() {
 
     /* ===== RENDER ===== */
     return (
-        <div className="manage-news-container">
-            <div className="manage-header">
-                <h2>Quản lý Tin tức</h2>
-                <button className="add-btn" onClick={openAddModal}><Plus size={18} /> Thêm bài viết</button>
+        <div className="p-6 bg-slate-50 min-h-screen">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-slate-800">Quản lý Tin tức</h2>
+                <button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white py-2.5 px-4 rounded-lg font-semibold transition-colors" onClick={openAddModal}>
+                    <Plus size={18} /> Thêm bài viết
+                </button>
             </div>
 
-            <div className="controls-bar">
-                <div className="search-box">
-                    <Search size={18} className="search-icon" />
-                    <input type="text" placeholder="Tìm kiếm tiêu đề…" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <div className="mb-5">
+                <div className="flex items-center bg-white border border-slate-200 rounded-lg px-4 w-[350px]">
+                    <Search size={18} className="text-slate-400" />
+                    <input 
+                        type="text" 
+                        placeholder="Tìm kiếm tiêu đề…" 
+                        value={searchTerm} 
+                        onChange={(e) => setSearchTerm(e.target.value)} 
+                        className="border-none outline-none py-3 px-2.5 w-full text-sm"
+                    />
                 </div>
             </div>
 
             {/* TABLE */}
-            <div className="table-responsive">
-                <table className="admin-table">
+            <div className="bg-white rounded-xl shadow-sm overflow-x-auto">
+                <table className="w-full border-collapse">
                     <thead>
                         <tr>
-                            <th>Ảnh bìa</th><th>Tiêu đề</th><th>Danh mục</th><th>Sản phẩm</th><th>Ngày tạo</th><th>Lượt xem</th><th>Trạng thái</th><th>Hành động</th>
+                            <th className="p-3.5 px-4 text-left border-b border-slate-100 text-sm bg-slate-50 font-semibold text-slate-600">Ảnh bìa</th>
+                            <th className="p-3.5 px-4 text-left border-b border-slate-100 text-sm bg-slate-50 font-semibold text-slate-600">Tiêu đề</th>
+                            <th className="p-3.5 px-4 text-left border-b border-slate-100 text-sm bg-slate-50 font-semibold text-slate-600">Danh mục</th>
+                            <th className="p-3.5 px-4 text-left border-b border-slate-100 text-sm bg-slate-50 font-semibold text-slate-600">Sản phẩm</th>
+                            <th className="p-3.5 px-4 text-left border-b border-slate-100 text-sm bg-slate-50 font-semibold text-slate-600">Ngày tạo</th>
+                            <th className="p-3.5 px-4 text-left border-b border-slate-100 text-sm bg-slate-50 font-semibold text-slate-600">Lượt xem</th>
+                            <th className="p-3.5 px-4 text-left border-b border-slate-100 text-sm bg-slate-50 font-semibold text-slate-600">Trạng thái</th>
+                            <th className="p-3.5 px-4 text-left border-b border-slate-100 text-sm bg-slate-50 font-semibold text-slate-600">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan="8" className="text-center">Đang tải dữ liệu…</td></tr>
+                            <tr><td colSpan="8" className="text-center p-10 text-slate-400">Đang tải dữ liệu…</td></tr>
                         ) : filteredNews.length === 0 ? (
-                            <tr><td colSpan="8" className="text-center">Chưa có bài viết nào.</td></tr>
+                            <tr><td colSpan="8" className="text-center p-10 text-slate-400">Chưa có bài viết nào.</td></tr>
                         ) : (
                             filteredNews.map((n) => (
                                 <tr key={n._id}>
-                                    <td><img src={n.thumbnail} alt="" className="news-thumb-sm" /></td>
-                                    <td className="news-title-cell"><strong>{n.title}</strong></td>
-                                    <td><span className="badge category-badge">{n.category}</span></td>
-                                    <td>{n.relatedProduct?.name || "—"}</td>
-                                    <td>{new Date(n.createdAt).toLocaleDateString("vi-VN")}</td>
-                                    <td>{n.views}</td>
-                                    <td>
-                                        <button className={`status-btn ${n.isActive ? "active" : "inactive"}`} onClick={() => toggleStatus(n._id)}>
+                                    <td className="p-3.5 px-4 border-b border-slate-100"><img src={n.thumbnail} alt="" className="w-20 h-[50px] object-cover rounded-md" /></td>
+                                    <td className="p-3.5 px-4 border-b border-slate-100 max-w-[220px] whitespace-nowrap overflow-hidden text-ellipsis text-sm text-slate-700"><strong>{n.title}</strong></td>
+                                    <td className="p-3.5 px-4 border-b border-slate-100"><span className="py-1 px-2.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">{n.category}</span></td>
+                                    <td className="p-3.5 px-4 border-b border-slate-100 text-sm text-slate-700">{n.relatedProduct?.name || "—"}</td>
+                                    <td className="p-3.5 px-4 border-b border-slate-100 text-sm text-slate-700">{new Date(n.createdAt).toLocaleDateString("vi-VN")}</td>
+                                    <td className="p-3.5 px-4 border-b border-slate-100 text-sm text-slate-700">{n.views}</td>
+                                    <td className="p-3.5 px-4 border-b border-slate-100">
+                                        <button 
+                                            className={`py-1.5 px-3 rounded-full text-xs font-semibold ${n.isActive ? "bg-green-100 text-green-600" : "bg-red-50 text-red-600"}`} 
+                                            onClick={() => toggleStatus(n._id)}
+                                        >
                                             {n.isActive ? "Hiển thị" : "Đã ẩn"}
                                         </button>
                                     </td>
-                                    <td className="actions-cell">
-                                        <button className="action-btn edit" onClick={() => openEditModal(n)}><Edit size={16} /></button>
-                                        <button className="action-btn delete" onClick={() => handleDelete(n._id)}><Trash2 size={16} /></button>
+                                    <td className="p-3.5 px-4 border-b border-slate-100">
+                                        <div className="flex gap-2.5">
+                                            <button className="bg-slate-100 w-8 h-8 rounded-md flex items-center justify-center text-slate-600 hover:bg-blue-50 hover:text-blue-500 transition-colors" onClick={() => openEditModal(n)}><Edit size={16} /></button>
+                                            <button className="bg-slate-100 w-8 h-8 rounded-md flex items-center justify-center text-slate-600 hover:bg-red-50 hover:text-red-500 transition-colors" onClick={() => handleDelete(n._id)}><Trash2 size={16} /></button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))
@@ -258,69 +277,86 @@ function ManageNews() {
 
             {/* MODAL */}
             {showModal && (
-                <div className="modal-overlay" onClick={closeModal}>
-                    <div className="news-modal-content" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3>{formConfig.title}</h3>
-                            <button className="close-btn" onClick={closeModal}><X size={24} /></button>
+                <div className="fixed inset-0 bg-black/45 flex justify-center items-start py-8 z-[9999] overflow-y-auto" onClick={closeModal}>
+                    <div className="bg-white w-[860px] max-w-[95%] rounded-2xl p-7" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
+                            <h3 className="text-xl font-bold text-slate-800">{formConfig.title}</h3>
+                            <button className="text-slate-400 hover:text-red-500 transition-colors" onClick={closeModal}><X size={24} /></button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="news-form">
+                        <form onSubmit={handleSubmit}>
                             {/* Row 1: Title + Category */}
-                            <div className="form-row">
-                                <div className="form-group flex-2">
-                                    <label>Tiêu đề <span className="req">*</span></label>
-                                    <input type="text" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Nhập tiêu đề bài viết…" />
+                            <div className="flex gap-5 mb-4">
+                                <div className="flex-[2] mb-4">
+                                    <label className="flex items-center gap-1.5 font-medium text-slate-800 mb-2 text-sm">Tiêu đề <span className="text-red-500">*</span></label>
+                                    <input 
+                                        type="text" required value={form.title} 
+                                        onChange={(e) => setForm({ ...form, title: e.target.value })} 
+                                        placeholder="Nhập tiêu đề bài viết…" 
+                                        className="w-full py-2.5 px-3 border border-slate-300 rounded-md text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                                    />
                                 </div>
-                                <div className="form-group flex-1">
-                                    <label>Danh mục <span className="req">*</span></label>
-                                    <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+                                <div className="flex-1 mb-4">
+                                    <label className="flex items-center gap-1.5 font-medium text-slate-800 mb-2 text-sm">Danh mục <span className="text-red-500">*</span></label>
+                                    <select 
+                                        value={form.category} 
+                                        onChange={(e) => setForm({ ...form, category: e.target.value })}
+                                        className="w-full py-2.5 px-3 border border-slate-300 rounded-md text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                                    >
                                         {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
                             </div>
 
                             {/* Short Desc */}
-                            <div className="form-group">
-                                <label>Mô tả ngắn <span className="req">*</span></label>
-                                <textarea rows="2" required value={form.shortDescription} onChange={(e) => setForm({ ...form, shortDescription: e.target.value })} placeholder="Đoạn mô tả ngắn hiển thị trên trang chủ…" />
+                            <div className="mb-4">
+                                <label className="flex items-center gap-1.5 font-medium text-slate-800 mb-2 text-sm">Mô tả ngắn <span className="text-red-500">*</span></label>
+                                <textarea 
+                                    rows="2" required value={form.shortDescription} 
+                                    onChange={(e) => setForm({ ...form, shortDescription: e.target.value })} 
+                                    placeholder="Đoạn mô tả ngắn hiển thị trên trang chủ…" 
+                                    className="w-full py-2.5 px-3 border border-slate-300 rounded-md text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 resize-y"
+                                />
                             </div>
 
                             {/* Thumbnail */}
-                            <div className="form-row align-center">
-                                <div className="form-group flex-1">
-                                    <label>Ảnh bìa <span className="req">*</span></label>
+                            <div className="flex gap-5 mb-4 items-center">
+                                <div className="flex-1 mb-4">
+                                    <label className="flex items-center gap-1.5 font-medium text-slate-800 mb-2 text-sm">Ảnh bìa <span className="text-red-500">*</span></label>
                                     <input type="file" id="news-thumb" accept="image/*" onChange={handleThumbUpload} hidden />
-                                    <label htmlFor="news-thumb" className="upload-label-btn"><ImageIcon size={16} /> Chọn ảnh bìa</label>
+                                    <label htmlFor="news-thumb" className="inline-flex items-center gap-2 bg-slate-100 text-slate-600 py-2.5 px-4 rounded-md cursor-pointer font-medium border border-dashed border-slate-300 hover:bg-slate-200 transition-colors">
+                                        <ImageIcon size={16} /> Chọn ảnh bìa
+                                    </label>
                                 </div>
-                                <div className="form-group flex-1">
-                                    {thumbPreview && <div className="preview-img-box"><img src={thumbPreview} alt="Preview" /></div>}
+                                <div className="flex-1 mb-4">
+                                    {thumbPreview && <div className="w-[150px] h-[90px] rounded-md overflow-hidden border border-slate-200"><img src={thumbPreview} alt="Preview" className="w-full h-full object-cover" /></div>}
                                 </div>
                             </div>
 
                             {/* Product Selector */}
-                            <div className="form-group">
-                                <label><Link2 size={14} /> Liên kết sản phẩm (tùy chọn)</label>
-                                <div className="product-selector">
+                            <div className="mb-4 relative">
+                                <label className="flex items-center gap-1.5 font-medium text-slate-800 mb-2 text-sm"><Link2 size={14} /> Liên kết sản phẩm (tùy chọn)</label>
+                                <div>
                                     <input
                                         type="text"
                                         placeholder="Tìm tên sản phẩm…"
                                         value={productSearch}
                                         onChange={(e) => { setProductSearch(e.target.value); setForm({ ...form, relatedProduct: "" }); }}
+                                        className="w-full py-2.5 px-3 border border-slate-300 rounded-md text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
                                     />
                                     {productSearch && !form.relatedProduct && (
-                                        <div className="product-dropdown">
+                                        <div className="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-lg shadow-xl max-h-[240px] overflow-y-auto z-50">
                                             {filteredProducts.slice(0, 8).map((p) => (
-                                                <div key={p._id} className="product-option" onClick={() => { setForm({ ...form, relatedProduct: p._id }); setProductSearch(p.name); }}>
-                                                    {p.colorImages?.[0]?.images?.[0] && <img src={p.colorImages[0].images[0]} alt="" className="product-option-img" />}
+                                                <div key={p._id} className="flex items-center gap-2.5 p-2.5 px-3.5 cursor-pointer text-sm hover:bg-slate-50" onClick={() => { setForm({ ...form, relatedProduct: p._id }); setProductSearch(p.name); }}>
+                                                    {p.colorImages?.[0]?.images?.[0] && <img src={p.colorImages[0].images[0]} alt="" className="w-9 h-9 object-cover rounded border border-slate-200" />}
                                                     <span>{p.name}</span>
                                                 </div>
                                             ))}
-                                            {filteredProducts.length === 0 && <div className="product-option disabled">Không tìm thấy sản phẩm</div>}
+                                            {filteredProducts.length === 0 && <div className="p-2.5 px-3.5 text-sm text-slate-400 cursor-default">Không tìm thấy sản phẩm</div>}
                                         </div>
                                     )}
                                     {form.relatedProduct && (
-                                        <button type="button" className="clear-product" onClick={() => { setForm({ ...form, relatedProduct: "" }); setProductSearch(""); }}>
+                                        <button type="button" className="inline-flex items-center gap-1 mt-2 py-1 px-2.5 text-xs text-red-500 bg-red-50 rounded cursor-pointer" onClick={() => { setForm({ ...form, relatedProduct: "" }); setProductSearch(""); }}>
                                             <X size={14} /> Bỏ liên kết
                                         </button>
                                     )}
@@ -328,17 +364,17 @@ function ManageNews() {
                             </div>
 
                             {/* ===== BLOCK EDITOR ===== */}
-                            <div className="form-group">
-                                <label>Nội dung bài viết <span className="req">*</span></label>
-                                <div className="block-editor">
+                            <div className="mb-4">
+                                <label className="flex items-center gap-1.5 font-medium text-slate-800 mb-2 text-sm">Nội dung bài viết <span className="text-red-500">*</span></label>
+                                <div className="border border-slate-200 rounded-xl p-4 bg-slate-50">
                                     {form.contentBlocks.map((block, idx) => (
-                                        <div key={idx} className="block-item">
-                                            <div className="block-toolbar">
-                                                <span className="block-type-label">{block.type === "text" ? "📝 Văn bản" : "🖼️ Ảnh"} #{idx + 1}</span>
-                                                <div className="block-actions">
-                                                    <button type="button" onClick={() => moveBlock(idx, -1)} disabled={idx === 0}><ArrowUp size={14} /></button>
-                                                    <button type="button" onClick={() => moveBlock(idx, 1)} disabled={idx === form.contentBlocks.length - 1}><ArrowDown size={14} /></button>
-                                                    <button type="button" className="block-delete" onClick={() => removeBlock(idx)}><Trash2 size={14} /></button>
+                                        <div key={idx} className="bg-white border border-slate-200 rounded-lg mb-3 overflow-hidden">
+                                            <div className="flex justify-between items-center p-2 px-3 bg-slate-50 border-b border-slate-100">
+                                                <span className="text-xs font-semibold text-slate-500">{block.type === "text" ? "📝 Văn bản" : "🖼️ Ảnh"} #{idx + 1}</span>
+                                                <div className="flex gap-1.5">
+                                                    <button type="button" className="bg-slate-100 w-[26px] h-[26px] rounded flex items-center justify-center text-slate-600 hover:bg-slate-200 disabled:opacity-35 disabled:cursor-not-allowed" onClick={() => moveBlock(idx, -1)} disabled={idx === 0}><ArrowUp size={14} /></button>
+                                                    <button type="button" className="bg-slate-100 w-[26px] h-[26px] rounded flex items-center justify-center text-slate-600 hover:bg-slate-200 disabled:opacity-35 disabled:cursor-not-allowed" onClick={() => moveBlock(idx, 1)} disabled={idx === form.contentBlocks.length - 1}><ArrowDown size={14} /></button>
+                                                    <button type="button" className="bg-slate-100 w-[26px] h-[26px] rounded flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors" onClick={() => removeBlock(idx)}><Trash2 size={14} /></button>
                                                 </div>
                                             </div>
 
@@ -348,17 +384,17 @@ function ManageNews() {
                                                     value={block.value}
                                                     onChange={(e) => updateBlock(idx, e.target.value)}
                                                     placeholder="Nhập nội dung văn bản (hỗ trợ HTML)…"
-                                                    className="block-textarea"
+                                                    className="w-full p-3 text-sm outline-none resize-y min-h-[80px]"
                                                 />
                                             ) : (
-                                                <div className="block-image-row">
+                                                <div className="p-4 text-center">
                                                     {block.value ? (
-                                                        <div className="block-image-preview">
-                                                            <img src={block.value} alt={`Block ${idx}`} />
-                                                            <button type="button" className="change-img-btn" onClick={() => document.getElementById(`block-img-${idx}`).click()}>Đổi ảnh</button>
+                                                        <div className="relative inline-block">
+                                                            <img src={block.value} alt={`Block ${idx}`} className="max-w-full max-h-[250px] rounded-lg object-contain" />
+                                                            <button type="button" className="absolute bottom-2 right-2 bg-black/60 text-white py-1 px-2.5 rounded text-xs cursor-pointer hover:bg-black/80" onClick={() => document.getElementById(`block-img-${idx}`).click()}>Đổi ảnh</button>
                                                         </div>
                                                     ) : (
-                                                        <label htmlFor={`block-img-${idx}`} className="upload-label-btn"><ImageIcon size={16} /> Chọn ảnh</label>
+                                                        <label htmlFor={`block-img-${idx}`} className="inline-flex items-center gap-2 bg-slate-100 text-slate-600 py-2.5 px-4 rounded-md cursor-pointer font-medium border border-dashed border-slate-300 hover:bg-slate-200"><ImageIcon size={16} /> Chọn ảnh</label>
                                                     )}
                                                     <input type="file" id={`block-img-${idx}`} accept="image/*" onChange={(e) => handleBlockImageUpload(idx, e)} hidden />
                                                 </div>
@@ -366,22 +402,22 @@ function ManageNews() {
                                         </div>
                                     ))}
 
-                                    <div className="add-block-row">
-                                        <button type="button" className="add-block-btn text" onClick={() => addBlock("text")}><Type size={16} /> + Văn bản</button>
-                                        <button type="button" className="add-block-btn image" onClick={() => addBlock("image")}><ImageIcon size={16} /> + Ảnh</button>
+                                    <div className="flex gap-3 justify-center pt-2">
+                                        <button type="button" className="flex items-center gap-1.5 py-2.5 px-5 rounded-lg font-semibold text-sm cursor-pointer border border-dashed bg-blue-50 text-blue-500 border-blue-300 hover:bg-blue-100 transition-colors" onClick={() => addBlock("text")}><Type size={16} /> + Văn bản</button>
+                                        <button type="button" className="flex items-center gap-1.5 py-2.5 px-5 rounded-lg font-semibold text-sm cursor-pointer border border-dashed bg-green-50 text-green-600 border-green-300 hover:bg-green-100 transition-colors" onClick={() => addBlock("image")}><ImageIcon size={16} /> + Ảnh</button>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Footer */}
-                            <div className="modal-footer">
-                                <label className="switch-label">
-                                    <input type="checkbox" checked={form.isActive} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} />
+                            <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-200">
+                                <label className="flex items-center gap-2.5 cursor-pointer text-sm">
+                                    <input type="checkbox" checked={form.isActive} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} className="w-[18px] h-[18px] cursor-pointer" />
                                     <span>Công khai</span>
                                 </label>
-                                <div className="footer-btns">
-                                    <button type="button" className="btn-cancel" onClick={closeModal} disabled={isSubmitting}>Hủy</button>
-                                    <button type="submit" className="btn-save" disabled={isSubmitting}>{isSubmitting ? "Đang lưu…" : "Lưu bài viết"}</button>
+                                <div className="flex gap-3">
+                                    <button type="button" className="py-2.5 px-5 bg-white border border-slate-300 rounded-md font-medium text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors" onClick={closeModal} disabled={isSubmitting}>Hủy</button>
+                                    <button type="submit" className="py-2.5 px-6 bg-emerald-500 hover:bg-emerald-600 text-white rounded-md font-semibold cursor-pointer disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors" disabled={isSubmitting}>{isSubmitting ? "Đang lưu…" : "Lưu bài viết"}</button>
                                 </div>
                             </div>
                         </form>

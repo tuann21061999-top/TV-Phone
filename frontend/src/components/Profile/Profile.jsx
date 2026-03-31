@@ -15,14 +15,13 @@ import axios from "axios";
 import AddressModal from "./AddressModal";
 import PaymentModal from "./PaymentModal";
 import ProductCard from "../Product/ProductCard";
-import "./Profile.css";
 
 const Profile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const tabFromUrl = queryParams.get("tab");
-  
+
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState(tabFromUrl || "info");
 
@@ -133,14 +132,15 @@ const Profile = () => {
   };
 
   const renderSidebarAvatar = () => (
-    <div className="avatar-wrapper">
-      <div className="avatar-main">
+    <div className="flex flex-col items-center px-5 pb-5 border-b border-slate-100 mb-4">
+      <div className="relative w-24 h-24 mb-4">
         {user.avatar ? (
-          <img src={user.avatar} alt="Avatar" />
+          <img src={user.avatar} alt="Avatar" className="w-full h-full rounded-full object-cover border-[3px] border-blue-50 shadow-[0_4px_12px_rgba(0,0,0,0.08)]" />
         ) : (
           <img
             src={`https://ui-avatars.com/api/?name=${user.name}&background=0D9488&color=fff&size=128`}
             alt="Default Avatar"
+            className="w-full h-full rounded-full object-cover border-[3px] border-blue-50 shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
           />
         )}
       </div>
@@ -153,9 +153,9 @@ const Profile = () => {
         onChange={handleAvatarChange}
       />
 
-      <div className="user-info">
-        <h4>{user.name}</h4>
-        <p className="user-email-sub">{user.email}</p>
+      <div className="text-center">
+        <h4 className="m-0 mb-1.5 text-lg font-semibold text-slate-800">{user.name}</h4>
+        <p className="m-0 text-[13px] text-slate-500">{user.email}</p>
       </div>
     </div>
   );
@@ -256,7 +256,7 @@ const Profile = () => {
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success(`Lưu mã ${voucherInput.toUpperCase()} thành công!`);
       setVoucherInput("");
-      
+
       // Tải lại danh sách voucher để hiển thị mã vừa lưu
       const { data } = await axios.get("http://localhost:5000/api/vouchers/my-vouchers", {
         headers: { Authorization: `Bearer ${token}` },
@@ -478,68 +478,63 @@ const Profile = () => {
   if (!user) return null;
 
   return (
-    <div className="profile-page">
+    <div className="bg-slate-50 min-h-screen font-sans">
       <Header />
 
-      <div className="container profile-container">
-        <div className="profile-grid">
+      <div className="w-full max-w-[1500px] mx-auto px-5 md:px-10 py-8 pb-16">
+        <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6 md:gap-8 items-start">
 
           {/* CỘT TRÁI: SIDEBAR */}
-          <aside className="profile-sidebar-card">
+          <aside className="bg-white rounded-xl py-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
             {renderSidebarAvatar()}
-            {/* Mình ẩn đi user-profile-header cũ của bạn vì renderSidebarAvatar đã có thông tin rồi */}
-            {/* <div className="user-profile-header"> ... </div> */}
 
-            <nav className="profile-menu">
-              <button className={`menu-item ${activeTab === "info" ? "active" : ""}`} onClick={() => setActiveTab("info")}>
+            <nav className="flex flex-col">
+              <button className={`flex items-center gap-3 w-full py-3 px-6 border-none bg-transparent text-sm cursor-pointer transition-all text-left ${activeTab === "info" ? "bg-blue-50 text-blue-600 font-medium border-l-[3px] border-blue-600" : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"}`} onClick={() => setActiveTab("info")}>
                 <User size={18} /> Thông tin cá nhân
               </button>
 
-              <button className={`menu-item ${activeTab === "orders" ? "active" : ""}`} onClick={() => setActiveTab("orders")}>
+              <button className={`flex items-center gap-3 w-full py-3 px-6 border-none bg-transparent text-sm cursor-pointer transition-all text-left ${activeTab === "orders" ? "bg-blue-50 text-blue-600 font-medium border-l-[3px] border-blue-600" : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"}`} onClick={() => setActiveTab("orders")}>
                 <Package size={18} /> Đơn hàng của tôi
               </button>
 
-              <button className={`menu-item ${activeTab === "favorites" ? "active" : ""}`} onClick={() => setActiveTab("favorites")}>
+              <button className={`flex items-center gap-3 w-full py-3 px-6 border-none bg-transparent text-sm cursor-pointer transition-all text-left ${activeTab === "favorites" ? "bg-blue-50 text-blue-600 font-medium border-l-[3px] border-blue-600" : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"}`} onClick={() => setActiveTab("favorites")}>
                 <Heart size={18} /> Sản phẩm yêu thích
               </button>
 
-              <button className={`menu-item ${activeTab === "vouchers" ? "active" : ""}`} onClick={() => setActiveTab("vouchers")}>
+              <button className={`flex items-center gap-3 w-full py-3 px-6 border-none bg-transparent text-sm cursor-pointer transition-all text-left ${activeTab === "vouchers" ? "bg-blue-50 text-blue-600 font-medium border-l-[3px] border-blue-600" : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"}`} onClick={() => setActiveTab("vouchers")}>
                 <Tag size={18} /> Mã giảm giá
               </button>
 
-              <button className={`menu-item ${activeTab === "address" ? "active" : ""}`} onClick={() => setActiveTab("address")}>
+              <button className={`flex items-center gap-3 w-full py-3 px-6 border-none bg-transparent text-sm cursor-pointer transition-all text-left ${activeTab === "address" ? "bg-blue-50 text-blue-600 font-medium border-l-[3px] border-blue-600" : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"}`} onClick={() => setActiveTab("address")}>
                 <MapPin size={18} /> Sổ địa chỉ
               </button>
 
-              <button className={`menu-item ${activeTab === "payment" ? "active" : ""}`} onClick={() => setActiveTab("payment")}>
+              <button className={`flex items-center gap-3 w-full py-3 px-6 border-none bg-transparent text-sm cursor-pointer transition-all text-left ${activeTab === "payment" ? "bg-blue-50 text-blue-600 font-medium border-l-[3px] border-blue-600" : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"}`} onClick={() => setActiveTab("payment")}>
                 <ReceiptText size={18} /> Lịch sử thanh toán
               </button>
 
-              <button className="menu-item logout-text" onClick={handleLogout}>
+              <button className="flex items-center gap-3 w-full py-3 px-6 border-none bg-transparent text-sm cursor-pointer transition-all text-left text-red-500 mt-2.5 border-t border-slate-100 hover:bg-red-50 hover:text-red-600" onClick={handleLogout}>
                 <LogOut size={18} /> Đăng xuất
               </button>
             </nav>
           </aside>
 
           {/* CỘT PHẢI: MAIN CONTENT */}
-          <main className="profile-main-content">
+          <main className="min-w-0">
 
             {/* TAB INFO */}
             {activeTab === "info" && (() => {
               const doneOrders = orders.filter(o => o.status === 'done');
               const totalSpent = doneOrders.reduce((sum, o) => sum + o.total, 0);
-              // Điểm tích lũy (dùng cho cấp bậc)
               const totalPoints = Math.floor(totalSpent / 50000);
-              // Điểm đã đổi
               const totalSpentPoints = redemptionHistory.reduce((s, r) => s + r.pointsSpent, 0);
-              // Điểm khả dụng (dùng để đổi voucher)
               const availablePoints = totalPoints - totalSpentPoints;
 
               const LEVELS = [
-                { name: "Normal",  min: 0,    max: 299,  color: "#64748B", icon: <User      size={20} /> },
-                { name: "Bronze",  min: 300,  max: 999,  color: "#92400E", icon: <Award     size={20} /> },
-                { name: "Silver",  min: 1000, max: 4999, color: "#475569", icon: <Star      size={20} /> },
-                { name: "Gold",    min: 5000, max: Infinity, color: "#B45309", icon: <Trophy size={20} /> },
+                { name: "Normal", min: 0, max: 299, color: "#64748B", icon: <User size={20} /> },
+                { name: "Bronze", min: 300, max: 999, color: "#92400E", icon: <Award size={20} /> },
+                { name: "Silver", min: 1000, max: 4999, color: "#475569", icon: <Star size={20} /> },
+                { name: "Gold", min: 5000, max: Infinity, color: "#B45309", icon: <Trophy size={20} /> },
               ];
 
               const currentLevel = LEVELS.slice().reverse().find(l => totalPoints >= l.min) || LEVELS[0];
@@ -549,11 +544,10 @@ const Profile = () => {
                 : 100;
 
               const VOUCHER_TIERS = [
-                { tier: "BONUS5",  label: "Giảm 5%",  points: 200,  color: "#2563EB" },
-                { tier: "BONUS10", label: "Giảm 10%", points: 500,  color: "#7C3AED" },
+                { tier: "BONUS5", label: "Giảm 5%", points: 200, color: "#2563EB" },
+                { tier: "BONUS10", label: "Giảm 10%", points: 500, color: "#7C3AED" },
                 { tier: "BONUS20", label: "Giảm 20%", points: 1000, color: "#DC2626" },
               ];
-
 
               const handleRedeem = async (tier) => {
                 try {
@@ -563,7 +557,6 @@ const Profile = () => {
                     { headers: { Authorization: `Bearer ${token}` } }
                   );
                   toast.success(data.message);
-                  // Update from authoritative history returned by backend
                   setRedeemedTiers(data.redemptionHistory.map(r => r.tier));
                   setRedemptionHistory(data.redemptionHistory);
                 } catch (error) {
@@ -572,106 +565,107 @@ const Profile = () => {
               };
 
               return (
-                <div className="card-section info-dashboard" style={{ background: 'transparent', boxShadow: 'none', padding: 0 }}>
+                <div className="flex flex-col gap-6">
 
                   {/* MEMBER LEVEL CARD */}
-                  <div className="member-level-card" style={{ borderLeft: `4px solid ${currentLevel.color}` }}>
-                    <div className="mlc-top">
-                      <div className="mlc-left">
-                        <span className="mlc-icon">{currentLevel.icon}</span>
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm" style={{ borderLeft: `4px solid ${currentLevel.color}` }}>
+                    <div className="flex justify-between items-start mb-4.5">
+                      <div className="flex items-center gap-3.5">
+                        <span className="text-[36px] leading-none">{currentLevel.icon}</span>
                         <div>
-                          <p className="mlc-label">Cấp thành viên</p>
-                          <h3 className="mlc-name" style={{ color: currentLevel.color }}>{currentLevel.name}</h3>
+                          <p className="text-xs text-slate-400 uppercase tracking-wide m-0 mb-0.5 font-semibold">Cấp thành viên</p>
+                          <h3 className="text-2xl font-extrabold m-0" style={{ color: currentLevel.color }}>{currentLevel.name}</h3>
                         </div>
                       </div>
-                      <div className="mlc-right">
-                        <div className="mlc-points-box">
-                          <span className="mlc-points-num">{totalPoints}</span>
-                          <span className="mlc-points-label">điểm tích lũy</span>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <span className="block text-[28px] font-extrabold text-slate-800 leading-none">{totalPoints}</span>
+                          <span className="text-xs text-slate-500">điểm tích lũy</span>
                         </div>
-                        <button className="mlc-help-btn" onClick={() => setShowLevelInfo(true)} title="Giải thích hệ thống">?</button>
+                        <button className="w-7 h-7 rounded-full border-2 border-slate-300 bg-slate-50 text-slate-500 text-sm font-bold cursor-pointer transition-all shrink-0 flex items-center justify-center hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50" onClick={() => setShowLevelInfo(true)} title="Giải thích hệ thống">?</button>
                       </div>
                     </div>
 
                     {nextLevel ? (
-                      <>
-                        <div className="mlc-progress-wrap">
-                          <div className="mlc-progress-bar">
-                            <div className="mlc-progress-fill" style={{ width: `${progressPct}%`, background: currentLevel.color }} />
-                          </div>
-                          <span className="mlc-progress-label">{nextLevel.min - totalPoints} điểm nữa để lên {nextLevel.icon} {nextLevel.name}</span>
+                      <div className="flex flex-col gap-1.5 mt-2">
+                        <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progressPct}%`, background: currentLevel.color }} />
                         </div>
-                      </>
+                        <span className="text-xs text-slate-500">{nextLevel.min - totalPoints} điểm nữa để lên {nextLevel.name}</span>
+                      </div>
                     ) : (
-                      <p className="mlc-max-label"><Trophy size={16} style={{display:'inline',verticalAlign:'middle',marginRight:5}} /> Bạn đã đạt cấp cao nhất!</p>
+                      <p className="text-sm font-semibold text-amber-700 m-0 flex items-center gap-1 mt-2"><Trophy size={16} /> Bạn đã đạt cấp cao nhất!</p>
                     )}
                   </div>
 
                   {/* MODAL "?" giải thích level */}
                   {showLevelInfo && (
-                    <div className="level-info-overlay" onClick={() => setShowLevelInfo(false)}>
-                      <div className="level-info-modal" onClick={e => e.stopPropagation()}>
-                        <div className="lim-header">
-                          <h3><Trophy size={18} style={{display:'inline',marginRight:6,verticalAlign:'middle'}} /> Hệ thống cấp thành viên</h3>
-                          <button onClick={() => setShowLevelInfo(false)}>✕</button>
+                    <div className="fixed inset-0 bg-slate-900/55 backdrop-blur-[3px] z-[99999] flex items-center justify-center p-5 animate-[fadeIn_0.2s_ease]" onClick={() => setShowLevelInfo(false)}>
+                      <div className="bg-white rounded-2xl p-7 w-full max-w-[520px] shadow-[0_20px_60px_rgba(0,0,0,0.15)]" onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="text-lg font-bold m-0 text-slate-800 flex items-center gap-1.5"><Trophy size={18} /> Hệ thống cấp thành viên</h3>
+                          <button className="bg-transparent border-none text-lg text-slate-500 cursor-pointer leading-none hover:text-slate-900" onClick={() => setShowLevelInfo(false)}>✕</button>
                         </div>
-                        <p className="lim-intro">Tích điểm từ mỗi đơn hàng đã giao thành công. <strong>50.000đ = 1 điểm</strong>. Điểm dùng để lên cấp và đổi voucher.</p>
-                        <div className="lim-list">
-                          <div className="lim-list-header"><span>Cấp</span><span>Điểm cần</span></div>
-                          <div className="lim-list-row"><span><User  size={13} style={{verticalAlign:'middle',marginRight:5}} />Normal</span><span>Mặc định</span></div>
-                          <div className="lim-list-row"><span><Award size={13} style={{verticalAlign:'middle',marginRight:5}} />Bronze</span><span>300 điểm</span></div>
-                          <div className="lim-list-row"><span><Star  size={13} style={{verticalAlign:'middle',marginRight:5}} />Silver</span><span>1.000 điểm</span></div>
-                          <div className="lim-list-row"><span><Trophy size={13} style={{verticalAlign:'middle',marginRight:5}} />Gold</span><span>5.000 điểm</span></div>
+                        <p className="text-sm text-slate-600 m-0 mb-3 leading-relaxed">Tích điểm từ mỗi đơn hàng đã giao thành công. <strong className="text-slate-800">50.000đ = 1 điểm</strong>. Điểm dùng để lên cấp và đổi voucher.</p>
+
+                        <div className="mb-3 border border-slate-200 rounded-lg overflow-hidden">
+                          <div className="flex justify-between py-1.5 px-3 bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wide border-b border-slate-200"><span>Cấp</span><span>Điểm cần</span></div>
+                          <div className="flex justify-between items-center py-2 px-3 border-b border-slate-100 text-[13px] text-slate-700"><span className="flex items-center gap-1"><User size={13} />Normal</span><span className="font-semibold text-slate-900 ml-3">Mặc định</span></div>
+                          <div className="flex justify-between items-center py-2 px-3 border-b border-slate-100 text-[13px] text-slate-700"><span className="flex items-center gap-1"><Award size={13} />Bronze</span><span className="font-semibold text-slate-900 ml-3">300 điểm</span></div>
+                          <div className="flex justify-between items-center py-2 px-3 border-b border-slate-100 text-[13px] text-slate-700"><span className="flex items-center gap-1"><Star size={13} />Silver</span><span className="font-semibold text-slate-900 ml-3">1.000 điểm</span></div>
+                          <div className="flex justify-between items-center py-2 px-3 text-[13px] text-slate-700"><span className="flex items-center gap-1"><Trophy size={13} />Gold</span><span className="font-semibold text-slate-900 ml-3">5.000 điểm</span></div>
                         </div>
-                        <p className="lim-note"><Info size={13} style={{display:'inline',verticalAlign:'middle',marginRight:4}} /> Lên cấp <strong>không mất điểm</strong>. Điểm chỉ bị trừ khi đổi voucher.</p>
-                        <div className="lim-separator" />
-                        <p className="lim-intro"><strong>Đổi điểm lấy voucher:</strong></p>
-                        <div className="lim-list">
-                          <div className="lim-list-header"><span>Voucher</span><span>Điểm cần</span></div>
-                          <div className="lim-list-row"><span>BONUS5 – Giảm 5%</span><span>200 điểm</span></div>
-                          <div className="lim-list-row"><span>BONUS10 – Giảm 10%</span><span>500 điểm</span></div>
-                          <div className="lim-list-row"><span>BONUS20 – Giảm 20%</span><span>1.000 điểm</span></div>
+
+                        <p className="text-[13px] text-slate-500 m-0 mb-2 leading-relaxed flex gap-1"><Info size={14} className="shrink-0 mt-0.5" /> Lên cấp <strong className="text-slate-700">không mất điểm</strong>. Điểm chỉ bị trừ khi đổi voucher.</p>
+                        <div className="border-0 border-t border-dashed border-slate-200 my-4" />
+                        <p className="text-sm text-slate-600 m-0 mb-2 leading-relaxed"><strong className="text-slate-800">Đổi điểm lấy voucher:</strong></p>
+
+                        <div className="mb-3 border border-slate-200 rounded-lg overflow-hidden">
+                          <div className="flex justify-between py-1.5 px-3 bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wide border-b border-slate-200"><span>Voucher</span><span>Điểm cần</span></div>
+                          <div className="flex justify-between items-center py-2 px-3 border-b border-slate-100 text-[13px] text-slate-700"><span>BONUS5 – Giảm 5%</span><span className="font-semibold text-slate-900 ml-3">200 điểm</span></div>
+                          <div className="flex justify-between items-center py-2 px-3 border-b border-slate-100 text-[13px] text-slate-700"><span>BONUS10 – Giảm 10%</span><span className="font-semibold text-slate-900 ml-3">500 điểm</span></div>
+                          <div className="flex justify-between items-center py-2 px-3 text-[13px] text-slate-700"><span>BONUS20 – Giảm 20%</span><span className="font-semibold text-slate-900 ml-3">1.000 điểm</span></div>
                         </div>
-                        <p className="lim-note"><AlertCircle size={13} style={{display:'inline',verticalAlign:'middle',marginRight:4}} /> Mỗi voucher tạo ra chỉ dùng được <strong>1 lần</strong>. Có thể đổi <strong>nhiều lần</strong> miễn là còn đủ điểm khả dụng.</p>
+                        <p className="text-[13px] text-slate-500 m-0 leading-relaxed flex gap-1"><AlertCircle size={14} className="shrink-0 mt-0.5" /> Mỗi voucher tạo ra chỉ dùng được <strong className="text-slate-700">1 lần</strong>. Có thể đổi <strong className="text-slate-700">nhiều lần</strong> miễn là còn đủ điểm khả dụng.</p>
                       </div>
                     </div>
                   )}
 
                   {/* THỐNG KÊ */}
-                  <div className="profile-stats-grid">
-                    <div className="stat-card">
-                      <div className="stat-icon-wrapper bg-blue-100 text-blue-600"><Package size={24} /></div>
-                      <div className="stat-info">
-                        <h3>{doneOrders.length}</h3>
-                        <p>Đơn hàng đã giao</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div className="bg-white rounded-xl p-5 flex items-center gap-4 shadow-sm border border-slate-100">
+                      <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-blue-100 text-blue-600"><Package size={24} /></div>
+                      <div>
+                        <h3 className="m-0 mb-1 text-[22px] text-slate-800 font-bold">{doneOrders.length}</h3>
+                        <p className="m-0 text-[13px] text-slate-500 font-medium">Đơn hàng đã giao</p>
                       </div>
                     </div>
-                    <div className="stat-card">
-                      <div className="stat-icon-wrapper bg-green-100 text-green-600"><DollarSign size={24} /></div>
-                      <div className="stat-info">
-                        <h3>{totalSpent.toLocaleString()}đ</h3>
-                        <p>Tổng chi tiêu</p>
+                    <div className="bg-white rounded-xl p-5 flex items-center gap-4 shadow-sm border border-slate-100">
+                      <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-emerald-100 text-emerald-600"><DollarSign size={24} /></div>
+                      <div>
+                        <h3 className="m-0 mb-1 text-[22px] text-slate-800 font-bold">{totalSpent.toLocaleString()}đ</h3>
+                        <p className="m-0 text-[13px] text-slate-500 font-medium">Tổng chi tiêu</p>
                       </div>
                     </div>
                   </div>
 
                   {/* ĐỔI ĐIỂM LẤY VOUCHER */}
-                  <div className="redeem-section">
-                    <h3 className="redeem-title"><Gift size={17} style={{display:'inline',verticalAlign:'middle',marginRight:6}} /> Đổi điểm lấy voucher</h3>
-                    <p className="redeem-subtitle">
-                      Tích lũy: <strong>{totalPoints} điểm</strong>
-                      {totalSpentPoints > 0 && <> &nbsp;·&nbsp; Đã dùng: <strong style={{color:'#DC2626'}}>{totalSpentPoints}</strong> &nbsp;·&nbsp; Khả dụng: <strong style={{color:'#059669'}}>{availablePoints} điểm</strong></>}
+                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <h3 className="text-[17px] font-bold text-slate-800 m-0 mb-1.5 flex items-center gap-1.5"><Gift size={17} /> Đổi điểm lấy voucher</h3>
+                    <p className="text-[13px] text-slate-500 m-0 mb-4">
+                      Tích lũy: <strong className="text-slate-700">{totalPoints} điểm</strong>
+                      {totalSpentPoints > 0 && <> &nbsp;·&nbsp; Đã dùng: <strong className="text-red-600">{totalSpentPoints}</strong> &nbsp;·&nbsp; Khả dụng: <strong className="text-emerald-600">{availablePoints} điểm</strong></>}
                     </p>
-                    <div className="redeem-grid">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                       {VOUCHER_TIERS.map(v => {
                         const canAfford = availablePoints >= v.points;
                         return (
-                          <div key={v.tier} className={`redeem-card ${!canAfford ? 'redeem-card-disabled' : ''}`}>
-                            <div className="redeem-card-badge" style={{ background: v.color }}>{v.tier}</div>
-                            <p className="redeem-card-label">{v.label}</p>
-                            <p className="redeem-card-cost">{v.points} điểm</p>
+                          <div key={v.tier} className={`border border-slate-200 rounded-xl p-4 flex flex-col items-center gap-2 text-center transition-shadow ${!canAfford ? 'opacity-55' : 'hover:shadow-md'}`}>
+                            <div className="text-white text-xs font-bold py-1 px-3 rounded-full tracking-wide" style={{ background: v.color }}>{v.tier}</div>
+                            <p className="text-[15px] font-bold text-slate-800 m-0">{v.label}</p>
+                            <p className="text-[13px] text-slate-500 m-0">{v.points} điểm</p>
                             <button
-                              className="redeem-btn"
+                              className={`w-full border-none rounded-lg py-2.5 text-[13px] font-semibold text-white mt-1 transition-opacity ${canAfford ? 'cursor-pointer hover:opacity-90' : 'cursor-not-allowed bg-slate-400'}`}
                               disabled={!canAfford}
                               style={canAfford ? { background: v.color } : {}}
                               onClick={() => handleRedeem(v.tier)}
@@ -685,89 +679,88 @@ const Profile = () => {
 
                     {/* Lịch sử đổi điểm */}
                     {redemptionHistory.length > 0 && (
-                      <div className="redemption-log">
-                        <h4 className="redemption-log-title"><History size={13} style={{display:'inline',verticalAlign:'middle',marginRight:5}} /> Lịch sử đổi điểm</h4>
+                      <div className="mt-4 border-t border-slate-100 pt-3.5">
+                        <h4 className="text-[13px] font-semibold text-slate-500 m-0 mb-2.5 uppercase tracking-wide flex items-center gap-1"><History size={14} /> Lịch sử đổi điểm</h4>
                         {[...redemptionHistory].reverse().map((r, i) => (
-                          <div key={i} className="redemption-log-row">
-                            <span className="rl-code">{r.code}</span>
-                            <span className="rl-pts">-{r.pointsSpent} điểm</span>
-                            <span className="rl-date">{new Date(r.redeemedAt).toLocaleDateString('vi-VN')}</span>
+                          <div key={i} className="flex items-center gap-3 py-1.5 border-b border-dashed border-slate-100 text-[13px] last:border-none">
+                            <span className="font-bold text-slate-800 min-w-[90px]">{r.code}</span>
+                            <span className="text-red-600 font-semibold flex-1">-{r.pointsSpent} điểm</span>
+                            <span className="text-slate-400">{new Date(r.redeemedAt).toLocaleDateString('vi-VN')}</span>
                           </div>
                         ))}
                       </div>
                     )}
-
-                  </div>{/* end redeem-section */}
+                  </div>
 
                   {/* THÔNG TIN CÁ NHÂN */}
-                  <div className="info-card-container">
-                    <div className="section-header-flex">
-                      <h2>Thông tin liên hệ</h2>
+                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
+                    <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                      <h2 className="text-xl text-slate-800 m-0 font-bold">Thông tin liên hệ</h2>
                       {!isEditingInfo && (
-                        <button className="btn-outline-small" onClick={() => setIsEditingInfo(true)}>
+                        <button className="flex items-center gap-1.5 py-1.5 px-3 bg-white border border-slate-200 rounded-md text-[13px] font-medium text-slate-600 cursor-pointer transition-colors hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800" onClick={() => setIsEditingInfo(true)}>
                           <Edit size={16} /> Chỉnh sửa
                         </button>
                       )}
                     </div>
 
                     {isEditingInfo ? (
-                      <div className="edit-info-form">
-                        <div className="edit-avatar-section">
+                      <div>
+                        <div className="flex items-center gap-5 mb-7 pb-5 border-b border-slate-100">
                           <img
                             src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=0D9488&color=fff&size=128`}
                             alt="Avatar"
-                            className="edit-avatar-preview"
+                            className="w-20 h-20 rounded-full object-cover border-[3px] border-blue-50 shadow-sm"
                           />
-                          <div className="edit-avatar-actions">
-                            <button className="btn-outline-small" onClick={() => fileInputRef.current.click()} disabled={isUploading}>
-                              {isUploading ? <Loader2 className="spinner" size={16} /> : <Camera size={16} />}
+                          <div className="flex flex-col gap-2">
+                            <button className="flex items-center gap-1.5 py-1.5 px-3 bg-white border border-slate-200 rounded-md text-[13px] font-medium text-slate-600 cursor-pointer transition-colors hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800" onClick={() => fileInputRef.current.click()} disabled={isUploading}>
+                              {isUploading ? <Loader2 className="animate-spin" size={16} /> : <Camera size={16} />}
                               {user.avatar ? " Đổi ảnh" : " Thêm ảnh"}
                             </button>
                             {user.avatar && (
-                              <button className="btn-danger-small" style={{marginTop: 0}} onClick={removeAvatar}>
+                              <button className="flex items-center gap-1.5 py-1.5 px-3 bg-red-50 border border-red-200 text-red-500 rounded-md text-[13px] font-medium cursor-pointer transition-colors hover:bg-red-100 hover:border-red-400" onClick={removeAvatar}>
                                 <Trash2 size={16} /> Xóa ảnh
                               </button>
                             )}
                           </div>
                         </div>
 
-                        <div className="form-group-row">
-                          <div className="form-group focus-group">
-                            <label>Họ và tên</label>
-                            <input type="text" value={editFormData.name} onChange={(e) => setEditFormData({...editFormData, name: e.target.value})} className="input-field" />
+                        <div className="flex flex-col sm:flex-row gap-5 mb-5">
+                          <div className="w-full">
+                            <label className="block mb-2 text-sm font-semibold text-slate-600">Họ và tên</label>
+                            <input type="text" value={editFormData.name} onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })} className="w-full py-2.5 px-4 rounded-lg border border-slate-300 text-[15px] text-slate-800 bg-white transition-all focus:border-blue-500 focus:ring-[3px] focus:ring-blue-500/10 outline-none" />
                           </div>
-                          <div className="form-group focus-group">
-                            <label>Số điện thoại</label>
-                            <input type="text" value={editFormData.phone} onChange={(e) => setEditFormData({...editFormData, phone: e.target.value})} placeholder="Thêm số điện thoại..." className="input-field" />
+                          <div className="w-full">
+                            <label className="block mb-2 text-sm font-semibold text-slate-600">Số điện thoại</label>
+                            <input type="text" value={editFormData.phone} onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })} placeholder="Thêm số điện thoại..." className="w-full py-2.5 px-4 rounded-lg border border-slate-300 text-[15px] text-slate-800 bg-white transition-all focus:border-blue-500 focus:ring-[3px] focus:ring-blue-500/10 outline-none" />
                           </div>
                         </div>
 
-                        <div className="form-group">
-                          <label>Email (Không thể thay đổi)</label>
-                          <input type="email" value={user.email} disabled className="input-field disabled-input" />
+                        <div className="mb-5 w-full">
+                          <label className="block mb-2 text-sm font-semibold text-slate-600">Email (Không thể thay đổi)</label>
+                          <input type="email" value={user.email} disabled className="w-full py-2.5 px-4 rounded-lg border border-slate-300 text-[15px] text-slate-800 outline-none bg-slate-50 text-slate-400 cursor-not-allowed" />
                         </div>
 
-                        <div className="edit-form-actions" style={{display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '20px'}}>
-                          <button className="btn-secondary" onClick={() => {
+                        <div className="flex gap-3 justify-end mt-5">
+                          <button className="py-2 px-4 bg-white text-slate-700 border border-slate-300 rounded-lg text-sm cursor-pointer transition-all hover:bg-slate-50" onClick={() => {
                             setIsEditingInfo(false);
                             setEditFormData({ name: user.name, phone: user.phone || "" });
                           }}>Hủy</button>
-                          <button className="btn-primary" onClick={handleUpdateInfo}>Lưu thay đổi</button>
+                          <button className="py-2 px-5 bg-blue-600 text-white border-none rounded-lg text-sm font-medium cursor-pointer transition-all hover:bg-blue-700" onClick={handleUpdateInfo}>Lưu thay đổi</button>
                         </div>
                       </div>
                     ) : (
-                      <div className="info-content-grid">
-                        <div className="info-item">
-                          <p className="info-label">Họ và tên</p>
-                          <p className="info-value">{user.name}</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="flex flex-col gap-1.5">
+                          <p className="text-[13px] text-slate-500 m-0 uppercase tracking-wide font-semibold">Họ và tên</p>
+                          <p className="text-base text-slate-800 m-0 font-medium">{user.name}</p>
                         </div>
-                        <div className="info-item">
-                          <p className="info-label">Email</p>
-                          <p className="info-value">{user.email}</p>
+                        <div className="flex flex-col gap-1.5">
+                          <p className="text-[13px] text-slate-500 m-0 uppercase tracking-wide font-semibold">Email</p>
+                          <p className="text-base text-slate-800 m-0 font-medium">{user.email}</p>
                         </div>
-                        <div className="info-item">
-                          <p className="info-label">Số điện thoại</p>
-                          <p className="info-value">{user.phone || <em className="text-muted">Chưa cập nhật</em>}</p>
+                        <div className="flex flex-col gap-1.5">
+                          <p className="text-[13px] text-slate-500 m-0 uppercase tracking-wide font-semibold">Số điện thoại</p>
+                          <p className="text-base text-slate-800 m-0 font-medium">{user.phone || <em className="text-slate-400 font-normal">Chưa cập nhật</em>}</p>
                         </div>
                       </div>
                     )}
@@ -779,68 +772,73 @@ const Profile = () => {
 
             {/* TAB ORDERS */}
             {activeTab === "orders" && (
-              <div className="card-section">
-                <div className="order-page-header">
+              <div className="bg-white rounded-xl p-6 md:p-7 shadow-sm border border-slate-100">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 md:gap-0">
                   <div>
-                    <h2 style={{ margin: 0, fontSize: "22px", color: "#1E293B" }}>Đơn hàng của tôi</h2>
-                    <p style={{ margin: "4px 0 0 0", color: "#64748B", fontSize: "14px" }}>Quản lý và theo dõi tất cả đơn hàng của bạn</p>
+                    <h2 className="m-0 text-[22px] text-slate-800 font-bold">Đơn hàng của tôi</h2>
+                    <p className="m-0 mt-1 text-sm text-slate-500">Quản lý và theo dõi tất cả đơn hàng của bạn</p>
                   </div>
-                  <div className="order-search-box">
-                    <Search size={18} />
-                    <input type="text" placeholder="Tìm đơn hàng..." />
+                  <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg py-2 px-4 w-full md:w-[300px] transition-all focus-within:border-blue-500 focus-within:bg-white focus-within:ring-[3px] focus-within:ring-blue-500/10">
+                    <Search size={18} className="text-slate-500" />
+                    <input type="text" placeholder="Tìm đơn hàng..." className="border-none bg-transparent outline-none w-full text-sm text-slate-800" />
                   </div>
                 </div>
 
-                <div className="order-status-tabs">
+                <div className="flex gap-3 mb-6 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300">
                   {filterOrderTabs.map(tab => (
                     <button
                       key={tab.id}
-                      className={`status-tab-btn ${activeOrderFilter === tab.id ? "active" : ""}`}
+                      className={`flex items-center gap-2 py-2 px-4 border rounded-full text-sm font-medium cursor-pointer whitespace-nowrap transition-all ${activeOrderFilter === tab.id ? "bg-blue-600 text-white border-blue-600" : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"}`}
                       onClick={() => setActiveOrderFilter(tab.id)}
                     >
-                      {tab.label} <span className="count-badge">{getTabCount(tab.id)}</span>
+                      {tab.label} <span className={`py-0.5 px-1.5 rounded-full text-xs font-bold ${activeOrderFilter === tab.id ? "bg-white/20 text-white" : "bg-slate-200 text-slate-600"}`}>{getTabCount(tab.id)}</span>
                     </button>
                   ))}
                 </div>
 
                 {loadingOrders ? (
-                  <div style={{ textAlign: "center", padding: "40px", color: "#64748B" }}>Đang tải danh sách đơn hàng...</div>
+                  <div className="text-center py-10 text-slate-500 animate-pulse">Đang tải danh sách đơn hàng...</div>
                 ) : filteredOrders.length === 0 ? (
-                  <div className="empty-state-container">
-                    <Package size={48} className="empty-icon" />
-                    <p>Bạn chưa có đơn hàng nào ở trạng thái này.</p>
-                    <button className="btn-secondary" onClick={() => navigate("/products")}>Tiếp tục mua sắm</button>
+                  <div className="flex flex-col items-center justify-center p-10 text-center text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                    <Package size={48} className="text-slate-300 mb-4" />
+                    <p className="text-[15px] text-slate-600 mb-5">Bạn chưa có đơn hàng nào ở trạng thái này.</p>
+                    <button className="py-2.5 px-5 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-medium cursor-pointer transition-colors hover:bg-slate-50 hover:border-slate-400" onClick={() => navigate("/products")}>Tiếp tục mua sắm</button>
                   </div>
                 ) : (
-                  <div className="orders-list">
+                  <div className="flex flex-col gap-5">
                     {filteredOrders.map(order => (
-                      <div key={order._id} className="order-item-card">
+                      <div key={order._id} className="border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm hover:border-slate-300 transition-colors">
 
                         {/* Header Đơn hàng */}
-                        <div className="order-card-header">
-                          <div className="order-id-date">
-                            <span className="order-id">#{order._id.slice(-6).toUpperCase()}</span>
-                            <span className="divider">|</span>
-                            <span className="order-date">{new Date(order.createdAt).toLocaleDateString('vi-VN')}</span>
+                        <div className="flex justify-between items-center py-4 px-5 bg-slate-50 border-b border-slate-100">
+                          <div className="flex items-center gap-2 text-sm text-slate-500">
+                            <span className="text-blue-600 font-bold uppercase">#{order._id.slice(-6)}</span>
+                            <span className="text-slate-300">|</span>
+                            <span>{new Date(order.createdAt).toLocaleDateString('vi-VN')}</span>
                           </div>
-                          <div className={`order-status-pill status-${order.status}`}>
+                          <div className={`py-1 px-3 rounded-full text-xs font-semibold ${order.status === "waiting_approval" ? "bg-amber-100 text-amber-700" :
+                            order.status === "pending" ? "bg-blue-100 text-blue-700" :
+                              order.status === "paid" ? "bg-indigo-100 text-indigo-700" :
+                                order.status === "done" ? "bg-emerald-100 text-emerald-700" :
+                                  "bg-red-100 text-red-700"
+                            }`}>
                             {getStatusText(order.status)}
                           </div>
                         </div>
 
                         {/* Body (Danh sách sản phẩm) */}
-                        <div className="order-card-body">
+                        <div className="p-5">
                           {order.items.map((item, index) => (
-                            <div key={index} className="order-product-row">
-                              <div className="order-product-img">
-                                <img src={item.image || "/no-image.png"} alt={item.name} />
+                            <div key={index} className="flex items-start gap-4 pb-4 mb-4 border-b border-dashed border-slate-100 last:border-0 last:pb-0 last:mb-0">
+                              <div className="w-20 h-20 bg-white border border-slate-200 rounded-lg flex items-center justify-center overflow-hidden shrink-0 p-1">
+                                <img src={item.image || "/no-image.png"} alt={item.name} className="max-w-full max-h-full object-contain" />
                               </div>
-                              <div className="order-product-info">
-                                <h4>{item.name}</h4>
-                                <p className="variant-info">{item.color} | {item.storage}</p>
-                                <p className="qty">Số lượng: x{item.quantity}</p>
+                              <div className="flex-1">
+                                <h4 className="m-0 mb-1.5 text-[15px] text-slate-800 font-semibold">{item.name}</h4>
+                                <p className="m-0 mb-1 text-[13px] text-slate-500">{item.color} {item.storage ? `| ${item.storage}` : ''}</p>
+                                <p className="m-0 text-[13px] text-slate-500 font-medium">Số lượng: x{item.quantity}</p>
                               </div>
-                              <div className="order-product-price">
+                              <div className="text-[15px] font-bold text-slate-800 shrink-0">
                                 {(item.price * item.quantity).toLocaleString()}đ
                               </div>
                             </div>
@@ -848,39 +846,35 @@ const Profile = () => {
                         </div>
 
                         {/* Footer Đơn hàng */}
-                        <div className="order-card-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div className="flex flex-col md:flex-row justify-between items-end md:items-center py-4 px-5 bg-slate-50 border-t border-slate-100 gap-4 md:gap-0">
 
-                          {/* Khối bên trái: Báo lỗi nếu chưa thanh toán */}
-                          <div className="footer-left-info">
-                            <div className="total-display">
-                              Thành tiền: <strong style={{ color: '#ef4444', fontSize: '18px' }}>{order.total.toLocaleString()}đ</strong>
+                          <div className="w-full md:w-auto flex flex-col items-start">
+                            <div className="text-sm text-slate-600">
+                              Thành tiền: <strong className="text-[18px] text-red-500 ml-1.5 font-extrabold">{order.total.toLocaleString()}đ</strong>
                             </div>
                             {order.status === 'pending' && ['VNPAY', 'MOMO'].includes(order.paymentMethod) && (
-                              <p style={{ color: '#ef4444', fontSize: '13px', margin: '4px 0 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <p className="flex items-center gap-1 text-red-500 text-[13px] m-0 mt-1 font-medium">
                                 <AlertCircle size={14} /> Vui lòng thanh toán trong 15 phút.
                               </p>
                             )}
                           </div>
 
-                          {/* Khối bên phải: Các nút thao tác */}
-                          <div className="action-buttons" style={{ display: 'flex', gap: '10px' }}>
-                            <button className="btn-outline-small" onClick={() => navigate(`/order/${order._id}`)}>
-                              <Eye size={16} /> Xem chi tiết
+                          <div className="flex gap-2.5 w-full md:w-auto justify-end">
+                            <button className="flex items-center gap-1.5 py-2 px-3.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800" onClick={() => navigate(`/order/${order._id}`)}>
+                              <Eye size={15} /> Xem chi tiết
                             </button>
 
                             {/* NÚT THANH TOÁN TIẾP VÀ HỦY ĐƠN CHO ĐƠN PENDING */}
                             {order.status === 'pending' && ['VNPAY', 'MOMO'].includes(order.paymentMethod) && (
                               <>
                                 <button
-                                  className="btn-danger-small"
-                                  style={{ backgroundColor: '#f1f5f9', color: '#64748b', borderColor: '#cbd5e1' }}
+                                  className="flex items-center gap-1.5 py-2 px-3.5 bg-slate-100 border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-slate-200"
                                   onClick={() => handleCancelOrder(order._id)}
                                 >
                                   Hủy đơn
                                 </button>
                                 <button
-                                  className="btn-primary-small"
-                                  style={{ backgroundColor: '#2563eb', color: 'white', padding: '8px 16px', borderRadius: '6px' }}
+                                  className="flex items-center gap-1.5 py-2 px-4 bg-blue-600 text-white border-none rounded-lg text-[13px] font-semibold cursor-pointer transition-colors hover:bg-blue-700 shadow-sm"
                                   onClick={() => {
                                     navigate('/payment', {
                                       state: {
@@ -893,13 +887,13 @@ const Profile = () => {
                                 >
                                   Thanh toán ngay
                                 </button>
-                              </  >
+                              </>
                             )}
 
                             {/* Nút hủy đơn cho đơn COD đang chờ duyệt */}
                             {order.status === 'waiting_approval' && (
                               <button
-                                className="btn-danger-small"
+                                className="flex items-center gap-1.5 py-2 px-3.5 bg-red-50 border border-red-200 text-red-500 rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-red-100 hover:border-red-300"
                                 onClick={() => handleCancelOrder(order._id)}
                               >
                                 Hủy đơn
@@ -908,7 +902,7 @@ const Profile = () => {
 
                             {(order.status === "done" || order.status === "cancelled" || order.status === "returned") && (
                               <button
-                                className="btn-primary-small"
+                                className="flex items-center gap-1.5 py-2 px-3.5 bg-blue-600 text-white border-none rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-blue-700 shadow-sm"
                                 onClick={() => {
                                   const firstItem = order.items[0];
                                   const slug = firstItem?.productId?.slug;
@@ -922,8 +916,7 @@ const Profile = () => {
 
                             {order.status === "done" && (
                               <button
-                                className="btn-outline-small"
-                                style={{ color: '#f59e0b', borderColor: '#f59e0b' }}
+                                className="flex items-center gap-1.5 py-2 px-3.5 bg-amber-50 border border-amber-200 text-amber-600 rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-amber-100 hover:border-amber-300"
                                 onClick={() => {
                                   const firstItem = order.items[0];
                                   const slug = firstItem?.productId?.slug;
@@ -931,54 +924,50 @@ const Profile = () => {
                                   else toast.error("Không tìm thấy sản phẩm.");
                                 }}
                               >
-                                <Star size={16} /> Đánh giá
+                                <Star size={15} /> Đánh giá
                               </button>
                             )}
 
                             {order.status === "done" && (() => {
-                               const isWithin15Days = (new Date() - new Date(order.updatedAt)) / (1000 * 60 * 60 * 24) <= 15;
-                               const returnReq = order.returnRequest;
+                              const isWithin15Days = (new Date() - new Date(order.updatedAt)) / (1000 * 60 * 60 * 24) <= 15;
+                              const returnReq = order.returnRequest;
 
-                               if (returnReq && returnReq.isRequested) {
-                                  if (returnReq.status === "pending") {
-                                    return <span className="badge badge-warning" style={{marginLeft: 10, alignSelf: 'center', backgroundColor: '#fef3c7', color: '#d97706', padding: '6px 12px', borderRadius: '4px', fontSize: '13px'}}>Đang yêu cầu trả hàng</span>;
-                                  }
-                                  if (returnReq.status === "rejected") {
-                                    return <span className="badge badge-danger" style={{marginLeft: 10, alignSelf: 'center', backgroundColor: '#fee2e2', color: '#ef4444', padding: '6px 12px', borderRadius: '4px', fontSize: '13px'}} title={returnReq.rejectedReason}>Bị từ chối trả hàng</span>;
-                                  }
-                               } else if (isWithin15Days) {
-                                  return (
-                                    <button
-                                      className="btn-danger-small"
-                                      style={{ backgroundColor: '#fff', color: '#ef4444', borderColor: '#ef4444' }}
-                                      onClick={() => {
-                                        // Kiểm tra số điểm thưởng trước khi cho phép trả hàng
-                                        const doneOrders = orders.filter(o => o.status === 'done');
-                                        const totalSpent = doneOrders.reduce((sum, ord) => sum + ord.total, 0);
-                                        const currentTotalPoints = Math.floor(totalSpent / 50000);
-                                        const currentSpentPoints = redemptionHistory.reduce((s, r) => s + r.pointsSpent, 0);
-                                        const currentAvailablePoints = currentTotalPoints - currentSpentPoints;
-                                        
-                                        // Số điểm mà đơn hàng này "đóng góp" vào tổng tích lũy
-                                        // Đoạn này lấy tổng điểm mới nếu trừ đi hóa đơn này
-                                        const newTotalSpent = totalSpent - order.total;
-                                        const newTotalPoints = Math.floor(newTotalSpent / 50000);
-                                        const newAvailablePoints = newTotalPoints - currentSpentPoints;
+                              if (returnReq && returnReq.isRequested) {
+                                if (returnReq.status === "pending") {
+                                  return <span className="bg-amber-100 text-amber-700 py-1.5 px-3 rounded-md text-[12px] font-semibold self-center ml-2">Đang yêu cầu trả hàng</span>;
+                                }
+                                if (returnReq.status === "rejected") {
+                                  return <span className="bg-red-100 text-red-600 py-1.5 px-3 rounded-md text-[12px] font-semibold self-center ml-2 cursor-help" title={returnReq.rejectedReason}>Bị từ chối trả hàng</span>;
+                                }
+                              } else if (isWithin15Days) {
+                                return (
+                                  <button
+                                    className="flex items-center gap-1.5 py-2 px-3.5 bg-white border border-red-500 text-red-500 rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-red-50"
+                                    onClick={() => {
+                                      const doneOrders = orders.filter(o => o.status === 'done');
+                                      const totalSpent = doneOrders.reduce((sum, ord) => sum + ord.total, 0);
+                                      const currentTotalPoints = Math.floor(totalSpent / 50000);
+                                      const currentSpentPoints = redemptionHistory.reduce((s, r) => s + r.pointsSpent, 0);
+                                      const currentAvailablePoints = currentTotalPoints - currentSpentPoints;
 
-                                        if (newAvailablePoints < 0) {
-                                            toast.error("Điểm thưởng của đơn này đã được dùng để đổi mã giảm giá. Không thể yêu cầu hoàn trả đơn hàng này nữa.");
-                                            return;
-                                        }
+                                      const newTotalSpent = totalSpent - order.total;
+                                      const newTotalPoints = Math.floor(newTotalSpent / 50000);
+                                      const newAvailablePoints = newTotalPoints - currentSpentPoints;
 
-                                        setReturnOrderId(order._id);
-                                        setShowReturnModal(true);
-                                      }}
-                                    >
-                                      <RotateCcw size={16} /> Yêu cầu trả hàng
-                                    </button>
-                                  );
-                               }
-                               return null;
+                                      if (newAvailablePoints < 0) {
+                                        toast.error("Điểm thưởng của đơn này đã được dùng để đổi mã giảm giá. Không thể yêu cầu hoàn trả đơn hàng này nữa.");
+                                        return;
+                                      }
+
+                                      setReturnOrderId(order._id);
+                                      setShowReturnModal(true);
+                                    }}
+                                  >
+                                    <RotateCcw size={15} /> Yêu cầu trả hàng
+                                  </button>
+                                );
+                              }
+                              return null;
                             })()}
                           </div>
                         </div>
@@ -992,18 +981,18 @@ const Profile = () => {
 
             {/* TAB FAVORITES */}
             {activeTab === "favorites" && (
-              <div className="card-section">
-                <div className="section-header-flex"><h2>Sản phẩm yêu thích</h2></div>
+              <div className="bg-white rounded-xl p-6 md:p-7 shadow-sm border border-slate-100">
+                <div className="mb-6 pb-4 border-b border-slate-100"><h2 className="text-xl text-slate-800 m-0 font-bold">Sản phẩm yêu thích</h2></div>
                 {loadingFavorites ? (
-                  <div style={{ textAlign: "center", padding: "40px", color: "#64748B" }}>Đang tải danh sách yêu thích...</div>
+                  <div className="text-center py-10 text-slate-500 animate-pulse">Đang tải danh sách yêu thích...</div>
                 ) : favorites.length === 0 ? (
-                  <div className="empty-state-container">
-                    <Heart size={48} className="empty-icon" />
-                    <p>Chưa có sản phẩm nào trong danh sách yêu thích.</p>
-                    <button className="btn-secondary" onClick={() => navigate("/")}>Khám phá sản phẩm</button>
+                  <div className="flex flex-col items-center justify-center py-16 px-5 text-center text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                    <Heart size={48} className="text-slate-300 mb-4" />
+                    <p className="text-[15px] text-slate-600 mb-5">Chưa có sản phẩm nào trong danh sách yêu thích.</p>
+                    <button className="py-2.5 px-5 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-medium cursor-pointer transition-colors hover:bg-slate-50 hover:border-slate-400" onClick={() => navigate("/")}>Khám phá sản phẩm</button>
                   </div>
                 ) : (
-                  <div className="favorites-grid">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {favorites.map((product) => (
                       <ProductCard
                         key={product._id}
@@ -1019,42 +1008,43 @@ const Profile = () => {
 
             {/* TAB VOUCHERS - KHO VOUCHER */}
             {activeTab === "vouchers" && (
-              <div className="card-section" style={{ background: 'transparent', boxShadow: 'none', padding: 0 }}>
+              <div className="flex flex-col gap-6">
                 {/* Header */}
-                <div className="voucher-page-header">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 md:px-7 rounded-xl shadow-sm border border-slate-200 gap-4 md:gap-0">
                   <div>
-                    <h2 className="voucher-page-title">Kho Voucher của tôi</h2>
-                    <p className="voucher-page-subtitle">Lưu và sử dụng mã giảm giá khi mua hàng</p>
+                    <h2 className="m-0 text-[22px] font-bold text-slate-800">Kho Voucher của tôi</h2>
+                    <p className="m-0 mt-1 text-sm text-slate-500">Lưu và sử dụng mã giảm giá khi mua hàng</p>
                   </div>
-                  <div className="voucher-input-section">
-                    <div className="voucher-apply-box">
-                      <Tag size={16} className="apply-icon" />
+                  <div className="shrink-0 w-full md:w-auto">
+                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl p-1 pl-3.5 transition-all focus-within:border-indigo-500 focus-within:shadow-[0_0_0_3px_rgba(99,102,241,0.1)] focus-within:bg-white">
+                      <Tag size={16} className="text-slate-400 shrink-0" />
                       <input
                         type="text"
                         placeholder="Nhập mã khuyến mãi tại đây"
                         value={voucherInput}
                         onChange={(e) => setVoucherInput(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleApplyVoucherCode()}
+                        className="border-none bg-transparent outline-none text-sm text-slate-800 w-full md:w-[200px] py-2 placeholder:text-slate-400"
                       />
-                      <button className="btn-apply-voucher" onClick={handleApplyVoucherCode}>Áp dụng</button>
+                      <button className="bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-none py-2 px-5 rounded-lg text-sm font-semibold cursor-pointer transition-all hover:from-indigo-600 hover:to-violet-600 hover:-translate-y-[1px] hover:shadow-[0_4px_12px_rgba(99,102,241,0.3)] whitespace-nowrap" onClick={handleApplyVoucherCode}>Áp dụng</button>
                     </div>
                   </div>
                 </div>
 
                 {/* Voucher Grid */}
                 {loadingVouchers ? (
-                  <div style={{ textAlign: "center", padding: "60px", color: "#64748B" }}>
-                    <Loader2 className="spinner" size={32} style={{ margin: '0 auto 12px' }} />
-                    <p>Đang tải kho voucher...</p>
+                  <div className="text-center py-16 text-slate-500 bg-white rounded-xl shadow-sm border border-slate-200">
+                    <Loader2 className="animate-spin mx-auto mb-3 text-slate-400" size={32} />
+                    <p className="m-0">Đang tải kho voucher...</p>
                   </div>
                 ) : myVouchers.length === 0 ? (
-                  <div className="voucher-empty-state">
-                    <Ticket size={64} strokeWidth={1} />
-                    <h3>Chưa có voucher nào</h3>
-                    <p>Các mã giảm giá sẽ xuất hiện tại đây khi có chương trình khuyến mãi mới.</p>
+                  <div className="flex flex-col items-center justify-center p-16 px-5 text-slate-400 text-center bg-white rounded-xl shadow-sm border border-slate-200">
+                    <Ticket size={64} strokeWidth={1} className="mb-4 text-slate-300" />
+                    <h3 className="m-0 mb-2 text-lg text-slate-600 font-semibold">Chưa có voucher nào</h3>
+                    <p className="m-0 text-sm max-w-[400px] leading-relaxed text-slate-500">Các mã giảm giá sẽ xuất hiện tại đây khi có chương trình khuyến mãi mới.</p>
                   </div>
                 ) : (
-                  <div className="voucher-card-grid">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     {myVouchers.map((voucher, index) => {
                       const colorScheme = getVoucherColor(index);
                       const VoucherIcon = getVoucherIcon(voucher, index);
@@ -1064,54 +1054,54 @@ const Profile = () => {
                       return (
                         <div
                           key={voucher._id}
-                          className="voucher-card"
+                          className="flex bg-white rounded-xl border border-slate-200 overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.1)] hover:border-slate-300 border-l-4"
                           style={{ borderLeftColor: colorScheme.border }}
                         >
                           {/* Left Icon Section */}
-                          <div className="voucher-card-icon" style={{ backgroundColor: colorScheme.bg }}>
+                          <div className="flex flex-col items-center justify-center py-5 px-4 min-w-[100px] gap-2 border-r border-slate-100 border-dashed" style={{ backgroundColor: colorScheme.bg }}>
                             <VoucherIcon size={32} color={colorScheme.icon} />
-                            <span className="voucher-type-label" style={{ color: colorScheme.icon }}>
+                            <span className="text-[10px] font-extrabold tracking-wide uppercase" style={{ color: colorScheme.icon }}>
                               {getVoucherLabel(index)}
                             </span>
                           </div>
 
                           {/* Content */}
-                          <div className="voucher-card-content">
-                            <h3 className="voucher-card-title">
-                              {voucher.discountType === "percentage"
-                                ? `Giảm ${voucher.value}%`
-                                : `Giảm ${voucher.value.toLocaleString()}đ`
-                              }
-                              {voucher.maxDiscountAmount && voucher.discountType === "percentage" &&
-                                ` (tối đa ${voucher.maxDiscountAmount.toLocaleString()}đ)`
-                              }
-                            </h3>
-                            <p className="voucher-card-desc">{voucher.description || `Áp dụng cho đơn hàng từ ${voucher.minOrderValue.toLocaleString()}đ`}</p>
-                            
-                            <div className="voucher-card-tags">
-                              {voucher.minOrderValue > 0 && (
-                                <span className="voucher-tag">Đơn tối thiểu {voucher.minOrderValue.toLocaleString()}đ</span>
-                              )}
+                          <div className="flex-1 p-4 pl-5 flex flex-col justify-between">
+                            <div>
+                              <h3 className="m-0 text-[15px] font-bold text-slate-800 leading-tight">
+                                {voucher.discountType === "percentage"
+                                  ? `Giảm ${voucher.value}%`
+                                  : `Giảm ${voucher.value.toLocaleString()}đ`
+                                }
+                                {voucher.maxDiscountAmount && voucher.discountType === "percentage" &&
+                                  ` (tối đa ${voucher.maxDiscountAmount.toLocaleString()}đ)`
+                                }
+                              </h3>
+                              <p className="m-0 mt-1.5 text-[13px] text-slate-500 leading-relaxed">{voucher.description || `Áp dụng cho đơn hàng từ ${voucher.minOrderValue.toLocaleString()}đ`}</p>
+
+                              <div className="flex flex-wrap gap-1.5 mt-2.5">
+                                {voucher.minOrderValue > 0 && (
+                                  <span className="bg-slate-100 text-slate-600 py-[3px] px-2 rounded text-[11px] font-medium">Đơn tối thiểu {voucher.minOrderValue.toLocaleString()}đ</span>
+                                )}
+                              </div>
                             </div>
 
-                            <div className="voucher-card-footer">
-                              <div className="voucher-expiry">
+                            <div className="flex justify-between items-center mt-3 pt-3 border-t border-dashed border-slate-200">
+                              <div className={`flex items-center gap-1.5 text-[12px] ${isExpiringSoon ? 'text-red-500 font-semibold' : 'text-slate-500'}`}>
                                 <Clock size={13} />
-                                <span className={isExpiringSoon ? "expiry-warning" : ""}>
-                                  {daysLeft}
-                                </span>
+                                <span>{daysLeft}</span>
                               </div>
-                              <div className="voucher-card-actions">
+                              <div className="flex items-center gap-2">
                                 <button
-                                  className="btn-copy-code"
+                                  className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 text-slate-600 py-1.5 px-2.5 rounded-md text-[11px] font-semibold cursor-pointer transition-all font-mono hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-500"
                                   onClick={() => handleCopyCode(voucher.code)}
                                   title="Sao chép mã"
                                 >
-                                  {copiedCode === voucher.code ? <CheckCircle size={14} /> : <Copy size={14} />}
+                                  {copiedCode === voucher.code ? <CheckCircle size={13} className="text-emerald-500" /> : <Copy size={13} />}
                                   {voucher.code}
                                 </button>
                                 <button
-                                  className="btn-use-voucher"
+                                  className="bg-gradient-to-br from-indigo-500 to-violet-500 text-white border-none py-1.5 px-3.5 rounded-md text-xs font-semibold cursor-pointer transition-all hover:from-indigo-600 hover:to-violet-600 hover:-translate-y-[1px] hover:shadow-[0_3px_10px_rgba(99,102,241,0.25)]"
                                   onClick={() => navigate('/cart')}
                                 >
                                   Dùng ngay
@@ -1129,20 +1119,19 @@ const Profile = () => {
 
             {/* TAB ADDRESS - REDESIGNED */}
             {activeTab === "address" && (
-              <div className="card-section" style={{ background: 'transparent', boxShadow: 'none', padding: 0 }}>
-
+              <div className="flex flex-col">
                 {/* Header */}
-                <div className="address-page-header">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white rounded-xl py-5 px-6 mb-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)] border border-slate-200 gap-4 sm:gap-0">
                   <div>
-                    <h2 className="address-page-title">Sổ địa chỉ</h2>
-                    <p className="address-page-subtitle">Quản lý địa chỉ giao hàng của bạn</p>
+                    <h2 className="text-[20px] font-bold text-slate-900 m-0 mb-1">Sổ địa chỉ</h2>
+                    <p className="text-[13px] text-slate-500 m-0">Quản lý địa chỉ giao hàng của bạn</p>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span className="address-count-badge">
+                  <div className="flex items-center gap-3">
+                    <span className="bg-blue-50 text-blue-600 border border-blue-200 rounded-full py-1 px-3.5 text-[13px] font-semibold">
                       {user.addresses?.length || 0} / 5 địa chỉ
                     </span>
                     {(user.addresses?.length || 0) < 5 && (
-                      <button className="btn-add-address" onClick={() => { setEditingAddress(null); setShowAddressModal(true); }}>
+                      <button className="flex items-center gap-1.5 bg-blue-600 text-white border-none rounded-lg py-2 px-4 text-sm font-medium cursor-pointer transition-colors hover:bg-blue-700 shadow-sm" onClick={() => { setEditingAddress(null); setShowAddressModal(true); }}>
                         <Plus size={16} /> Thêm địa chỉ
                       </button>
                     )}
@@ -1151,43 +1140,43 @@ const Profile = () => {
 
                 {/* Empty state */}
                 {(!user.addresses || user.addresses.length === 0) && (
-                  <div className="address-empty-state">
-                    <MapPin size={52} strokeWidth={1} />
-                    <h3>Chưa có địa chỉ nào</h3>
-                    <p>Thêm địa chỉ giao hàng để việc mua sắm trở nên nhanh chóng hơn.</p>
-                    <button className="btn-add-address" onClick={() => { setEditingAddress(null); setShowAddressModal(true); }}>
+                  <div className="flex flex-col items-center text-center py-16 px-5 text-slate-400 bg-white border border-dashed border-slate-300 rounded-2xl">
+                    <MapPin size={52} strokeWidth={1} className="text-slate-300 mb-4" />
+                    <h3 className="text-lg text-slate-800 font-bold m-0 mb-2">Chưa có địa chỉ nào</h3>
+                    <p className="text-sm text-slate-500 m-0 mb-5 max-w-[280px]">Thêm địa chỉ giao hàng để việc mua sắm trở nên nhanh chóng hơn.</p>
+                    <button className="flex items-center gap-1.5 bg-blue-600 text-white border-none rounded-lg py-2.5 px-5 text-sm font-medium cursor-pointer transition-colors hover:bg-blue-700 shadow-sm" onClick={() => { setEditingAddress(null); setShowAddressModal(true); }}>
                       <Plus size={16} /> Thêm địa chỉ đầu tiên
                     </button>
                   </div>
                 )}
 
                 {/* Address cards grid */}
-                <div className="address-cards-grid">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {user.addresses?.map((addr, index) => (
-                    <div key={addr._id} className={`address-card ${index === 0 ? 'address-card-default' : ''}`}>
+                    <div key={addr._id} className={`bg-white border rounded-2xl p-5 relative flex flex-col gap-3 transition-all duration-200 hover:shadow-[0_4px_16px_rgba(37,99,235,0.1)] hover:border-blue-300 ${index === 0 ? 'border-blue-500 bg-gradient-to-br from-blue-50 via-white to-white' : 'border-slate-200'}`}>
                       {index === 0 && (
-                        <span className="address-default-badge">Mặc định</span>
+                        <span className="absolute top-3 right-3 bg-blue-600 text-white text-[11px] font-bold py-[3px] px-2.5 rounded-full">Mặc định</span>
                       )}
-                      <div className="address-card-icon-wrap">
-                        <Home size={22} />
+                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${index === 0 ? 'bg-blue-100 text-blue-600' : 'bg-slate-50 text-slate-500'}`}>
+                        <Home size={20} />
                       </div>
-                      <div className="address-card-body">
-                        <div className="address-card-name-row">
-                          <span className="address-card-name">{addr.fullName}</span>
+                      <div className="flex-1 mt-1">
+                        <div className="flex items-center gap-2.5 flex-wrap mb-1.5">
+                          <span className="font-bold text-[15px] text-slate-900">{addr.fullName}</span>
                           {addr.phone && (
-                            <span className="address-card-phone"><Phone size={13} /> {addr.phone}</span>
+                            <span className="flex items-center gap-1 text-[13px] text-slate-500"><Phone size={12} /> {addr.phone}</span>
                           )}
                         </div>
-                        <p className="address-card-detail">
+                        <p className="text-[13px] text-slate-600 leading-relaxed m-0">
                           {[addr.detail, addr.ward, addr.district, addr.province].filter(Boolean).join(', ')}
                         </p>
                       </div>
-                      <div className="address-card-actions">
-                        <button className="addr-btn-edit" onClick={() => { setEditingAddress(addr); setShowAddressModal(true); }}>
-                          <Edit size={15} /> Sửa
+                      <div className="flex gap-2 border-t border-slate-100 pt-3 mt-auto">
+                        <button className="flex items-center gap-1.5 text-[13px] font-medium rounded-lg py-1.5 px-3.5 cursor-pointer border border-transparent transition-all bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200" onClick={() => { setEditingAddress(addr); setShowAddressModal(true); }}>
+                          <Edit size={14} /> Sửa
                         </button>
-                        <button className="addr-btn-delete" onClick={() => deleteAddress(addr._id)}>
-                          <Trash2 size={15} /> Xóa
+                        <button className="flex items-center gap-1.5 text-[13px] font-medium rounded-lg py-1.5 px-3.5 cursor-pointer border border-transparent transition-all bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-red-500 hover:border-red-200" onClick={() => deleteAddress(addr._id)}>
+                          <Trash2 size={14} /> Xóa
                         </button>
                       </div>
                     </div>
@@ -1195,7 +1184,7 @@ const Profile = () => {
                 </div>
 
                 {(user.addresses?.length || 0) >= 5 && (
-                  <p className="address-limit-notice">⚠️ Bạn đã đạt giới hạn 5 địa chỉ. Xóa một địa chỉ để thêm mới.</p>
+                  <p className="mt-5 text-center text-[13px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg py-2.5 px-4 font-medium">⚠️ Bạn đã đạt giới hạn 5 địa chỉ. Xóa một địa chỉ để thêm mới.</p>
                 )}
               </div>
             )}
@@ -1210,64 +1199,62 @@ const Profile = () => {
                 'COD': { label: 'Tiền mặt (COD)', color: '#059669', bg: '#ecfdf5', icon: '💵' },
               };
               return (
-                <div className="card-section" style={{ background: 'transparent', boxShadow: 'none', padding: 0 }}>
+                <div className="flex flex-col">
 
                   {/* Header stats */}
-                  <div className="payment-history-header">
-                    <div>
-                      <h2 className="payment-history-title">Lịch sử thanh toán</h2>
-                      <p className="payment-history-subtitle">Tổng quan các giao dịch thành công của bạn</p>
-                    </div>
+                  <div className="bg-white rounded-xl py-5 px-6 mb-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)] border border-slate-200">
+                    <h2 className="text-[20px] font-bold text-slate-900 m-0 mb-1">Lịch sử thanh toán</h2>
+                    <p className="text-[13px] text-slate-500 m-0">Tổng quan các giao dịch thành công của bạn</p>
                   </div>
 
                   {/* Stat cards */}
-                  <div className="payment-stat-row">
-                    <div className="payment-stat-card">
-                      <div className="payment-stat-icon" style={{ background: '#eff6ff', color: '#2563eb' }}><ReceiptText size={22} /></div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-blue-50 text-blue-600"><ReceiptText size={22} /></div>
                       <div>
-                        <p className="payment-stat-label">Giao dịch thành công</p>
-                        <h3 className="payment-stat-value">{paidOrders.length}</h3>
+                        <p className="text-[13px] text-slate-500 m-0 mb-1 font-medium">Giao dịch thành công</p>
+                        <h3 className="text-[22px] font-bold text-slate-900 m-0">{paidOrders.length}</h3>
                       </div>
                     </div>
-                    <div className="payment-stat-card">
-                      <div className="payment-stat-icon" style={{ background: '#ecfdf5', color: '#059669' }}><DollarSign size={22} /></div>
+                    <div className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-emerald-50 text-emerald-600"><DollarSign size={22} /></div>
                       <div>
-                        <p className="payment-stat-label">Tổng đã thanh toán</p>
-                        <h3 className="payment-stat-value">{totalSpent.toLocaleString()}đ</h3>
+                        <p className="text-[13px] text-slate-500 m-0 mb-1 font-medium">Tổng đã thanh toán</p>
+                        <h3 className="text-[22px] font-bold text-slate-900 m-0">{totalSpent.toLocaleString()}đ</h3>
                       </div>
                     </div>
                   </div>
 
                   {/* Transaction list */}
                   {paidOrders.length === 0 ? (
-                    <div className="address-empty-state">
-                      <ReceiptText size={52} strokeWidth={1} />
-                      <h3>Chưa có giao dịch nào</h3>
-                      <p>Các đơn hàng đã thanh toán thành công sẽ hiển thị tại đây.</p>
+                    <div className="flex flex-col items-center text-center py-16 px-5 text-slate-400 bg-white border border-dashed border-slate-300 rounded-2xl">
+                      <ReceiptText size={52} strokeWidth={1} className="text-slate-300 mb-4" />
+                      <h3 className="text-lg text-slate-800 font-bold m-0 mb-2">Chưa có giao dịch nào</h3>
+                      <p className="text-sm text-slate-500 m-0 max-w-[300px]">Các đơn hàng đã thanh toán thành công sẽ hiển thị tại đây.</p>
                     </div>
                   ) : (
-                    <div className="payment-history-list">
+                    <div className="flex flex-col gap-3">
                       {paidOrders.map(order => {
                         const method = methodMap[order.paymentMethod] || { label: order.paymentMethod, color: '#64748b', bg: '#f1f5f9', icon: '💰' };
                         const firstItem = order.items?.[0];
                         return (
-                          <div key={order._id} className="payment-history-card">
-                            <div className="phc-left">
-                              <div className="phc-img">
-                                <img src={firstItem?.image || '/no-image.png'} alt={firstItem?.name} />
+                          <div key={order._id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white border border-slate-200 rounded-xl py-4 px-5 transition-shadow hover:shadow-[0_4px_12px_rgba(0,0,0,0.07)] gap-4 sm:gap-0">
+                            <div className="flex items-center gap-3.5 w-full sm:w-auto">
+                              <div className="w-14 h-14 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center p-1">
+                                <img src={firstItem?.image || '/no-image.png'} alt={firstItem?.name} className="max-w-full max-h-full object-contain" />
                               </div>
-                              <div className="phc-info">
-                                <p className="phc-order-id">Đơn #{order._id.slice(-6).toUpperCase()}</p>
-                                <p className="phc-product-name">{firstItem?.name}{order.items?.length > 1 ? ` +${order.items.length - 1} sản phẩm` : ''}</p>
-                                <p className="phc-date">{new Date(order.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[11px] font-bold text-blue-600 uppercase tracking-wide m-0 mb-1">Đơn #{order._id.slice(-6)}</p>
+                                <p className="text-[14px] font-semibold text-slate-900 m-0 mb-1 truncate max-w-full sm:max-w-[250px]">{firstItem?.name}{order.items?.length > 1 ? ` +${order.items.length - 1} sản phẩm` : ''}</p>
+                                <p className="text-[12px] text-slate-400 m-0 font-medium">{new Date(order.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
                               </div>
                             </div>
-                            <div className="phc-right">
-                              <span className="phc-method-badge" style={{ color: method.color, background: method.bg }}>
+                            <div className="flex flex-col items-start sm:items-end gap-1.5 w-full sm:w-auto border-t sm:border-0 border-slate-100 pt-3 sm:pt-0">
+                              <span className="text-[12px] font-semibold py-1 px-3 rounded-full" style={{ color: method.color, background: method.bg }}>
                                 {method.icon} {method.label}
                               </span>
-                              <p className="phc-total">{order.total.toLocaleString()}đ</p>
-                              <span className="phc-status-ok">✓ Đã thanh toán</span>
+                              <p className="text-[18px] font-extrabold text-slate-900 m-0 mt-0.5">{order.total.toLocaleString()}đ</p>
+                              <span className="text-[12px] text-emerald-600 font-semibold">✓ Đã thanh toán</span>
                             </div>
                           </div>
                         );
@@ -1287,51 +1274,57 @@ const Profile = () => {
 
       {/* MODAL TRẢ HÀNG */}
       {showReturnModal && (
-        <div className="modal-overlay" style={{ background: 'rgba(0,0,0,0.5)', zIndex: 9999 }}>
-          <div className="modal-content" style={{ maxWidth: '500px', width: '90%', backgroundColor: '#fff', padding: '24px', borderRadius: '12px', margin: 'auto' }}>
-            <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0 }}>Yêu cầu trả hàng</h3>
-              <button className="close-btn" style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => {setShowReturnModal(false); setReturnOrderId(null); setReturnReason(""); setReturnImages([]);}}><XCircle size={20} /></button>
+        <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-[9999] backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]">
+          <div className="bg-white rounded-2xl p-6 w-[90%] max-w-[500px] shadow-[0_10px_25px_rgba(0,0,0,0.1)] mx-auto overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="flex justify-between items-center mb-4 shrink-0">
+              <h3 className="m-0 text-lg font-bold text-slate-900">Yêu cầu trả hàng</h3>
+              <button className="bg-transparent border-none text-slate-400 hover:text-slate-800 cursor-pointer p-1 transition-colors" onClick={() => { setShowReturnModal(false); setReturnOrderId(null); setReturnReason(""); setReturnImages([]); }}><XCircle size={22} /></button>
             </div>
-            <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-              <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '15px' }}>
-                Bạn có thể gửi yêu cầu trả hàng nếu sản phẩm gặp lỗi từ nhà sản xuất hoặc không đúng mô tả trong vòng 15 ngày. 
+
+            <div className="overflow-y-auto pr-2 pb-2">
+              <p className="text-[13px] text-slate-600 mb-4 leading-relaxed bg-blue-50 border border-blue-100 p-3 rounded-lg">
+                Bạn có thể gửi yêu cầu trả hàng nếu sản phẩm gặp lỗi từ nhà sản xuất hoặc không đúng mô tả trong vòng 15 ngày.
                 Vui lòng ghi rõ lý do và tải lên hình ảnh minh chứng.
               </p>
-              <div className="form-group" style={{ marginBottom: '15px' }}>
-                <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Lý do trả hàng <span className="text-danger" style={{color: 'red'}}>*</span></label>
+
+              <div className="mb-4">
+                <label className="block mb-2 text-sm font-semibold text-slate-700">Lý do trả hàng <span className="text-red-500">*</span></label>
                 <textarea
-                  className="input-field"
-                  rows="4"
+                  className="w-full p-3 rounded-lg border border-slate-300 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-[3px] focus:ring-blue-500/10 transition-all resize-y min-h-[100px]"
                   placeholder="Mô tả chi tiết lý do bạn muốn trả hàng..."
                   value={returnReason}
                   onChange={(e) => setReturnReason(e.target.value)}
-                  style={{width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc', outline: 'none'}}
                 ></textarea>
               </div>
-              <div className="form-group" style={{ marginBottom: '15px' }}>
-                <label style={{display: 'block', marginBottom: '8px', fontWeight: '500'}}>Hình ảnh minh chứng <span className="text-danger" style={{color: 'red'}}>*</span> (Tối đa 5 ảnh)</label>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleReturnImageChange}
-                  className="input-field"
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '6px' }}
-                />
+
+              <div className="mb-2">
+                <label className="block mb-2 text-sm font-semibold text-slate-700">Hình ảnh minh chứng <span className="text-red-500">*</span> <span className="text-xs text-slate-400 font-normal">(Tối đa 5 ảnh)</span></label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleReturnImageChange}
+                    className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-slate-200 rounded-lg p-1.5"
+                  />
+                </div>
+
                 {returnImages.length > 0 && (
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px' }}>
+                  <div className="flex gap-2.5 flex-wrap mt-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
                     {Array.from(returnImages).map((file, idx) => (
-                      <img key={idx} src={URL.createObjectURL(file)} alt="preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #e2e8f0' }} />
+                      <div key={idx} className="relative group">
+                        <img src={URL.createObjectURL(file)} alt="preview" className="w-16 h-16 object-cover rounded-md border border-slate-200 shadow-sm" />
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
             </div>
-            <div className="modal-footer" style={{display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px', paddingTop: '15px', borderTop: '1px solid #e2e8f0'}}>
-              <button className="btn-secondary" style={{padding: '8px 16px', borderRadius: '6px', background: '#f1f5f9'}} onClick={() => {setShowReturnModal(false); setReturnOrderId(null); setReturnReason(""); setReturnImages([]);}}>Hủy bỏ</button>
-              <button className="btn-primary" style={{padding: '8px 16px', borderRadius: '6px', background: '#ef4444', color: '#fff', border: 'none'}} onClick={submitReturnRequest} disabled={isSubmittingReturn}>
-                {isSubmittingReturn ? <Loader2 size={16} className="spinner" style={{animation: 'spin 1s linear infinite'}} /> : "Gửi yêu cầu"}
+
+            <div className="flex justify-end gap-3 mt-5 pt-4 border-t border-slate-100 shrink-0">
+              <button className="py-2.5 px-5 rounded-lg bg-slate-100 text-slate-700 font-semibold border-none cursor-pointer transition-colors hover:bg-slate-200" onClick={() => { setShowReturnModal(false); setReturnOrderId(null); setReturnReason(""); setReturnImages([]); }}>Hủy bỏ</button>
+              <button className="flex items-center gap-2 py-2.5 px-6 rounded-lg bg-red-500 text-white font-semibold border-none cursor-pointer transition-colors hover:bg-red-600 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed" onClick={submitReturnRequest} disabled={isSubmittingReturn}>
+                {isSubmittingReturn ? <Loader2 size={16} className="animate-spin" /> : "Gửi yêu cầu"}
               </button>
             </div>
           </div>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '../Product/ProductCard';
-import './AIRecommend.css';
 
 const AIRecommend = () => {
     const [recommendations, setRecommendations] = useState([]);
@@ -32,7 +31,7 @@ const AIRecommend = () => {
             }).then(res => {
                 const ids = new Set(res.data.map(p => p._id));
                 setFavoriteIds(ids);
-            }).catch(() => {});
+            }).catch(() => { });
         }
     }, [token]);
 
@@ -88,57 +87,79 @@ const AIRecommend = () => {
     if (loading || recommendations.length === 0) return null;
 
     return (
-        <section className="ai-recommend-wrapper container">
-            <div className="ai-recommend-header">
-                <div className="ai-badge-title">
-                    <Sparkles className="ai-icon-pulse" size={24} />
-                    <h2>Dành Riêng Cho Bạn</h2>
-                    <span className="ai-tag">AI Powered</span>
+        <section className="my-[50px] container mx-auto px-4 relative">
+
+            {/* HEADER */}
+            <div className="mb-[25px] text-center">
+                <div className="inline-flex items-center gap-3 bg-gradient-to-r from-green-50 to-pink-50 px-6 py-2.5 rounded-full border border-pink-200 shadow-sm">
+                    <Sparkles className="text-rose-600 animate-pulse" size={24} />
+                    <h2 className="text-2xl font-extrabold m-0 bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">
+                        Dành Riêng Cho Bạn
+                    </h2>
+                    <span className="bg-gradient-to-br from-[#FF6B6B] to-[#FF8E53] text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        AI Powered
+                    </span>
                 </div>
-                <p className="ai-subtitle">Gợi ý thông minh dựa trên sở thích và hành vi mua sắm của bạn.</p>
+                <p className="mt-2.5 text-slate-500 text-[15px]">
+                    Gợi ý thông minh dựa trên sở thích và hành vi mua sắm của bạn.
+                </p>
             </div>
-            
-            <div className="ai-carousel-container">
-                <button 
-                    className="ai-carousel-btn left" 
+
+            {/* CAROUSEL CONTAINER */}
+            <div className="relative flex items-center w-full">
+
+                {/* NÚT TRÁI */}
+                <button
+                    className="absolute top-1/2 -translate-y-1/2 -left-3 md:-left-5 z-20 bg-white border border-slate-200 rounded-full w-10 h-10 md:w-11 md:h-11 flex items-center justify-center cursor-pointer shadow-md text-slate-700 transition-all duration-200 hover:bg-slate-50 hover:text-rose-600 hover:shadow-lg"
                     onClick={() => scroll('left')}
                     style={{ opacity: currentIndex === 0 ? 0.5 : 1, pointerEvents: currentIndex === 0 ? 'none' : 'auto' }}
                 >
                     <ChevronLeft size={24} />
                 </button>
 
-                <div className="ai-recommend-grid" ref={carouselRef} onScroll={handleScroll}>
+                {/* GRID SẢN PHẨM */}
+                <div
+                    className="flex gap-5 overflow-x-auto pb-5 pt-2.5 scroll-smooth items-stretch w-full snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+                    ref={carouselRef}
+                    onScroll={handleScroll}
+                >
                     {recommendations.map((item, idx) => {
                         if (!item.product) return null;
                         return (
-                            <div key={idx} className="ai-product-item">
-                                <ProductCard 
-                                    product={item.product} 
-                                    isFavorited={favoriteIds.has(item.product._id)}
-                                    onFavoriteToggle={handleFavoriteToggle}
-                                />
-                                <div className="ai-reason-box">
-                                    <div className="ai-reason-text">"{item.reason}"</div>
+                            <div key={idx} className="snap-start min-w-[280px] max-w-[300px] rounded-xl bg-white shrink-0 flex flex-col">
+                                <div className="relative z-10">
+                                    <ProductCard
+                                        product={item.product}
+                                        isFavorited={favoriteIds.has(item.product._id)}
+                                        onFavoriteToggle={handleFavoriteToggle}
+                                    />
+                                </div>
+                                <div className="-mt-2.5 p-3.5 bg-slate-50 rounded-b-xl border border-slate-200 border-t-0 flex-grow relative z-0">
+                                    <div className="text-[13.5px] text-slate-700 italic leading-relaxed pl-2.5 border-l-[3px] border-rose-500">
+                                        "{item.reason}"
+                                    </div>
                                 </div>
                             </div>
                         );
                     })}
                 </div>
 
-                <button 
-                    className="ai-carousel-btn right" 
+                {/* NÚT PHẢI */}
+                <button
+                    className="absolute top-1/2 -translate-y-1/2 -right-3 md:-right-5 z-20 bg-white border border-slate-200 rounded-full w-10 h-10 md:w-11 md:h-11 flex items-center justify-center cursor-pointer shadow-md text-slate-700 transition-all duration-200 hover:bg-slate-50 hover:text-rose-600 hover:shadow-lg"
                     onClick={() => scroll('right')}
-                    style={{ opacity: currentIndex >= recommendations.length - 1 ? 0.5 : 1, pointerEvents: currentIndex >= recommendations.length - 1 ? 'none' : 'auto' }}
+                    style={{ opacity: currentIndex >= totalPages - 1 ? 0.5 : 1, pointerEvents: currentIndex >= totalPages - 1 ? 'none' : 'auto' }}
                 >
                     <ChevronRight size={24} />
                 </button>
             </div>
 
-            <div className="ai-carousel-dots">
+            {/* CAROUSEL DOTS */}
+            <div className="flex justify-center gap-2 mt-2.5">
                 {[...Array(totalPages)].map((_, idx) => (
-                    <div 
-                        key={`dot-${idx}`} 
-                        className={`ai-dot ${currentIndex === idx ? 'active' : ''}`}
+                    <div
+                        key={`dot-${idx}`}
+                        className={`h-2.5 rounded-full cursor-pointer transition-all duration-300 ${currentIndex === idx ? 'bg-rose-600 w-6' : 'bg-slate-300 w-2.5'}`}
                         onClick={() => scrollToIndex(idx)}
                     />
                 ))}

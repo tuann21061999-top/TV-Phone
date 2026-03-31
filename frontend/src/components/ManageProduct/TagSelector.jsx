@@ -17,47 +17,52 @@ export default function TagSelector({ tagsList, selectedTags, onChange }) {
   };
 
   return (
-    <div className="tags-grouped-container" style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '15px', background: '#fff' }}>
+    <div className="border border-slate-300 rounded-xl p-4 bg-white shadow-sm">
       {Object.entries(groupedTags).map(([type, tags]) => (
-        <div key={type} className="tag-group" style={{ marginBottom: '15px', paddingBottom: '10px', borderBottom: '1px dashed #e2e8f0' }}>
-          <strong style={{ display: 'block', marginBottom: '8px', color: '#334155', fontSize: '14px' }}>
+        <div key={type} className="mb-4 pb-3 border-b border-dashed border-slate-200 last:mb-0 last:pb-0 last:border-b-0">
+          <strong className="block mb-2 text-slate-700 text-[13px]">
             {typeLabels[type] || type}
           </strong>
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            {tags.map(tag => (
-              <label key={tag._id} style={{ 
-                display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px', 
-                background: selectedTags.includes(tag._id) ? '#dbeafe' : '#f1f5f9', 
-                color: selectedTags.includes(tag._id) ? '#1e40af' : '#475569',
-                border: `1px solid ${selectedTags.includes(tag._id) ? '#bfdbfe' : 'transparent'}`,
-                padding: '6px 12px', borderRadius: '20px', cursor: 'pointer', transition: 'all 0.2s' 
-              }}>
-                <input 
-                  type="checkbox" 
-                  hidden
-                  checked={selectedTags.includes(tag._id)}
-                  onChange={(e) => {
-                    const newTags = e.target.checked 
-                      ? [...selectedTags, tag._id]
-                      : selectedTags.filter(id => id !== tag._id);
-                    onChange(newTags);
-                  }}
-                />
-                <div style={{ 
-                  width: '14px', height: '14px', borderRadius: '4px', 
-                  border: `2px solid ${selectedTags.includes(tag._id) ? '#3b82f6' : '#cbd5e1'}`,
-                  background: selectedTags.includes(tag._id) ? '#3b82f6' : '#fff',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>
-                  {selectedTags.includes(tag._id) && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                </div>
-                {tag.name}
-              </label>
-            ))}
+          <div className="flex flex-wrap gap-2.5">
+            {tags.map(tag => {
+              const isSelected = selectedTags.includes(tag._id);
+              return (
+                <label 
+                  key={tag._id} 
+                  className={`flex items-center gap-1.5 text-xs font-medium py-1.5 px-3 rounded-full cursor-pointer transition-all border ${
+                    isSelected 
+                      ? 'bg-blue-50 text-blue-700 border-blue-200 shadow-sm' 
+                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                  }`}
+                >
+                  <input 
+                    type="checkbox" 
+                    hidden
+                    checked={isSelected}
+                    onChange={(e) => {
+                      const newTags = e.target.checked 
+                        ? [...selectedTags, tag._id]
+                        : selectedTags.filter(id => id !== tag._id);
+                      onChange(newTags);
+                    }}
+                  />
+                  <div className={`w-3.5 h-3.5 rounded-[4px] border-[1.5px] flex items-center justify-center transition-colors ${
+                    isSelected ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300'
+                  }`}>
+                    {isSelected && (
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    )}
+                  </div>
+                  {tag.name}
+                </label>
+              );
+            })}
           </div>
         </div>
       ))}
-      {tagsList.length === 0 && <span style={{fontSize: '13px', color: '#64748b'}}>Chưa có tag nào trong hệ thống.</span>}
+      {tagsList.length === 0 && <span className="text-[13px] text-slate-500 italic block mt-2">Chưa có tag nào phù hợp trong hệ thống.</span>}
     </div>
   );
 }

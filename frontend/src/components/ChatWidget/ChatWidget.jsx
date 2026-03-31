@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
 import { MessageCircle, X, Send, Headphones } from "lucide-react";
-import "./ChatWidget.css";
 import { useNavigate } from "react-router-dom";
 
 const SOCKET_URL = "http://localhost:5000";
@@ -241,78 +240,98 @@ function ChatWidget() {
     };
     return (
         <>
+            {/* Inject keyframe cho hiệu ứng trượt lên mượt mà */}
+            <style>
+                {`
+                @keyframes chatSlideUp {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-chatSlideUp {
+                    animation: chatSlideUp 0.3s ease-out forwards;
+                }
+                `}
+            </style>
+
             {/* Nút mở chat */}
-            <button className="chat-widget-toggle" onClick={() => setIsOpen(!isOpen)}>
+            <button
+                className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 text-white border-none cursor-pointer flex items-center justify-center shadow-[0_4px_16px_rgba(37,99,235,0.4)] z-[9998] transition-all duration-300 hover:scale-[1.08] hover:shadow-[0_6px_20px_rgba(37,99,235,0.5)]"
+                onClick={() => setIsOpen(!isOpen)}
+            >
                 {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
-                {hasUnread && !isOpen && <span className="unread-dot" />}
+                {hasUnread && !isOpen && <span className="absolute top-[2px] right-[2px] w-[14px] h-[14px] bg-red-500 rounded-full border-2 border-white" />}
             </button>
 
             {/* Khung chat */}
             {isOpen && (
-                <div className="chat-widget-box">
+                <div className="fixed bottom-[90px] right-6 w-[370px] h-[500px] bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex flex-col z-[9999] overflow-hidden min-h-0 animate-chatSlideUp max-[480px]:w-[calc(100vw-16px)] max-[480px]:right-2 max-[480px]:bottom-[80px] max-[480px]:h-[60vh]">
+
                     {/* Header */}
-                    <div className="chat-widget-header">
-                        <div className="chat-header-info">
-                            <div className="chat-avatar">
+                    <div className="flex items-center justify-between px-[18px] py-[14px] bg-gradient-to-br from-blue-600 to-purple-600 text-white">
+                        <div className="flex items-center gap-[10px]">
+                            <div className="w-[36px] h-[36px] rounded-full bg-white/20 flex items-center justify-center shrink-0">
                                 <Headphones size={18} />
                             </div>
-                            <div className="chat-header-text">
-                                <h4>Hỗ trợ TechStore</h4>
-                                <div style={{ display: 'flex', gap: '5px', marginTop: '4px' }}>
+                            <div>
+                                <h4 className="m-0 text-[14px] font-semibold">Hỗ trợ TechStore</h4>
+                                <div className="flex gap-[5px] mt-1">
                                     <button
                                         onClick={() => setChatMode("admin")}
-                                        style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '10px', border: 'none', background: chatMode === "admin" ? '#fff' : 'rgba(255,255,255,0.3)', color: chatMode === "admin" ? '#2563eb' : '#fff', cursor: 'pointer', fontWeight: 600 }}
+                                        className={`text-[11px] px-2 py-0.5 rounded-full border-none cursor-pointer font-semibold transition-colors ${chatMode === "admin" ? 'bg-white text-blue-600' : 'bg-white/30 text-white'}`}
                                     >
                                         CSKH
                                     </button>
                                     <button
                                         onClick={() => setChatMode("ai")}
-                                        style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '10px', border: 'none', background: chatMode === "ai" ? '#fff' : 'rgba(255,255,255,0.3)', color: chatMode === "ai" ? '#2563eb' : '#fff', cursor: 'pointer', fontWeight: 600 }}
+                                        className={`text-[11px] px-2 py-0.5 rounded-full border-none cursor-pointer font-semibold transition-colors ${chatMode === "ai" ? 'bg-white text-blue-600' : 'bg-white/30 text-white'}`}
                                     >
                                         AI Tư vấn
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <button className="chat-close-btn" onClick={() => setIsOpen(false)}>
+                        <button
+                            className="bg-transparent border-none text-white cursor-pointer opacity-80 flex transition-opacity duration-200 hover:opacity-100 p-0"
+                            onClick={() => setIsOpen(false)}
+                        >
                             <X size={18} />
                         </button>
                     </div>
 
                     {/* Messages */}
-                    <div className="chat-widget-messages">
+                    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-[10px] bg-[#F8FAFC] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full">
                         {chatMode === "admin" ? (
                             <>
                                 {loading ? (
-                                    <div className="chat-loading">Đang tải lịch sử chat...</div>
+                                    <div className="flex items-center justify-center p-5 text-slate-400 text-[13px]">Đang tải lịch sử chat...</div>
                                 ) : messages.length === 0 ? (
-                                    <div className="chat-empty">
+                                    <div className="text-center text-slate-400 py-10 px-5 text-[13px]">
                                         <p>👋 Xin chào! Hãy gửi tin nhắn để gặp chuyên viên hỗ trợ.</p>
                                     </div>
                                 ) : (
                                     messages.map((msg, idx) => (
                                         <div
                                             key={msg._id || idx}
-                                            className={`chat-msg ${msg.senderId === currentUser._id || msg.senderId?._id === currentUser._id
-                                                ? "sent"
-                                                : "received"
+                                            className={`max-w-[80%] px-[14px] py-[10px] rounded-2xl text-[13px] leading-relaxed break-words ${msg.senderId === currentUser._id || msg.senderId?._id === currentUser._id
+                                                    ? "self-end bg-gradient-to-br from-blue-600 to-blue-500 text-white rounded-br-sm shadow-sm"
+                                                    : "self-start bg-white text-slate-800 border border-slate-200 rounded-bl-sm shadow-sm"
                                                 }`}
                                         >
                                             {msg.content}
-                                            <span className="chat-msg-time">{formatTime(msg.createdAt)}</span>
+                                            <span className="text-[10px] opacity-70 mt-1 block">{formatTime(msg.createdAt)}</span>
                                         </div>
                                     ))
                                 )}
-                                {isTyping && <div className="chat-typing">Admin đang nhập...</div>}
+                                {isTyping && <div className="self-start text-[12px] text-slate-400 italic py-1">Admin đang nhập...</div>}
                             </>
                         ) : (
                             <>
                                 {aiMessages.map((msg, idx) => (
                                     <div
                                         key={msg._id || idx}
-                                        className={`chat-msg ${msg.senderId === currentUser._id
-                                            ? "sent"
-                                            : "received"
+                                        className={`max-w-[80%] px-[14px] py-[10px] rounded-2xl text-[13px] leading-relaxed break-words ${msg.senderId === currentUser._id
+                                                ? "self-end bg-gradient-to-br from-blue-600 to-blue-500 text-white rounded-br-sm shadow-sm"
+                                                : "self-start bg-white text-slate-800 border border-slate-200 rounded-bl-sm shadow-sm"
                                             }`}
                                     >
                                         {/* Phân tách: Nếu là AI thì render HTML để có Link, nếu là User thì in text thường để chống hack */}
@@ -325,10 +344,10 @@ function ChatWidget() {
                                         ) : (
                                             <div style={{ whiteSpace: 'pre-line' }}>{msg.content}</div>
                                         )}
-                                        <span className="chat-msg-time">{formatTime(msg.createdAt)}</span>
+                                        <span className="text-[10px] opacity-70 mt-1 block">{formatTime(msg.createdAt)}</span>
                                     </div>
                                 ))}
-                                {aiLoading && <div className="chat-typing">AI đang suy nghĩ...</div>}
+                                {aiLoading && <div className="self-start text-[12px] text-slate-400 italic py-1">AI đang suy nghĩ...</div>}
                             </>
                         )}
 
@@ -336,16 +355,17 @@ function ChatWidget() {
                     </div>
 
                     {/* Input */}
-                    <div className="chat-widget-input">
+                    <div className="flex items-center gap-2 px-[14px] py-[12px] border-t border-slate-200 bg-white">
                         <input
                             type="text"
                             placeholder="Nhập tin nhắn..."
                             value={inputMsg}
                             onChange={handleInputChange}
                             onKeyDown={handleKeyDown}
+                            className="flex-1 border border-slate-200 rounded-full px-4 py-2.5 text-[13px] outline-none transition-all duration-200 focus:border-blue-500 focus:ring-[3px] focus:ring-blue-500/10"
                         />
                         <button
-                            className="chat-send-btn"
+                            className="w-[38px] h-[38px] min-w-[38px] min-h-[38px] rounded-full bg-gradient-to-br from-blue-600 to-purple-600 text-white border-none cursor-pointer flex items-center justify-center transition-transform duration-200 hover:scale-105 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                             onClick={handleSend}
                             disabled={!inputMsg.trim()}
                         >

@@ -4,7 +4,6 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import TagSelector from './TagSelector';
 import CompatibleProductSelector from './CompatibleProductSelector';
-import './ManageProduct.css';
 
 export default function BulkActionsPanel({ selectedIds, clearSelection, refreshData, products, allProducts, tagsList, defaultCategoryName }) {
   const [actionType, setActionType] = useState(null); // 'status', 'tags', 'compatible', 'delete'
@@ -60,60 +59,62 @@ export default function BulkActionsPanel({ selectedIds, clearSelection, refreshD
   };
 
   return (
-    <div className="bulk-actions-panel" style={{ 
-      background: '#f8fafc', padding: '12px 20px', borderRadius: '10px', 
-      display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px', 
-      border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)'
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', color: '#334155' }}>
-        <CheckSquare size={20} color="#3b82f6" />
+    <div className="bg-slate-50 py-3 px-5 rounded-xl flex flex-wrap items-center gap-4 mb-5 border border-slate-200 shadow-sm animate-[fadeIn_0.2s_ease-out]">
+      <div className="flex items-center gap-2 font-bold text-slate-700">
+        <CheckSquare size={20} className="text-blue-500" />
         Đã chọn {selectedIds.length} sản phẩm
       </div>
       
-      <div style={{ width: '1px', height: '24px', background: '#cbd5e1', margin: '0 10px' }}></div>
+      <div className="hidden sm:block w-px h-6 bg-slate-300 mx-2"></div>
       
-      <button className="bulk-btn" onClick={() => handleActionClick('tags')} style={btnStyle}>
-        <Tag size={16} /> Gán Tags
-      </button>
-      <button className="bulk-btn" onClick={() => handleActionClick('status')} style={btnStyle}>
-        <Eye size={16} /> Đổi trạng thái
-      </button>
-      <button className="bulk-btn" onClick={() => handleActionClick('compatible')} style={btnStyle}>
-        <LinkIcon size={16} /> SP Tương thích
-      </button>
-      <button className="bulk-btn" onClick={() => handleActionClick('delete')} style={{...btnStyle, color: '#ef4444', borderColor: '#fee2e2', background: '#fef2f2'}}>
-        <Trash2 size={16} /> Xóa
-      </button>
+      <div className="flex flex-wrap gap-2.5">
+        <button className="flex items-center gap-1.5 py-2 px-3 rounded-lg bg-white border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer" onClick={() => handleActionClick('tags')}>
+          <Tag size={16} className="text-slate-500" /> Gán Tags
+        </button>
+        <button className="flex items-center gap-1.5 py-2 px-3 rounded-lg bg-white border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer" onClick={() => handleActionClick('status')}>
+          <Eye size={16} className="text-slate-500" /> Đổi trạng thái
+        </button>
+        <button className="flex items-center gap-1.5 py-2 px-3 rounded-lg bg-white border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-colors cursor-pointer" onClick={() => handleActionClick('compatible')}>
+          <LinkIcon size={16} className="text-slate-500" /> SP Tương thích
+        </button>
+        <button className="flex items-center gap-1.5 py-2 px-3 rounded-lg bg-red-50 border border-red-200 text-sm font-medium text-red-600 hover:bg-red-100 hover:border-red-300 transition-colors cursor-pointer" onClick={() => handleActionClick('delete')}>
+          <Trash2 size={16} /> Xóa
+        </button>
+      </div>
 
-      <button onClick={clearSelection} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '14px', textDecoration: 'underline' }}>
+      <button onClick={clearSelection} className="ml-auto bg-transparent border-none text-slate-500 hover:text-slate-700 cursor-pointer text-sm underline underline-offset-2 transition-colors">
         Bỏ chọn
       </button>
 
       {/* MODAL CHO BULK ACTION */}
       {actionType && (
-        <div className="modal-overlay" style={{ zIndex: 1100 }}>
-          <div className="modal-window" style={{ maxWidth: '500px' }}>
-            <div className="modal-header">
-              <div className="modal-title">
-                <LayoutList size={20} color="#2563eb" />
-                <h3>Thao tác hàng loạt ({selectedIds.length} SP)</h3>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-[2px] flex justify-center py-10 px-5 z-[9999] overflow-y-auto">
+          <div className="bg-white w-full max-w-[500px] rounded-2xl shadow-2xl flex flex-col m-auto animate-[modalPop_0.3s_ease-out]">
+            <div className="flex justify-between items-center p-5 px-6 border-b border-slate-100 rounded-t-2xl bg-white">
+              <div className="flex items-center gap-2">
+                <LayoutList size={22} className="text-blue-600" />
+                <h3 className="m-0 text-lg font-bold text-slate-800">Thao tác hàng loạt ({selectedIds.length} SP)</h3>
               </div>
-              <button className="modal-close-btn" onClick={closeModal}><X size={24} /></button>
+              <button className="bg-transparent border-none text-slate-400 hover:text-red-500 cursor-pointer transition-colors flex" onClick={closeModal}><X size={24} /></button>
             </div>
             
-            <div className="modal-scroll-body" style={{ padding: '20px' }}>
+            <div className="p-6 bg-slate-50">
               {actionType === 'delete' && (
-                <div style={{ textAlign: 'center', color: '#ef4444' }}>
-                  <Trash2 size={48} style={{ marginBottom: '15px' }} />
-                  <p style={{ fontSize: '16px', fontWeight: 'bold' }}>Bạn có chắc chắn muốn xóa vĩnh viễn {selectedIds.length} sản phẩm này?</p>
-                  <p style={{ fontSize: '14px', color: '#64748b' }}>Hành động này không thể hoàn tác.</p>
+                <div className="text-center text-red-500 p-4">
+                  <Trash2 size={56} className="mb-4 mx-auto opacity-80" />
+                  <p className="text-base font-bold m-0 mb-2">Bạn có chắc chắn muốn xóa vĩnh viễn {selectedIds.length} sản phẩm này?</p>
+                  <p className="text-sm text-slate-500 m-0">Hành động này không thể hoàn tác.</p>
                 </div>
               )}
 
               {actionType === 'status' && (
-                <div className="form-group-full">
-                  <label>Chọn trạng thái mới cho {selectedIds.length} sản phẩm:</label>
-                  <select value={statusVal} onChange={(e) => setStatusVal(e.target.value === 'true')} style={{ padding: '10px', width: '100%', borderRadius: '8px', border: '1px solid #cbd5e1', marginTop: '10px' }}>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Chọn trạng thái mới cho {selectedIds.length} sản phẩm:</label>
+                  <select 
+                    value={statusVal} 
+                    onChange={(e) => setStatusVal(e.target.value === 'true')} 
+                    className="p-3 w-full rounded-xl border border-slate-200 mt-1 bg-white text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_12px_center] bg-[length:16px_16px]"
+                  >
                     <option value="true">Đang kinh doanh (Hiện)</option>
                     <option value="false">Ngừng kinh doanh (Ẩn)</option>
                   </select>
@@ -132,9 +133,9 @@ export default function BulkActionsPanel({ selectedIds, clearSelection, refreshD
                   });
                 });
                 return (
-                  <div className="form-group-full">
-                    <label>Chọn các Tags muốn gán cho {selectedIds.length} sản phẩm:</label>
-                    <div style={{ marginTop: '10px' }}>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold text-slate-700">Chọn các Tags muốn gán cho {selectedIds.length} sản phẩm:</label>
+                    <div className="mt-1">
                       <TagSelector 
                         tagsList={filteredBulkTags} 
                         selectedTags={selectedTags} 
@@ -146,9 +147,9 @@ export default function BulkActionsPanel({ selectedIds, clearSelection, refreshD
               })()}
 
               {actionType === 'compatible' && (
-                <div className="form-group-full">
-                  <label>Gán sản phẩm tương thích (Phụ kiện đi kèm):</label>
-                  <div style={{ marginTop: '10px' }}>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-slate-700">Gán sản phẩm tương thích (Phụ kiện đi kèm):</label>
+                  <div className="mt-1">
                     <CompatibleProductSelector 
                       products={allProducts || products} 
                       selectedIds={selectedCompatible} 
@@ -160,11 +161,10 @@ export default function BulkActionsPanel({ selectedIds, clearSelection, refreshD
               )}
             </div>
 
-            <div className="modal-footer-sticky" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-              <button className="btn-close-form" onClick={closeModal}>Hủy</button>
+            <div className="flex justify-end gap-3 p-5 bg-white border-t border-slate-100 rounded-b-2xl">
+              <button className="py-2.5 px-5 bg-slate-100 text-slate-600 font-semibold rounded-lg hover:bg-slate-200 transition-colors cursor-pointer border-none" onClick={closeModal}>Hủy</button>
               <button 
-                className="btn-save-form" 
-                style={{ background: actionType === 'delete' ? '#ef4444' : '#2563eb' }}
+                className={`py-2.5 px-5 text-white font-semibold rounded-lg transition-colors cursor-pointer border-none shadow-sm ${actionType === 'delete' ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-600 hover:bg-blue-700'}`} 
                 onClick={executeBulkAction}
               >
                 Xác nhận {actionType === 'delete' ? 'Xóa' : 'Cập nhật'}
@@ -176,11 +176,3 @@ export default function BulkActionsPanel({ selectedIds, clearSelection, refreshD
     </div>
   );
 }
-
-const btnStyle = {
-  display: 'flex', alignItems: 'center', gap: '5px',
-  padding: '8px 12px', borderRadius: '6px',
-  background: '#fff', border: '1px solid #cbd5e1',
-  cursor: 'pointer', fontSize: '14px', fontWeight: '500', color: '#334155',
-  transition: 'all 0.2s'
-};

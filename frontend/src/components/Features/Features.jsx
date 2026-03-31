@@ -1,4 +1,3 @@
-import "./Features.css";
 import {
   BadgeCheck,
   Truck,
@@ -27,11 +26,16 @@ function Features() {
   ];
 
   return (
-    <section className="features">
+    <section className="flex flex-wrap justify-center gap-10 py-[30px] px-5 md:px-[80px] bg-[#f8f9fa]">
       {list.map((item, i) => (
-        <div key={i} className="feature-item">
-          <div className="feature-icon">{item.icon}</div>
-          <p>{item.text}</p>
+        <div
+          key={i}
+          className="flex items-center gap-2.5 font-medium transition-transform duration-300 ease-in-out cursor-default hover:-translate-y-[3px] text-slate-800"
+        >
+          <div className="text-[#0d6efd] flex items-center justify-center">
+            {item.icon}
+          </div>
+          <p className="m-0">{item.text}</p>
         </div>
       ))}
     </section>

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { CheckCircle, XCircle, ArrowRight, Home } from "lucide-react";
-import "./PaymentResult.css";
 
 const PaymentResult = () => {
   const [searchParams] = useSearchParams();
@@ -26,27 +25,41 @@ const PaymentResult = () => {
   }, [searchParams]);
 
   return (
-    <div className="payment-result-container">
-      <div className={`result-card ${status}`}>
+    <div className="flex justify-center items-center min-h-[80vh] bg-slate-50 p-5 font-sans">
+      <div className={`bg-white rounded-xl p-10 text-center shadow-xl max-w-[500px] w-full border-t-[5px] animate-in fade-in zoom-in duration-300 ${
+        status === "success" ? "border-green-500" : "border-red-500"
+      }`}>
         {status === "success" ? (
           <>
-            <CheckCircle className="result-icon success" size={80} />
-            <h1>Thanh toán thành công!</h1>
-            <p>Cảm ơn bạn đã mua sắm tại TechNova. Đơn hàng của bạn đang được xử lý.</p>
+            <CheckCircle className="mx-auto text-green-500" size={80} />
+            <h1 className="text-2xl font-bold mt-5 mb-4 text-slate-800">Thanh toán thành công!</h1>
+            <p className="text-slate-600 text-base leading-relaxed mb-8">
+              Cảm ơn bạn đã mua sắm tại <span className="font-semibold text-blue-600">TechNova</span>. 
+              Đơn hàng của bạn đang được xử lý và sẽ sớm được giao.
+            </p>
           </>
         ) : (
           <>
-            <XCircle className="result-icon error" size={80} />
-            <h1>Giao dịch thất bại</h1>
-            <p>Rất tiếc, đã có lỗi xảy ra hoặc bạn đã hủy giao dịch.</p>
+            <XCircle className="mx-auto text-red-500" size={80} />
+            <h1 className="text-2xl font-bold mt-5 mb-4 text-slate-800">Giao dịch thất bại</h1>
+            <p className="text-slate-600 text-base leading-relaxed mb-8">
+              Rất tiếc, đã có lỗi xảy ra trong quá trình thanh toán hoặc bạn đã hủy giao dịch. 
+              Vui lòng thử lại hoặc liên hệ hỗ trợ.
+            </p>
           </>
         )}
 
-        <div className="result-actions">
-          <button className="btn-home" onClick={() => navigate("/")}>
+        <div className="flex flex-wrap gap-4 justify-center">
+          <button 
+            className="flex items-center gap-2 py-3 px-6 bg-slate-100 text-slate-700 rounded-lg text-base font-medium transition-all hover:bg-slate-200 cursor-pointer border-none active:scale-95" 
+            onClick={() => navigate("/")}
+          >
             <Home size={18} /> Về Trang Chủ
           </button>
-          <button className="btn-orders" onClick={() => navigate("/profile")}>
+          <button 
+            className="flex items-center gap-2 py-3 px-6 bg-blue-600 text-white rounded-lg text-base font-medium transition-all hover:bg-blue-700 cursor-pointer border-none shadow-md shadow-blue-600/20 active:scale-95" 
+            onClick={() => navigate("/profile?tab=orders")}
+          >
             Xem Đơn Hàng <ArrowRight size={18} />
           </button>
         </div>

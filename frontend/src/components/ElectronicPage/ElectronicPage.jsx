@@ -4,7 +4,6 @@ import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import axios from "axios";
 import { toast } from "sonner";
-import "./ElectronicPage.css";
 import {
   Star,
   ShoppingCart,
@@ -288,40 +287,58 @@ function ElectronicPage() {
   /* ================= UI ================= */
 
   return (
-    <div className="electronics-page">
+    <div className="min-h-screen bg-[#f5f7fa] font-sans">
       <Header />
 
-      <div className="electronics-container">
-        <nav className="breadcrumb" style={{ paddingBottom: "15px" }}>
-          <Link to="/">Trang chủ</Link>
+      {/* CSS Nhúng cho animation nảy tim */}
+      <style>
+        {`
+          @keyframes heartPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+          }
+          .animate-heartPop {
+            animation: heartPop 0.35s ease;
+          }
+        `}
+      </style>
+
+      <div className="w-[90%] max-w-[1600px] mx-auto py-8 px-4 md:px-10">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm text-gray-500 pb-4">
+          <Link to="/" className="hover:text-blue-600 transition-colors no-underline">Trang chủ</Link>
           <ChevronRight size={14} />
-          <span>Đồ điện tử</span>
+          <span className="font-medium text-gray-800">Đồ điện tử</span>
         </nav>
-        <div className="electronics-header">
-          <h1>Đồ điện tử</h1>
-          <p>Tìm thấy {filteredProducts.length} sản phẩm</p>
+
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Đồ điện tử</h1>
+          <p className="text-gray-500 m-0">Tìm thấy {filteredProducts.length} sản phẩm</p>
         </div>
 
-        <div className="electronics-content">
-          <aside className="electronics-sidebar">
-            <h3>
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* SIDEBAR */}
+          <aside className="w-full md:w-[250px] bg-white p-5 rounded-lg shadow-sm sticky top-[100px] max-h-[calc(100vh-120px)] overflow-y-auto shrink-0">
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-800 m-0 mb-5">
               <Filter size={18} /> Bộ lọc
             </h3>
 
             {/* CATEGORY */}
-            <div className="filter-group">
-              <h4>Danh mục</h4>
+            <div className="mb-6">
+              <h4 className="font-medium text-gray-700 mb-3 m-0">Danh mục</h4>
               {categories.map((cat) => (
                 <button
                   key={cat.name}
-                  className={
-                    activeCategory === cat.name
-                      ? "category-btn active"
-                      : "category-btn"
-                  }
-                  onClick={() =>
-                    setActiveCategory(cat.name)
-                  }
+                  className={`flex items-center gap-2 w-full p-2 border-none rounded-md cursor-pointer transition-colors mb-2 text-sm font-medium ${activeCategory === cat.name
+                      ? "bg-blue-600 text-white"
+                      : "bg-[#f3f3f3] text-gray-700 hover:bg-gray-200"
+                    }`}
+                  onClick={() => {
+                    setActiveCategory(cat.name);
+                    setBrandFilter("all");
+                  }}
                 >
                   {cat.icon} {cat.name}
                 </button>
@@ -329,35 +346,27 @@ function ElectronicPage() {
             </div>
 
             {/* PRICE */}
-            <div className="filter-group">
-              <h4>Khoảng giá</h4>
+            <div className="mb-6">
+              <h4 className="font-medium text-gray-700 mb-2 m-0">Khoảng giá</h4>
               <select
+                className="w-full p-2.5 border border-gray-200 rounded-md bg-white text-gray-700 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm cursor-pointer"
                 value={priceRange}
-                onChange={(e) =>
-                  setPriceRange(e.target.value)
-                }
+                onChange={(e) => setPriceRange(e.target.value)}
               >
                 <option value="all">Tất cả</option>
-                <option value="under500">
-                  Dưới 500.000₫
-                </option>
-                <option value="500to1m">
-                  500.000₫ - 1.000.000₫
-                </option>
-                <option value="above1m">
-                  Trên 1.000.000₫
-                </option>
+                <option value="under500">Dưới 500.000₫</option>
+                <option value="500to1m">500.000₫ - 1.000.000₫</option>
+                <option value="above1m">Trên 1.000.000₫</option>
               </select>
             </div>
 
             {/* RATING */}
-            <div className="filter-group">
-              <h4>Đánh giá</h4>
+            <div className="mb-6">
+              <h4 className="font-medium text-gray-700 mb-2 m-0">Đánh giá</h4>
               <select
+                className="w-full p-2.5 border border-gray-200 rounded-md bg-white text-gray-700 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm cursor-pointer"
                 value={ratingFilter}
-                onChange={(e) =>
-                  setRatingFilter(e.target.value)
-                }
+                onChange={(e) => setRatingFilter(e.target.value)}
               >
                 <option value="all">Tất cả</option>
                 <option value="4">4★ trở lên</option>
@@ -366,13 +375,12 @@ function ElectronicPage() {
             </div>
 
             {/* BRAND */}
-            <div className="filter-group">
-              <h4>Hãng</h4>
+            <div className="mb-6">
+              <h4 className="font-medium text-gray-700 mb-2 m-0">Hãng</h4>
               <select
+                className="w-full p-2.5 border border-gray-200 rounded-md bg-white text-gray-700 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm cursor-pointer"
                 value={brandFilter}
-                onChange={(e) =>
-                  setBrandFilter(e.target.value)
-                }
+                onChange={(e) => setBrandFilter(e.target.value)}
               >
                 <option value="all">Tất cả</option>
                 {brands.map((brand) => (
@@ -384,29 +392,22 @@ function ElectronicPage() {
             </div>
 
             {/* SORT */}
-            <div className="filter-group">
-              <h4>Sắp xếp</h4>
+            <div className="mb-6">
+              <h4 className="font-medium text-gray-700 mb-2 m-0">Sắp xếp</h4>
               <select
+                className="w-full p-2.5 border border-gray-200 rounded-md bg-white text-gray-700 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm cursor-pointer"
                 value={sortOption}
-                onChange={(e) =>
-                  setSortOption(e.target.value)
-                }
+                onChange={(e) => setSortOption(e.target.value)}
               >
                 <option value="default">Mặc định</option>
-                <option value="priceAsc">
-                  Giá tăng dần
-                </option>
-                <option value="priceDesc">
-                  Giá giảm dần
-                </option>
-                <option value="rating">
-                  Đánh giá cao nhất
-                </option>
+                <option value="priceAsc">Giá tăng dần</option>
+                <option value="priceDesc">Giá giảm dần</option>
+                <option value="rating">Đánh giá cao nhất</option>
               </select>
             </div>
 
             <button
-              className="reset-btn"
+              className="w-full py-2 bg-gray-100 text-gray-600 font-semibold border-none rounded-md hover:bg-gray-200 hover:text-gray-800 transition-colors cursor-pointer"
               onClick={resetFilters}
             >
               Reset bộ lọc
@@ -414,65 +415,85 @@ function ElectronicPage() {
           </aside>
 
           {/* PRODUCTS */}
-          <section className="electronics-products">
-            {loading && <div>Đang tải...</div>}
-            {error && <div>{error}</div>}
+          <section className="flex-1">
+            {loading && <div className="text-gray-500 font-medium">Đang tải...</div>}
+            {error && <div className="text-red-500 font-medium">{error}</div>}
 
             {!loading && !error && (
-              <div className="product-grid">
+              /* ĐÂY LÀ ĐOẠN GRID 3x3 Y HỆT TRANG ACCESSORY */
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {currentProducts.map((product) => {
                   const { basePrice, finalPrice, discountPercent } = getPricingInfo(product);
                   const hasDiscount = finalPrice < basePrice;
 
+                  const displayImage =
+                    product.colorImages?.find((img) => img.isDefault)?.imageUrl ||
+                    product.colorImages?.[0]?.imageUrl ||
+                    product.images?.[0] ||
+                    "/no-image.png";
+
                   return (
                     <div
                       key={product._id}
-                      className="product-card"
+                      className="bg-white p-5 rounded-xl relative text-center flex flex-col h-full shadow-sm hover:shadow-md transition-shadow duration-300 group"
                     >
                       <Link
                         to={`/product/${product.slug || product._id}`}
-                        className="product-link"
+                        className="flex flex-col flex-grow no-underline text-inherit"
                       >
-                        <div className="product-image">
+                        {hasDiscount && discountPercent > 0 && (
+                          <span className="absolute top-2.5 left-2.5 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
+                            -{discountPercent}%
+                          </span>
+                        )}
+
+                        <div className="h-[150px] mb-4 relative flex items-center justify-center rounded-lg">
                           <button
-                            className={`wishlist-btn ${favoriteIds.has(product._id) ? "liked" : ""}`}
+                            className={`absolute top-2 right-2 z-20 bg-white/90 border-none rounded-full w-8 h-8 p-0 flex items-center justify-center cursor-pointer shadow-sm transition-all duration-300 hover:scale-110 hover:bg-white hover:shadow-md active:scale-125 ${favoriteIds.has(product._id) ? "bg-red-50 animate-heartPop" : ""
+                              }`}
                             onClick={(e) => handleToggleFavorite(e, product._id)}
                             title={favoriteIds.has(product._id) ? "Bỏ yêu thích" : "Yêu thích"}
                           >
-                            <HeartPlus size={18} fill="none" stroke={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"} />
+                            <HeartPlus
+                              size={18}
+                              color={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"}
+                              fill={favoriteIds.has(product._id) ? "#ef4444" : "none"}
+                            />
                           </button>
                           <img
-                            src={
-                              product.colorImages?.[0]?.imageUrl ||
-                              product.images?.[0] ||
-                              "/no-image.png"
-                            }
+                            src={displayImage}
                             alt={product.name}
+                            className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                           />
                         </div>
 
-                        <h3>{product.name}</h3>
+                        <h3 className="text-[15px] font-semibold text-gray-800 mb-2 m-0 line-clamp-2 h-[45px]">
+                          {product.name}
+                        </h3>
 
-                        <div className="product-highlights-small" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', margin: '5px 0' }}>
+                        <div className="flex flex-wrap justify-center gap-1 my-1.5 min-h-[28px]">
                           {product.highlights?.map((text, idx) => (
-                            <span key={idx} style={{ background: '#f1f5f9', color: '#475569', fontSize: '11px', padding: '4px 8px', borderRadius: '4px' }}>{text}</span>
+                            <span
+                              key={idx}
+                              className="bg-slate-100 text-slate-600 text-[11px] px-2 py-1 rounded"
+                            >
+                              {text}
+                            </span>
                           ))}
                         </div>
 
-                        <div className="product-price">
-                          {hasDiscount && discountPercent > 0 ? (
-                            <>
-                              <span className="old-price" style={{ textDecoration: 'line-through', color: '#9ca3af', marginRight: '6px', fontSize: '12px' }}>{formatPrice(basePrice)}</span>
-                              <span className="new-price" style={{ color: '#ef4444' }}>{formatPrice(finalPrice)}</span>
-                            </>
-                          ) : (
-                            formatPrice(basePrice)
+                        <div className="mt-auto mb-3 font-bold text-red-500 text-lg">
+                          {formatPrice(finalPrice)}
+                          {hasDiscount && (
+                            <span className="ml-2 text-sm font-normal text-gray-400 line-through">
+                              {formatPrice(basePrice)}
+                            </span>
                           )}
                         </div>
                       </Link>
 
-                      <button className="add-cart">
-                        <ShoppingCart size={16} />
+                      <button className="bg-blue-600 text-white border-none py-2.5 px-4 cursor-pointer rounded-lg flex items-center justify-center gap-2 w-full hover:bg-blue-700 transition-colors font-medium mt-2">
+                        <ShoppingCart size={18} />
                         Thêm vào giỏ
                       </button>
                     </div>
@@ -481,17 +502,17 @@ function ElectronicPage() {
               </div>
             )}
 
-            {!loading &&
-              filteredProducts.length === 0 && (
-                <div className="no-products">
-                  Không tìm thấy sản phẩm phù hợp.
-                </div>
-              )}
+            {!loading && filteredProducts.length === 0 && (
+              <div className="bg-white p-10 rounded-xl text-center text-gray-500 shadow-sm border border-dashed border-gray-200">
+                Không tìm thấy đồ điện tử nào phù hợp.
+              </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="pagination">
+              <div className="flex justify-center gap-2 mt-10 flex-wrap">
                 <button
+                  className="w-10 h-10 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold flex items-center justify-center cursor-pointer transition-all hover:border-blue-600 hover:text-blue-600 disabled:bg-slate-50 disabled:text-slate-300 disabled:border-slate-100 disabled:cursor-not-allowed"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage(currentPage - 1)}
                 >
@@ -501,15 +522,21 @@ function ElectronicPage() {
                 {getPaginationNumbers().map((item, index) => (
                   <button
                     key={index}
-                    className={`${currentPage === item ? "active" : ""} ${item === '...' ? "dots" : ""}`}
-                    onClick={() => typeof item === 'number' && setCurrentPage(item)}
-                    disabled={item === '...'}
+                    className={`w-10 h-10 rounded-lg border flex items-center justify-center font-semibold transition-all duration-200 ${currentPage === item
+                        ? "bg-blue-600 text-white border-blue-600 cursor-pointer"
+                        : item === "..."
+                          ? "bg-transparent border-transparent text-slate-500 cursor-default"
+                          : "bg-white text-slate-600 border-slate-200 hover:border-blue-600 hover:text-blue-600 cursor-pointer"
+                      }`}
+                    onClick={() => typeof item === "number" && setCurrentPage(item)}
+                    disabled={item === "..."}
                   >
                     {item}
                   </button>
                 ))}
 
                 <button
+                  className="w-10 h-10 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold flex items-center justify-center cursor-pointer transition-all hover:border-blue-600 hover:text-blue-600 disabled:bg-slate-50 disabled:text-slate-300 disabled:border-slate-100 disabled:cursor-not-allowed"
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage(currentPage + 1)}
                 >

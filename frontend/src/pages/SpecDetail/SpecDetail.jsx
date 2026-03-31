@@ -4,7 +4,6 @@ import axios from 'axios';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import { ChevronRight, Cpu, HardDrive, Maximize, Camera, Battery, Smartphone, Wifi, Gamepad2, Layers, ShoppingCart, List } from 'lucide-react';
-import './SpecDetail.css';
 
 const ICONS = {
     "Thông tin chung": <Layers size={20} color="#2563eb" />,
@@ -78,8 +77,8 @@ function SpecDetail() {
         return Math.min(...product.variants.map(v => v.price));
     }, [product]);
 
-    if (loading) return <div className="loading-state">Đang tải cấu hình chi tiết...</div>;
-    if (!product) return <div className="error-state">Không tìm thấy sản phẩm</div>;
+    if (loading) return <div className="flex justify-center items-center py-20 text-slate-500 font-medium animate-pulse">Đang tải cấu hình chi tiết...</div>;
+    if (!product) return <div className="flex justify-center items-center py-20 text-red-500 font-medium">Không tìm thấy sản phẩm</div>;
 
     const hasDetailedSpecs = product.detailedSpecs &&
         Object.keys(product.detailedSpecs).length > 0 &&
@@ -87,60 +86,57 @@ function SpecDetail() {
     const hasBasicSpecs = product.specs && Object.keys(product.specs).length > 0;
 
     return (
-        <div className="spec-detail-page">
+        <div className="bg-slate-50 min-h-screen font-sans">
             <Header />
 
             {/* Sticky Top Header Bar */}
-            <div className="spec-sticky-header">
-                <div className="spec-container sticky-content">
-                    <div className="sticky-product-info">
-                        <img src={mainImage} alt={product.name} />
+            <div className="sticky top-0 bg-white border-b border-slate-200 z-50 py-3 shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
+                <div className="max-w-[1400px] mx-auto px-5 md:px-10 w-full flex justify-between items-center">
+                    <div className="flex items-center gap-4">
+                        <img src={mainImage} alt={product.name} className="w-[45px] h-[45px] object-contain bg-slate-100 rounded-lg p-1" />
                         <div>
-                            <h2 className="sticky-title">{product.name}</h2>
-                            <span className="sticky-price">{minPrice.toLocaleString()}đ</span>
+                            <h2 className="m-0 mb-0.5 text-base font-bold text-slate-800">{product.name}</h2>
+                            <span className="text-sm font-semibold text-blue-600">{minPrice.toLocaleString()}đ</span>
                         </div>
                     </div>
-                    <div className="sticky-nav">
-                        <Link to={`/product/${product.slug}`} className="nav-link">Tổng quan</Link>
-                        <span className="nav-link active">Thông số kỹ thuật chi tiết</span>
-                        <Link to={`/product/${product.slug}/reviews`} className="nav-link">Đánh giá</Link>
+                    <div className="hidden md:flex items-center gap-[30px]">
+                        <Link to={`/product/${product.slug}`} className="text-sm font-semibold text-slate-500 no-underline relative pb-5 -mb-5 hover:text-blue-600 transition-colors">Tổng quan</Link>
+                        <span className="text-sm font-semibold text-blue-600 relative pb-5 -mb-5 after:absolute after:bottom-0 after:left-0 after:w-full after:h-[3px] after:bg-blue-600 after:rounded-t-sm cursor-default">Thông số kỹ thuật chi tiết</span>
+                        <Link to={`/product/${product.slug}/reviews`} className="text-sm font-semibold text-slate-500 no-underline relative pb-5 -mb-5 hover:text-blue-600 transition-colors">Đánh giá</Link>
                     </div>
                 </div>
             </div>
 
-            <div className="spec-container main-content-layout">
+            <div className="max-w-[1400px] mx-auto px-5 md:px-10 w-full flex flex-col lg:flex-row gap-[30px] mt-[30px] mb-[60px]">
                 {/* Left Sidebar */}
-                <div className="spec-sidebar">
-                    <div className="sidebar-card">
-                        <h3>So sánh cấu hình</h3>
-                        <p className="sidebar-desc">Chọn thiết bị khác để xem sự khác biệt về cấu hình.</p>
-                        <div className="compare-search-dropdown-wrapper" style={{ position: 'relative' }}>
-                            <div className="compare-search">
+                <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-5 order-2 lg:order-1">
+                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                        <h3 className="m-0 mb-2.5 text-base font-bold text-slate-800">So sánh cấu hình</h3>
+                        <p className="text-[13.5px] text-slate-500 leading-relaxed mb-5">Chọn thiết bị khác để xem sự khác biệt về cấu hình.</p>
+                        <div className="relative">
+                            <div className="flex items-center border border-slate-300 rounded-lg p-2.5 px-4 bg-slate-50 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
                                 <input 
                                     type="text" 
                                     placeholder="Tìm sản phẩm..." 
+                                    className="border-none bg-transparent flex-1 outline-none text-sm text-slate-800"
                                     value={searchCompare}
                                     onChange={(e) => setSearchCompare(e.target.value)}
                                 />
-                                <span className="plus-icon">{isSearching ? '...' : '+'}</span>
+                                <span className="bg-blue-600 text-white w-6 h-6 flex items-center justify-center rounded-full text-lg font-bold shrink-0 ml-2">
+                                    {isSearching ? '...' : '+'}
+                                </span>
                             </div>
                             
                             {compareResults.length > 0 && (
-                                <div className="compare-search-results" style={{
-                                    position: 'absolute', top: '100%', left: 0, right: 0, 
-                                    background: 'white', border: '1px solid #ddd', borderRadius: '8px', 
-                                    zIndex: 10, marginTop: '5px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                    maxHeight: '300px', overflowY: 'auto'
-                                }}>
+                                <div className="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-lg z-10 mt-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.1)] max-h-[300px] overflow-y-auto">
                                     {compareResults.map(p => (
                                         <div 
                                             key={p._id} 
-                                            className="search-result-item"
-                                            style={{ padding: '10px', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', borderBottom: '1px solid #eee' }}
+                                            className="p-2.5 flex items-center gap-2.5 cursor-pointer border-b border-slate-50 last:border-none hover:bg-slate-50 transition-colors"
                                             onClick={() => navigate(`/compare?p1=${product.slug}&p2=${p.slug}`)}
                                         >
-                                            <img src={p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl} alt={p.name} style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
-                                            <div style={{ flex: 1, fontSize: '13px', fontWeight: 500, color: '#333' }}>{p.name}</div>
+                                            <img src={p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl} alt={p.name} className="w-10 h-10 object-contain" />
+                                            <div className="flex-1 text-[13px] font-semibold text-slate-800">{p.name}</div>
                                         </div>
                                     ))}
                                 </div>
@@ -148,42 +144,46 @@ function SpecDetail() {
                         </div>
                     </div>
 
-                    <div className="sidebar-card support-card">
-                        <h3 className="text-primary">Bạn cần hỗ trợ?</h3>
-                        <p className="sidebar-desc">Các chuyên gia công nghệ của chúng tôi luôn sẵn lòng giúp đỡ.</p>
-                        <Link to="/contact" className="btn-support-chat">Chat với tư vấn viên</Link>
+                    <div className="bg-green-50 rounded-xl p-6 border border-green-200 shadow-sm">
+                        <h3 className="m-0 mb-2.5 text-base font-bold text-blue-600">Bạn cần hỗ trợ?</h3>
+                        <p className="text-[13.5px] text-slate-600 leading-relaxed mb-5">Các chuyên gia công nghệ của chúng tôi luôn sẵn lòng giúp đỡ.</p>
+                        <Link to="/contact" className="block text-center bg-white border border-blue-600 text-blue-600 p-3 rounded-lg font-semibold no-underline transition-colors hover:bg-blue-50">
+                            Chat với tư vấn viên
+                        </Link>
                     </div>
                 </div>
 
                 {/* Right Main Content */}
-                <div className="spec-main">
-                    <nav className="breadcrumb">
-                        <Link to="/">Trang chủ</Link> <ChevronRight size={14} />
-                        <Link to={`/product/${product.slug}`}>{product.name}</Link> <ChevronRight size={14} />
-                        <span className="current">Thông số kỹ thuật</span>
+                <div className="flex-1 min-w-0 order-1 lg:order-2">
+                    <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6 flex-wrap">
+                        <Link to="/" className="text-slate-500 hover:text-blue-600 no-underline transition-colors">Trang chủ</Link> 
+                        <ChevronRight size={14} />
+                        <Link to={`/product/${product.slug}`} className="text-slate-500 hover:text-blue-600 no-underline transition-colors">{product.name}</Link> 
+                        <ChevronRight size={14} />
+                        <span className="font-semibold text-slate-800">Thông số kỹ thuật</span>
                     </nav>
 
                     {hasDetailedSpecs ? (
-                        <div className="detailed-specs-list">
+                        <div className="flex flex-col gap-10">
                             {Object.entries(product.detailedSpecs).map(([groupName, specsArr], idx) => {
                                 // Bỏ qua nhóm nếu không có dữ liệu thực tế
                                 const validSpecs = Array.isArray(specsArr) ? specsArr.filter(s => s.value && String(s.value).trim() !== "") : [];
                                 if (validSpecs.length === 0) return null;
 
                                 return (
-                                    <div key={idx} className="spec-group-box">
-                                        <div className="spec-group-header">
-                                            <div className="icon-wrapper">
-                                                {ICONS[groupName] || <List size={20} color="#2563eb" />}
+                                    <div key={idx} className="bg-transparent">
+                                        <div className="flex items-center gap-3 mb-5">
+                                            <div className="bg-blue-50 w-10 h-10 flex items-center justify-center rounded-lg text-blue-600 shrink-0">
+                                                {ICONS[groupName] || <List size={20} className="text-blue-600" />}
                                             </div>
-                                            <h3 className="spec-group-title">{groupName}</h3>
+                                            <h3 className="m-0 text-xl font-bold text-slate-800">{groupName}</h3>
                                         </div>
 
-                                        <div className="spec-items-grid">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
                                             {validSpecs.map((spec, sIdx) => (
-                                                <div key={sIdx} className="spec-item-cell">
-                                                    <div className="spec-item-key">{spec.key}</div>
-                                                    <div className="spec-item-value" dangerouslySetInnerHTML={{ __html: String(spec.value).replace(/\n/g, '<br/>') }} />
+                                                <div key={sIdx} className="flex flex-col gap-1.5">
+                                                    <div className="text-[13px] font-bold uppercase tracking-[0.5px] text-slate-400">{spec.key}</div>
+                                                    <div className="text-[15px] text-slate-700 leading-relaxed font-medium" dangerouslySetInnerHTML={{ __html: String(spec.value).replace(/\n/g, '<br/>') }} />
                                                 </div>
                                             ))}
                                         </div>
@@ -192,28 +192,30 @@ function SpecDetail() {
                             })}
                         </div>
                     ) : hasBasicSpecs ? (
-                        <div className="detailed-specs-list fallback-specs">
-                            <div className="spec-group-box">
-                                <div className="spec-group-header">
-                                    <div className="icon-wrapper">
-                                        <List size={20} color="#2563eb" />
+                        <div className="flex flex-col gap-10">
+                            <div className="bg-transparent">
+                                <div className="flex items-center gap-3 mb-5">
+                                    <div className="bg-blue-50 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">
+                                        <List size={20} className="text-blue-600" />
                                     </div>
-                                    <h3 className="spec-group-title">Cấu hình sản phẩm</h3>
+                                    <h3 className="m-0 text-xl font-bold text-slate-800">Cấu hình sản phẩm</h3>
                                 </div>
-                                <div className="spec-items-grid">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
                                     {Object.entries(product.specs).map(([key, value], idx) => (
-                                        <div key={idx} className="spec-item-cell">
-                                            <div className="spec-item-key">{key}</div>
-                                            <div className="spec-item-value">{value}</div>
+                                        <div key={idx} className="flex flex-col gap-1.5">
+                                            <div className="text-[13px] font-bold uppercase tracking-[0.5px] text-slate-400">{key}</div>
+                                            <div className="text-[15px] text-slate-700 leading-relaxed font-medium">{value}</div>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="no-detailed-specs-message">
-                            <p>chưa có thông tin phù hợp</p>
-                            <Link to={`/product/${product.slug}`} className="btn-back">Quay lại Tổng quan</Link>
+                        <div className="bg-white p-10 text-center rounded-xl border border-slate-200 shadow-sm">
+                            <p className="text-slate-500 mb-5 text-[15px]">chưa có thông tin phù hợp</p>
+                            <Link to={`/product/${product.slug}`} className="inline-block bg-blue-600 text-white py-2.5 px-6 rounded-lg no-underline font-semibold hover:bg-blue-700 transition-colors">
+                                Quay lại Tổng quan
+                            </Link>
                         </div>
                     )}
                 </div>

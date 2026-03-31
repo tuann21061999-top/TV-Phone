@@ -1,4 +1,4 @@
-import "./Navbar.css";
+
 import { NavLink, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -70,66 +70,73 @@ function Navbar() {
   const renderBrandLink = (brand, basePath) => {
     const logoSrc = BRAND_LOGOS[brand];
     return (
-      <Link key={brand} to={`${basePath}?brand=${encodeURIComponent(brand)}`} className="brand-item">
-        {logoSrc ? (
-          <div className="brand-logo-wrapper"><img src={logoSrc} alt={brand} className="brand-logo" /></div>
-        ) : (
-          <div className="brand-logo-wrapper"><img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(brand)}&background=F3F4F6&color=374151&bold=true&font-size=0.45&length=1`} alt={brand} className="brand-logo text-avatar" /></div>
-        )}
-        <span className="brand-name">{brand}</span>
+      <Link key={brand} to={`${basePath}?brand=${encodeURIComponent(brand)}`} className="flex flex-col items-center gap-2.5 group/brand no-underline">
+        <div className="w-[60px] h-[60px] bg-white border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden transition-all duration-300 group-hover/brand:border-blue-400 group-hover/brand:shadow-md p-2">
+          {logoSrc ? (
+            <img src={logoSrc} alt={brand} className="w-full h-full object-contain transition-transform duration-300 group-hover/brand:scale-110" />
+          ) : (
+            <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(brand)}&background=F3F4F6&color=374151&bold=true&font-size=0.45&length=1`} alt={brand} className="w-full h-full object-contain rounded-lg" />
+          )}
+        </div>
+        <span className="text-[13px] font-semibold text-slate-600 text-center transition-colors duration-200 group-hover/brand:text-blue-600 line-clamp-1">{brand}</span>
       </Link>
     );
   };
 
   return (
-    <div className="navbar">
-      <div className="navbar-content">
+    <nav className="hidden lg:block z-50 font-sans">
+      <div className="flex items-center gap-8">
 
-        <NavLink to="/" end>
+        <NavLink to="/" end className={({ isActive }) => `flex items-center gap-2 font-bold text-[15px] transition-colors duration-200 no-underline ${isActive ? 'text-yellow-400' : 'text-white/90 hover:text-white'}`}>
           <Home size={18} /> Trang chủ
         </NavLink>
 
-        {/* 🔥 DROPDOWN DANH MỤC */}
-        <div className="dropdown">
-          <span className="dropdown-title">
-            <LayoutGrid size={18} /> Danh mục <ChevronDown size={16} strokeWidth={2.5} className="chevron" />
+        {/* 🔥 DROPDOWN DANH MỤC (MEGA MENU) */}
+        <div className="relative group">
+          <span className="flex items-center gap-2 font-bold text-[15px] text-white/90 hover:text-white cursor-pointer transition-colors duration-200 py-6">
+            <LayoutGrid size={18} /> Danh mục <ChevronDown size={16} strokeWidth={2.5} className="transition-transform duration-300 group-hover:rotate-180" />
           </span>
 
-          <div className="dropdown-menu mega-menu-container">
-            <div className="mega-menu-list">
-              
-              <div className="mega-menu-item">
-                <NavLink to="/phones" className="cat-link">
-                  Điện thoại, Máy tính bảng <ChevronRight size={14} className="cat-icon"/>
+          {/* MAIN DROPDOWN */}
+          <div className="absolute top-full left-0 w-[280px] bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-slate-100 opacity-0 invisible translate-y-3 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 z-50">
+            <div className="flex flex-col py-2.5">
+
+              {/* MENU ITEM 1 */}
+              <div className="relative group/item">
+                <NavLink to="/phones" className="flex items-center justify-between px-5 py-3.5 text-[14.5px] font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 no-underline transition-colors">
+                  Điện thoại, Máy tính bảng <ChevronRight size={16} className="text-slate-400 group-hover/item:text-blue-600 transition-colors" />
                 </NavLink>
-                <div className="mega-submenu-panel">
-                  <h4>Thương hiệu Điện thoại</h4>
-                  <div className="brand-grid">
-                    {deviceBrands.length > 0 ? deviceBrands.map(b => renderBrandLink(b, "/phones")) : <span className="no-brand">Đang tải...</span>}
+                {/* SUBMENU PANEL */}
+                <div className="absolute top-0 left-full ml-1 w-[480px] bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-slate-100 p-6 opacity-0 invisible -translate-x-3 group-hover/item:opacity-100 group-hover/item:visible group-hover/item:translate-x-0 transition-all duration-300 z-50">
+                  <h4 className="text-base font-extrabold text-slate-800 m-0 mb-5 pb-3 border-b border-slate-100">Thương hiệu Điện thoại</h4>
+                  <div className="grid grid-cols-4 gap-y-6 gap-x-4">
+                    {deviceBrands.length > 0 ? deviceBrands.map(b => renderBrandLink(b, "/phones")) : <span className="text-sm text-slate-400 italic col-span-4">Đang tải...</span>}
                   </div>
                 </div>
               </div>
 
-              <div className="mega-menu-item">
-                <NavLink to="/electronics" className="cat-link">
-                  Đồ điện tử <ChevronRight size={14} className="cat-icon"/>
+              {/* MENU ITEM 2 */}
+              <div className="relative group/item">
+                <NavLink to="/electronics" className="flex items-center justify-between px-5 py-3.5 text-[14.5px] font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 no-underline transition-colors">
+                  Đồ điện tử <ChevronRight size={16} className="text-slate-400 group-hover/item:text-blue-600 transition-colors" />
                 </NavLink>
-                <div className="mega-submenu-panel">
-                  <h4>Thương hiệu Điện tử</h4>
-                  <div className="brand-grid">
-                    {electronicBrands.length > 0 ? electronicBrands.map(b => renderBrandLink(b, "/electronics")) : <span className="no-brand">Đang tải...</span>}
+                <div className="absolute top-0 left-full ml-1 w-[480px] bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-slate-100 p-6 opacity-0 invisible -translate-x-3 group-hover/item:opacity-100 group-hover/item:visible group-hover/item:translate-x-0 transition-all duration-300 z-50">
+                  <h4 className="text-base font-extrabold text-slate-800 m-0 mb-5 pb-3 border-b border-slate-100">Thương hiệu Điện tử</h4>
+                  <div className="grid grid-cols-4 gap-y-6 gap-x-4">
+                    {electronicBrands.length > 0 ? electronicBrands.map(b => renderBrandLink(b, "/electronics")) : <span className="text-sm text-slate-400 italic col-span-4">Đang tải...</span>}
                   </div>
                 </div>
               </div>
 
-              <div className="mega-menu-item">
-                <NavLink to="/accessories" className="cat-link">
-                  Phụ kiện <ChevronRight size={14} className="cat-icon"/>
+              {/* MENU ITEM 3 */}
+              <div className="relative group/item">
+                <NavLink to="/accessories" className="flex items-center justify-between px-5 py-3.5 text-[14.5px] font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 no-underline transition-colors">
+                  Phụ kiện <ChevronRight size={16} className="text-slate-400 group-hover/item:text-blue-600 transition-colors" />
                 </NavLink>
-                <div className="mega-submenu-panel">
-                  <h4>Thương hiệu Phụ kiện</h4>
-                  <div className="brand-grid">
-                    {accessoryBrands.length > 0 ? accessoryBrands.map(b => renderBrandLink(b, "/accessories")) : <span className="no-brand">Đang tải...</span>}
+                <div className="absolute top-0 left-full ml-1 w-[480px] bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-slate-100 p-6 opacity-0 invisible -translate-x-3 group-hover/item:opacity-100 group-hover/item:visible group-hover/item:translate-x-0 transition-all duration-300 z-50">
+                  <h4 className="text-base font-extrabold text-slate-800 m-0 mb-5 pb-3 border-b border-slate-100">Thương hiệu Phụ kiện</h4>
+                  <div className="grid grid-cols-4 gap-y-6 gap-x-4">
+                    {accessoryBrands.length > 0 ? accessoryBrands.map(b => renderBrandLink(b, "/accessories")) : <span className="text-sm text-slate-400 italic col-span-4">Đang tải...</span>}
                   </div>
                 </div>
               </div>
@@ -138,20 +145,20 @@ function Navbar() {
           </div>
         </div>
 
-        <NavLink to="/promotions">
+        <NavLink to="/promotions" className={({ isActive }) => `flex items-center gap-2 font-bold text-[15px] transition-colors duration-200 no-underline ${isActive ? 'text-yellow-400' : 'text-white/90 hover:text-white'}`}>
           <Tag size={18} /> Khuyến mãi
         </NavLink>
 
-        <NavLink to="/news">
+        <NavLink to="/news" className={({ isActive }) => `flex items-center gap-2 font-bold text-[15px] transition-colors duration-200 no-underline ${isActive ? 'text-yellow-400' : 'text-white/90 hover:text-white'}`}>
           <Newspaper size={18} /> Tin tức
         </NavLink>
 
-        <NavLink to="/contact">
+        <NavLink to="/contact" className={({ isActive }) => `flex items-center gap-2 font-bold text-[15px] transition-colors duration-200 no-underline ${isActive ? 'text-yellow-400' : 'text-white/90 hover:text-white'}`}>
           <Phone size={18} /> Liên hệ
         </NavLink>
 
       </div>
-    </div>
+    </nav>
   );
 }
 

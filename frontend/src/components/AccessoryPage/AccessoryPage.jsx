@@ -4,7 +4,6 @@ import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import axios from "axios";
 import { toast } from "sonner";
-import "./AccessoryPage.css";
 import {
   Star,
   ShoppingCart,
@@ -77,7 +76,6 @@ function AccessoriesPage() {
         );
 
         setProducts(accessories);
-        // eslint-disable-next-line no-unused-vars
       } catch (err) {
         setError("Không thể tải sản phẩm phụ kiện");
       } finally {
@@ -124,8 +122,6 @@ function AccessoriesPage() {
       toast.error("Lỗi khi thực hiện yêu thích!");
     }
   };
-
-
 
   /* ================= HELPERS ================= */
 
@@ -300,44 +296,42 @@ function AccessoriesPage() {
   /* ================= UI ================= */
 
   return (
-    <div className="accessories-page">
+    <div className="min-h-screen bg-[#f5f7fa] font-sans">
       <Header />
 
-      <div className="accessories-container">
-        <nav className="breadcrumb" style={{ paddingBottom: "15px" }}>
-          <Link to="/">Trang chủ</Link>
+      <div className="w-[90%] max-w-[1600px] mx-auto py-8 px-4 md:px-10">
+        <nav className="flex items-center gap-2 text-sm text-gray-500 pb-4">
+          <Link to="/" className="hover:text-blue-600 transition-colors">Trang chủ</Link>
           <ChevronRight size={14} />
-          <span>Phụ kiện Công nghệ</span>
+          <span className="font-medium text-gray-800">Phụ kiện Công nghệ</span>
         </nav>
-        <div className="accessories-header">
-          <h1>Phụ kiện Công nghệ</h1>
-          <p>Tìm thấy {filteredProducts.length} sản phẩm</p>
+
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Phụ kiện Công nghệ</h1>
+          <p className="text-gray-500">Tìm thấy {filteredProducts.length} sản phẩm</p>
         </div>
 
-        <div className="accessories-content">
+        <div className="flex flex-col md:flex-row gap-8">
           {/* SIDEBAR */}
-          <aside className="accessories-sidebar">
-            <h3>
+          <aside className="w-full md:w-[250px] bg-white p-5 rounded-lg shadow-sm sticky top-[100px] max-h-[calc(100vh-120px)] overflow-y-auto shrink-0">
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-800 mb-5">
               <Filter size={18} /> Bộ lọc
             </h3>
 
             {/* CATEGORY */}
-            <div className="filter-group">
-              <h4>Danh mục</h4>
+            <div className="mb-6">
+              <h4 className="font-medium text-gray-700 mb-3">Danh mục</h4>
               {categories.map((cat) => (
                 <button
                   key={cat.name}
-                  className={
-                    activeCategory === cat.name
-                      ? "category-btn active"
-                      : "category-btn"
-                  }
-                  onClick={() =>
-                  {
+                  className={`flex items-center gap-2 w-full p-2 border-none rounded-md cursor-pointer transition-colors mb-2 text-sm font-medium ${activeCategory === cat.name
+                      ? "bg-blue-600 text-white"
+                      : "bg-[#f3f3f3] text-gray-700 hover:bg-gray-200"
+                    }`}
+                  onClick={() => {
                     setActiveCategory(cat.name);
                     setBrandFilter("all");
-                  }
-                }
+                  }}
                 >
                   {cat.icon} {cat.name}
                 </button>
@@ -345,34 +339,28 @@ function AccessoriesPage() {
             </div>
 
             {/* PRICE */}
-            <div className="filter-group">
-              <h4>Khoảng giá</h4>
+            <div className="mb-6">
+              <h4 className="font-medium text-gray-700 mb-2">Khoảng giá</h4>
               <select
+                className="w-full p-2.5 border border-gray-200 rounded-md bg-white text-gray-700 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
                 value={priceRange}
-                onChange={(e) =>
-                  setPriceRange(e.target.value)
-                }
+                onChange={(e) => setPriceRange(e.target.value)}
               >
                 <option value="all">Tất cả</option>
                 <option value="under100">Dưới 100.000₫</option>
-                <option value="100to300">
-                  100.000₫ - 300.000₫
-                </option>
-                <option value="above300">
-                  Trên 300.000₫
-                </option>
+                <option value="100to300">100.000₫ - 300.000₫</option>
+                <option value="above300">Trên 300.000₫</option>
               </select>
             </div>
 
-            {/* RATING - chỉ hiện khi có sản phẩm có review */}
+            {/* RATING */}
             {hasRatedProducts && (
-              <div className="filter-group">
-                <h4>Đánh giá</h4>
+              <div className="mb-6">
+                <h4 className="font-medium text-gray-700 mb-2">Đánh giá</h4>
                 <select
+                  className="w-full p-2.5 border border-gray-200 rounded-md bg-white text-gray-700 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
                   value={ratingFilter}
-                  onChange={(e) =>
-                    setRatingFilter(e.target.value)
-                  }
+                  onChange={(e) => setRatingFilter(e.target.value)}
                 >
                   <option value="all">Tất cả</option>
                   <option value="4">4★ trở lên</option>
@@ -382,13 +370,12 @@ function AccessoriesPage() {
             )}
 
             {/* BRAND */}
-            <div className="filter-group">
-              <h4>Hãng</h4>
+            <div className="mb-6">
+              <h4 className="font-medium text-gray-700 mb-2">Hãng</h4>
               <select
+                className="w-full p-2.5 border border-gray-200 rounded-md bg-white text-gray-700 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
                 value={brandFilter}
-                onChange={(e) =>
-                  setBrandFilter(e.target.value)
-                }
+                onChange={(e) => setBrandFilter(e.target.value)}
               >
                 <option value="all">Tất cả</option>
                 {brands.map((brand) => (
@@ -400,29 +387,22 @@ function AccessoriesPage() {
             </div>
 
             {/* SORT */}
-            <div className="filter-group">
-              <h4>Sắp xếp</h4>
+            <div className="mb-6">
+              <h4 className="font-medium text-gray-700 mb-2">Sắp xếp</h4>
               <select
+                className="w-full p-2.5 border border-gray-200 rounded-md bg-white text-gray-700 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
                 value={sortOption}
-                onChange={(e) =>
-                  setSortOption(e.target.value)
-                }
+                onChange={(e) => setSortOption(e.target.value)}
               >
                 <option value="default">Mặc định</option>
-                <option value="priceAsc">
-                  Giá tăng dần
-                </option>
-                <option value="priceDesc">
-                  Giá giảm dần
-                </option>
-                <option value="rating">
-                  Đánh giá cao nhất
-                </option>
+                <option value="priceAsc">Giá tăng dần</option>
+                <option value="priceDesc">Giá giảm dần</option>
+                <option value="rating">Đánh giá cao nhất</option>
               </select>
             </div>
 
             <button
-              className="reset-btn"
+              className="w-full py-2 bg-gray-100 text-gray-600 font-semibold rounded-md hover:bg-gray-200 hover:text-gray-800 transition-colors"
               onClick={resetFilters}
             >
               Reset bộ lọc
@@ -430,68 +410,83 @@ function AccessoriesPage() {
           </aside>
 
           {/* PRODUCTS */}
-          <section className="accessories-products">
-            {loading && <div>Đang tải...</div>}
-            {error && <div>{error}</div>}
+          <section className="flex-1">
+            {loading && <div className="text-gray-500 font-medium">Đang tải...</div>}
+            {error && <div className="text-red-500 font-medium">{error}</div>}
 
             {!loading && !error && (
-              <div className="product-grid">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {currentProducts.map((product) => {
                   const { basePrice, finalPrice, discountPercent } = getPricingInfo(product);
                   const hasDiscount = finalPrice < basePrice;
 
                   const displayImage =
-                    product.colorImages?.find(
-                      (img) => img.isDefault
-                    )?.imageUrl ||
-                    product.colorImages?.[0]
-                      ?.imageUrl ||
+                    product.colorImages?.find((img) => img.isDefault)?.imageUrl ||
+                    product.colorImages?.[0]?.imageUrl ||
                     "/no-image.png";
 
                   return (
                     <div
                       key={product._id}
-                      className="product-card"
+                      className="bg-white p-5 rounded-xl relative text-center flex flex-col h-full shadow-sm hover:shadow-md transition-shadow duration-300 group"
                     >
                       <Link
                         to={`/product/${product.slug || product._id}`}
-                        className="product-link"
+                        className="flex flex-col flex-grow no-underline text-inherit"
                       >
                         {hasDiscount && discountPercent > 0 && (
-                          <span className="product-tag">
+                          <span className="absolute top-2.5 left-2.5 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
                             -{discountPercent}%
                           </span>
                         )}
 
-                        <div className="product-image">
+                        <div className="h-[150px] mb-4 relative flex items-center justify-center rounded-lg">
                           <button
-                            className={`wishlist-btn ${favoriteIds.has(product._id) ? "liked" : ""}`}
+                            className={`absolute top-2 right-2 z-20 bg-white/90 border-none rounded-full w-8 h-8 flex items-center justify-center cursor-pointer shadow-sm transition-all duration-300 hover:scale-110 hover:bg-white hover:shadow-md active:scale-125 ${favoriteIds.has(product._id) ? "bg-red-50" : ""
+                              }`}
                             onClick={(e) => handleToggleFavorite(e, product._id)}
                             title={favoriteIds.has(product._id) ? "Bỏ yêu thích" : "Yêu thích"}
                           >
-                            <Heart size={18} color={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"} fill={favoriteIds.has(product._id) ? "#ef4444" : "none"} />
+                            <Heart
+                              size={18}
+                              color={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"}
+                              fill={favoriteIds.has(product._id) ? "#ef4444" : "none"}
+                            />
                           </button>
                           <img
                             src={displayImage}
                             alt={product.name}
+                            className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                           />
                         </div>
 
-                        <h3>{product.name}</h3>
+                        <h3 className="text-[15px] font-semibold text-gray-800 mb-2 line-clamp-2 h-[45px]">
+                          {product.name}
+                        </h3>
 
-                        <div className="product-highlights-small" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', margin: '5px 0' }}>
+                        <div className="flex flex-wrap justify-center gap-1 my-1.5 min-h-[28px]">
                           {product.highlights?.map((text, idx) => (
-                            <span key={idx} style={{ background: '#f1f5f9', color: '#475569', fontSize: '11px', padding: '4px 8px', borderRadius: '4px' }}>{text}</span>
+                            <span
+                              key={idx}
+                              className="bg-slate-100 text-slate-600 text-[11px] px-2 py-1 rounded"
+                            >
+                              {text}
+                            </span>
                           ))}
                         </div>
 
-                        <div className="product-price">
+                        <div className="mt-auto mb-3 font-bold text-red-500 text-lg">
                           {formatPrice(finalPrice)}
+                          {hasDiscount && (
+                            <span className="ml-2 text-sm font-normal text-gray-400 line-through">
+                              {formatPrice(basePrice)}
+                            </span>
+                          )}
                         </div>
                       </Link>
 
-                      <button className="add-cart">
-                        <ShoppingCart size={16} />
+                      <button className="bg-blue-600 text-white border-none py-2.5 px-4 cursor-pointer rounded-lg flex items-center justify-center gap-2 w-full hover:bg-blue-700 transition-colors font-medium mt-2">
+                        <ShoppingCart size={18} />
                         Thêm vào giỏ
                       </button>
                     </div>
@@ -500,17 +495,17 @@ function AccessoriesPage() {
               </div>
             )}
 
-            {!loading &&
-              filteredProducts.length === 0 && (
-                <div className="no-products">
-                  Không tìm thấy sản phẩm.
-                </div>
-              )}
+            {!loading && filteredProducts.length === 0 && (
+              <div className="bg-white p-10 rounded-xl text-center text-gray-500 shadow-sm border border-dashed border-gray-200">
+                Không tìm thấy sản phẩm phụ kiện nào phù hợp.
+              </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="pagination">
+              <div className="flex justify-center gap-2 mt-10 flex-wrap">
                 <button
+                  className="w-10 h-10 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold flex items-center justify-center transition-all hover:border-blue-600 hover:text-blue-600 disabled:bg-slate-50 disabled:text-slate-300 disabled:border-slate-100 disabled:cursor-not-allowed"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage(currentPage - 1)}
                 >
@@ -520,15 +515,21 @@ function AccessoriesPage() {
                 {getPaginationNumbers().map((item, index) => (
                   <button
                     key={index}
-                    className={`${currentPage === item ? "active" : ""} ${item === '...' ? "dots" : ""}`}
-                    onClick={() => typeof item === 'number' && setCurrentPage(item)}
-                    disabled={item === '...'}
+                    className={`w-10 h-10 rounded-lg border flex items-center justify-center font-semibold transition-all duration-200 ${currentPage === item
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : item === "..."
+                          ? "bg-transparent border-transparent text-slate-500 cursor-default"
+                          : "bg-white text-slate-600 border-slate-200 hover:border-blue-600 hover:text-blue-600"
+                      }`}
+                    onClick={() => typeof item === "number" && setCurrentPage(item)}
+                    disabled={item === "..."}
                   >
                     {item}
                   </button>
                 ))}
 
                 <button
+                  className="w-10 h-10 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold flex items-center justify-center transition-all hover:border-blue-600 hover:text-blue-600 disabled:bg-slate-50 disabled:text-slate-300 disabled:border-slate-100 disabled:cursor-not-allowed"
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage(currentPage + 1)}
                 >

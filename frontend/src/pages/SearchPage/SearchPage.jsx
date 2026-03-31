@@ -5,7 +5,6 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import ProductCard from "../../components/Product/ProductCard";
 import { ChevronRight } from "lucide-react";
-import "./SearchPage.css";
 
 function SearchPage() {
   const [searchParams] = useSearchParams();
@@ -62,23 +61,35 @@ function SearchPage() {
   };
 
   return (
-    <div className="search-page-container">
+    <div className="flex flex-col min-h-screen bg-slate-50 font-sans">
       <Header />
-      <div className="search-content">
-        <nav className="breadcrumb" style={{ paddingBottom: "15px" }}>
-          <Link to="/">Trang chủ</Link>
+      
+      <main className="flex-1 w-full max-w-[1400px] mx-auto px-5 py-10 md:px-10">
+        
+        {/* BREADCRUMB */}
+        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6 flex-wrap">
+          <Link to="/" className="text-slate-500 hover:text-blue-600 transition-colors no-underline">Trang chủ</Link>
           <ChevronRight size={14} />
-          <span>Tìm kiếm</span>
+          <span className="font-semibold text-slate-800">Tìm kiếm</span>
         </nav>
-        <h1 className="search-title">Kết quả tìm kiếm cho: "{query}"</h1>
-        <p className="search-subtitle">Tìm thấy {products.length} sản phẩm phù hợp</p>
+        
+        {/* HEADER TÌM KIẾM */}
+        <div className="mb-8">
+          <h1 className="text-2xl md:text-[28px] font-bold text-slate-900 m-0 mb-1">Kết quả tìm kiếm cho: "{query}"</h1>
+          <p className="text-[15px] text-slate-500 m-0">Tìm thấy {products.length} sản phẩm phù hợp</p>
+        </div>
 
+        {/* NỘI DUNG */}
         {loading ? (
-          <div className="search-loading">Đang tải kết quả...</div>
+          <div className="text-center py-16 bg-white rounded-xl border border-slate-200 text-slate-600 text-lg animate-pulse shadow-sm">
+            Đang tải kết quả...
+          </div>
         ) : error ? (
-          <div className="search-error">{error}</div>
+          <div className="text-center py-16 bg-red-50 rounded-xl border border-red-200 text-red-500 text-lg shadow-sm">
+            {error}
+          </div>
         ) : products.length > 0 ? (
-          <div className="search-grid">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-5">
             {products.map((product) => (
               <ProductCard 
                 key={product._id} 
@@ -89,11 +100,13 @@ function SearchPage() {
             ))}
           </div>
         ) : (
-          <div className="search-empty">
+          <div className="text-center py-16 bg-white rounded-xl border border-slate-200 text-slate-600 text-lg shadow-sm px-5">
             Không tìm thấy sản phẩm nào khớp với từ khóa của bạn. Hãy thử lại với từ khóa khác nhé!
           </div>
         )}
-      </div>
+        
+      </main>
+
       <Footer />
     </div>
   );
