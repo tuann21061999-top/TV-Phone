@@ -5,6 +5,8 @@ const Voucher = require("../models/Voucher");
 const PromotionModel = require("../models/Promotion");
 const Notification = require("../models/Notification");
 const { validateVoucher, calculateDiscount } = require("./voucherController");
+const cloudinary = require("../config/cloudinary");
+const fs = require("fs");
 
 // Hàm bổ trợ cập nhật kho báu
 const updateInventory = async (items, type) => {
@@ -419,6 +421,114 @@ const orderController = {
       res.status(200).json({ message: "Thành công", order });
     } catch (error) {
       res.status(500).json({ error: error.message });
+    }
+  },
+
+  requestReturn: async (req, res) => {
+    try {
+      const orderId = req.params.id;
+      const { reason } = req.body;
+      const order = await Order.findById(orderId);
+
+      if (!order) return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+      if (order.userId.toString() !== req.user.id) {
+        return res.status(403).json({ message: "Không có quyền thực hiện" });
+      }
+      if (order.status !== "done") {
+        return res.status(400).json({ message: "Chỉ đơn hàng đã giao thành công mới được yêu cầu trả" });
+      }
+
+      if (order.returnRequest && order.returnRequest.isRequested) {
+        return res.status(400).json({ message: "Yêu cầu trả hàng đã được gửi trước đó" });
+      }
+
+      let uploadedImages = [];
+      if (req.files && req.files.length > 0) {
+        for (const file of req.files) {
+          const result = await cloudinary.uploader.upload(file.path, { folder: "returns" });
+          uploadedImages.push(result.secure_url);
+          fs.unlinkSync(file.path);
+        }
+      }
+
+      if (uploadedImages.length === 0) {
+        return res.status(400).json({ message: "Vui lòng đính kèm hình ảnh minh chứng" });
+      }
+
+      order.returnRequest = {
+        isRequested: true,
+        reason: reason || "Không có lý do",
+        images: uploadedImages,
+        status: "pending",
+        requestedAt: new Date()
+      };
+
+      await order.save();
+      res.status(200).json({ message: "Yêu cầu hoàn trả đã được gửi thành công", order });
+    } catch (error) {
+      if (req.files) {
+         req.files.forEach(f => {
+           if (fs.existsSync(f.path)) fs.unlinkSync(f.path);
+         });
+      }
+      res.status(500).json({ message: "Lỗi tạo yêu cầu hoàn trả", error: error.message });
+    }
+  },
+
+  handleReturnAction: async (req, res) => {
+    try {
+      const orderId = req.params.id;
+      const { action, rejectReason } = req.body; // action: 'approve' or 'reject'
+
+      const order = await Order.findById(orderId);
+      if (!order) return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+
+      if (!order.returnRequest || !order.returnRequest.isRequested) {
+        return res.status(400).json({ message: "Đơn hàng này chưa có yêu cầu hoàn trả nào" });
+      }
+      
+      if (order.returnRequest.status !== "pending") {
+        return res.status(400).json({ message: "Yêu cầu hoàn trả đã được xử lý" });
+      }
+
+      if (action === "approve") {
+        order.returnRequest.status = "approved";
+        order.status = "returned";
+        
+        // Hoàn kho
+        await updateInventory(order.items, "increase");
+
+        // Gui thong bao
+        await Notification.create({
+          userId: order.userId,
+          title: "Hoàn trả đơn hàng được chấp nhận",
+          message: `Yêu cầu trả hàng cho đơn #${order._id.toString().substring(0, 6).toUpperCase()} đã được duyệt và chuyển sang trạng thái chờ thu hồi hàng.`,
+          type: "order",
+          link: `/order/${order._id}`
+        });
+
+      } else if (action === "reject") {
+        order.returnRequest.status = "rejected";
+        if (rejectReason) {
+            order.returnRequest.rejectedReason = rejectReason;
+        }
+
+        // Gui thong bao
+        await Notification.create({
+          userId: order.userId,
+          title: "Yêu cầu trả hàng bị từ chối",
+          message: `Yêu cầu trả hàng cho đơn #${order._id.toString().substring(0, 6).toUpperCase()} không được chấp nhận. Lý do: ${rejectReason || "Không hợp lệ"}.`,
+          type: "order",
+          link: `/order/${order._id}`
+        });
+      } else {
+        return res.status(400).json({ message: "Hành động không hợp lệ" });
+      }
+
+      await order.save();
+      res.status(200).json({ message: "Xử lý yêu cầu trả hàng thành công", order });
+    } catch (error) {
+       res.status(500).json({ message: "Lỗi xử lý yêu cầu", error: error.message });
     }
   }
 };

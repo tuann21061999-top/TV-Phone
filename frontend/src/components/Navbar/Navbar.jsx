@@ -83,7 +83,7 @@ function Navbar() {
 
   return (
     <div className="navbar">
-      <div className="container navbar-content">
+      <div className="navbar-content">
 
         <NavLink to="/" end>
           <Home size={18} /> Trang chủ

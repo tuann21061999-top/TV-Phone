@@ -17,6 +17,13 @@ const paymentMethodSchema = new mongoose.Schema({
   isDefault: { type: Boolean, default: false }
 });
 
+const redemptionSchema = new mongoose.Schema({
+  tier:       { type: String, required: true },   // 'BONUS5' | 'BONUS10' | 'BONUS20'
+  code:       { type: String, required: true },
+  pointsSpent:{ type: Number, required: true },
+  redeemedAt: { type: Date, default: Date.now }
+});
+
 const userSchema = new mongoose.Schema(
   {
     name: String,
@@ -36,9 +43,10 @@ const userSchema = new mongoose.Schema(
         addedAt: { type: Date, default: Date.now }
       }
     ],
-    paymentMethods: [paymentMethodSchema]
+    paymentMethods: [paymentMethodSchema],
+    redemptionHistory: [redemptionSchema]   // lịch sử đổi điểm
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("User", userSchema);

@@ -1,18 +1,14 @@
 .navbar {
   /* Để trong suốt để ăn theo dải màu của .main-header ở file Header.css */
   background: transparent;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
   position: relative;
   z-index: 10000;
 }
 
 .navbar-content {
-  max-width: 1200px;
-  width: 90%;
-  margin: 0 auto;
   display: flex;
   justify-content: center;
-  gap: 40px; /* Tăng khoảng cách cho thoáng mắt */
+  gap: 24px; /* Thu gọn khoảng cách so với lúc trước vì header hẹp hơn */
   align-items: center;
 }
 
@@ -25,7 +21,7 @@
   font-size: 15px;
   position: relative;
   cursor: pointer;
-  padding: 18px 0; /* Tăng padding để vùng hover rộng ra, dễ bấm */
+  padding: 8px 0; /* Tăng padding để vùng hover rộng ra, dễ bấm */
   display: flex;
   align-items: center;
   gap: 6px;

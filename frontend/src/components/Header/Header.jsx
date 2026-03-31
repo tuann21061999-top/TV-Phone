@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import "./Header.css";
 import Navbar from "../Navbar/Navbar";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, Search, Smartphone, Bell } from "lucide-react";
+import { ShoppingCart, User, Search, Bell } from "lucide-react";
 import axios from "axios";
+import logoImg from "../../assets/Logo3.png";
 
 function Header() {
   const [cartCount, setCartCount] = useState(0);
@@ -145,10 +146,14 @@ function Header() {
     <header className="main-header">
       <div className="top-header">
         <div className="container header-content">
-          <Link to="/" className="logo">
-            <Smartphone size={22} />
-            <span>TechNova</span>
-          </Link>
+          <div className="header-left">
+            <Link to="/" className="logo">
+              <img src={logoImg} alt="TechNova Logo" className="logo-img" />
+            </Link>
+            <Navbar />
+          </div>
+
+          <div className="header-right">
 
           <div className="search-wrapper">
             <input 
@@ -265,9 +270,9 @@ function Header() {
               )}
             </Link>
           </div>
+          </div>
         </div>
       </div>
-      <Navbar />
     </header>
   );
 }

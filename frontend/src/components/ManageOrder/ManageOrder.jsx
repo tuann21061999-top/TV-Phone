@@ -64,6 +64,26 @@ const ManageOrder = () => {
     }
   };
 
+  const handleReturnAction = async (orderId, action, reason = "") => {
+    if (!window.confirm(`Xác nhận ${action === 'approve' ? 'đồng ý nhận lại' : 'từ chối'} yêu cầu trả hàng?`)) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(
+        `http://localhost:5000/api/orders/admin/${orderId}/return-action`,
+        { action, rejectReason: reason },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Đã xử lý yêu cầu trả hàng!");
+      fetchAllOrders();
+      if (selectedOrder && selectedOrder._id === orderId) {
+        setSelectedOrder(null);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Lỗi xử lý yêu cầu!");
+    }
+  };
+
   const filteredOrders = orders.filter(order => {
     const query = searchQuery.toLowerCase();
     const matchesSearch =
@@ -76,7 +96,7 @@ const ManageOrder = () => {
     // 1. Lọc theo tab trạng thái
     let matchesTab = true;
     switch (activeTab) {
-      case "needs_action": matchesTab = (order.status === "waiting_approval" || order.status === "paid"); break;
+      case "needs_action": matchesTab = (order.status === "waiting_approval" || order.status === "paid" || (order.returnRequest && order.returnRequest.status === "pending")); break;
       case "pending": matchesTab = (order.status === "pending"); break;
       case "preparing": matchesTab = (order.status === "preparing"); break;
       case "shipping": matchesTab = (order.status === "shipping"); break;
@@ -141,7 +161,7 @@ const ManageOrder = () => {
         {adminTabs.map(tab => {
           let count = 0;
           if (tab.id === "all") count = orders.length;
-          else if (tab.id === "needs_action") count = orders.filter(o => o.status === "waiting_approval" || o.status === "paid").length;
+          else if (tab.id === "needs_action") count = orders.filter(o => o.status === "waiting_approval" || o.status === "paid" || (o.returnRequest && o.returnRequest.status === "pending")).length;
           else if (tab.id === "cancelled_returned") count = orders.filter(o => o.status === "cancelled" || o.status === "returned").length;
           else count = orders.filter(o => o.status === tab.id).length;
 
@@ -166,6 +186,9 @@ const ManageOrder = () => {
                   <strong>#{order._id.slice(-8).toUpperCase()}</strong>
                   <span className="mo-date">{new Date(order.createdAt).toLocaleString('vi-VN')}</span>
                   {getStatusBadge(order.status)}
+                  {order.returnRequest && order.returnRequest.status === "pending" && (
+                    <span className="badge badge-warning" style={{marginLeft: 8, background: '#fef3c7', color: '#d97706'}}>Có Yêu cầu Trả hàng</span>
+                  )}
                 </div>
                 <div className="mo-header-right">
                   <span className={`mo-payment-method ${order.paymentMethod.toLowerCase()}`}>
@@ -274,6 +297,39 @@ const ManageOrder = () => {
                     <p><strong>Trạng thái:</strong> {getStatusBadge(selectedOrder.status)}</p>
                     <p><strong>Thời gian:</strong> {new Date(selectedOrder.createdAt).toLocaleString('vi-VN')}</p>
                   </div>
+
+                  {selectedOrder.returnRequest && selectedOrder.returnRequest.isRequested && (
+                    <div className="mo-detail-box" style={{ border: '1px solid #f87171', background: '#fef2f2' }}>
+                      <h3 style={{ color: '#b91c1c' }}>Yêu cầu trả hàng</h3>
+                      <p><strong>Trạng thái: </strong> 
+                        {selectedOrder.returnRequest.status === 'pending' ? <span style={{color: '#d97706'}}>Đang chờ xử lý</span> : 
+                         selectedOrder.returnRequest.status === 'approved' ? <span style={{color: '#16a34a'}}>Đã chấp nhận</span> : 
+                         <span style={{color: '#dc2626'}}>Đã từ chối</span>}
+                      </p>
+                      <p><strong>Lý do:</strong> {selectedOrder.returnRequest.reason}</p>
+                      {selectedOrder.returnRequest.rejectedReason && (
+                        <p><strong>Lý do từ chối:</strong> {selectedOrder.returnRequest.rejectedReason}</p>
+                      )}
+                      {selectedOrder.returnRequest.images && selectedOrder.returnRequest.images.length > 0 && (
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px' }}>
+                          {selectedOrder.returnRequest.images.map((img, idx) => (
+                            <a key={idx} href={img} target="_blank" rel="noopener noreferrer">
+                              <img src={img} alt="return-proof" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #fecaca' }} />
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                      {selectedOrder.returnRequest.status === 'pending' && (
+                         <div style={{ marginTop: '15px', display: 'flex', gap: '10px' }}>
+                           <button className="btn-success" style={{ padding: '6px 12px', borderRadius: '4px', border: 'none', background: '#22c55e', color: '#fff', cursor: 'pointer' }} onClick={() => handleReturnAction(selectedOrder._id, 'approve')}>Đồng ý nhận lại hàng</button>
+                           <button className="btn-danger" style={{ padding: '6px 12px', borderRadius: '4px', border: 'none', background: '#ef4444', color: '#fff', cursor: 'pointer' }} onClick={() => {
+                              const reason = prompt("Lý do từ chối yêu cầu trả hàng:");
+                              if (reason !== null) handleReturnAction(selectedOrder._id, 'reject', reason);
+                           }}>Từ chối</button>
+                         </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="mo-modal-col">

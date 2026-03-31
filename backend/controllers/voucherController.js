@@ -324,7 +324,105 @@ const voucherController = {
             res.status(500).json({ message: "Lỗi server", error: error.message });
         }
     },
+
+    /* =====================================================
+       USER: ĐỔI ĐIỂM LẤY VOUCHER (multi-redemption)
+       ===================================================== */
+    redeemPoints: async (req, res) => {
+        try {
+            const { tier } = req.body;
+            const userId = req.user.id;
+
+            const Order = require("../models/Order");
+            const User  = require("../models/User");
+
+            const TIERS = {
+                BONUS5:  { prefix: "BONUS5",  value: 5,  pointsRequired: 200 },
+                BONUS10: { prefix: "BONUS10", value: 10, pointsRequired: 500 },
+                BONUS20: { prefix: "BONUS20", value: 20, pointsRequired: 1000 },
+            };
+
+            const tierConfig = TIERS[tier];
+            if (!tierConfig) {
+                return res.status(400).json({ message: "Loại voucher không hợp lệ!" });
+            }
+
+            const user = await User.findById(userId);
+
+            // Tính điểm tích lũy từ đơn hoàn thành
+            const doneOrders = await Order.find({ userId, status: "done" });
+            const totalAccumulated = Math.floor(
+                doneOrders.reduce((s, o) => s + o.total, 0) / 50000
+            );
+
+            // Tính điểm đã tiêu (tất cả lần đổi trong lịch sử)
+            const totalSpentPoints = (user.redemptionHistory || [])
+                .reduce((s, r) => s + r.pointsSpent, 0);
+
+            const availablePoints = totalAccumulated - totalSpentPoints;
+
+            if (availablePoints < tierConfig.pointsRequired) {
+                return res.status(400).json({
+                    message: `Bạn cần ${tierConfig.pointsRequired} điểm khả dụng. Hiện tại bạn có ${availablePoints} điểm.`,
+                });
+            }
+
+            // Tạo code UNIQUE mỗi lần đổi → không bị trùng targetUsers
+            const uniqueSuffix = Date.now().toString(36).toUpperCase().slice(-5);
+            const uniqueCode   = `${tierConfig.prefix}-${uniqueSuffix}`;
+
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 30); // hết hạn 30 ngày
+
+            await Voucher.create({
+                code: uniqueCode,
+                discountType: "percentage",
+                value: tierConfig.value,
+                minOrderValue: 0,
+                expiryDate,
+                usageLimit: 1,           // chỉ dùng 1 lần, mỗi lần đổi 1 voucher riêng
+                description: `Voucher đổi điểm giảm ${tierConfig.value}%`,
+                isPublic: false,
+                targetUsers: [userId],
+            });
+
+            const newHistoryItem = {
+                tier,
+                code: uniqueCode,
+                pointsSpent: tierConfig.pointsRequired,
+            };
+
+            const updatedUser = await User.findByIdAndUpdate(
+                userId,
+                { $push: { redemptionHistory: newHistoryItem } },
+                { new: true }
+            );
+
+            return res.status(200).json({
+                message: `Đổi điểm thành công! Voucher ${uniqueCode} đã được thêm vào ví.`,
+                code: uniqueCode,
+                redemptionHistory: updatedUser.redemptionHistory,
+            });
+        } catch (error) {
+            console.error("Lỗi đổi điểm:", error);
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
+
+    /* =====================================================
+       USER: LẤY LỊCH SỬ ĐỔI ĐIỂM
+       ===================================================== */
+    getRedemptionHistory: async (req, res) => {
+        try {
+            const User = require("../models/User");
+            const user = await User.findById(req.user.id).select("redemptionHistory");
+            res.status(200).json(user.redemptionHistory || []);
+        } catch (error) {
+            res.status(500).json({ message: "Lỗi server", error: error.message });
+        }
+    },
 };
+
 
 // Export controller + utility functions
 module.exports = {
