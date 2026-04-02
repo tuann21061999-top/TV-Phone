@@ -239,27 +239,53 @@ exports.getPersonalizedRecommendations = async (req, res) => {
 
         // Có dữ liệu: Lấy ra các tags từ những sản phẩm đó
         const interactProducts = await Product.find({ _id: { $in: combinedProductIds } }).select('tags');
-        let collectedTags = [];
+        
+        // Tính tần suất xuất hiện của từng tag
+        let tagFrequencies = {};
         interactProducts.forEach(p => {
             if (p.tags) {
-                p.tags.forEach(t => collectedTags.push(t.toString()));
+                p.tags.forEach(t => {
+                    const tagStr = t.toString();
+                    tagFrequencies[tagStr] = (tagFrequencies[tagStr] || 0) + 1;
+                });
             }
         });
 
-        // Xóa trùng lặp tag
-        collectedTags = [...new Set(collectedTags)];
+        const uniqueTags = Object.keys(tagFrequencies);
 
-        // Query các sản phẩm CHƯA MUA nhưng có chứa các Tag mà user thích
-        const suggestedProducts = await Product.find({
+        // Lấy CÁC sản phẩm CHƯA MUA có chứa ÍT NHẤT 1 Tag mà user thích
+        const candidates = await Product.find({
             isActive: true,
             _id: { $nin: combinedProductIds }, // không đề xuất lại máy đã mua/tim
-            tags: { $in: collectedTags }      // phải có chung tag
-        })
-            .sort({ totalSold: -1 })
-            .limit(8)
-            .select('name slug variants colorImages promotion averageRating totalSold');
+            tags: { $in: uniqueTags }          // phải có chung tag
+        }).select('name slug variants colorImages promotion averageRating totalSold tags'); // Kéo cả trường tags để tính score
 
-        // Nếu số lượng máy có tag đó quá ít (dưới 4 máy), bù thêm bằng hàng bán chạy
+        // Tính điểm "Độ phù hợp" (matchScore) cho từng sản phẩm
+        let suggestedProducts = candidates.map(p => {
+            let matchScore = 0;
+            if (p.tags) {
+                p.tags.forEach(t => {
+                    const tagStr = t.toString();
+                    if (tagFrequencies[tagStr]) {
+                        matchScore += tagFrequencies[tagStr]; // Gợi ý chuẩn xác hơn nhờ cộng dồn điểm theo tần suất
+                    }
+                });
+            }
+            return { product: p, matchScore };
+        });
+
+        // Sắp xếp: Ưu tiên điểm matchScore cao nhất, nếu bằng thì xét đến totalSold
+        suggestedProducts.sort((a, b) => {
+            if (b.matchScore !== a.matchScore) {
+                return b.matchScore - a.matchScore;
+            }
+            return (b.product.totalSold || 0) - (a.product.totalSold || 0);
+        });
+
+        // Lấy tối đa 8 sản phẩm đầu tiên và gỡ bỏ lớp wrapper
+        suggestedProducts = suggestedProducts.slice(0, 8).map(item => item.product);
+
+        // Nếu số lượng máy có tag đó quá ít (dưới 8 máy), bù thêm bằng hàng bán chạy
         let finalProducts = [...suggestedProducts];
         if (finalProducts.length < 8) {
             const existingIds = [...combinedProductIds, ...finalProducts.map(fp => fp._id.toString())];

@@ -1,7 +1,6 @@
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import { FileText, ShoppingBag, RefreshCw, Truck, CreditCard, ShieldAlert, Scale, Phone } from "lucide-react";
-import "./TermsOfService.css";
 
 const sections = [
   {
