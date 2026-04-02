@@ -70,7 +70,7 @@ function TermsOfService() {
   return (
     <div className="bg-slate-50 min-h-screen font-sans">
       <Header />
-      
+
       {/* HERO SECTION */}
       <div className="bg-slate-50 border-b border-slate-200 py-12 px-5 text-center text-slate-900">
         <div className="max-w-[700px] mx-auto">
@@ -89,7 +89,7 @@ function TermsOfService() {
 
       {/* CONTAINER */}
       <div className="max-w-[860px] mx-auto py-12 px-6 md:px-8 pb-16">
-        
+
         {/* INTRO CARD */}
         <div className="bg-emerald-50 border border-emerald-200 border-l-4 border-l-emerald-600 rounded-xl py-5 px-6 mb-8 text-emerald-900 text-[15px] leading-relaxed">
           <p className="m-0">
@@ -109,10 +109,10 @@ function TermsOfService() {
               </div>
               <ul className="list-none p-0 m-0 flex flex-col gap-3">
                 {sec.content.map((item, i) => (
-                  <li 
-                    key={i} 
+                  <li
+                    key={i}
                     className="relative pl-5 text-[15px] text-slate-700 leading-relaxed before:content-['●'] before:absolute before:left-0 before:text-emerald-500 before:text-[10px] before:top-[7px]"
-                    dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }} 
+                    dangerouslySetInnerHTML={{ __html: item.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") }}
                   />
                 ))}
               </ul>

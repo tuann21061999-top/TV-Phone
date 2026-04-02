@@ -7,7 +7,7 @@ import {
   Trash2, CreditCard, Edit, Heart, Search, Eye,
   Camera, XCircle, Loader2, AlertCircle, Star, DollarSign,
   Ticket, Truck, Percent, Gift, Clock, Copy, CheckCircle,
-  Phone, Home, ReceiptText, Trophy, Award, History, Info, Medal, RotateCcw
+  Phone, Home, ReceiptText, Trophy, Award, History, Info, Medal, RotateCcw, ShieldCheck
 } from "lucide-react";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
@@ -24,6 +24,7 @@ const Profile = () => {
 
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState(tabFromUrl || "info");
+  const [warrantyPhoneSearch, setWarrantyPhoneSearch] = useState("");
 
   useEffect(() => {
     const tabParam = new URLSearchParams(location.search).get("tab");
@@ -511,6 +512,10 @@ const Profile = () => {
 
               <button className={`flex items-center gap-3 w-full py-3 px-6 border-none bg-transparent text-sm cursor-pointer transition-all text-left ${activeTab === "payment" ? "bg-blue-50 text-blue-600 font-medium border-l-[3px] border-blue-600" : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"}`} onClick={() => setActiveTab("payment")}>
                 <ReceiptText size={18} /> Lịch sử thanh toán
+              </button>
+
+              <button className={`flex items-center gap-3 w-full py-3 px-6 border-none bg-transparent text-sm cursor-pointer transition-all text-left ${activeTab === "warranty" ? "bg-blue-50 text-blue-600 font-medium border-l-[3px] border-blue-600" : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"}`} onClick={() => setActiveTab("warranty")}>
+                <ShieldCheck size={18} /> Tra cứu bảo hành
               </button>
 
               <button className="flex items-center gap-3 w-full py-3 px-6 border-none bg-transparent text-sm cursor-pointer transition-all text-left text-red-500 mt-2.5 border-t border-slate-100 hover:bg-red-50 hover:text-red-600" onClick={handleLogout}>
@@ -1264,7 +1269,122 @@ const Profile = () => {
                 </div>
               );
             })()}
+            {/* TAB WARRANTY - TRA CỨU BẢO HÀNH */}
+            {activeTab === "warranty" && (() => {
+              // 1. Lọc đơn hàng đã giao thành công
+              const doneOrders = orders.filter(o => o.status === 'done');
 
+              let warrantyItems = [];
+              doneOrders.forEach(order => {
+                // Nếu có nhập số điện thoại tìm kiếm thì lọc theo SĐT
+                if (warrantyPhoneSearch && !order.shippingInfo?.phone?.includes(warrantyPhoneSearch)) return;
+
+                // 2. Đọc gói bảo hành để suy ra số tháng (Dựa vào CheckoutPage)
+                const wType = order.warrantyType || "Bảo hành cơ bản";
+                let months = 6; // Mặc định cơ bản là 6 tháng
+                if (wType.toLowerCase().includes('mở rộng') || wType.toLowerCase().includes('vàng')) months = 12;
+                if (wType.toLowerCase().includes('kim cương')) months = 24;
+
+                // 3. Tính toán ngày tháng
+                const purchaseDate = new Date(order.createdAt);
+                const endDate = new Date(purchaseDate);
+                endDate.setMonth(endDate.getMonth() + months);
+
+                const now = new Date();
+                const diffTime = endDate - now;
+                const remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                // 4. Đẩy từng sản phẩm vào mảng
+                order.items.forEach(item => {
+                  warrantyItems.push({
+                    ...item,
+                    orderId: order._id,
+                    purchaseDate,
+                    endDate,
+                    remainingDays,
+                    warrantyType: wType,
+                    phone: order.shippingInfo?.phone
+                  });
+                });
+              });
+
+              return (
+                <div className="flex flex-col gap-6 animate-[fadeIn_0.3s_ease-out]">
+                  {/* Header & Search */}
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-xl shadow-sm border border-slate-200 gap-4 md:gap-0">
+                    <div>
+                      <h2 className="m-0 text-[22px] font-bold text-slate-800 flex items-center gap-2"><ShieldCheck size={24} className="text-blue-600" /> Tra cứu bảo hành</h2>
+                      <p className="m-0 mt-1 text-sm text-slate-500">Kiểm tra thời hạn bảo hành thiết bị của bạn</p>
+                    </div>
+                    <div className="shrink-0 w-full md:w-auto">
+                      <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl p-1 pl-3.5 transition-all focus-within:border-blue-500 focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] focus-within:bg-white">
+                        <Phone size={16} className="text-slate-400 shrink-0" />
+                        <input
+                          type="text"
+                          placeholder="Nhập SĐT mua hàng..."
+                          value={warrantyPhoneSearch}
+                          onChange={(e) => setWarrantyPhoneSearch(e.target.value)}
+                          className="border-none bg-transparent outline-none text-sm text-slate-800 w-full md:w-[220px] py-2 placeholder:text-slate-400"
+                        />
+                        {warrantyPhoneSearch && (
+                          <button onClick={() => setWarrantyPhoneSearch("")} className="bg-transparent border-none p-2 cursor-pointer text-slate-400 hover:text-slate-700"><XCircle size={16} /></button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Danh sách thiết bị */}
+                  {warrantyItems.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 px-5 text-center bg-white rounded-xl border border-dashed border-slate-300 shadow-sm">
+                      <ShieldCheck size={56} strokeWidth={1} className="text-slate-300 mb-4" />
+                      <h3 className="m-0 mb-2 text-lg text-slate-700 font-semibold">Không tìm thấy thiết bị</h3>
+                      <p className="m-0 text-sm text-slate-500 max-w-[400px]">Không có thiết bị nào khớp với số điện thoại này hoặc bạn chưa có đơn hàng nào giao thành công.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-4">
+                      {warrantyItems.map((item, idx) => (
+                        <div key={idx} className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col md:flex-row gap-5 items-start md:items-center shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md transition-shadow">
+                          {/* Ảnh SP */}
+                          <div className="w-20 h-20 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center p-2 shrink-0">
+                            <img src={item.image} alt={item.name} className="max-w-full max-h-full object-contain" />
+                          </div>
+
+                          {/* Thông tin SP */}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="m-0 text-[15px] font-bold text-slate-800 mb-1">{item.name}</h4>
+                            <p className="m-0 text-[13px] text-slate-500 mb-2">Màu: {item.color} {item.storage ? `| ${item.storage}` : ''}</p>
+                            <div className="flex flex-wrap gap-2 text-[12px]">
+                              <span className="bg-slate-100 text-slate-600 py-1 px-2.5 rounded-md font-medium">SĐT: {item.phone}</span>
+                              <span className="bg-blue-50 text-blue-700 border border-blue-100 py-1 px-2.5 rounded-md font-semibold">{item.warrantyType}</span>
+                            </div>
+                          </div>
+
+                          {/* Thông tin thời hạn */}
+                          <div className="flex flex-col items-start md:items-end gap-2 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-5 w-full md:w-auto">
+                            <div className="text-[13px] text-slate-600">
+                              Ngày mua: <strong className="text-slate-800">{item.purchaseDate.toLocaleDateString('vi-VN')}</strong>
+                            </div>
+                            <div className="text-[13px] text-slate-600">
+                              Hết hạn: <strong className="text-slate-800">{item.endDate.toLocaleDateString('vi-VN')}</strong>
+                            </div>
+
+                            {item.remainingDays > 0 ? (
+                              <div className="mt-1 bg-emerald-50 text-emerald-700 border border-emerald-200 py-1.5 px-3 rounded-lg text-[13px] font-bold flex items-center gap-1.5">
+                                <CheckCircle size={14} /> Còn {item.remainingDays} ngày bảo hành
+                              </div>
+                            ) : (
+                              <div className="mt-1 bg-red-50 text-red-600 border border-red-200 py-1.5 px-3 rounded-lg text-[13px] font-bold flex items-center gap-1.5">
+                                <XCircle size={14} /> Đã hết hạn bảo hành
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </main>
         </div>
       </div>
@@ -1329,6 +1449,7 @@ const Profile = () => {
             </div>
           </div>
         </div>
+
       )}
 
       <Footer />
