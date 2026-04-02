@@ -165,6 +165,17 @@ const orderController = {
       if (status === "cancelled" && oldStatus !== "cancelled" && oldStatus !== "returned") {
         await updateInventory(order.items, "increase");
       }
+      // Hoàn lại lượt sử dụng voucher cho khách nếu có áp dụng
+      if (order.voucherCode) {
+        const Voucher = require("../models/Voucher"); // Đảm bảo đã import
+        await Voucher.findOneAndUpdate(
+          { code: order.voucherCode },
+          {
+            $inc: { usedCount: -1 },
+            $pull: { usedBy: order.userId }
+          }
+        );
+      }
 
       order.status = status;
       await order.save();
@@ -177,7 +188,7 @@ const orderController = {
         cancelled: "Đã bị hủy",
         returned: "Đã hoàn trả"
       };
-      
+
       const viStatus = statusMap[status] || status;
       await Notification.create({
         userId: order.userId,
@@ -212,12 +223,23 @@ const orderController = {
 
       const oldStatus = order.status;
       order.status = "cancelled";
-      
+
       // Nếu trạng thái trước đó chưa bị trừ kho thì tùy thuộc logic của bạn. 
       // Nhưng theo logic createOrder của bạn, khi "waiting_approval" (COD) hoặc "paid" thì kho đã bị trừ.
       // Dù trạng thái cũ là gì, miễn là nó chưa phải "cancelled" hoặc "returned" thì ta cứ hoàn kho:
-      if (oldStatus !== "cancelled" && oldStatus !== "returned") {
+      if (oldStatus !== "cancelled" && oldStatus !== "returned" && oldStatus !== "pending") {
         await updateInventory(order.items, "increase");
+      }
+      // Hoàn lại lượt sử dụng voucher cho khách nếu có áp dụng
+      if (order.voucherCode) {
+        const Voucher = require("../models/Voucher"); // Đảm bảo đã import
+        await Voucher.findOneAndUpdate(
+          { code: order.voucherCode },
+          {
+            $inc: { usedCount: -1 },
+            $pull: { usedBy: order.userId }
+          }
+        );
       }
 
       await order.save();
@@ -236,16 +258,15 @@ const orderController = {
       if (isAccepted) {
         order.status = "done";
       } else {
-        // Khách từ chối nhận hàng -> Hoàn kho
+        // Khách không nhận hàng -> chuyển sang returned và hoàn kho
         order.status = "returned";
         await updateInventory(order.items, "increase");
       }
 
-      order.isDeliveryConfirming = false;
       await order.save();
-      res.status(200).json({ message: "Xác nhận thành công", order });
+      res.status(200).json({ message: "Xác nhận giao hàng thành công", order });
     } catch (error) {
-      res.status(500).json({ message: "Lỗi server", error: error.message });
+      res.status(500).json({ message: "Lỗi hệ thống", error: error.message });
     }
   },
 
@@ -253,17 +274,36 @@ const orderController = {
   getAdminStats: async (req, res) => {
     try {
       const User = require("../models/User"); // Import thêm User model để đếm
+      const { period = "year", year, month, topProductLimit = 4 } = req.query;
 
       const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonth = now.getMonth() + 1;
+      const currentYear = year ? parseInt(year) : now.getFullYear();
+      const currentMonth = month ? parseInt(month) : now.getMonth() + 1;
 
-      // 1. TỔNG QUAN (Doanh thu, Lợi nhuận, Đơn hàng, Thành viên)
-      const allDoneOrders = await Order.find({ status: "done" });
+      // Xây dựng điều kiện lọc thời gian
+      let matchStageForTotals = { status: "done" };
+      let matchStageForChart = { status: "done" };
+
+      if (period === "day") {
+        matchStageForTotals.createdAt = {
+          $gte: new Date(currentYear, currentMonth - 1, 1),
+          $lt: new Date(currentYear, currentMonth, 1)
+        };
+        matchStageForChart = { ...matchStageForTotals };
+      } else if (period === "month") {
+        matchStageForTotals.createdAt = {
+          $gte: new Date(currentYear, 0, 1),
+          $lt: new Date(currentYear + 1, 0, 1)
+        };
+        matchStageForChart = { ...matchStageForTotals };
+      }
+
+      // 1. TỔNG QUAN
+      const allDoneOrdersFiltered = await Order.find(matchStageForTotals);
       let totalRevenue = 0;
       let totalImportCost = 0;
 
-      allDoneOrders.forEach(order => {
+      allDoneOrdersFiltered.forEach(order => {
         totalRevenue += (order.total - (order.shippingFee || 0));
         order.items.forEach(item => {
           totalImportCost += (item.importPrice || 0) * item.quantity;
@@ -272,32 +312,48 @@ const orderController = {
 
       const totalProfit = totalRevenue - totalImportCost;
       const totalUsers = await User.countDocuments({ role: "user" });
+
       const newOrdersCount = await Order.countDocuments({
-        createdAt: { $gte: new Date(now.getFullYear(), now.getMonth(), 1) } // Đơn mới trong tháng
+        createdAt: { $gte: new Date(now.getFullYear(), now.getMonth(), 1) }
       });
 
-      // 2. DỮ LIỆU BIỂU ĐỒ (6 tháng gần nhất)
+      // 2. DỮ LIỆU BIỂU ĐỒ
       const chartData = [];
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const month = d.getMonth() + 1;
-        const year = d.getFullYear();
+      const ordersForChart = period === "year" ? await Order.find({ status: "done" }) : allDoneOrdersFiltered;
 
-        const monthlyOrders = await Order.find({
-          status: "done",
-          createdAt: {
-            $gte: new Date(year, month - 1, 1),
-            $lt: new Date(year, month, 1)
-          }
-        });
-
-        const monthRev = monthlyOrders.reduce((sum, o) => sum + (o.total - (o.shippingFee || 0)), 0);
-        chartData.push({ name: `THG ${month}`, revenue: monthRev });
+      if (period === "day") {
+        const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+        for (let d = 1; d <= daysInMonth; d++) {
+          const startOfDay = new Date(currentYear, currentMonth - 1, d);
+          const endOfDay = new Date(currentYear, currentMonth - 1, d + 1);
+          const dailyOrders = ordersForChart.filter(o => o.createdAt >= startOfDay && o.createdAt < endOfDay);
+          const dailyRev = dailyOrders.reduce((sum, o) => sum + (o.total - (o.shippingFee || 0)), 0);
+          chartData.push({ name: `${d}/${currentMonth}`, revenue: dailyRev });
+        }
+      } else if (period === "month") {
+        for (let m = 1; m <= 12; m++) {
+          const startOfMonth = new Date(currentYear, m - 1, 1);
+          const endOfMonth = new Date(currentYear, m, 1);
+          const monthlyOrders = ordersForChart.filter(o => o.createdAt >= startOfMonth && o.createdAt < endOfMonth);
+          const monthRev = monthlyOrders.reduce((sum, o) => sum + (o.total - (o.shippingFee || 0)), 0);
+          chartData.push({ name: `THG ${m}`, revenue: monthRev });
+        }
+      } else {
+        const minOrder = await Order.findOne({ status: "done" }).sort({ createdAt: 1 });
+        const startYear = minOrder ? minOrder.createdAt.getFullYear() : currentYear - 4;
+        for (let y = startYear; y <= currentYear; y++) {
+          const startOfYear = new Date(y, 0, 1);
+          const endOfYear = new Date(y + 1, 0, 1);
+          const yearlyOrders = ordersForChart.filter(o => o.createdAt >= startOfYear && o.createdAt < endOfYear);
+          const yearRev = yearlyOrders.reduce((sum, o) => sum + (o.total - (o.shippingFee || 0)), 0);
+          chartData.push({ name: `Năm ${y}`, revenue: yearRev });
+        }
       }
 
-      // 3. SẢN PHẨM BÁN CHẠY (Dùng MongoDB Aggregation)
+      // 3. SẢN PHẨM BÁN CHẠY
+      const limitVal = parseInt(topProductLimit) || 4;
       const topProducts = await Order.aggregate([
-        { $match: { status: "done" } },
+        { $match: matchStageForTotals },
         { $unwind: "$items" },
         {
           $group: {
@@ -309,12 +365,12 @@ const orderController = {
           }
         },
         { $sort: { sales: -1 } },
-        { $limit: 4 } // Lấy top 4
+        { $limit: limitVal }
       ]);
 
-      // 4. THỐNG KÊ GÓI BẢO HÀNH ĐÃ BÁN
+      // 4. THỐNG KÊ GÓI BẢO HÀNH
       const warrantyStats = await Order.aggregate([
-        { $match: { status: "done", warrantyType: { $exists: true, $ne: null } } },
+        { $match: { ...matchStageForTotals, warrantyType: { $exists: true, $ne: null } } },
         {
           $group: {
             _id: "$warrantyType",
@@ -325,7 +381,7 @@ const orderController = {
         { $sort: { count: -1 } }
       ]);
 
-      // 5. ĐƠN HÀNG MỚI NHẤT LÊN BẢNG (5 đơn)
+      // 5. ĐƠN HÀNG MỚI NHẤT
       const recentOrders = await Order.find()
         .sort({ createdAt: -1 })
         .limit(5)
@@ -339,7 +395,7 @@ const orderController = {
         recentOrders
       });
 
-    } catch (error) {
+    } catch (error) { // Đã xóa block bị lặp, chỉ giữ lại 1 catch
       console.error("Lỗi Dashboard API:", error);
       res.status(500).json({ message: "Lỗi tính toán thống kê", error: error.message });
     }
@@ -467,9 +523,9 @@ const orderController = {
       res.status(200).json({ message: "Yêu cầu hoàn trả đã được gửi thành công", order });
     } catch (error) {
       if (req.files) {
-         req.files.forEach(f => {
-           if (fs.existsSync(f.path)) fs.unlinkSync(f.path);
-         });
+        req.files.forEach(f => {
+          if (fs.existsSync(f.path)) fs.unlinkSync(f.path);
+        });
       }
       res.status(500).json({ message: "Lỗi tạo yêu cầu hoàn trả", error: error.message });
     }
@@ -486,7 +542,7 @@ const orderController = {
       if (!order.returnRequest || !order.returnRequest.isRequested) {
         return res.status(400).json({ message: "Đơn hàng này chưa có yêu cầu hoàn trả nào" });
       }
-      
+
       if (order.returnRequest.status !== "pending") {
         return res.status(400).json({ message: "Yêu cầu hoàn trả đã được xử lý" });
       }
@@ -494,7 +550,7 @@ const orderController = {
       if (action === "approve") {
         order.returnRequest.status = "approved";
         order.status = "returned";
-        
+
         // Hoàn kho
         await updateInventory(order.items, "increase");
 
@@ -510,7 +566,7 @@ const orderController = {
       } else if (action === "reject") {
         order.returnRequest.status = "rejected";
         if (rejectReason) {
-            order.returnRequest.rejectedReason = rejectReason;
+          order.returnRequest.rejectedReason = rejectReason;
         }
 
         // Gui thong bao
@@ -528,7 +584,7 @@ const orderController = {
       await order.save();
       res.status(200).json({ message: "Xử lý yêu cầu trả hàng thành công", order });
     } catch (error) {
-       res.status(500).json({ message: "Lỗi xử lý yêu cầu", error: error.message });
+      res.status(500).json({ message: "Lỗi xử lý yêu cầu", error: error.message });
     }
   }
 };

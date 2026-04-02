@@ -16,27 +16,35 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [warrantyFilter, setWarrantyFilter] = useState("all");
 
+  const [filterPeriod, setFilterPeriod] = useState("year"); // "year", "month", "day"
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear());
+  const [filterMonth, setFilterMonth] = useState(new Date().getMonth() + 1);
+  const [topProductLimit, setTopProductLimit] = useState(4);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const [dashRes, favRes] = await Promise.all([
+        axios.get(`http://localhost:5000/api/orders/admin/stats/dashboard?period=${filterPeriod}&year=${filterYear}&month=${filterMonth}&topProductLimit=${topProductLimit}`, { headers }),
+        axios.get("http://localhost:5000/api/favorites/admin/stats", { headers }).catch(() => ({ data: [] })),
+      ]);
+
+      setData(dashRes.data);
+      setFavoriteStats(favRes.data);
+    } catch (error) {
+      console.error("Lỗi lấy dữ liệu Dashboard:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const headers = { Authorization: `Bearer ${token}` };
-
-        const [dashRes, favRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/orders/admin/stats/dashboard", { headers }),
-          axios.get("http://localhost:5000/api/favorites/admin/stats", { headers }).catch(() => ({ data: [] })),
-        ]);
-
-        setData(dashRes.data);
-        setFavoriteStats(favRes.data);
-      } catch (error) {
-        console.error("Lỗi lấy dữ liệu Dashboard:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchDashboardData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterPeriod, filterYear, filterMonth, topProductLimit]);
 
   const formatCurrency = (amount) => {
     if (amount >= 1000000000) return (amount / 1000000000).toFixed(1) + ' tỷ';
@@ -112,9 +120,44 @@ const AdminDashboard = () => {
 
         {/* Biểu đồ */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 lg:col-span-2">
-          <div className="flex flex-wrap justify-between items-center mb-5 gap-2">
-            <h3 className="text-base font-semibold text-slate-900 m-0">Doanh thu theo tháng (Đơn hoàn thành)</h3>
-            <span className="text-[13px] text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md font-medium">6 tháng gần nhất</span>
+          <div className="flex flex-col md:flex-row justify-between md:items-center mb-5 gap-3">
+            <h3 className="text-base font-semibold text-slate-900 m-0">Doanh thu</h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <select 
+                value={filterPeriod} 
+                onChange={(e) => setFilterPeriod(e.target.value)}
+                className="px-3 py-1.5 rounded-lg border border-slate-200 outline-none text-sm text-slate-700 bg-slate-50 cursor-pointer"
+              >
+                <option value="year">Theo Các Năm</option>
+                <option value="month">Theo Tháng (trong năm)</option>
+                <option value="day">Theo Ngày (trong tháng)</option>
+              </select>
+
+              {(filterPeriod === "month" || filterPeriod === "day") && (
+                <select 
+                  value={filterYear} 
+                  onChange={(e) => setFilterYear(Number(e.target.value))}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 outline-none text-sm text-slate-700 bg-slate-50 cursor-pointer"
+                >
+                  {Array.from({ length: 5 }).map((_, i) => {
+                    const y = new Date().getFullYear() - i;
+                    return <option key={y} value={y}>Năm {y}</option>;
+                  })}
+                </select>
+              )}
+
+              {filterPeriod === "day" && (
+                <select 
+                  value={filterMonth} 
+                  onChange={(e) => setFilterMonth(Number(e.target.value))}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 outline-none text-sm text-slate-700 bg-slate-50 cursor-pointer"
+                >
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <option key={i + 1} value={i + 1}>Tháng {i + 1}</option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
           <div className="w-full">
             <ResponsiveContainer width="100%" height={300}>
@@ -153,9 +196,27 @@ const AdminDashboard = () => {
               </div>
             ))}
           </div>
-          <Link to="/admin/products" className="block text-center w-full p-2.5 mt-4 bg-slate-50 text-blue-600 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
-            Xem kho hàng
-          </Link>
+          
+          <div className="mt-auto px-1 pt-4 space-y-2">
+            {topProductLimit === 4 ? (
+              <button 
+                onClick={() => setTopProductLimit(10)}
+                className="w-full p-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-semibold hover:bg-slate-200 transition-colors"
+              >
+                Tải thêm (Xem top 10)
+              </button>
+            ) : (
+              <button 
+                onClick={() => setTopProductLimit(4)}
+                className="w-full p-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-semibold hover:bg-slate-200 transition-colors"
+              >
+                Thu gọn
+              </button>
+            )}
+            <Link to="/admin/products" className="block text-center w-full p-2.5 bg-blue-50 text-blue-600 rounded-lg text-sm font-semibold hover:bg-blue-100 transition-colors">
+              Xem kho hàng
+            </Link>
+          </div>
         </div>
       </div>
 
