@@ -10,4 +10,7 @@ router.post('/chat', aiController.chatWithAI);
 // Gợi ý sản phẩm khách hàng hoặc Guest
 router.get('/recommendations', optionalAuth, aiController.getPersonalizedRecommendations);
 
+// Gợi ý phụ kiện theo lịch sử mua hàng
+router.get('/accessory-recommendations', optionalAuth, aiController.getAccessoryRecommendations);
+
 module.exports = router;

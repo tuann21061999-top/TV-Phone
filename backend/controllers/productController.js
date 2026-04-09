@@ -12,6 +12,15 @@ exports.createProduct = async (req, res) => {
     fs.appendFileSync('debug_logs.txt', 'Create Product Payload: ' + JSON.stringify(req.body, null, 2) + '\n');
     console.log("Create Product Request Body:", JSON.stringify(req.body, null, 2));
     const product = await Product.create(req.body);
+
+    // Tự động đồng bộ compatibleWith 2 chiều
+    if (req.body.compatibleWith && req.body.compatibleWith.length > 0) {
+      await Product.updateMany(
+        { _id: { $in: req.body.compatibleWith } },
+        { $addToSet: { compatibleWith: product._id } }
+      );
+    }
+
     res.status(201).json(product);
   } catch (error) {
     console.error("Create Product Error:", error.message);
@@ -219,6 +228,12 @@ exports.updateProduct = async (req, res) => {
 
     console.log("Update Product Payload:", updateData);
 
+    // Lấy product cũ để kiểm tra thay đổi compatibleWith
+    const oldProduct = await Product.findById(req.params.id);
+    if (!oldProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       { $set: updateData },
@@ -228,8 +243,27 @@ exports.updateProduct = async (req, res) => {
       }
     );
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+    // Tự động đồng bộ 2 chiều khi cập nhật compatibleWith
+    if ('compatibleWith' in updateData) {
+      const oldComp = (oldProduct.compatibleWith || []).map(id => id.toString());
+      const newComp = (updateData.compatibleWith || []).map(id => id.toString());
+
+      const addedIds = newComp.filter(id => !oldComp.includes(id));
+      const removedIds = oldComp.filter(id => !newComp.includes(id));
+
+      if (addedIds.length > 0) {
+        await Product.updateMany(
+          { _id: { $in: addedIds } },
+          { $addToSet: { compatibleWith: product._id } }
+        );
+      }
+
+      if (removedIds.length > 0) {
+        await Product.updateMany(
+          { _id: { $in: removedIds } },
+          { $pull: { compatibleWith: product._id } }
+        );
+      }
     }
 
     // Tiến hành xoá ảnh cũ trên Cloudinary
@@ -275,6 +309,12 @@ exports.deleteProduct = async (req, res) => {
     }
 
     await Product.findByIdAndDelete(req.params.id);
+
+    // Gỡ liên kết compatibleWith đồng bộ ở tất cả các Product liên quan
+    await Product.updateMany(
+      { compatibleWith: req.params.id },
+      { $pull: { compatibleWith: req.params.id } }
+    );
 
     // Tiến hành xoá ảnh trên Cloudinary
     if (imagesToDelete.length > 0) {
@@ -356,6 +396,14 @@ exports.bulkUpdateProducts = async (req, res) => {
     if ('compatibleWith' in updateData) {
       if (!updateQuery.$addToSet) updateQuery.$addToSet = {};
       updateQuery.$addToSet.compatibleWith = { $each: updateData.compatibleWith || [] };
+
+      // Chạy đồng bộ 2 chiều (gắn hàng loạt productIds vào mảng compatibleWith ở các SP đích)
+      if (updateData.compatibleWith && updateData.compatibleWith.length > 0) {
+        await Product.updateMany(
+          { _id: { $in: updateData.compatibleWith } },
+          { $addToSet: { compatibleWith: { $each: productIds } } }
+        );
+      }
     }
 
     if (Object.keys(updateQuery).length === 0) {
@@ -390,6 +438,12 @@ exports.bulkDeleteProducts = async (req, res) => {
     }
 
     const result = await Product.deleteMany({ _id: { $in: productIds } });
+
+    // Gỡ toàn bộ productIds ở những Product liên quan
+    await Product.updateMany(
+      { compatibleWith: { $in: productIds } },
+      { $pull: { compatibleWith: { $in: productIds } } }
+    );
 
     res.json({
       message: `Đã xóa hàng loạt thành công. Số SP đã xóa: ${result.deletedCount}`,

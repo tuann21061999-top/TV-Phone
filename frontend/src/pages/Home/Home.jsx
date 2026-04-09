@@ -7,6 +7,7 @@ import Category from "../../components/Category/Category";
 import Features from "../../components/Features/Features";
 import Promotion from "../../components/Promotion/Promotion";
 import AIRecommend from "../../components/AIRecommend/AIRecommend";
+import AIAccessoryRecommend from "../../components/AIAccessoryRecommend/AIAccessoryRecommend";
 
 function Home() {
   return (
@@ -15,6 +16,8 @@ function Home() {
       <Hero />
       <Category />
       <AIRecommend />
+      <div className="h-5"></div>
+      <AIAccessoryRecommend />
       <Promotion />
       <ProductGrid />
       <Features />

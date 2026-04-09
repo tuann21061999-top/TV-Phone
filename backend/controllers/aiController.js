@@ -312,3 +312,92 @@ exports.getPersonalizedRecommendations = async (req, res) => {
         res.status(500).json({ message: "Lấy gợi ý AI thất bại", error: error.message });
     }
 };
+
+/* ================================================================
+   GỢI Ý PHỤ KIỆN TƯƠNG THÍCH THEO LỊCH SỬ MUA HÀNG
+================================================================ */
+exports.getAccessoryRecommendations = async (req, res) => {
+    try {
+        const userId = req.user ? req.user._id : null;
+        let finalProducts = [];
+        
+        // Cần tìm type là 'accessory'
+        const accessoryTypeCondition = { productType: 'accessory', isActive: true };
+
+        // Fallback chung cho khách vãng lai hoặc người chưa mua gì
+        const fallbackToTopAccessories = async () => {
+            const bestSellers = await Product.find(accessoryTypeCondition)
+                .sort({ totalSold: -1, averageRating: -1 })
+                .limit(8)
+                .select('name slug variants colorImages promotion averageRating totalSold');
+
+            return bestSellers.map(p => ({
+                product: p,
+                reason: "Phụ kiện hot gợi ý cho bạn"
+            }));
+        };
+
+        if (!userId) {
+            const recommendations = await fallbackToTopAccessories();
+            return res.status(200).json({ recommendations });
+        }
+
+        // Lấy lịch sử Mua hàng
+        const recentOrders = await Order.find({ userId: userId, status: { $nin: ['cancelled', 'returned'] } })
+            .sort({ createdAt: -1 }).limit(10);
+            
+        const orderProductIds = recentOrders.flatMap(o => o.items.map(i => i.productId)).filter(Boolean);
+
+        if (orderProductIds.length === 0) {
+            const recommendations = await fallbackToTopAccessories();
+            return res.status(200).json({ recommendations });
+        }
+
+        const suggestedProducts = await Product.find({
+            ...accessoryTypeCondition,
+            compatibleWith: { $in: orderProductIds }
+        })
+            .sort({ totalSold: -1 })
+            .limit(8)
+            .select('name slug variants colorImages promotion averageRating totalSold compatibleWith');
+
+        finalProducts = [...suggestedProducts];
+
+        // Nếu số lượng máy có tag đó quá ít (dưới 8 máy), bù thêm bằng hàng bán chạy
+        if (finalProducts.length < 8) {
+            const existingIds = finalProducts.map(fp => fp._id.toString());
+            const extraProducts = await Product.find({
+                ...accessoryTypeCondition,
+                _id: { $nin: existingIds }
+            })
+                .sort({ totalSold: -1 })
+                .limit(8 - finalProducts.length)
+                .select('name slug variants colorImages promotion averageRating totalSold');
+
+            finalProducts = [...finalProducts, ...extraProducts];
+        }
+
+        const orderProductIdsStr = orderProductIds.map(id => id.toString());
+
+        const recommendations = finalProducts.map(p => {
+            // Kiểm tra mức độ tương thích để hiển thị nhãn lý do thích hợp
+            const pObj = p.toObject ? p.toObject() : p;
+            let isCompatible = false;
+            
+            if (pObj.compatibleWith && Array.isArray(pObj.compatibleWith)) {
+                isCompatible = pObj.compatibleWith.some(id => orderProductIdsStr.includes(id.toString()));
+            }
+
+            return {
+                product: p,
+                reason: isCompatible ? "Phù hợp với thiết bị bạn đang dùng" : "Phụ kiện hot gợi ý cho bạn"
+            };
+        });
+
+        res.status(200).json({ recommendations });
+
+    } catch (error) {
+        console.error("Lỗi AI Accessory Recommendation:", error);
+        res.status(500).json({ message: "Lấy gợi ý phụ kiện thất bại", error: error.message });
+    }
+};

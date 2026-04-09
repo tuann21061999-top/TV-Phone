@@ -485,9 +485,11 @@ function AccessoriesPage() {
                         </div>
                       </Link>
 
-                      <button className="bg-blue-600 text-white border-none py-2.5 px-4 cursor-pointer rounded-lg flex items-center justify-center gap-2 w-full hover:bg-blue-700 transition-colors font-medium mt-2">
-                        <ShoppingCart size={18} />
-                        Thêm vào giỏ
+                      <button 
+                        className="bg-blue-600 text-white border-none py-2.5 px-4 cursor-pointer rounded-lg flex items-center justify-center w-full hover:bg-blue-700 transition-colors font-medium mt-2"
+                        onClick={() => navigate(`/product/${product.slug || product._id}`)}
+                      >
+                        Xem chi tiết
                       </button>
                     </div>
                   );
