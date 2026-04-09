@@ -15,4 +15,7 @@ router.put("/admin/promotions/:productId/reset", protect, admin, promotionContro
 // Public: Lấy danh sách sản phẩm đang có khuyến mãi (tất cả hoặc shock deals)
 router.get("/public/promotions", promotionController.getPublicPromotions);
 
+// Public: Lấy sản phẩm có khuyến mãi sâu nhất cho banner Home
+router.get("/public/best", promotionController.getBestPromotion);
+
 module.exports = router;

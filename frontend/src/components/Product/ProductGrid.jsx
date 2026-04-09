@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import "./Product.css";
 import ProductCard from "./ProductCard";
 import axios from "axios";
 
 function ProductGrid() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [favoriteIds, setFavoriteIds] = useState(new Set()); // Thêm state lưu tim
 
   // Trạng thái cho bộ lọc và phân trang
   const [activeTab, setActiveTab] = useState("all");
@@ -29,6 +29,17 @@ function ProductGrid() {
       }
     };
     fetchProducts();
+
+    // Lấy danh sách yêu thích nếu đã đăng nhập
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.get("http://localhost:5000/api/favorites", {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(res => {
+        const ids = new Set(res.data.map(p => p._id));
+        setFavoriteIds(ids);
+      }).catch(() => {});
+    }
   }, []);
 
   // Lọc sản phẩm theo Tab (Tất cả, Điện thoại, Điện tử, Phụ kiện)
@@ -52,38 +63,44 @@ function ProductGrid() {
     setVisibleCount(6); // Quay về hiển thị 6 cái đầu tiên của tab mới
   };
 
-  if (loading) return <div className="loading">Đang tải sản phẩm...</div>;
+  const handleFavoriteToggle = (productId, isLiked) => {
+    setFavoriteIds(prev => {
+      const next = new Set(prev);
+      isLiked ? next.add(productId) : next.delete(productId);
+      return next;
+    });
+  };
+
+  if (loading) return <div className="flex justify-center items-center py-20 text-gray-500 font-medium text-sm animate-pulse">Đang tải sản phẩm...</div>;
 
   return (
-    <section className="product-grid-section">
-      <div className="grid-header">
-        <div className="grid-header-text">
-          <h2>Sản phẩm nổi bật</h2>
-          <p>Sản phẩm bán chạy nhất được tuyển chọn cho bạn.</p>
+    <section className="w-full max-w-[1400px] mx-auto my-10 px-5 md:px-10 font-sans">
+      <div className="flex justify-between items-start mb-8 flex-wrap gap-5">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 m-0 mb-2">Sản phẩm nổi bật</h2>
+          <p className="text-sm text-gray-500 m-0">Sản phẩm bán chạy nhất được tuyển chọn cho bạn.</p>
         </div>
-        <div className="grid-filters">
+        <div className="flex gap-2.5 flex-wrap">
           <button
-            className={`filter-btn ${activeTab === "all" ? "active" : ""}`}
+            className={`border-none py-2 px-4 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 ${activeTab === "all" ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
             onClick={() => handleTabChange("all")}
           >
             Tất cả
           </button>
           <button
-            className={`filter-btn ${activeTab === "device" ? "active" : ""}`}
+            className={`border-none py-2 px-4 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 ${activeTab === "device" ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
             onClick={() => handleTabChange("device")}
           >
             Điện thoại
           </button>
-          {/* Đã đổi từ Âm thanh sang Điện tử */}
           <button
-            className={`filter-btn ${activeTab === "electronic" ? "active" : ""}`}
+            className={`border-none py-2 px-4 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 ${activeTab === "electronic" ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
             onClick={() => handleTabChange("electronic")}
           >
             Điện tử
           </button>
-          {/* Đã thêm tab Phụ kiện */}
           <button
-            className={`filter-btn ${activeTab === "accessory" ? "active" : ""}`}
+            className={`border-none py-2 px-4 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 ${activeTab === "accessory" ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
             onClick={() => handleTabChange("accessory")}
           >
             Phụ kiện
@@ -91,25 +108,33 @@ function ProductGrid() {
         </div>
       </div>
 
-      <div className="grid-container">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {displayedProducts.map((p) => (
-          <ProductCard key={p._id} product={p} />
+          <ProductCard 
+            key={p._id} 
+            product={p} 
+            isFavorited={favoriteIds.has(p._id)} 
+            onFavoriteToggle={handleFavoriteToggle} 
+          />
         ))}
       </div>
 
-      <div className="load-more-container">
+      <div className="flex justify-center mt-2.5">
         {visibleCount < filteredProducts.length ? (
-          <button className="load-more-btn" onClick={handleLoadMore}>
+          <button 
+            className="bg-white text-gray-700 border border-gray-300 py-3 px-6 rounded-full text-sm font-semibold cursor-pointer transition-all duration-200 hover:border-gray-400 hover:bg-gray-50" 
+            onClick={handleLoadMore}
+          >
             Tải thêm sản phẩm
           </button>
         ) : (
           filteredProducts.length > 0 && (
-            <p className="no-more-msg">Đã hiển thị tất cả sản phẩm trong mục này.</p>
+            <p className="text-sm text-gray-500 italic text-center m-0">Đã hiển thị tất cả sản phẩm trong mục này.</p>
           )
         )}
 
         {filteredProducts.length === 0 && (
-          <p className="no-more-msg">Không tìm thấy sản phẩm nào.</p>
+          <p className="text-sm text-gray-500 italic text-center m-0">Không tìm thấy sản phẩm nào.</p>
         )}
       </div>
     </section>

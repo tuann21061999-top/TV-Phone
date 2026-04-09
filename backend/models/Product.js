@@ -184,6 +184,13 @@ const productSchema = new mongoose.Schema(
       },
     ],
 
+    tags: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tag",
+      },
+    ],
+
     isFeatured: {
       type: Boolean,
       default: false,
@@ -207,6 +214,12 @@ const productSchema = new mongoose.Schema(
     totalSold: {
       type: Number,
       default: 0,
+    },
+
+    productGroup: {
+      type: String,
+      default: "",
+      index: true,
     },
 
     isActive: {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Plus, Edit, Trash2, Eye, EyeOff, Image as ImageIcon, X, Upload, Search } from "lucide-react";
 import { toast } from "sonner";
-import "./ManageBanner.css";
+
 
 const ManageBanner = () => {
   const [banners, setBanners] = useState([]);
@@ -174,44 +174,52 @@ const ManageBanner = () => {
   };
 
   return (
-    <div className="manage-banner-container">
-      {/* ... (Giữ nguyên phần Toolbar và render List Banners) ... */}
-      <div className="mb-toolbar">
-        <h2>Quản lý Banner (Hero)</h2>
-        <button className="btn-add-banner" onClick={openAddModal}>
+    <div className="flex flex-col gap-5 w-full max-w-full box-border font-sans">
+      
+      {/* TOOLBAR */}
+      <div className="flex justify-between items-center mb-2.5 pb-4 border-b-2 border-slate-200 w-full">
+        <h2 className="m-0 text-[24px] font-extrabold text-slate-900">Quản lý Banner (Hero)</h2>
+        <button 
+          className="bg-blue-600 hover:bg-blue-700 text-white border-none py-2.5 px-5 rounded-lg text-[14px] font-semibold flex items-center gap-2 cursor-pointer transition-colors duration-200" 
+          onClick={openAddModal}
+        >
           <Plus size={18} /> Thêm Banner mới
         </button>
       </div>
 
+      {/* DANH SÁCH BANNER */}
       {loading ? (
-        <div className="mb-message">Đang tải danh sách banner...</div>
+        <div className="text-center py-[60px] text-slate-500 text-[15px] bg-white rounded-xl border border-dashed border-slate-300">Đang tải danh sách banner...</div>
       ) : banners.length === 0 ? (
-        <div className="mb-message">Chưa có banner nào. Hãy thêm mới!</div>
+        <div className="text-center py-[60px] text-slate-500 text-[15px] bg-white rounded-xl border border-dashed border-slate-300">Chưa có banner nào. Hãy thêm mới!</div>
       ) : (
-        <div className="mb-list">
+        <div className="flex flex-col gap-6 w-full">
           {banners.map(banner => (
-            <div key={banner._id} className="mb-card">
-              <div className="mb-card-image">
-                <img src={banner.image} alt={banner.title} onError={(e) => e.target.src="https://via.placeholder.com/800x400?text=Loi+Anh"} />
-                {!banner.isActive && <div className="mb-overlay-disabled">Đang Ẩn</div>}
+            <div key={banner._id} className="bg-white rounded-xl border border-slate-200 shadow-[0_2px_5px_rgba(0,0,0,0.03)] flex flex-col overflow-hidden w-full">
+              
+              <div className="w-full h-[250px] relative bg-slate-50 border-b border-slate-200">
+                <img src={banner.image} alt={banner.title} className="w-full h-full object-cover" onError={(e) => e.target.src="https://via.placeholder.com/800x400?text=Loi+Anh"} />
+                {!banner.isActive && (
+                  <div className="absolute inset-0 bg-slate-900/60 text-white flex items-center justify-center text-[24px] font-extrabold tracking-[2px]">Đang Ẩn</div>
+                )}
               </div>
               
-              <div className="mb-card-content">
-                <div className="mb-info">
-                  <h3>{banner.title}</h3>
-                  <p>{banner.subtitle}</p>
-                  <span className="mb-link">Link: {banner.link}</span>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-6 gap-5 md:gap-0">
+                <div>
+                  <h3 className="m-0 mb-2 text-[18px] font-bold text-slate-800">{banner.title}</h3>
+                  <p className="m-0 mb-2 text-[14px] text-slate-500">{banner.subtitle}</p>
+                  <span className="text-[13px] text-blue-600 font-medium bg-blue-50 py-1 px-2.5 rounded">Link: {banner.link}</span>
                 </div>
                 
-                <div className="mb-actions">
-                  <span className="mb-order-badge">Thứ tự: {banner.order}</span>
-                  <button onClick={() => toggleStatus(banner._id)} className="btn-icon">
+                <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                  <span className="bg-slate-100 text-slate-600 py-2 px-3 rounded-lg text-[13px] font-semibold mr-0 md:mr-3">Thứ tự: {banner.order}</span>
+                  <button onClick={() => toggleStatus(banner._id)} className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 py-2 px-4 rounded-lg text-[13px] font-semibold cursor-pointer flex items-center gap-1.5 transition-colors">
                     {banner.isActive ? <><EyeOff size={15}/> Ẩn</> : <><Eye size={15}/> Hiện</>}
                   </button>
-                  <button onClick={() => openEditModal(banner)} className="btn-icon btn-blue">
+                  <button onClick={() => openEditModal(banner)} className="bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600 py-2 px-4 rounded-lg text-[13px] font-semibold cursor-pointer flex items-center gap-1.5 transition-colors">
                     <Edit size={15}/> Sửa
                   </button>
-                  <button onClick={() => handleDelete(banner._id)} className="btn-icon btn-red">
+                  <button onClick={() => handleDelete(banner._id)} className="bg-red-50 hover:bg-red-100 border border-red-200 text-red-500 py-2 px-4 rounded-lg text-[13px] font-semibold cursor-pointer flex items-center gap-1.5 transition-colors">
                     <Trash2 size={15}/> Xóa
                   </button>
                 </div>
@@ -221,56 +229,58 @@ const ManageBanner = () => {
         </div>
       )}
 
-      {/* Modal Thêm/Sửa Banner */}
+      {/* MODAL THÊM/SỬA BANNER */}
       {showModal && (
-        <div className="mb-modal-overlay">
-          <div className="mb-modal-content">
-            <div className="mb-modal-header">
-              <h3>{isEditing ? "Chỉnh sửa Banner" : "Thêm Banner mới"}</h3>
-              <button className="mb-close-btn" onClick={() => setShowModal(false)}><X size={20}/></button>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-[4px] flex items-center justify-center z-[9999]">
+          <div className="bg-white w-[90%] md:w-[500px] rounded-2xl shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col max-h-[90vh]">
+            
+            <div className="flex justify-between items-center py-5 px-6 bg-slate-50 border-b border-slate-200 shrink-0">
+              <h3 className="m-0 text-[18px] text-slate-900 font-bold">{isEditing ? "Chỉnh sửa Banner" : "Thêm Banner mới"}</h3>
+              <button className="bg-transparent border-none cursor-pointer text-slate-500 hover:text-slate-800" onClick={() => setShowModal(false)}><X size={20}/></button>
             </div>
             
-            <form onSubmit={handleSubmit} className="mb-form">
-              <div className="mb-form-group">
-                <label>Tiêu đề chính (Title) *</label>
-                <input type="text" name="title" value={formData.title} onChange={handleInputChange} placeholder="VD: iPhone 15 Pro Max mới nhất..." required />
+            <form onSubmit={handleSubmit} className="p-6 overflow-y-auto [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-400">
+              
+              <div className="mb-4">
+                <label className="block text-[13px] font-semibold text-slate-800 mb-2">Tiêu đề chính (Title) *</label>
+                <input type="text" name="title" value={formData.title} onChange={handleInputChange} placeholder="VD: iPhone 15 Pro Max mới nhất..." required className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
               </div>
 
-              <div className="mb-form-group">
-                <label>Mô tả phụ (Subtitle)</label>
-                <input type="text" name="subtitle" value={formData.subtitle} onChange={handleInputChange} placeholder="VD: Giảm sốc 2 triệu đồng..." />
+              <div className="mb-4">
+                <label className="block text-[13px] font-semibold text-slate-800 mb-2">Mô tả phụ (Subtitle)</label>
+                <input type="text" name="subtitle" value={formData.subtitle} onChange={handleInputChange} placeholder="VD: Giảm sốc 2 triệu đồng..." className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
               </div>
 
               {/* KHU VỰC UPLOAD FILE ẢNH */}
-              <div className="mb-form-group">
-                <label>Hình ảnh Banner {isEditing ? "" : "*"}</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <label htmlFor="banner-upload" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', background: '#F1F5F9', padding: '10px 16px', borderRadius: '8px', border: '1px dashed #CBD5E1', color: '#475569', fontWeight: '600' }}>
-                    <Upload size={18} /> Chọn ảnh từ máy tính
+              <div className="mb-4">
+                <label className="block text-[13px] font-semibold text-slate-800 mb-2">Hình ảnh Banner {isEditing ? "" : "*"}</label>
+                <div className="flex items-center gap-2.5">
+                  <label htmlFor="banner-upload" className="cursor-pointer flex items-center gap-2 bg-slate-100 py-2.5 px-4 rounded-lg border border-dashed border-slate-300 text-slate-600 font-semibold hover:bg-slate-200 transition-colors">
+                    <Upload size={18} /> Chọn ảnh từ máy
                   </label>
-                  <input type="file" id="banner-upload" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
-                  <span style={{ fontSize: '13px', color: '#64748B' }}>
-                    {imageFile ? imageFile.name : (isEditing ? "Để trống nếu không muốn đổi ảnh" : "Chưa chọn file")}
+                  <input type="file" id="banner-upload" accept="image/*" onChange={handleImageChange} className="hidden" />
+                  <span className="text-[13px] text-slate-500 line-clamp-1">
+                    {imageFile ? imageFile.name : (isEditing ? "Để trống nếu không muốn đổi" : "Chưa chọn file")}
                   </span>
                 </div>
                 
                 {/* Khu vực Preview Ảnh */}
                 {imagePreview && (
-                  <div style={{ marginTop: '16px', padding: '10px', border: '1px solid #E2E8F0', borderRadius: '8px', background: '#F8FAFC' }}>
-                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: '#64748B' }}>Ảnh xem trước:</p>
-                    <img src={imagePreview} alt="Preview" style={{ width: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '4px' }} />
+                  <div className="mt-4 p-2.5 border border-slate-200 rounded-lg bg-slate-50">
+                    <p className="m-0 mb-2 text-[12px] text-slate-500">Ảnh xem trước:</p>
+                    <img src={imagePreview} alt="Preview" className="w-full max-h-[200px] object-contain rounded" />
                   </div>
                 )}
               </div>
 
               {/* KHU VỰC TÌM KIẾM SẢN PHẨM & NHẬP LINK */}
-              <div className="mb-form-group">
-                <label>Link trỏ tới khi click *</label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', position: 'relative' }}>
+              <div className="mb-4">
+                <label className="block text-[13px] font-semibold text-slate-800 mb-2">Link trỏ tới khi click *</label>
+                <div className="flex flex-col gap-2 relative">
                   
-                  {/* 1. Ô tìm kiếm thông minh */}
-                  <div style={{ position: 'relative' }}>
-                    <Search size={16} color="#94A3B8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  {/* Ô tìm kiếm thông minh */}
+                  <div className="relative">
+                    <Search size={16} color="#94A3B8" className="absolute left-3 top-1/2 -translate-y-1/2" />
                     <input 
                       type="text" 
                       placeholder="🔍 Gõ tên sản phẩm để tìm nhanh (VD: iPhone 15...)" 
@@ -280,46 +290,45 @@ const ManageBanner = () => {
                         setShowSuggestions(true);
                       }}
                       onFocus={() => setShowSuggestions(true)}
-                      // Delay 200ms để kịp click chọn item trước khi bảng bị ẩn
                       onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} 
-                      style={{ padding: '10px 14px 10px 36px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none', width: '100%', boxSizing: 'border-box' }}
+                      className="w-full py-2.5 pr-3.5 pl-9 rounded-lg border border-slate-300 text-[13px] outline-none focus:border-blue-500 transition-colors"
                     />
                   </div>
 
                   {/* Bảng kết quả xổ xuống */}
                   {showSuggestions && productSearch && (
-                    <div className="mb-suggestions-box">
+                    <div className="absolute top-[44px] left-0 w-full bg-white border border-slate-200 rounded-lg shadow-[0_10px_25px_rgba(0,0,0,0.1)] z-50 max-h-[250px] overflow-y-auto">
                       {products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())).length > 0 ? (
                         products
                           .filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase()))
-                          .slice(0, 5) // Hiển thị 5 sản phẩm khớp nhất
+                          .slice(0, 5)
                           .map(p => (
                             <div 
                               key={p._id} 
-                              className="mb-suggestion-item"
+                              className="flex items-center py-2 px-3 cursor-pointer border-b border-slate-100 transition-colors hover:bg-blue-50 group last:border-none"
                               onClick={() => {
-                                setFormData({ ...formData, link: `/product/${p.slug}` }); // Điền tự động link
-                                setProductSearch(p.name); // Cập nhật tên lên ô tìm kiếm
-                                setShowSuggestions(false); // Ẩn bảng
+                                setFormData({ ...formData, link: `/product/${p.slug}` });
+                                setProductSearch(p.name);
+                                setShowSuggestions(false);
                               }}
                             >
-                              <div style={{ width: '30px', height: '30px', borderRadius: '4px', overflow: 'hidden', marginRight: '10px', background: '#F1F5F9', flexShrink: 0 }}>
+                              <div className="w-[30px] h-[30px] rounded overflow-hidden mr-2.5 bg-slate-100 shrink-0 flex items-center justify-center">
                                 {p.colorImages && p.colorImages.length > 0 ? (
-                                  <img src={p.colorImages[0].imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  <img src={p.colorImages[0].imageUrl} alt={p.name} className="w-full h-full object-cover" />
                                 ) : (
-                                  <ImageIcon size={14} style={{ margin: '8px', color: '#94A3B8' }}/>
+                                  <ImageIcon size={14} className="text-slate-400" />
                                 )}
                               </div>
-                              <span style={{ fontSize: '13px', color: '#334155', fontWeight: '500' }}>{p.name}</span>
+                              <span className="text-[13px] text-slate-700 font-medium group-hover:text-blue-600 transition-colors">{p.name}</span>
                             </div>
                           ))
                       ) : (
-                        <div className="mb-suggestion-empty">Không tìm thấy sản phẩm nào</div>
+                        <div className="p-4 text-center text-[13px] text-slate-400">Không tìm thấy sản phẩm nào</div>
                       )}
                     </div>
                   )}
 
-                  {/* 2. Ô chứa Link chính thức (Vẫn cho phép nhập tay nếu muốn) */}
+                  {/* Ô chứa Link chính thức */}
                   <input 
                     type="text" 
                     name="link" 
@@ -327,30 +336,30 @@ const ManageBanner = () => {
                     onChange={handleInputChange} 
                     placeholder="Kết quả link: /product/slug-san-pham" 
                     required 
-                    style={{ background: '#F8FAFC', padding: '10px 14px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', width: '100%', boxSizing: 'border-box', outline: 'none' }}
+                    className="w-full py-2.5 px-3.5 bg-slate-50 rounded-lg border border-slate-300 text-[14px] outline-none focus:border-blue-500 transition-colors"
                   />
                 </div>
               </div>
 
-              <div className="mb-form-row">
-                <div className="mb-form-group" style={{flex: 1}}>
-                  <label>Chữ trên nút</label>
-                  <input type="text" name="buttonText" value={formData.buttonText} onChange={handleInputChange} placeholder="VD: Mua ngay" />
+              <div className="flex gap-4">
+                <div className="mb-4 flex-1">
+                  <label className="block text-[13px] font-semibold text-slate-800 mb-2">Chữ trên nút</label>
+                  <input type="text" name="buttonText" value={formData.buttonText} onChange={handleInputChange} placeholder="VD: Mua ngay" className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
                 </div>
-                <div className="mb-form-group" style={{width: '120px'}}>
-                  <label>Thứ tự hiển thị</label>
-                  <input type="number" name="order" value={formData.order} onChange={handleInputChange} min="0" />
+                <div className="mb-4 w-[120px]">
+                  <label className="block text-[13px] font-semibold text-slate-800 mb-2">Thứ tự</label>
+                  <input type="number" name="order" value={formData.order} onChange={handleInputChange} min="0" className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
                 </div>
               </div>
 
-              <div className="mb-form-checkbox">
-                <input type="checkbox" id="isActive" name="isActive" checked={formData.isActive} onChange={handleInputChange} />
-                <label htmlFor="isActive">Cho phép hiển thị Banner này</label>
+              <div className="flex items-center gap-2 mb-6 mt-2">
+                <input type="checkbox" id="isActive" name="isActive" checked={formData.isActive} onChange={handleInputChange} className="w-[18px] h-[18px] cursor-pointer accent-blue-600" />
+                <label htmlFor="isActive" className="text-[14px] text-slate-800 font-medium cursor-pointer">Cho phép hiển thị Banner này</label>
               </div>
 
-              <div className="mb-form-actions">
-                <button type="button" onClick={() => setShowModal(false)} className="btn-cancel" disabled={isSubmitting}>Hủy</button>
-                <button type="submit" className="btn-submit" disabled={isSubmitting}>
+              <div className="flex justify-end gap-3 pt-5 border-t border-slate-200 mt-2.5">
+                <button type="button" onClick={() => setShowModal(false)} className="bg-white border border-slate-200 py-2.5 px-5 rounded-lg font-semibold text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors" disabled={isSubmitting}>Hủy</button>
+                <button type="submit" className="bg-blue-600 text-white border-none py-2.5 px-5 rounded-lg font-semibold cursor-pointer hover:bg-blue-700 transition-colors disabled:bg-blue-400" disabled={isSubmitting}>
                   {isSubmitting ? "Đang xử lý..." : (isEditing ? "Lưu thay đổi" : "Tạo Banner")}
                 </button>
               </div>

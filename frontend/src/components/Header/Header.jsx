@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
-import "./Header.css";
 import Navbar from "../Navbar/Navbar";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, Search, Smartphone } from "lucide-react";
+import { ShoppingCart, User, Search, Smartphone, Bell } from "lucide-react";
 import axios from "axios";
+import logoImg from "../../assets/Logo3.png";
 
 function Header() {
   const [cartCount, setCartCount] = useState(0);
+  const [user, setUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadNotifyCount, setUnreadNotifyCount] = useState(0);
+  const [isNotifyOpen, setIsNotifyOpen] = useState(false);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -19,6 +23,7 @@ function Header() {
   const handleSearch = () => {
     if (searchTerm.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+      setIsSearchOpen(false);
     }
   };
 
@@ -33,9 +38,17 @@ function Header() {
       if (searchTerm.trim()) {
         setIsSearching(true);
         try {
-          // Fetch up to 5 results for live preview
           const { data } = await axios.get(`http://localhost:5000/api/products?search=${encodeURIComponent(searchTerm.trim())}`);
-          setSearchResults(data.slice(0, 5));
+
+          // THUẬT TOÁN ƯU TIÊN ĐIỆN THOẠI TRƯỚC
+          const sortedData = data.sort((a, b) => {
+            const isPhoneA = a.productType === "device" || a.categoryName === "Điện thoại" ? 1 : 0;
+            const isPhoneB = b.productType === "device" || b.categoryName === "Điện thoại" ? 1 : 0;
+            return isPhoneB - isPhoneA; // Xếp giảm dần (Điện thoại lên đầu)
+          });
+
+          // Lấy 5 kết quả đầu tiên sau khi đã sắp xếp ưu tiên
+          setSearchResults(sortedData.slice(0, 5));
           setIsSearchOpen(true);
         } catch (error) {
           console.error("Lỗi khi fetch live search", error);
@@ -57,6 +70,9 @@ function Header() {
       if (!event.target.closest(".search-wrapper")) {
         setIsSearchOpen(false);
       }
+      if (!event.target.closest(".notification-wrapper")) {
+        setIsNotifyOpen(false);
+      }
     };
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
@@ -72,98 +88,218 @@ function Header() {
         const { data } = await axios.get("http://localhost:5000/api/cart", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        // data.items.length sẽ trả về số lượng LOẠI sản phẩm (đúng yêu cầu của bạn)
         setCartCount(data.items?.length || 0);
       } catch {
         console.error("Lỗi lấy số lượng giỏ hàng");
       }
     };
 
+    const fetchUserProfile = async () => {
+      if (!token) return;
+      try {
+        const { data } = await axios.get("http://localhost:5000/api/users/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(data);
+      } catch (error) {
+        console.error("Lỗi lấy profile user:", error);
+      }
+    };
+
+    const fetchNotifications = async () => {
+      if (!token) return;
+      try {
+        const { data } = await axios.get("http://localhost:5000/api/notifications", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setNotifications(data.notifications || []);
+        setUnreadNotifyCount(data.unreadCount || 0);
+      } catch (error) {
+        console.error("Lỗi tải thông báo:", error);
+      }
+    };
+
     fetchCartCount();
-    
-    // Lắng nghe sự kiện "cartUpdated" nếu bạn phát đi từ trang Product/Cart
+    fetchUserProfile();
+    fetchNotifications();
+
     window.addEventListener("cartUpdated", fetchCartCount);
     return () => window.removeEventListener("cartUpdated", fetchCartCount);
   }, [token]);
 
-  return (
-    <>
-      <div className="top-header">
-        <div className="container header-content">
-          <Link to="/" className="logo">
-            <Smartphone size={22} />
-            <span>TechNova</span>
-          </Link>
+  const handleNotificationClick = async (notif) => {
+    try {
+      if (!notif.isRead) {
+        await axios.put(`http://localhost:5000/api/notifications/${notif._id}/read`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUnreadNotifyCount(prev => Math.max(0, prev - 1));
+        setNotifications(prev => prev.map(n => n._id === notif._id ? { ...n, isRead: true } : n));
+      }
+      setIsNotifyOpen(false);
+      let targetLink = notif.link;
+      if (targetLink === "/account") targetLink = "/profile?tab=orders";
+      if (targetLink === "/vouchers") targetLink = "/profile?tab=vouchers";
+      if (targetLink) {
+        navigate(targetLink);
+      }
+    } catch (e) {
+      console.error("Lỗi click thông báo:", e);
+    }
+  };
 
-          <div className="search-wrapper">
-            <input 
-              type="text" 
-              placeholder="Tìm kiếm sản phẩm..." 
-              className="search" 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onFocus={() => { if (searchTerm.trim()) setIsSearchOpen(true); }}
-            />
-            <Search size={18} className="search-icon" onClick={handleSearch} style={{ cursor: 'pointer' }}/>
-            
-            {/* SEARCH DROPDOWN */}
-            {isSearchOpen && (searchTerm.trim().length > 0) && (
-              <div className="search-dropdown">
-                {isSearching ? (
-                  <div className="search-dropdown-message">Đang tìm kiếm...</div>
-                ) : searchResults.length > 0 ? (
-                  <>
-                    {searchResults.map((product) => (
-                      <div 
-                        key={product._id} 
-                        className="search-dropdown-item"
-                        onClick={() => {
-                          setIsSearchOpen(false);
-                          setSearchTerm("");
-                          navigate(`/product/${product.slug || product._id}`);
-                        }}
-                      >
-                        <img 
-                          src={product.colorImages?.[0]?.imageUrl || product.images?.[0] || "/no-image.png"} 
-                          alt={product.name} 
-                        />
-                        <div className="search-item-info">
-                          <h4>{product.name}</h4>
-                          <span className="search-item-price">
-                            {product.variants?.[0]?.price ? product.variants[0].price.toLocaleString("vi-VN") + "₫" : "Đang cập nhật"}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="search-dropdown-footer" onClick={handleSearch}>
-                      Xem tất cả kết quả cho "{searchTerm}"
-                    </div>
-                  </>
-                ) : (
-                  <div className="search-dropdown-message">Không tìm thấy sản phẩm nào.</div>
-                )}
-              </div>
-            )}
+  return (
+    <header className="relative w-full z-[9999] bg-[linear-gradient(135deg,#0f172a,#1e40af,#3b82f6,#0ea5e9,#0f172a)] bg-[length:300%_300%] animate-gradientFlow mb-2.5">
+
+      {/* CSS Nhúng cho animation dải màu gradient */}
+      <style>
+        {`
+          @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+          .animate-gradientFlow {
+            animation: gradientFlow 12s ease infinite;
+          }
+        `}
+      </style>
+
+      {/* FIX Z-INDEX: Thêm relative và z-[20000] vào div này để nổi lên trên Navbar */}
+      <div className="relative z-[20000] bg-transparent border-b border-white/10 px-4 pb-4 pt-[44px] h-[100px] flex items-end">
+        <div className="flex items-center justify-between max-w-[1400px] w-[95%] mx-auto">
+
+          {/* HEADER LEFT: LOGO & NAVBAR */}
+          <div className="flex items-center gap-10">
+            <Link to="/" className="inline-block leading-none no-underline transition-transform duration-300 hover:text-[#FACC15] hover:scale-105 group">
+              <img src={logoImg} alt="V&T Nexis Logo" className="h-[45px] w-auto object-contain transition-transform duration-300" />
+            </Link>
+            <Navbar />
           </div>
 
-          <div className="icons">
-            {/* Giỏ hàng với Badge */}
-            <Link to="/cart" className="icon-btn cart-wrapper">
-              <ShoppingCart size={20} />
-              {cartCount > 0 && (
-                <span className="cart-badge">{cartCount}</span>
-              )}
-            </Link>
+          {/* HEADER RIGHT: SEARCH & ICONS */}
+          <div className="flex items-center gap-[30px]">
 
-            <Link to="/profile" className="icon-btn">
-              <User size={20} />
-            </Link>
+            {/* SEARCH BAR (Glassmorphism) */}
+            <div className="relative w-[300px] search-wrapper">
+              <input
+                type="text"
+                placeholder="Tìm kiếm sản phẩm..."
+                className="w-full py-2.5 pr-10 pl-4 rounded-xl border border-white/20 bg-white/10 backdrop-blur-[12px] text-white outline-none text-[14px] transition-all duration-300 placeholder:text-white/70 focus:bg-white/15 focus:border-white/50 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.4)]"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onFocus={() => { if (searchTerm.trim()) setIsSearchOpen(true); }}
+              />
+              <Search size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/80 cursor-pointer transition-colors duration-200 hover:text-white" onClick={handleSearch} />
+
+              {/* SEARCH DROPDOWN - FIX Z-INDEX: z-[99999] */}
+              {isSearchOpen && (searchTerm.trim().length > 0) && (
+                <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white rounded-lg shadow-[0_10px_25px_rgba(0,0,0,0.15)] z-[99999] overflow-hidden flex flex-col">
+                  {isSearching ? (
+                    <div className="p-[15px] text-center text-slate-500 text-[14px]">Đang tìm kiếm...</div>
+                  ) : searchResults.length > 0 ? (
+                    <>
+                      {searchResults.map((product) => (
+                        <div
+                          key={product._id}
+                          className="flex items-center gap-3 py-2.5 px-[15px] cursor-pointer transition-colors duration-200 border-b border-slate-100 last:border-none hover:bg-slate-50"
+                          onClick={() => {
+                            setIsSearchOpen(false);
+                            setSearchTerm("");
+                            navigate(`/product/${product.slug || product._id}`);
+                          }}
+                        >
+                          <img
+                            src={product.colorImages?.[0]?.imageUrl || product.images?.[0] || "/no-image.png"}
+                            alt={product.name}
+                            className="w-10 h-10 object-contain rounded bg-white shrink-0"
+                          />
+                          <div>
+                            <h4 className="text-[14px] text-slate-800 m-0 mb-1 font-medium line-clamp-1">{product.name}</h4>
+                            <span className="text-[13px] text-red-500 font-semibold">
+                              {product.variants?.[0]?.price ? product.variants[0].price.toLocaleString("vi-VN") + "₫" : "Đang cập nhật"}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="p-3 text-center bg-slate-50 text-blue-600 text-[13px] font-semibold cursor-pointer transition-colors duration-200 border-t border-slate-200 hover:bg-slate-200" onClick={handleSearch}>
+                        Xem tất cả kết quả cho "{searchTerm}"
+                      </div>
+                    </>
+                  ) : (
+                    <div className="p-[15px] text-center text-slate-500 text-[14px]">Không tìm thấy sản phẩm nào.</div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-6">
+              {/* GIỎ HÀNG */}
+              <Link to="/cart" className="text-white transition-all duration-200 flex items-center justify-center hover:text-[#FACC15] hover:-translate-y-[2px] relative cart-wrapper">
+                <ShoppingCart size={20} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-[10px] bg-red-500 text-white text-[11px] font-bold min-w-[16px] h-4 rounded-full flex items-center justify-center shadow-[0_0_0_2px_rgba(255,255,255,0.2)] p-[2px]">{cartCount}</span>
+                )}
+              </Link>
+
+              {/* THÔNG BÁO */}
+              <div className="text-white transition-all duration-200 flex items-center justify-center hover:text-[#FACC15] hover:-translate-y-[2px] relative notification-wrapper cursor-pointer" title="Thông báo">
+                <Bell size={20} onClick={() => setIsNotifyOpen(!isNotifyOpen)} />
+                {unreadNotifyCount > 0 && (
+                  <span className="absolute -top-[2px] -right-[2px] bg-red-500 text-white text-[11px] font-bold min-w-[16px] h-4 rounded-full flex items-center justify-center shadow-[0_0_0_2px_rgba(255,255,255,0.2)] p-[2px]">{unreadNotifyCount}</span>
+                )}
+
+                {/* BOX THÔNG BÁO DROPDOWN */}
+                {isNotifyOpen && (
+                  <div className="absolute top-[120%] -right-[10px] w-[320px] bg-white rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.15)] z-[99999] p-[15px] max-h-[400px] overflow-y-auto cursor-default">
+                    <h4 className="m-0 mb-2.5 text-[16px] font-semibold text-slate-800 border-b border-slate-100 pb-2.5 text-left">Thông báo</h4>
+                    {notifications.length > 0 ? (
+                      notifications.map(notif => (
+                        <div
+                          key={notif._id}
+                          onClick={() => handleNotificationClick(notif)}
+                          className={`p-2.5 rounded-md mb-2 cursor-pointer transition-colors duration-200 text-left ${notif.isRead ? "bg-white hover:bg-slate-50" : "bg-indigo-50 hover:bg-indigo-100"}`}
+                        >
+                          <h5 className="m-0 mb-1 text-[14px] text-slate-900">{notif.title}</h5>
+                          <p className="m-0 text-[12px] text-slate-600 leading-[1.4]">{notif.message}</p>
+                          <span className="text-[10px] text-slate-400 block mt-1">
+                            {new Date(notif.createdAt).toLocaleDateString('vi-VN')}
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center text-slate-500 py-5 text-[14px]">Chưa có thông báo nào.</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* USER AVATAR */}
+              <Link to="/profile" className="text-white transition-all duration-200 flex items-center justify-center hover:text-[#FACC15] hover:-translate-y-[2px] relative user-wrapper group" title={user ? user.name : "Tài khoản"}>
+                {user ? (
+                  <div className="relative inline-flex">
+                    {user.avatar ? (
+                      <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full object-cover border-2 border-white/80 transition-colors duration-200 group-hover:border-[#FACC15]" />
+                    ) : (
+                      <img
+                        src={`https://ui-avatars.com/api/?name=${user.name}&background=0D9488&color=fff&size=128`}
+                        alt="Default Avatar"
+                        className="w-8 h-8 rounded-full object-cover border-2 border-white/80 transition-colors duration-200 group-hover:border-[#FACC15]"
+                      />
+                    )}
+                    {/* Chấm xanh biểu thị online */}
+                    <span className="absolute -bottom-[2px] -right-[2px] w-3 h-3 bg-emerald-500 rounded-full shadow-[0_0_0_2px_rgba(255,255,255,0.8)]"></span>
+                  </div>
+                ) : (
+                  <User size={20} />
+                )}
+              </Link>
+            </div>
           </div>
         </div>
       </div>
-      <Navbar />
-    </>
+    </header>
   );
 }
 

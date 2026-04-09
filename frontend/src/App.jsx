@@ -1,4 +1,5 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { Toaster } from "sonner";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
@@ -14,6 +15,7 @@ import NewsDetail from "./pages/NewsDetail/NewsDetail";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
 import SearchPage from "./pages/SearchPage/SearchPage";
 import SpecDetail from "./pages/SpecDetail/SpecDetail";
+import ProductCompare from "./pages/ProductCompare/ProductCompare";
 import ReviewPage from "./pages/ReviewPage/ReviewPage";
 import Cart from "./components/Cart/Cart";
 import LoginPage from "./components/LoginPages/LoginPage";
@@ -27,12 +29,17 @@ import ManageAccessory from "./components/ManageProduct/ManageAccessory";
 import AddressModal from "./components/Profile/AddressModal";
 import CheckoutPage from "./pages/CheckoutPage/CheckoutPage";
 import Payment from "./pages/Payment/Payment";
+import PaymentResult from "./pages/PaymentResult/PaymentResult";
 import ManageOrder from "./components/ManageOrder/ManageOrder";
 import OrderDetail from "./pages/OrderDetail/OrderDetail";
+import ReviewOrder from "./pages/ReviewOrder/ReviewOrder";
+import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService/TermsOfService";
 import GlobalDeliveryConfirm from "./components/GlobalDeliveryConfirm/GlobalDeliveryConfirm";
 import ChatWidget from "./components/ChatWidget/ChatWidget";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import AdminRoute from "./components/AdminRoute/AdminRoute";
+import PageTransition from "./components/PageTransition/PageTransition";
 import "./App.css";
 
 // Khởi tạo Cloudinary bên ngoài component để tránh khởi tạo lại nhiều lần
@@ -42,40 +49,49 @@ export const cld = new Cloudinary({
 });
 
 function App() {
+  const location = useLocation();
+
   return (
     <>
       <Toaster position="top-right" richColors />
       <GlobalDeliveryConfirm />
       <ChatWidget />
       <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/phones" element={<PhonePage />} />
-        <Route path="/electronics" element={<ElectronicPage />} />
-        <Route path="/accessories" element={<AccessoryPage />} />
-        <Route path="/promotions" element={<Promotions />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/news" element={<News />} />
-        <Route path="/news/:slug" element={<NewsDetail />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/product/:slug" element={<ProductDetail />} />
-        <Route path="/product/:slug/specs" element={<SpecDetail />} />
-        <Route path="/product/:slug/reviews" element={<ReviewPage />} />
-        <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
-        <Route path="/admin/products" element={<AdminRoute><ManageProduct /></AdminRoute>} />
-        <Route path="/admin/electronics" element={<AdminRoute><ManageElectronic /></AdminRoute>} />
-        <Route path="/admin/accessories" element={<AdminRoute><ManageAccessory /></AdminRoute>} />
-        <Route path="/profile/address" element={<AddressModal />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/payment" element={<Payment />} />
-        <Route path="/admin/orders" element={<AdminRoute><ManageOrder /></AdminRoute>} />
-        <Route path="/order/:id" element={<OrderDetail />} />
-      </Routes>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+          <Route path="/phones" element={<PageTransition><PhonePage /></PageTransition>} />
+          <Route path="/electronics" element={<PageTransition><ElectronicPage /></PageTransition>} />
+          <Route path="/accessories" element={<PageTransition><AccessoryPage /></PageTransition>} />
+          <Route path="/promotions" element={<PageTransition><Promotions /></PageTransition>} />
+          <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
+          <Route path="/news" element={<PageTransition><News /></PageTransition>} />
+          <Route path="/news/:slug" element={<PageTransition><NewsDetail /></PageTransition>} />
+          <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
+          <Route path="/cart" element={<PageTransition><Cart /></PageTransition>} />
+          <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
+          <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
+          <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+          <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+          <Route path="/product/:slug" element={<PageTransition><ProductDetail /></PageTransition>} />
+          <Route path="/product/:slug/specs" element={<PageTransition><SpecDetail /></PageTransition>} />
+          <Route path="/compare" element={<PageTransition><ProductCompare /></PageTransition>} />
+          <Route path="/product/:slug/reviews" element={<PageTransition><ReviewPage /></PageTransition>} />
+          <Route path="/admin" element={<AdminRoute><PageTransition><AdminPage /></PageTransition></AdminRoute>} />
+          <Route path="/admin/products" element={<AdminRoute><PageTransition><ManageProduct /></PageTransition></AdminRoute>} />
+          <Route path="/admin/electronics" element={<AdminRoute><PageTransition><ManageElectronic /></PageTransition></AdminRoute>} />
+          <Route path="/admin/accessories" element={<AdminRoute><PageTransition><ManageAccessory /></PageTransition></AdminRoute>} />
+          <Route path="/profile/address" element={<PageTransition><AddressModal /></PageTransition>} />
+          <Route path="/checkout" element={<PageTransition><CheckoutPage /></PageTransition>} />
+          <Route path="/payment" element={<PageTransition><Payment /></PageTransition>} />
+          <Route path="/payment-result" element={<PageTransition><PaymentResult /></PageTransition>} />
+          <Route path="/admin/orders" element={<AdminRoute><PageTransition><ManageOrder /></PageTransition></AdminRoute>} />
+          <Route path="/order/:id" element={<PageTransition><OrderDetail /></PageTransition>} />
+          <Route path="/review-order/:id" element={<PageTransition><ReviewOrder /></PageTransition>} />
+          <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+          <Route path="/terms-of-service" element={<PageTransition><TermsOfService /></PageTransition>} />
+        </Routes>
+      </AnimatePresence>
     </>
   );
 }

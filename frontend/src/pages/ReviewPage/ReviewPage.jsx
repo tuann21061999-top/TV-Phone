@@ -5,7 +5,6 @@ import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import ProductReview from '../../components/Review/ProductReview';
 import { ShoppingCart } from 'lucide-react';
-import '../SpecDetail/SpecDetail.css'; // Re-use sticky nav styling
 
 function ReviewPage() {
     const { slug } = useParams();
@@ -38,36 +37,43 @@ function ReviewPage() {
         return Math.min(...product.variants.map(v => v.price));
     }, [product]);
 
-    if (loading) return <div className="loading-state">Đang tải...</div>;
-    if (!product) return <div className="error-state">Không tìm thấy sản phẩm</div>;
+    if (loading) return <div className="flex justify-center items-center min-h-[60vh] text-slate-500 font-medium animate-pulse">Đang tải...</div>;
+    if (!product) return <div className="flex justify-center items-center min-h-[60vh] text-red-500 font-medium">Không tìm thấy sản phẩm</div>;
 
     return (
-        <div className="spec-detail-page">
+        <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
             <Header />
 
-            {/* STICKY TOP HEADER BAR */}
-            <div className="spec-sticky-header">
-                <div className="spec-container sticky-content">
-                    <div className="sticky-product-info">
-                        <img src={mainImage} alt={product.name} />
-                        <div>
-                            <h2 className="sticky-title">{product.name}</h2>
-                            <span className="sticky-price">{minPrice.toLocaleString()}đ</span>
+            {/* TOP HEADER BAR (Không cuộn theo trang) */}
+            <div className="hidden md:block z-40 bg-white border-b border-slate-200 shadow-sm transition-all">
+                <div className="max-w-[1400px] mx-auto px-10 flex justify-between items-center h-16">
+                    <div className="flex items-center gap-4">
+                        <img src={mainImage} alt={product.name} className="h-10 w-10 object-contain" />
+                        <div className="flex flex-col">
+                            <h2 className="m-0 text-sm font-bold text-slate-800 truncate max-w-[200px] lg:max-w-[300px]">{product.name}</h2>
+                            <span className="text-xs font-bold text-blue-600">{minPrice.toLocaleString()}đ</span>
                         </div>
                     </div>
-                    <div className="sticky-nav">
-                        <Link to={`/product/${product.slug}`} className="nav-link">Tổng quan</Link>
-                        <Link to={`/product/${product.slug}/specs`} className="nav-link">Thông số kỹ thuật</Link>
-                        <span className="nav-link active">Đánh giá</span>
-                        <Link to={`/product/${product.slug}`} className="btn-buy-now-sticky">
-                            <ShoppingCart size={16} /> Mua ngay
+                    <div className="flex items-center gap-6 h-full">
+                        <Link to={`/product/${product.slug}`} className="text-slate-600 font-medium hover:text-blue-600 h-full flex items-center text-sm no-underline transition-colors px-2">
+                            Tổng quan
                         </Link>
+                        <Link to={`/product/${product.slug}/specs`} className="text-slate-600 font-medium hover:text-blue-600 h-full flex items-center text-sm no-underline transition-colors px-2">
+                            Thông số kỹ thuật chi tiết
+                        </Link>
+                        <span className="text-blue-600 font-semibold border-b-2 border-blue-600 h-full flex items-center text-sm cursor-default px-2">
+                            Đánh giá
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <div className="spec-container" style={{ marginTop: '40px', marginBottom: '80px', backgroundColor: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
-                <ProductReview productId={product._id} />
+            {/* NỘI DUNG CHÍNH */}
+            <div className="flex-1 w-full max-w-[1200px] mx-auto px-5 mt-8 mb-20">
+                <div className="bg-white p-5 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+                    {/* Bọc component đánh giá bên trong khung này */}
+                    <ProductReview productId={product._id} />
+                </div>
             </div>
 
             <Footer />

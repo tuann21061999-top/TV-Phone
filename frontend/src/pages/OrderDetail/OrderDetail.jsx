@@ -8,7 +8,6 @@ import {
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import { toast } from "sonner";
-import "./OrderDetail.css";
 
 const OrderDetail = () => {
   const { id } = useParams(); // Lấy ID đơn hàng từ URL
@@ -69,8 +68,8 @@ const OrderDetail = () => {
     }
   };
 
-  if (loading) return <div className="loading-screen">Đang tải thông tin đơn hàng...</div>;
-  if (!order) return <div className="error-screen">Không tìm thấy đơn hàng!</div>;
+  if (loading) return <div className="text-center mt-24 text-slate-500">Đang tải thông tin đơn hàng...</div>;
+  if (!order) return <div className="text-center mt-24 text-slate-500">Không tìm thấy đơn hàng!</div>;
 
   const currentStep = getStepIndex(order.status);
   const isCancelled = order.status === "cancelled" || order.status === "returned";
@@ -79,181 +78,203 @@ const OrderDetail = () => {
   const orderDate = new Date(order.createdAt).toLocaleString('vi-VN');
   
   return (
-    <div className="order-detail-page">
+    <div className="bg-slate-50 min-h-screen font-sans">
       <Header />
 
-      <main className="od-container">
+      <main className="max-w-[1100px] mx-auto px-4 py-8 pb-16">
         {/* Nút quay lại */}
-        <button className="btn-back" onClick={() => navigate(-1)}>
+        <button 
+          className="flex items-center gap-1 bg-transparent border-none text-slate-500 text-sm font-medium cursor-pointer mb-6 p-0 transition-colors hover:text-blue-600" 
+          onClick={() => navigate(-1)}
+        >
           <ChevronLeft size={20} /> Quay lại danh sách đơn hàng
         </button>
 
         {/* Header Đơn hàng */}
-        <div className="od-header-section">
-          <div className="od-header-left">
-            <h2>Đơn hàng #{order._id.slice(-8).toUpperCase()}</h2>
-            <span className={`status-badge status-${order.status}`}>
-              {getStatusText(order.status)}
-            </span>
-            <p className="od-date-text">Đặt ngày {new Date(order.createdAt).toLocaleDateString('vi-VN')} • Dự kiến giao: Sau 2-3 ngày</p>
+        <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h2 className="text-2xl font-bold text-slate-800 m-0">Đơn hàng #{order._id.slice(-8).toUpperCase()}</h2>
+              <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                order.status === "done" ? "bg-emerald-100 text-emerald-700" :
+                (order.status === "cancelled" || order.status === "returned") ? "bg-red-100 text-red-700" :
+                (order.status === "shipping") ? "bg-indigo-100 text-indigo-700" :
+                "bg-amber-100 text-amber-600"
+              }`}>
+                {getStatusText(order.status)}
+              </span>
+            </div>
+            <p className="text-slate-500 text-sm mt-2 font-medium">
+              Đặt ngày {new Date(order.createdAt).toLocaleDateString('vi-VN')} • Dự kiến giao: Sau 2-3 ngày
+            </p>
           </div>
-          <div className="od-header-actions">
-            <button className="btn-outline"><Headphones size={16}/> Liên hệ hỗ trợ</button>
-            <button className="btn-outline"><Printer size={16}/> In hóa đơn</button>
+          <div className="flex gap-3 w-full md:w-auto">
+            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 py-2 px-4 bg-white border border-slate-200 rounded-lg text-slate-600 font-semibold text-sm transition-all hover:bg-slate-50 hover:border-slate-300">
+              <Headphones size={16}/> Hỗ trợ
+            </button>
+            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 py-2 px-4 bg-white border border-slate-200 rounded-lg text-slate-600 font-semibold text-sm transition-all hover:bg-slate-50 hover:border-slate-300">
+              <Printer size={16}/> In hóa đơn
+            </button>
           </div>
         </div>
 
         {/* Thanh Tiến Trình (Stepper) */}
-        <div className="od-stepper-container">
-          <div className="stepper-track">
-            {/* Thanh màu xanh chạy theo phần trăm */}
+        <div className="bg-white rounded-2xl p-6 md:p-10 shadow-sm mb-6 relative overflow-hidden">
+          <div className="absolute top-[55px] left-[10%] right-[10%] h-1 bg-slate-100 z-0 hidden md:block">
             <div 
-              className={`stepper-progress ${isCancelled ? 'cancelled' : ''}`} 
+              className={`h-full transition-all duration-500 ${isCancelled ? 'bg-red-500' : 'bg-blue-600'}`} 
               style={{ width: `${(currentStep - 1) * 25}%` }}
             ></div>
           </div>
           
-          <div className="stepper-steps">
-            <div className={`step ${currentStep >= 1 ? 'active' : ''} ${isCancelled ? 'error' : ''}`}>
-              <div className="step-icon"><ShoppingCart size={20}/></div>
-              <p>Đã đặt</p>
-              <span>{new Date(order.createdAt).toLocaleDateString('vi-VN')}</span>
-            </div>
-            <div className={`step ${currentStep >= 2 ? 'active' : ''} ${isCancelled ? 'error' : ''}`}>
-              <div className="step-icon"><CheckCircle size={20}/></div>
-              <p>Đã xác nhận</p>
-            </div>
-            <div className={`step ${currentStep >= 3 ? 'active' : ''} ${isCancelled ? 'error' : ''}`}>
-              <div className="step-icon"><Package size={20}/></div>
-              <p>Đang đóng gói</p>
-            </div>
-            <div className={`step ${currentStep >= 4 ? 'active' : ''} ${isCancelled ? 'error' : ''}`}>
-              <div className="step-icon"><Truck size={20}/></div>
-              <p>Đang giao</p>
-            </div>
-            <div className={`step ${currentStep >= 5 ? 'active' : ''} ${isCancelled ? 'error' : ''}`}>
-              <div className="step-icon"><Check size={20}/></div>
-              <p>{isCancelled ? (order.status === 'cancelled' ? 'Đã hủy' : 'Trả hàng') : 'Thành công'}</p>
-            </div>
+          <div className="flex justify-between relative z-10">
+            {[
+              { label: "Đã đặt", icon: ShoppingCart, date: new Date(order.createdAt).toLocaleDateString('vi-VN') },
+              { label: "Đã xác nhận", icon: CheckCircle },
+              { label: "Đang đóng gói", icon: Package },
+              { label: "Đang giao", icon: Truck },
+              { label: isCancelled ? (order.status === 'cancelled' ? 'Đã hủy' : 'Trả hàng') : 'Thành công', icon: Check }
+            ].map((step, idx) => {
+              const stepNum = idx + 1;
+              const isActive = currentStep >= stepNum;
+              return (
+                <div key={idx} className={`flex flex-col items-center text-center w-20 md:w-32 ${isActive ? (isCancelled ? 'text-red-500' : 'text-slate-800') : 'text-slate-300'}`}>
+                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center mb-3 border-2 transition-all duration-300 ${
+                    isActive 
+                      ? (isCancelled ? 'bg-red-500 border-red-500 text-white' : 'bg-blue-600 border-blue-600 text-white') 
+                      : 'bg-white border-slate-100 text-slate-300'
+                  }`}>
+                    <step.icon size={20} className="md:w-6 md:h-6" />
+                  </div>
+                  <p className="m-0 text-xs md:text-sm font-bold hidden sm:block">{step.label}</p>
+                  {step.date && <span className="text-[10px] md:text-xs mt-1 opacity-70">{step.date}</span>}
+                </div>
+              );
+            })}
           </div>
         </div>
 
         {/* Khung nội dung 2 cột */}
-        <div className="od-grid">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-6">
           
           {/* CỘT TRÁI: Bản đồ & Lịch sử */}
-          <div className="od-left-col">
-            <div className="map-placeholder">
-              <div className="map-badge">VỊ TRÍ HIỆN TẠI</div>
-              <p>Trung tâm phân phối khu vực</p>
-              {/* Fake image bản đồ cho giống thiết kế */}
-              <div className="fake-map-bg">
-                 <div className="map-pin"><MapPin size={24} fill="#2563eb" color="white" /></div>
+          <div className="flex flex-col gap-6">
+            <div className="bg-white rounded-2xl p-5 shadow-sm relative overflow-hidden">
+              <div className="inline-block bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded mb-2 uppercase">Vị trí hiện tại</div>
+              <p className="m-0 mb-4 font-bold text-slate-800 text-sm">Trung tâm phân phối khu vực</p>
+              <div className="h-48 bg-slate-50 rounded-xl relative flex items-center justify-center border border-slate-100 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px]">
+                  <div className="p-2 bg-white rounded-full shadow-lg border border-blue-100">
+                    <MapPin size={28} className="fill-blue-600 text-white" />
+                  </div>
               </div>
             </div>
 
-            <div className="od-card">
-              <h3>Lịch sử vận chuyển</h3>
-              <div className="timeline">
-                
-                {/* Dựng giả lập timeline dựa theo trạng thái */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <h3 className="text-base font-bold text-slate-800 m-0 mb-6 flex items-center gap-2">Lịch sử vận chuyển</h3>
+              <div className="flex flex-col gap-6">
                 {currentStep >= 4 && (
-                  <div className="timeline-item active">
-                    <div className="tl-dot"></div>
-                    <div className="tl-content">
-                      <strong>Đang trên đường giao tới bạn.</strong>
-                      <p>Đơn hàng đã rời kho phân phối và đang được Shipper giao.</p>
+                  <div className="flex gap-4 relative pb-1">
+                    <div className="absolute left-[5px] top-5 bottom-[-24px] w-0.5 bg-slate-100"></div>
+                    <div className="w-3 h-3 bg-blue-600 rounded-full mt-1.5 z-10 ring-4 ring-blue-100"></div>
+                    <div className="flex-1">
+                      <strong className="block text-sm text-blue-600 mb-1">Đang trên đường giao tới bạn.</strong>
+                      <p className="m-0 text-[13px] text-slate-500 leading-relaxed">Đơn hàng đã rời kho phân phối và đang được Shipper giao.</p>
                     </div>
                   </div>
                 )}
 
                 {currentStep >= 3 && (
-                  <div className="timeline-item">
-                    <div className="tl-dot"></div>
-                    <div className="tl-content">
-                      <strong>Đã bàn giao cho đơn vị vận chuyển.</strong>
-                      <p>Đơn hàng đã được đóng gói xong.</p>
+                  <div className="flex gap-4 relative pb-1">
+                    <div className="absolute left-[5px] top-5 bottom-[-24px] w-0.5 bg-slate-100"></div>
+                    <div className={`w-3 h-3 rounded-full mt-1.5 z-10 ${currentStep === 3 ? 'bg-blue-600 ring-4 ring-blue-100' : 'bg-slate-300'}`}></div>
+                    <div className="flex-1">
+                      <strong className={`block text-sm mb-1 ${currentStep === 3 ? 'text-blue-600' : 'text-slate-800'}`}>Đã bàn giao cho đơn vị vận chuyển.</strong>
+                      <p className="m-0 text-[13px] text-slate-500 leading-relaxed">Đơn hàng đã được đóng gói xong.</p>
                     </div>
                   </div>
                 )}
 
-                <div className="timeline-item">
-                  <div className="tl-dot"></div>
-                  <div className="tl-content">
-                    <strong>Đơn hàng đã được tạo thành công.</strong>
-                    <p>{orderDate}</p>
+                <div className="flex gap-4 relative">
+                  <div className={`w-3 h-3 rounded-full mt-1.5 z-10 ${currentStep < 3 ? 'bg-blue-600 ring-4 ring-blue-100' : 'bg-slate-300'}`}></div>
+                  <div className="flex-1">
+                    <strong className={`block text-sm mb-1 ${currentStep < 3 ? 'text-blue-600' : 'text-slate-800'}`}>Đơn hàng đã được tạo thành công.</strong>
+                    <p className="m-0 text-[13px] text-slate-500 leading-relaxed">{orderDate}</p>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
 
           {/* CỘT PHẢI: Chi tiết & Tóm tắt */}
-          <div className="od-right-col">
+          <div className="flex flex-col gap-6">
             
             {/* Chi tiết sản phẩm */}
-            <div className="od-card">
-              <h3>Chi tiết đơn hàng</h3>
-              <div className="od-product-list">
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <h3 className="text-base font-bold text-slate-800 m-0 mb-5">Chi tiết đơn hàng</h3>
+              <div className="flex flex-col gap-4 mb-6">
                 {order.items.map((item, idx) => (
-                  <div key={idx} className="od-product-item">
-                    <img src={item.image} alt={item.name} />
-                    <div className="od-product-info">
-                      <h4>{item.name}</h4>
-                      <p>Phân loại: {item.color} {item.storage ? `| ${item.storage}` : ''}</p>
-                      <p>SL: {item.quantity}</p>
-                      <strong className="od-price">{(item.price * item.quantity).toLocaleString()}đ</strong>
+                  <div key={idx} className="flex gap-4 pb-4 border-b border-dashed border-slate-100 last:border-none last:pb-0">
+                    <img src={item.image} alt={item.name} className="w-16 h-16 rounded-lg border border-slate-50 object-contain shrink-0 bg-slate-50" />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="m-0 mb-1 text-sm font-bold text-slate-800 truncate">{item.name}</h4>
+                      <p className="m-0 text-xs text-slate-500 mb-1">Màu: {item.color} {item.storage ? `| ${item.storage}` : ''}</p>
+                      <p className="m-0 text-xs text-slate-500">SL: {item.quantity}</p>
                     </div>
+                    <strong className="text-sm text-blue-600 shrink-0">{(item.price * item.quantity).toLocaleString()}đ</strong>
                   </div>
                 ))}
               </div>
 
-              <div className="od-summary-lines">
-                <div className="line">
+              <div className="flex flex-col gap-3 border-t border-slate-100 pt-5">
+                <div className="flex justify-between text-sm text-slate-500">
                   <span>Tạm tính</span>
-                  <span>{order.items.reduce((sum, item) => sum + item.price * item.quantity, 0).toLocaleString()}đ</span>
+                  <span className="font-medium text-slate-700">{order.items.reduce((sum, item) => sum + item.price * item.quantity, 0).toLocaleString()}đ</span>
                 </div>
-                <div className="line">
+                <div className="flex justify-between text-sm text-slate-500">
                   <span>Phí vận chuyển</span>
-                  <span>{order.shippingFee === 0 ? "Miễn phí" : `${order.shippingFee.toLocaleString()}đ`}</span>
+                  <span className="font-medium text-slate-700">{order.shippingFee === 0 ? "Miễn phí" : `${order.shippingFee.toLocaleString()}đ`}</span>
                 </div>
                 {order.warrantyFee > 0 && (
-                  <div className="line">
-                    <span>Gói bảo hành ({order.warrantyType})</span>
-                    <span>{order.warrantyFee.toLocaleString()}đ</span>
+                  <div className="flex justify-between text-sm text-slate-500">
+                    <span>Bảo hành ({order.warrantyType})</span>
+                    <span className="font-medium text-slate-700">{order.warrantyFee.toLocaleString()}đ</span>
                   </div>
                 )}
                 {order.discountAmount > 0 && (
-                  <div className="line discount">
+                  <div className="flex justify-between text-sm text-emerald-600 font-medium">
                     <span>Giảm giá</span>
                     <span>-{order.discountAmount.toLocaleString()}đ</span>
                   </div>
                 )}
-                <div className="line total">
-                  <span>Tổng thanh toán</span>
-                  <span className="total-price">{order.total.toLocaleString()}đ</span>
+                <div className="flex justify-between items-center mt-3 pt-4 border-t border-slate-100">
+                  <span className="font-bold text-slate-800">Tổng thanh toán</span>
+                  <span className="text-xl font-extrabold text-blue-600">{order.total.toLocaleString()}đ</span>
                 </div>
               </div>
             </div>
 
             {/* Địa chỉ nhận hàng */}
-            <div className="od-card address-card">
-              <h3><MapPin size={18} color="#2563eb" /> ĐỊA CHỈ NHẬN HÀNG</h3>
-              <div className="address-content">
-                <strong>{order.shippingInfo.fullName}</strong>
-                <p>{order.shippingInfo.phone}</p>
-                <p>{order.shippingInfo.addressDetail}, {order.shippingInfo.ward}, {order.shippingInfo.district}, {order.shippingInfo.province}</p>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border-l-4 border-blue-600">
+              <h3 className="text-sm font-bold text-slate-800 m-0 mb-4 flex items-center gap-2 uppercase tracking-wide">
+                <MapPin size={18} className="text-blue-600" /> Địa chỉ nhận hàng
+              </h3>
+              <div className="text-sm leading-relaxed">
+                <strong className="block text-slate-800 mb-1">{order.shippingInfo.fullName}</strong>
+                <p className="m-0 text-slate-600 mb-1 font-medium">{order.shippingInfo.phone}</p>
+                <p className="m-0 text-slate-500">{order.shippingInfo.addressDetail}, {order.shippingInfo.ward}, {order.shippingInfo.district}, {order.shippingInfo.province}</p>
               </div>
             </div>
 
-            {/* Banner Khuyến mãi giống hình */}
-            <div className="od-promo-banner">
-              <p className="promo-title">ƯU ĐÃI DÀNH CHO BẠN</p>
-              <h4>Giảm 10% cho đơn hàng tiếp theo</h4>
-              <div className="promo-code-box">
-                <span>TECHNOVA10</span>
-                <button><Copy size={14}/> Sao chép</button>
+            {/* Banner Khuyến mãi */}
+            <div className="bg-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
+              <p className="text-[10px] font-extrabold text-blue-400 bg-blue-400/10 inline-block px-2 py-1 rounded mb-3 tracking-widest uppercase">Ưu đãi dành cho bạn</p>
+              <h4 className="m-0 mb-4 text-base font-bold">Giảm 10% cho đơn hàng tiếp theo</h4>
+              <div className="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-dashed border-white/20">
+                <span className="font-mono font-bold text-lg tracking-wider">TECHNOVA10</span>
+                <button className="bg-transparent border-none text-blue-400 flex items-center gap-1.5 cursor-pointer text-xs font-bold hover:text-blue-300">
+                  <Copy size={14}/> SAO CHÉP
+                </button>
               </div>
             </div>
 

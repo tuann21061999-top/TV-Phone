@@ -19,7 +19,23 @@ router.delete("/admin/:id", protect, admin, voucherController.deleteVoucher);
 
 /* ================= USER ROUTES ================= */
 
+// Lấy danh sách Voucher khả dụng của User
+router.get("/my-vouchers", protect, voucherController.getUserVouchers);
+
 // Áp dụng mã giảm giá (kiểm tra + tính tiền)
 router.post("/apply", protect, voucherController.applyVoucher);
+
+// Lưu mã giảm giá vào ví (nếu chưa có)
+router.post("/save", protect, voucherController.saveVoucher);
+
+// Lấy lịch sử đổi điểm
+router.get("/redemption-history", protect, voucherController.getRedemptionHistory);
+
+// Lấy chi tiết mã giảm giá theo code (Dùng cho trang Voucher Detail)
+router.get("/:code", voucherController.getVoucherByCode);
+
+// Đổi điểm tích lũy lấy voucher
+router.post("/redeem-points", protect, voucherController.redeemPoints);
+
 
 module.exports = router;

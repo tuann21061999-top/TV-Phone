@@ -63,9 +63,22 @@ const orderSchema = new mongoose.Schema(
         "shipping",         // Đã giao cho shipper (Đang vận chuyển)
         "done",             // Shipper giao thành công (Hoàn thành)
         "cancelled",        // Đơn bị hủy (Khách hủy hoặc Shop hủy)
-        "returned"          // Đơn bị hoàn về (Khách từ chối nhận)
+        "returned"          // Đơn bị hoàn về (Khách từ chối nhận hoặc trả hàng)
       ],
       default: "waiting_approval"
+    },
+
+    returnRequest: {
+      isRequested: { type: Boolean, default: false },
+      reason: { type: String },
+      images: [{ type: String }],
+      status: {
+        type: String,
+        enum: ["none", "pending", "approved", "rejected"],
+        default: "none"
+      },
+      requestedAt: { type: Date },
+      rejectedReason: { type: String }
     }
   },
   { timestamps: true }

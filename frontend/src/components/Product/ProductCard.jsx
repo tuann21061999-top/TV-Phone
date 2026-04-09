@@ -1,14 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Star, ShoppingCart, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import axios from "axios";
-import "./Product.css";
 
 function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
   const navigate = useNavigate();
   const [liked, setLiked] = useState(isFavorited);
   const [loadingLike, setLoadingLike] = useState(false);
+
+  // Sync internal state if parent fetches favorite data asynchronously
+  useEffect(() => {
+    setLiked(isFavorited);
+  }, [isFavorited]);
 
   const handleToggleFavorite = async (e) => {
     e.stopPropagation();
@@ -79,22 +83,22 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
 
   return (
     <div
-      className="card-grid"
+      className="bg-white border border-gray-100 rounded-2xl p-4 transition-all duration-300 cursor-pointer flex flex-col hover:shadow-[0_10px_25px_rgba(0,0,0,0.05)] hover:-translate-y-1 group"
       onClick={() => navigate(`/product/${product.slug || product._id}`)}
     >
-      <div className="image-container">
+      <div className="relative bg-slate-50 rounded-xl p-5 h-[220px] flex items-center justify-center mb-4">
         {/* Badges nằm trong khung ảnh giống thiết kế */}
-        <div className="badges-wrapper">
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
           {isDiscounted && discountPercent > 0 && (
-            <span className="badge-discount">-{discountPercent}%</span>
+            <span className="bg-red-500 text-white text-[11px] font-bold py-1 px-2 rounded">-{discountPercent}%</span>
           )}
           {product.isFeatured && !isDiscounted && (
-            <span className="badge-new">Mới</span>
+            <span className="bg-emerald-500 text-white text-[11px] font-bold py-1 px-2 rounded">Mới</span>
           )}
         </div>
 
         <button
-          className={`wishlist-btn-grid ${liked ? "liked" : ""}`}
+          className={`absolute top-3 right-3 bg-white border-none w-8 h-8 p-0 rounded-full flex items-center justify-center cursor-pointer shadow-[0_2px_5px_rgba(0,0,0,0.05)] z-10 transition-all duration-200 hover:scale-110 ${liked ? "bg-red-50" : ""}`}
           onClick={handleToggleFavorite}
           title={liked ? "Bỏ yêu thích" : "Yêu thích"}
         >
@@ -104,21 +108,22 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
         <img
           src={product.images?.[0] || product.colorImages?.[0]?.imageUrl || "/no-image.png"}
           alt={product.name}
+          className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
         />
       </div>
 
-      <div className="card-content">
-        <h4 className="product-title">{product.name}</h4>
+      <div className="flex flex-col flex-1">
+        <h4 className="text-base font-semibold text-gray-800 m-0 mb-2 line-clamp-2 overflow-hidden text-ellipsis">{product.name}</h4>
 
         {/* HIỂN THỊ HIGHLIGHT XẾP CHỒNG NHƯ YÊU CẦU */}
-        <div className="product-highlights-stacked">
+        <div className="flex flex-col gap-1.5 mb-3">
           {product.highlights?.slice(0, 3).map((h, idx) => (
-            <span key={idx} className="h-tag">{h}</span>
+            <span key={idx} className="bg-gray-100 text-gray-600 text-[11px] py-1 px-2 rounded whitespace-nowrap overflow-hidden text-ellipsis w-fit max-w-full">{h}</span>
           ))}
         </div>
 
-        <div className="stars-grid">
-          <div className="star-icons">
+        <div className="flex items-center gap-1.5 mb-auto pb-4">
+          <div className="flex gap-0.5">
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
@@ -128,29 +133,20 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
               />
             ))}
           </div>
-          <span className="rating-count">({product.reviewsCount || Math.floor(Math.random() * 200) + 10})</span>
+          <span className="text-xs text-gray-400">({product.reviewsCount || 0})</span>
         </div>
 
-        <div className="card-footer-grid">
-          <div className="price-block">
+        <div className="flex justify-between items-end mt-auto">
+          <div className="flex flex-col gap-0.5">
             {isDiscounted ? (
               <>
-                <span className="old-price-grid">{formatPrice(basePrice)}</span>
-                <span className="current-price-grid">{formatPrice(finalPrice)}</span>
+                <span className="text-xs text-gray-400 line-through">{formatPrice(basePrice)}</span>
+                <span className="text-lg font-bold text-gray-900">{formatPrice(finalPrice)}</span>
               </>
             ) : (
-              <span className="current-price-grid">{formatPrice(basePrice)}</span>
+              <span className="text-lg font-bold text-gray-900">{formatPrice(basePrice)}</span>
             )}
           </div>
-
-          <button
-            className={`cart-btn-grid ${isDiscounted ? "primary" : "secondary"}`}
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <ShoppingCart size={18} />
-          </button>
         </div>
       </div>
     </div>

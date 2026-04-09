@@ -31,10 +31,13 @@ const feedbackRoutes = require("./routes/feedbackRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
 const voucherRoutes = require("./routes/voucherRoutes");
 const chatRoutes = require("./routes/chatRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 const promotionRoutes = require("./routes/promotionRoutes");
 const favoriteRoutes = require("./routes/favoriteRoutes");
 const newsRoutes = require("./routes/newsRoutes");
 const viewHistoryRoutes = require("./routes/viewHistoryRoutes");
+const tagRoutes = require("./routes/tagRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -64,9 +67,11 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
     }
 
     // Upload lên Cloudinary
+    console.log("Attempting Cloudinary upload for:", req.file.path);
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: "tv-phone-test",
     });
+    console.log("Cloudinary upload success:", result.secure_url);
 
     // Xóa file tạm sau khi upload
     fs.unlinkSync(req.file.path);
@@ -76,8 +81,8 @@ app.post("/api/upload", upload.single("image"), async (req, res) => {
       imageUrl: result.secure_url,
     });
   } catch (error) {
-    console.error("UPLOAD ERROR:", error);
-    res.status(500).json({ message: error.message });
+    console.error("UPLOAD ERROR DETAILS:", error);
+    res.status(500).json({ message: error.message, stack: error.stack, fullError: error });
   }
 });
 // Lên lịch chạy ngầm: Cứ mỗi 5 phút hệ thống sẽ tự động quét 1 lần
@@ -160,10 +165,13 @@ app.use("/api/feedbacks", feedbackRoutes);
 app.use("/api/admin/inventory", inventoryRoutes);
 app.use("/api/vouchers", voucherRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/ai", aiRoutes);
 app.use("/api/promotions", promotionRoutes);
 app.use("/api/favorites", favoriteRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/view-history", viewHistoryRoutes);
+app.use("/api/tags", tagRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 app.use(errorHandler);
 

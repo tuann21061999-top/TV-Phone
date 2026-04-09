@@ -71,6 +71,20 @@ const voucherSchema = new mongoose.Schema(
             default: true,
         },
 
+        // Phát hành công khai (Tự động thả vào ví Voucher của tất cả)
+        isPublic: {
+            type: Boolean,
+            default: true,
+        },
+
+        // Danh sách user được tặng đích danh (nếu isPublic = false)
+        targetUsers: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+
         // Mô tả ngắn (tùy chọn)
         description: {
             type: String,

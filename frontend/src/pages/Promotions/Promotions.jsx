@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import ProductCard from "../../components/Product/ProductCard";
-import "./Promotions.css";
 
 // Component Đếm ngược
 const CountdownTimer = ({ targetDate }) => {
@@ -39,37 +40,91 @@ const CountdownTimer = ({ targetDate }) => {
         return () => clearInterval(timer);
     }, [targetDate]);
 
-    if (isExpired) return <span className="expired-text">Đã quá hạn khuyến mãi</span>;
+    if (isExpired) return <span className="block text-red-500 font-semibold text-sm">Đã quá hạn khuyến mãi</span>;
 
     return (
-        <div className="countdown-timer">
-            {timeLeft.days > 0 && <div className="time-box"><span>{timeLeft.days}</span><span>Ngày</span></div>}
-            <div className="time-box"><span>{timeLeft.hours.toString().padStart(2, '0')}</span><span>Giờ</span></div>
-            <span className="colon">:</span>
-            <div className="time-box"><span>{timeLeft.minutes.toString().padStart(2, '0')}</span><span>Phút</span></div>
-            <span className="colon">:</span>
-            <div className="time-box"><span>{timeLeft.seconds.toString().padStart(2, '0')}</span><span>Giây</span></div>
+        <div className="flex items-center gap-2">
+            {timeLeft.days > 0 && (
+                <div className="flex flex-col items-center justify-center bg-slate-800 text-white rounded-lg p-2 min-w-[45px] shadow-[0_4px_10px_rgba(0,0,0,0.3)]">
+                    <span className="text-lg font-extrabold leading-none">{timeLeft.days}</span>
+                    <span className="text-[10px] uppercase opacity-80 mt-1">Ngày</span>
+                </div>
+            )}
+            <div className="flex flex-col items-center justify-center bg-slate-800 text-white rounded-lg p-2 min-w-[45px] shadow-[0_4px_10px_rgba(0,0,0,0.3)]">
+                <span className="text-lg font-extrabold leading-none">{timeLeft.hours.toString().padStart(2, '0')}</span>
+                <span className="text-[10px] uppercase opacity-80 mt-1">Giờ</span>
+            </div>
+            <span className="font-black text-inherit text-xl mx-0.5">:</span>
+            <div className="flex flex-col items-center justify-center bg-slate-800 text-white rounded-lg p-2 min-w-[45px] shadow-[0_4px_10px_rgba(0,0,0,0.3)]">
+                <span className="text-lg font-extrabold leading-none">{timeLeft.minutes.toString().padStart(2, '0')}</span>
+                <span className="text-[10px] uppercase opacity-80 mt-1">Phút</span>
+            </div>
+            <span className="font-black text-inherit text-xl mx-0.5">:</span>
+            <div className="flex flex-col items-center justify-center bg-slate-800 text-white rounded-lg p-2 min-w-[45px] shadow-[0_4px_10px_rgba(0,0,0,0.3)]">
+                <span className="text-lg font-extrabold leading-none">{timeLeft.seconds.toString().padStart(2, '0')}</span>
+                <span className="text-[10px] uppercase opacity-80 mt-1">Giây</span>
+            </div>
         </div>
     );
 };
 
+// Helper function to extract pricing logic from variants
+const getProductPricing = (product) => {
+    if (!product.variants?.length) return { basePrice: 0, finalPrice: 0, discountPercent: 0, targetEnd: null };
+    
+    let bestBasePrice = Infinity;
+    let bestFinalPrice = Infinity;
+    let bestDiscountPercent = 0;
+    let bestPromotionEnd = null;
+
+    product.variants.forEach(v => {
+      const now = new Date();
+      let currentActivePrice = v.price;
+      let currentDiscountPercent = 0;
+
+      if (v.discountPrice != null && v.promotionEnd && new Date(v.promotionEnd) > now) {
+        currentActivePrice = v.discountPrice;
+        if (v.discountType === "percentage") {
+          currentDiscountPercent = v.discountValue;
+        } else if (v.discountType === "fixed") {
+          currentDiscountPercent = Math.round((v.discountValue / v.price) * 100);
+        }
+      }
+
+      if (currentActivePrice < bestFinalPrice) {
+        bestFinalPrice = currentActivePrice;
+        bestBasePrice = v.price;
+        bestDiscountPercent = currentDiscountPercent;
+        bestPromotionEnd = v.promotionEnd ? new Date(v.promotionEnd) : null;
+      }
+    });
+
+    return {
+      basePrice: bestBasePrice === Infinity ? 0 : bestBasePrice,
+      finalPrice: bestFinalPrice === Infinity ? 0 : bestFinalPrice,
+      discountPercent: bestDiscountPercent,
+      targetEnd: bestPromotionEnd
+    };
+};
 
 const Promotions = () => {
-    const [shockDeals, setShockDeals] = useState([]);
     const [allPromotions, setAllPromotions] = useState([]);
+    const [topDeals, setTopDeals] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [currentSlide, setCurrentSlide] = useState(0);
 
     useEffect(() => {
         const fetchPromotions = async () => {
             try {
                 setLoading(true);
-                // Lấy tất cả khuyến mãi
                 const resAll = await axios.get("http://localhost:5000/api/promotions/public/promotions?type=all");
-                // Lấy riêng shock deals để hiển thị phần banner trên đầu (API sẽ filter giúp hoặc ta tự filter từ resAll cũng được)
                 const resShock = await axios.get("http://localhost:5000/api/promotions/public/promotions?type=shock");
 
                 setAllPromotions(resAll.data);
-                setShockDeals(resShock.data);
+                
+                // Sort shockDeals by totalSold and take top 3
+                const sortedTop = [...resShock.data].sort((a, b) => (b.totalSold || 0) - (a.totalSold || 0)).slice(0, 3);
+                setTopDeals(sortedTop);
             } catch (error) {
                 console.error("Lỗi fetch promotions", error);
             } finally {
@@ -79,72 +134,135 @@ const Promotions = () => {
         fetchPromotions();
     }, []);
 
-    // Hàm helper lấy ra promotionEnd xa nhất của sản phẩm để hiển thị đồng hồ chung cho Card
-    const getLatestPromotionEnd = (product) => {
-        if (!product || !product.variants) return null;
-        let latest = 0;
-        product.variants.forEach(v => {
-            if (v.promotionEnd) {
-                const t = new Date(v.promotionEnd).getTime();
-                if (t > latest) latest = t;
-            }
-        });
-        return latest > 0 ? new Date(latest) : null;
-    };
+    // Slider auto-play
+    useEffect(() => {
+        if (topDeals.length <= 1) return;
+        const timer = setInterval(() => {
+            setCurrentSlide(prev => (prev + 1) % topDeals.length);
+        }, 5000); // 5 seconds per slide
+        return () => clearInterval(timer);
+    }, [topDeals.length]);
+
+    const nextSlide = () => setCurrentSlide(prev => (prev + 1) % topDeals.length);
+    const prevSlide = () => setCurrentSlide(prev => (prev - 1 + topDeals.length) % topDeals.length);
 
     return (
-        <div className="promotions-page">
+        <div className="bg-slate-100 min-h-screen font-sans pb-16">
             <Header />
 
-            <div className="promo-container">
-                {/* SHOCK DEALS SECTION */}
-                <div className="shock-deals-section">
-                    <div className="shock-deals-header">
-                        <h2>🔥 GIỜ VÀNG GIÁ SỐC 🔥</h2>
-                        <p>Săn ngay deal hot số lượng có hạn!</p>
-                    </div>
-
-                    {loading ? (
-                        <div className="loading-state">Đang tải data...</div>
-                    ) : shockDeals.length > 0 ? (
-                        <div className="shock-deals-list">
-                            {shockDeals.map(product => {
-                                const targetEnd = getLatestPromotionEnd(product);
-                                return (
-                                    <div key={`shock-${product._id}`} className="shock-deal-card-wrapper">
-                                        <ProductCard product={product} />
-                                        {targetEnd && (
-                                            <div className="card-countdown-wrapper">
-                                                <CountdownTimer targetDate={targetEnd} />
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
+            <div className="w-full max-w-[1300px] mx-auto px-5 py-10 md:py-16 flex flex-col gap-10">
+                {/* SHOCK DEALS SECTION (SLIDER) */}
+                <div className="relative bg-transparent">
+                    <div className="relative z-10">
+                        <div className="text-center text-slate-800 mb-10">
+                            <h2 className="text-[32px] md:text-[42px] font-black mb-3 uppercase tracking-[3px] text-red-500 drop-shadow-[0_4px_15px_rgba(239,68,68,0.2)]">
+                                🔥 GIỜ VÀNG GIÁ SỐC 🔥
+                            </h2>
+                            <p className="text-lg md:text-xl opacity-90 text-slate-600 m-0 font-medium">Săn ngay những siêu phẩm bán chạy nhất!</p>
                         </div>
-                    ) : (
-                        <div className="empty-state">Hiện chưa có deal sốc nào đang diễn ra.</div>
-                    )}
+
+                        {loading ? (
+                            <div className="flex justify-center items-center py-20 text-slate-500 font-medium text-lg animate-pulse">
+                                Đang tải dữ liệu khuyến mãi...
+                            </div>
+                        ) : topDeals.length > 0 ? (
+                            <div className="relative w-full overflow-hidden rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] bg-gradient-to-br from-slate-900 to-blue-900 p-0">
+                                {topDeals.length > 1 && (
+                                    <>
+                                        <button onClick={prevSlide} className="hidden md:flex absolute top-1/2 -translate-y-1/2 left-5 bg-white/10 border border-white/20 text-white w-12 h-12 rounded-full justify-center items-center cursor-pointer z-10 transition-all duration-300 backdrop-blur-sm hover:bg-amber-400 hover:text-slate-900 hover:border-amber-400 p-0">
+                                            <ChevronLeft size={32} />
+                                        </button>
+                                        <button onClick={nextSlide} className="hidden md:flex absolute top-1/2 -translate-y-1/2 right-5 bg-white/10 border border-white/20 text-white w-12 h-12 rounded-full justify-center items-center cursor-pointer z-10 transition-all duration-300 backdrop-blur-sm hover:bg-amber-400 hover:text-slate-900 hover:border-amber-400 p-0">
+                                            <ChevronRight size={32} />
+                                        </button>
+                                    </>
+                                )}
+                                
+                                <div className="flex transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] w-full" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+                                    {topDeals.map((product) => {
+                                        const pricing = getProductPricing(product);
+                                        const displayImage = product.images?.[0] || product.colorImages?.[0]?.imageUrl || "/no-image.png";
+
+                                        return (
+                                            <div key={`slide-${product._id}`} className="flex-none w-full flex flex-col md:flex-row justify-between items-center p-10 md:p-[60px_80px] gap-10 text-white box-border text-center md:text-left">
+                                                <div className="flex-1 flex flex-col items-center md:items-start gap-4">
+                                                    <div className="bg-white/10 border border-white/20 py-2 px-4 rounded-full text-sm font-bold tracking-[1.5px] text-amber-400 backdrop-blur-md">TOP BÁN CHẠY</div>
+                                                    <h3 className="text-3xl md:text-4xl font-extrabold m-0 text-white leading-tight">{product.name}</h3>
+                                                    <div className="flex items-baseline justify-center md:justify-start gap-4 mt-2.5">
+                                                        <span className="text-3xl md:text-[32px] font-black text-amber-400">{pricing.finalPrice.toLocaleString()}đ</span>
+                                                        {pricing.discountPercent > 0 && <span className="text-lg line-through text-slate-400 font-medium">{pricing.basePrice.toLocaleString()}đ</span>}
+                                                    </div>
+
+                                                    {pricing.targetEnd && (
+                                                        <div className="my-5 bg-white/5 p-4 rounded-xl border-t-4 md:border-t-0 md:border-l-4 border-red-500">
+                                                            <CountdownTimer targetDate={pricing.targetEnd} />
+                                                        </div>
+                                                    )}
+
+                                                    <Link to={`/product/${product.slug || product._id}`} className="inline-block bg-amber-400 text-slate-900 font-bold py-3.5 px-7 rounded-xl no-underline cursor-pointer transition-all duration-300 text-base border-none mt-2.5 hover:bg-amber-500 hover:-translate-y-1 hover:shadow-[0_4px_15px_rgba(245,158,11,0.4)]">
+                                                        Xem siêu phẩm này
+                                                    </Link>
+                                                </div>
+
+                                                <div className="flex-1 flex justify-center items-center relative z-10 w-full">
+                                                    <div className="bg-white rounded-full w-[280px] h-[280px] md:w-[420px] md:h-[420px] flex justify-center items-center relative shadow-[0_20px_50px_rgba(0,0,0,0.3),0_0_0_10px_rgba(255,255,255,0.05)] transition-transform duration-700 hover:scale-105">
+                                                        {pricing.discountPercent > 0 && (
+                                                            <div className="absolute -top-1.5 right-2 md:right-4 bg-red-500 text-white w-16 h-16 md:w-20 md:h-20 flex items-center justify-center rounded-full text-xl md:text-2xl font-black shadow-[0_10px_25px_rgba(239,68,68,0.4)] rotate-[15deg] z-10">
+                                                                -{pricing.discountPercent}%
+                                                            </div>
+                                                        )}
+                                                        <img src={displayImage} alt={product.name} className="w-[70%] h-[70%] object-contain mix-blend-multiply" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                {topDeals.length > 1 && (
+                                    <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-3 z-10">
+                                        {topDeals.map((_, idx) => (
+                                            <button 
+                                                key={idx} 
+                                                className={`h-3 rounded-full border-none cursor-pointer transition-all duration-300 p-0 ${idx === currentSlide ? "bg-amber-400 w-[30px]" : "bg-white/30 w-3 hover:bg-white/50"}`}
+                                                onClick={() => setCurrentSlide(idx)}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 text-slate-500 shadow-sm">
+                                Hiện chưa có deal sốc nào đang diễn ra.
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* ALL PROMOTIONS SECTION */}
-                <div className="all-promotions-section">
-                    <div className="section-title">
-                        <h3>TẤT CẢ KHUYẾN MÃI</h3>
+                <div className="bg-white rounded-3xl p-6 md:p-10 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+                    <div className="mb-[30px] border-b-2 border-slate-100 pb-[15px]">
+                        <h3 className="text-[24px] md:text-[28px] text-slate-800 m-0 relative inline-block font-extrabold after:content-[''] after:absolute after:-bottom-[17px] after:left-0 after:w-[60%] after:h-1 after:rounded-md after:bg-blue-600">
+                            TẤT CẢ KHUYẾN MÃI
+                        </h3>
                     </div>
 
                     {loading ? (
-                        <div className="loading-state">Đang tải data...</div>
+                        <div className="flex justify-center items-center py-20 text-slate-500 font-medium text-lg animate-pulse">
+                            Đang tải dữ liệu...
+                        </div>
                     ) : allPromotions.length > 0 ? (
-                        <div className="products-grid">
+                        <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-[30px]">
                             {allPromotions.map(product => (
-                                <div key={`promo-${product._id}`} className="promo-card-wrapper">
+                                <div key={`promo-${product._id}`} className="bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                                     <ProductCard product={product} />
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div className="empty-state">Hiện không có sản phẩm khuyến mãi.</div>
+                        <div className="text-center py-16 text-slate-500 italic">
+                            Hiện không có sản phẩm khuyến mãi.
+                        </div>
                     )}
                 </div>
             </div>

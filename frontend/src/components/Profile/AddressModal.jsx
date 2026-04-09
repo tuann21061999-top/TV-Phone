@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./Profile.css"
 
 const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
   const [form, setForm] = useState({
@@ -123,37 +122,60 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
     }
     onSave(form);
   };
+  useEffect(() => {
+  if (isOpen) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "auto";
+  }
+
+  return () => {
+    document.body.style.overflow = "auto";
+  };
+}, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <h3>{initialData ? "Cập nhật địa chỉ" : "Thêm địa chỉ"}</h3>
+  <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center">
+    <div className="bg-white w-full max-w-lg rounded-2xl shadow-xl p-6">
+
+      <h3 className="text-lg font-bold text-slate-800 mb-4">
+        {initialData ? "Cập nhật địa chỉ" : "Thêm địa chỉ"}
+      </h3>
+
+      <div className="flex flex-col gap-3">
 
         <input
+          className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
           placeholder="Họ và tên"
           value={form.fullName || ""}
           onChange={(e) => setForm({ ...form, fullName: e.target.value })}
         />
 
         <input
+          className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
           placeholder="Số điện thoại"
           value={form.phone || ""}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
         />
 
-        <select value={selectedProvinceCode} onChange={(e) => handleProvinceChange(e.target.value)}>
+        <select
+          className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
+          value={selectedProvinceCode}
+          onChange={(e) => handleProvinceChange(e.target.value)}
+        >
           <option value="">Chọn tỉnh/thành phố</option>
           {provinces.map(p => (
             <option key={p.code} value={p.code}>{p.name}</option>
           ))}
         </select>
 
-        <select 
-          value={selectedDistrictCode} 
+        <select
+          className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
+          value={selectedDistrictCode}
           onChange={(e) => handleDistrictChange(e.target.value)}
-          disabled={!selectedProvinceCode} // Khóa nếu chưa chọn tỉnh
+          disabled={!selectedProvinceCode}
         >
           <option value="">Chọn quận/huyện</option>
           {districts.map(d => (
@@ -161,10 +183,11 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
           ))}
         </select>
 
-        <select 
-          value={selectedWardCode} 
+        <select
+          className="border border-slate-200 rounded-lg px-3 py-2 text-sm"
+          value={selectedWardCode}
           onChange={(e) => handleWardChange(e.target.value)}
-          disabled={!selectedDistrictCode} // Khóa nếu chưa chọn quận
+          disabled={!selectedDistrictCode}
         >
           <option value="">Chọn phường/xã</option>
           {wards.map(w => (
@@ -173,12 +196,13 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
         </select>
 
         <textarea
+          className="border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
           placeholder="Số nhà, tên đường"
           value={form.detail || ""}
           onChange={(e) => setForm({ ...form, detail: e.target.value })}
         />
 
-        <label>
+        <label className="flex items-center gap-2 text-sm text-slate-600">
           <input
             type="checkbox"
             checked={form.isDefault || false}
@@ -187,13 +211,26 @@ const AddressModal = ({ isOpen, onClose, onSave, initialData }) => {
           Đặt làm mặc định
         </label>
 
-        <div className="modal-actions">
-          <button onClick={onClose}>Hủy</button>
-          <button onClick={handleSubmit}>Lưu thay đổi</button>
-        </div>
       </div>
+
+      <div className="flex justify-end gap-3 mt-5">
+        <button
+          onClick={onClose}
+          className="px-4 py-2 text-sm border border-slate-200 rounded-lg hover:bg-slate-100"
+        >
+          Hủy
+        </button>
+        <button
+          onClick={handleSubmit}
+          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Lưu thay đổi
+        </button>
+      </div>
+
     </div>
-  );
+  </div>
+);
 };
 
 export default AddressModal;
