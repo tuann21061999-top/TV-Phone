@@ -137,16 +137,16 @@ export default function ManagePhone() {
           <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2">Kho Điện Thoại</h2>
           <div className="flex items-center bg-white border border-slate-200 p-2.5 px-4 rounded-xl w-full sm:w-[340px] focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 transition-all">
             <Search size={18} className="text-slate-500 shrink-0" />
-            <input 
-              placeholder="Tìm theo tên..." 
-              value={searchTerm} 
-              onChange={handleSearch} 
-              className="border-none outline-none ml-2.5 w-full text-sm text-slate-800 bg-transparent" 
+            <input
+              placeholder="Tìm theo tên..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="border-none outline-none ml-2.5 w-full text-sm text-slate-800 bg-transparent"
             />
           </div>
         </div>
-        <button 
-          className="flex items-center justify-center gap-2 font-semibold cursor-pointer transition-all border-none bg-gradient-to-br from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl text-sm shadow-[0_4px_12px_rgba(37,99,235,0.2)] hover:-translate-y-0.5 hover:shadow-[0_8px_15px_rgba(37,99,235,0.3)]" 
+        <button
+          className="flex items-center justify-center gap-2 font-semibold cursor-pointer transition-all border-none bg-gradient-to-br from-blue-600 to-blue-700 text-white py-3 px-6 rounded-xl text-sm shadow-[0_4px_12px_rgba(37,99,235,0.2)] hover:-translate-y-0.5 hover:shadow-[0_8px_15px_rgba(37,99,235,0.3)]"
           onClick={openModalForAdd}
         >
           <Plus size={20} /> Thêm điện thoại mới
@@ -159,9 +159,8 @@ export default function ManagePhone() {
           <button
             key={tab}
             onClick={() => { setActiveTab(tab); setCurrentPage(1); }}
-            className={`py-2 px-4 rounded-full border-none font-semibold cursor-pointer whitespace-nowrap transition-all text-sm ${
-              activeTab === tab ? "bg-blue-600 text-white" : "bg-slate-200/70 text-slate-500 hover:bg-slate-200"
-            }`}
+            className={`py-2 px-4 rounded-full border-none font-semibold cursor-pointer whitespace-nowrap transition-all text-sm ${activeTab === tab ? "bg-blue-600 text-white" : "bg-slate-200/70 text-slate-500 hover:bg-slate-200"
+              }`}
           >
             {tab}
           </button>
@@ -191,7 +190,7 @@ export default function ManagePhone() {
                   className="w-4 h-4 rounded cursor-pointer"
                 />
               </th>
-              <th className="w-[25%] p-4 text-left box-border bg-slate-50 text-[13px] text-slate-500 uppercase tracking-wide border-b border-slate-200">Sản phẩm</th>
+              <th className="w-[28%] p-4 text-left box-border bg-slate-50 text-[13px] text-slate-500 uppercase tracking-wide border-b border-slate-200">Sản phẩm</th>
               <th className="w-[15%] p-4 text-left box-border bg-slate-50 text-[13px] text-slate-500 uppercase tracking-wide border-b border-slate-200">Loại</th>
               <th className="p-4 text-left box-border bg-slate-50 text-[13px] text-slate-500 uppercase tracking-wide border-b border-slate-200">Giá sàn</th>
               <th className="p-4 text-left box-border bg-slate-50 text-[13px] text-slate-500 uppercase tracking-wide border-b border-slate-200">Tồn kho</th>
@@ -211,10 +210,20 @@ export default function ManagePhone() {
                   />
                 </td>
                 <td className="p-4 border-b border-slate-100 whitespace-nowrap overflow-hidden text-ellipsis">
-                  <div className="flex flex-col gap-1">
-                    <strong className="text-sm text-slate-800">{p.name}</strong>
+                  <div className="flex flex-col gap-1.5">
+                    <strong className="text-sm text-slate-800 truncate" title={p.name}>{p.name}</strong>
+
+                    {/* BỔ SUNG: KHU VỰC HIỂN THỊ SAO & LƯỢT ĐÁNH GIÁ */}
+                    <div className="flex items-center gap-1.5">
+                      <div className={`flex items-center gap-0.5 px-1.5 py-[2px] rounded text-[11px] font-bold ${p.averageRating > 0 ? "bg-amber-50 text-amber-600" : "bg-slate-100 text-slate-500"}`}>
+                        <Star size={12} className={p.averageRating > 0 ? "fill-amber-500 text-amber-500" : "fill-slate-400 text-slate-400"} />
+                        <span>{p.averageRating ? parseFloat(p.averageRating).toFixed(1) : "0.0"}</span>
+                      </div>
+                      <span className="text-[11px] text-slate-500 font-medium">({p.reviewsCount || 0} đánh giá)</span>
+                    </div>
+
                     {p.condition === "used" && (
-                      <div className="flex flex-wrap gap-1 mt-1">
+                      <div className="flex flex-wrap gap-1 mt-0.5">
                         {p.conditionLevel?.map((lv, idx) => (
                           <span key={`cond-${p._id}-${idx}`} className="bg-orange-50 text-orange-700 border border-orange-100 py-[2px] px-1.5 rounded text-[10px] font-bold">
                             {lv}
@@ -314,7 +323,7 @@ export default function ManagePhone() {
                         <option value="used">Đã qua sử dụng (Used)</option>
                       </select>
                     </div>
-                    
+
                     {form.condition === "used" && (
                       <div className="flex flex-col gap-2 md:col-span-2 animate-fade-in">
                         <label className="text-sm font-semibold text-slate-600">Các mức độ tình trạng hiện có</label>
@@ -512,7 +521,7 @@ export default function ManagePhone() {
                                   <input type="number" placeholder="Số lượng" value={c.quantity} onChange={(e) => { const u = [...form.variants]; u[i].colors[cIdx].quantity = Number(e.target.value); setForm({ ...form, variants: u }) }} min="0" required className="flex-1 p-2.5 px-3 border border-slate-200 rounded-lg text-sm bg-white outline-none focus:border-blue-500" />
                                   <button type="button" onClick={() => {
                                     const u = [...form.variants];
-                                    if (u[i].colors.length > 1) { u[i].colors.splice(cIdx, 1); setForm({ ...form, variants: u }); } 
+                                    if (u[i].colors.length > 1) { u[i].colors.splice(cIdx, 1); setForm({ ...form, variants: u }); }
                                     else { toast.error("Phải có ít nhất 1 màu cho mỗi cấu hình!"); }
                                   }} className="bg-white border border-slate-200 text-red-500 h-[42px] w-[42px] rounded-lg flex items-center justify-center cursor-pointer hover:bg-red-50">
                                     <Trash2 size={16} />

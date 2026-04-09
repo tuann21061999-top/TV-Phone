@@ -349,11 +349,14 @@ const voucherController = {
 
             const user = await User.findById(userId);
 
-            // Tính điểm tích lũy từ đơn hoàn thành
-            const doneOrders = await Order.find({ userId, status: "done" });
-            const totalAccumulated = Math.floor(
-                doneOrders.reduce((s, o) => s + o.total, 0) / 50000
-            );
+            // Tính điểm tích lũy bằng Aggregate MongoDB để tránh nghẽn RAM khi có hàng ngàn orders
+            const mongoose = require("mongoose");
+            const orderStats = await Order.aggregate([
+                { $match: { userId: new mongoose.Types.ObjectId(userId), status: "done" } },
+                { $group: { _id: null, totalSpent: { $sum: "$total" } } }
+            ]);
+            const totalDoneAmount = orderStats.length > 0 ? orderStats[0].totalSpent : 0;
+            const totalAccumulated = Math.floor(totalDoneAmount / 50000);
 
             // Tính điểm đã tiêu (tất cả lần đổi trong lịch sử)
             const totalSpentPoints = (user.redemptionHistory || [])

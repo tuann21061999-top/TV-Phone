@@ -211,6 +211,11 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
 
+    reviewsCount: {
+      type: Number,
+      default: 0,
+    },
+
     totalSold: {
       type: Number,
       default: 0,

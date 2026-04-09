@@ -70,12 +70,14 @@ const CountdownTimer = ({ targetDate }) => {
 
 // Helper function to extract pricing logic from variants
 const getProductPricing = (product) => {
-    if (!product.variants?.length) return { basePrice: 0, finalPrice: 0, discountPercent: 0, targetEnd: null };
+    if (!product.variants?.length) return { basePrice: 0, finalPrice: 0, discountPercent: 0, targetEnd: null, totalLimit: 0, totalSold: 0 };
     
     let bestBasePrice = Infinity;
     let bestFinalPrice = Infinity;
     let bestDiscountPercent = 0;
     let bestPromotionEnd = null;
+    let totalLimit = 0;
+    let totalSold = 0;
 
     product.variants.forEach(v => {
       const now = new Date();
@@ -84,6 +86,12 @@ const getProductPricing = (product) => {
 
       if (v.discountPrice != null && v.promotionEnd && new Date(v.promotionEnd) > now) {
         currentActivePrice = v.discountPrice;
+        
+        if (v.quantityLimit > 0) {
+            totalLimit += v.quantityLimit;
+            totalSold += (v.soldQuantity || 0);
+        }
+
         if (v.discountType === "percentage") {
           currentDiscountPercent = v.discountValue;
         } else if (v.discountType === "fixed") {
@@ -103,7 +111,9 @@ const getProductPricing = (product) => {
       basePrice: bestBasePrice === Infinity ? 0 : bestBasePrice,
       finalPrice: bestFinalPrice === Infinity ? 0 : bestFinalPrice,
       discountPercent: bestDiscountPercent,
-      targetEnd: bestPromotionEnd
+      targetEnd: bestPromotionEnd,
+      totalLimit,
+      totalSold
     };
 };
 
@@ -183,6 +193,10 @@ const Promotions = () => {
                                         const pricing = getProductPricing(product);
                                         const displayImage = product.images?.[0] || product.colorImages?.[0]?.imageUrl || "/no-image.png";
 
+                                        const hasLimit = pricing.totalLimit > 0;
+                                        const progressPercent = hasLimit ? Math.min((pricing.totalSold / pricing.totalLimit) * 100, 100) : 0;
+                                        const quantityLeft = Math.max(0, pricing.totalLimit - pricing.totalSold);
+
                                         return (
                                             <div key={`slide-${product._id}`} className="flex-none w-full flex flex-col md:flex-row justify-between items-center p-10 md:p-[60px_80px] gap-10 text-white box-border text-center md:text-left">
                                                 <div className="flex-1 flex flex-col items-center md:items-start gap-4">
@@ -196,6 +210,24 @@ const Promotions = () => {
                                                     {pricing.targetEnd && (
                                                         <div className="my-5 bg-white/5 p-4 rounded-xl border-t-4 md:border-t-0 md:border-l-4 border-red-500">
                                                             <CountdownTimer targetDate={pricing.targetEnd} />
+                                                        </div>
+                                                    )}
+
+                                                    {hasLimit && (
+                                                        <div className="w-full max-w-sm my-3 border border-red-500/30 bg-red-950/40 p-3 rounded-lg backdrop-blur-sm">
+                                                            <div className="flex justify-between text-[13px] text-white/90 mb-2 font-medium">
+                                                                <span className="flex items-center gap-1.5 text-red-400">
+                                                                    <span className="relative flex h-2 w-2">
+                                                                        {quantityLeft > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>}
+                                                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                                                                    </span>
+                                                                    {quantityLeft > 0 ? "Kẻo lỡ!" : "Đã cháy hàng!"}
+                                                                </span>
+                                                                <span>Đã bán: <span className="font-bold text-amber-400">{pricing.totalSold}</span>/{pricing.totalLimit}</span>
+                                                            </div>
+                                                            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                                                                <div className="h-full bg-gradient-to-r from-red-600 to-amber-500 rounded-full" style={{ width: `${progressPercent}%` }} />
+                                                            </div>
                                                         </div>
                                                     )}
 

@@ -54,7 +54,13 @@ const ManagePromotions = () => {
         }
 
         setProjectedPrice(newPrice);
-        setProjectedProfit(newPrice - (selectedProduct.avgImportPrice || 0));
+
+        // Tránh lỗi False Positive: Nếu Giá bán thấp nhất < Giá nhập T/Bình thì phép tính này vô nghĩa và luôn ra âm
+        if ((selectedProduct.avgImportPrice || 0) <= selectedProduct.lowestPrice) {
+            setProjectedProfit(newPrice - (selectedProduct.avgImportPrice || 0));
+        } else {
+            setProjectedProfit(null); // Ẩn nhãn dự tính
+        }
     }, [discountType, discountValue, selectedProduct]);
 
     const handleOpenModal = (product) => {
@@ -155,8 +161,8 @@ const ManagePromotions = () => {
                 </div>
 
                 <div className="relative">
-                    <select 
-                        value={filter} 
+                    <select
+                        value={filter}
                         onChange={e => setFilter(e.target.value)}
                         className="appearance-none py-2.5 pl-4 pr-10 border border-slate-200 rounded-lg outline-none bg-white text-slate-700 text-sm cursor-pointer focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_12px_center] bg-[length:16px_16px]"
                     >
@@ -166,8 +172,8 @@ const ManagePromotions = () => {
                     </select>
                 </div>
 
-                <button 
-                    className="flex items-center gap-1.5 py-2.5 px-4 bg-white border border-slate-200 rounded-lg cursor-pointer text-slate-600 text-sm font-medium transition-all hover:bg-slate-100 active:bg-slate-200" 
+                <button
+                    className="flex items-center gap-1.5 py-2.5 px-4 bg-white border border-slate-200 rounded-lg cursor-pointer text-slate-600 text-sm font-medium transition-all hover:bg-slate-100 active:bg-slate-200"
                     onClick={fetchPromotions}
                 >
                     <RefreshCcw size={16} /> Làm mới
@@ -237,15 +243,15 @@ const ManagePromotions = () => {
                                     </td>
                                     <td className="p-4 align-middle text-right">
                                         <div className="flex gap-2 justify-end">
-                                            <button 
-                                                className="flex items-center gap-1 bg-blue-500 text-white border-none py-1.5 px-3 rounded-md cursor-pointer text-xs font-semibold transition-colors hover:bg-blue-600 shadow-sm" 
+                                            <button
+                                                className="flex items-center gap-1 bg-blue-500 text-white border-none py-1.5 px-3 rounded-md cursor-pointer text-xs font-semibold transition-colors hover:bg-blue-600 shadow-sm"
                                                 onClick={() => handleOpenModal(item)}
                                             >
                                                 <Edit2 size={14} /> Thiết lập
                                             </button>
                                             {item.isActivePromo && (
-                                                <button 
-                                                    className="bg-white text-slate-600 border border-slate-300 py-1.5 px-3 rounded-md cursor-pointer text-xs font-semibold transition-colors hover:bg-red-50 hover:text-red-500 hover:border-red-200" 
+                                                <button
+                                                    className="bg-white text-slate-600 border border-slate-300 py-1.5 px-3 rounded-md cursor-pointer text-xs font-semibold transition-colors hover:bg-red-50 hover:text-red-500 hover:border-red-200"
                                                     onClick={() => handleResetDiscount(item)}
                                                 >
                                                     Hủy
@@ -276,15 +282,15 @@ const ManagePromotions = () => {
                                     {selectedProduct.variantCount} phiên bản · Giảm giá sẽ áp dụng cho TẤT CẢ phiên bản
                                 </div>
                                 <div className="text-sm text-slate-600">
-                                    Giá gốc thấp nhất: <span className="text-blue-600 font-semibold">{selectedProduct.lowestPrice?.toLocaleString()}đ</span> | 
+                                    Giá gốc thấp nhất: <span className="text-blue-600 font-semibold">{selectedProduct.lowestPrice?.toLocaleString()}đ</span> |
                                     WAC TB: <span className="text-amber-500 font-semibold ml-1">{selectedProduct.avgImportPrice?.toLocaleString()}đ</span>
                                 </div>
                             </div>
 
                             <div className="mb-4">
                                 <label className="block text-[13px] font-semibold text-slate-700 mb-1.5">Loại Giảm giá</label>
-                                <select 
-                                    value={discountType} 
+                                <select
+                                    value={discountType}
                                     onChange={e => setDiscountType(e.target.value)}
                                     className="w-full p-2.5 border border-slate-300 rounded-lg outline-none text-sm text-slate-700 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_10px_center] bg-[length:16px_16px]"
                                 >

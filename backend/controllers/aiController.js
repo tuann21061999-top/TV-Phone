@@ -199,7 +199,7 @@ exports.getPersonalizedRecommendations = async (req, res) => {
             const bestSellers = await Product.find({ isActive: true })
                 .sort({ totalSold: -1, averageRating: -1 })
                 .limit(8)
-                .select('name slug variants colorImages promotion averageRating totalSold');
+                .select('name slug variants colorImages promotion averageRating reviewsCount totalSold');
 
             const recommendations = bestSellers.map(p => ({
                 product: p,
@@ -228,7 +228,7 @@ exports.getPersonalizedRecommendations = async (req, res) => {
             const bestSellers = await Product.find({ isActive: true })
                 .sort({ totalSold: -1, averageRating: -1 })
                 .limit(8)
-                .select('name slug variants colorImages promotion averageRating totalSold');
+                .select('name slug variants colorImages promotion averageRating reviewsCount totalSold');
 
             const recommendations = bestSellers.map(p => ({
                 product: p,
@@ -258,7 +258,7 @@ exports.getPersonalizedRecommendations = async (req, res) => {
             isActive: true,
             _id: { $nin: combinedProductIds }, // không đề xuất lại máy đã mua/tim
             tags: { $in: uniqueTags }          // phải có chung tag
-        }).select('name slug variants colorImages promotion averageRating totalSold tags'); // Kéo cả trường tags để tính score
+        }).select('name slug variants colorImages promotion averageRating reviewsCount totalSold tags'); // Kéo cả trường tags để tính score
 
         // Tính điểm "Độ phù hợp" (matchScore) cho từng sản phẩm
         let suggestedProducts = candidates.map(p => {
@@ -295,7 +295,7 @@ exports.getPersonalizedRecommendations = async (req, res) => {
             })
                 .sort({ totalSold: -1 })
                 .limit(8 - finalProducts.length)
-                .select('name slug variants colorImages promotion averageRating totalSold');
+                .select('name slug variants colorImages promotion averageRating reviewsCount totalSold');
 
             finalProducts = [...finalProducts, ...extraProducts];
         }
