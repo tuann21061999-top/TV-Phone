@@ -20,5 +20,6 @@ router.put("/admin/:id/toggle-status", protect, admin, reviewController.toggleRe
 router.get("/check-eligibility/:productId", protect, reviewController.checkEligibility);
 router.delete("/admin/:id", protect, admin, reviewController.deleteReview);
 router.put("/admin/:id/reply", protect, admin, reviewController.replyReview);
+router.post("/admin/sync-stats", protect, admin, reviewController.syncAllReviewStats);
 
 module.exports = router;

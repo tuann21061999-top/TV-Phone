@@ -134,6 +134,10 @@ function AccessoriesPage() {
     let bestBasePrice = Infinity;
     let bestFinalPrice = Infinity;
     let bestDiscountPercent = 0;
+    
+    let isShock = false;
+    let totalLimit = 0;
+    let totalSold = 0;
 
     product.variants.forEach(v => {
       const now = new Date();
@@ -142,6 +146,13 @@ function AccessoriesPage() {
 
       if (v.discountPrice != null && v.promotionEnd && new Date(v.promotionEnd) > now) {
         currentActivePrice = v.discountPrice;
+        if (v.isShockDeal) isShock = true;
+        
+        if (v.quantityLimit > 0) {
+            totalLimit += v.quantityLimit;
+            totalSold += (v.soldQuantity || 0);
+        }
+
         if (v.discountType === "percentage") {
           currentDiscountPercent = v.discountValue;
         } else if (v.discountType === "fixed") {
@@ -159,7 +170,9 @@ function AccessoriesPage() {
     return {
       basePrice: bestBasePrice === Infinity ? 0 : bestBasePrice,
       finalPrice: bestFinalPrice === Infinity ? 0 : bestFinalPrice,
-      discountPercent: bestDiscountPercent
+      discountPercent: bestDiscountPercent,
+      totalLimit,
+      totalSold
     };
   };
 
@@ -417,8 +430,10 @@ function AccessoriesPage() {
             {!loading && !error && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {currentProducts.map((product) => {
-                  const { basePrice, finalPrice, discountPercent } = getPricingInfo(product);
+                  const { basePrice, finalPrice, discountPercent, totalLimit, totalSold } = getPricingInfo(product);
                   const hasDiscount = finalPrice < basePrice;
+                  const quantityLeft = Math.max(0, totalLimit - totalSold);
+                  const progressPercent = totalLimit > 0 ? Math.min((totalSold / totalLimit) * 100, 100) : 0;
 
                   const displayImage =
                     product.colorImages?.find((img) => img.isDefault)?.imageUrl ||
@@ -475,12 +490,42 @@ function AccessoriesPage() {
                           ))}
                         </div>
 
-                        <div className="mt-auto mb-3 font-bold text-red-500 text-lg">
-                          {formatPrice(finalPrice)}
-                          {hasDiscount && (
-                            <span className="ml-2 text-sm font-normal text-gray-400 line-through">
-                              {formatPrice(basePrice)}
-                            </span>
+                        {/* Rating */}
+                        <div className="flex items-center justify-center gap-[2px] mb-3">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={14}
+                              fill={i < Math.round(product.averageRating || 0) ? "#fbbf24" : "none"}
+                              stroke={i < Math.round(product.averageRating || 0) ? "#fbbf24" : "#d1d5db"}
+                            />
+                          ))}
+                          <span className="text-[12px] text-slate-500 ml-1">({product.reviewsCount || 0} đánh giá)</span>
+                        </div>
+
+                        <div className="mt-auto mb-3 font-bold text-red-500 text-lg w-full flex flex-col items-center">
+                          <div className="flex items-baseline justify-center">
+                            {formatPrice(finalPrice)}
+                            {hasDiscount && (
+                              <span className="ml-2 text-sm font-normal text-gray-400 line-through">
+                                {formatPrice(basePrice)}
+                              </span>
+                            )}
+                          </div>
+                          
+                          {totalLimit > 0 && (
+                            <div className="w-full mt-2">
+                              <div className="w-full h-1.5 bg-red-100/50 rounded-full overflow-hidden">
+                                <div className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full" style={{ width: `${progressPercent}%` }} />
+                              </div>
+                              <div className="flex justify-center text-[10px] items-center gap-1.5 font-semibold text-red-500 mt-1">
+                                 <span className="relative flex h-1.5 w-1.5">
+                                   {quantityLeft > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>}
+                                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
+                                 </span>
+                                 {quantityLeft > 0 ? `Còn ${quantityLeft} suất` : "Đã hết suất"}
+                              </div>
+                            </div>
                           )}
                         </div>
                       </Link>

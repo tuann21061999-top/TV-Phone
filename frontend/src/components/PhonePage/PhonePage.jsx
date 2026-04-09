@@ -110,6 +110,10 @@ function PhonePage() {
     let bestBasePrice = Infinity;
     let bestFinalPrice = Infinity;
     let bestDiscountPercent = 0;
+    
+    let isShock = false;
+    let totalLimit = 0;
+    let totalSold = 0;
 
     product.variants.forEach(v => {
       const now = new Date();
@@ -118,6 +122,13 @@ function PhonePage() {
 
       if (v.discountPrice != null && v.promotionEnd && new Date(v.promotionEnd) > now) {
         currentActivePrice = v.discountPrice;
+        if (v.isShockDeal) isShock = true;
+        
+        if (v.quantityLimit > 0) {
+            totalLimit += v.quantityLimit;
+            totalSold += (v.soldQuantity || 0);
+        }
+
         if (v.discountType === "percentage") {
           currentDiscountPercent = v.discountValue;
         } else if (v.discountType === "fixed") {
@@ -135,7 +146,9 @@ function PhonePage() {
     return {
       basePrice: bestBasePrice === Infinity ? 0 : bestBasePrice,
       finalPrice: bestFinalPrice === Infinity ? 0 : bestFinalPrice,
-      discountPercent: bestDiscountPercent
+      discountPercent: bestDiscountPercent,
+      totalLimit,
+      totalSold
     };
   };
 
@@ -412,9 +425,11 @@ function PhonePage() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {currentProducts.map((product) => {
-                  const { basePrice, finalPrice, discountPercent } = getPricingInfo(product);
+                  const { basePrice, finalPrice, discountPercent, totalLimit, totalSold } = getPricingInfo(product);
                   const isDiscount = finalPrice < basePrice;
                   const displayImage = product.colorImages?.find(img => img.isDefault)?.imageUrl || product.colorImages?.[0]?.imageUrl || "/no-image.png";
+                  const quantityLeft = Math.max(0, totalLimit - totalSold);
+                  const progressPercent = totalLimit > 0 ? Math.min((totalSold / totalLimit) * 100, 100) : 0;
 
                   return (
                     <div key={product._id} className="bg-white p-4 rounded-xl text-center transition-all duration-300 flex flex-col border border-slate-200 relative hover:-translate-y-1 hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.1)] hover:border-slate-300 group h-full">
@@ -473,16 +488,30 @@ function PhonePage() {
                             stroke={i < Math.round(product.averageRating || 0) ? "#fbbf24" : "#d1d5db"}
                           />
                         ))}
-                        <span className="text-[12px] text-slate-500 ml-1">({product.reviewsCount || 0})</span>
+                        <span className="text-[12px] text-slate-500 ml-1">({product.reviewsCount || 0} đánh giá)</span>
                       </div>
 
                       {/* Price */}
                       <div className="mt-auto mb-4 flex flex-col items-center min-h-[44px] justify-end">
                         {isDiscount ? (
-                          <>
+                          <div className="flex flex-col items-center w-full">
                             <span className="text-[13px] text-slate-400 line-through mb-0.5">{formatPrice(basePrice)}</span>
                             <span className="text-red-500 font-bold text-[16px] sm:text-[18px]">{formatPrice(finalPrice)}</span>
-                          </>
+                            {totalLimit > 0 && (
+                              <div className="w-full mt-2">
+                                <div className="w-full h-1.5 bg-red-100/50 rounded-full overflow-hidden">
+                                  <div className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full" style={{ width: `${progressPercent}%` }} />
+                                </div>
+                                <div className="flex justify-center text-[10px] items-center gap-1.5 font-semibold text-red-500 mt-1">
+                                   <span className="relative flex h-1.5 w-1.5">
+                                     {quantityLeft > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>}
+                                     <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
+                                   </span>
+                                   {quantityLeft > 0 ? `Còn ${quantityLeft} suất` : "Đã hết suất"}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         ) : (
                           <span className="text-red-500 font-bold text-[16px] sm:text-[18px]">{formatPrice(basePrice)}</span>
                         )}

@@ -55,6 +55,12 @@ exports.importStock = async (req, res) => {
             );
         }
 
+        let warning = undefined;
+        // Bắt lỗi bán lỗ nếu giá nhập kho WAC lố cả giá bán
+        if (newImportPrice > variant.price) {
+            warning = "Cảnh báo: Giá nhập trung bình (WAC) mới hiện lớn hơn giá bán niêm yết (Bán lỗ)! Hãy điều chỉnh lại giá sản phẩm.";
+        }
+
         // ── Cập nhật variant ────────────────────────────────────
         variant.importPrice = newImportPrice;
         variant.quantity = totalQuantity;
@@ -64,6 +70,7 @@ exports.importStock = async (req, res) => {
         // ── Phản hồi kết quả chi tiết ──────────────────────────
         res.status(200).json({
             message: "Nhập hàng thành công!",
+            warning: warning,
             data: {
                 productName: product.name,
                 variantSku: variant.sku,

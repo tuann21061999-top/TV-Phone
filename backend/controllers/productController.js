@@ -64,31 +64,12 @@ exports.getAllProducts = async (req, res) => {
       .populate("categoryId", "name")
       .sort({ createdAt: -1 });
 
-    // Aggregate averageRating + reviewsCount từ reviews collection
-    const reviewStats = await Review.aggregate([
-      { $match: { status: "active" } },
-      {
-        $group: {
-          _id: "$productId",
-          averageRating: { $avg: "$rating" },
-          reviewsCount: { $sum: 1 }
-        }
-      }
-    ]);
-
-    const statsMap = {};
-    reviewStats.forEach(s => {
-      statsMap[s._id.toString()] = {
-        averageRating: Math.round(s.averageRating * 10) / 10,
-        reviewsCount: s.reviewsCount
-      };
-    });
-
+    // Không cần aggregate nữa, vì averageRating và reviewsCount đã được cache sẵn trong Product Model
     const enriched = products.map(p => {
       const obj = p.toObject();
-      const stats = statsMap[p._id.toString()];
-      obj.averageRating = stats ? stats.averageRating : 0;
-      obj.reviewsCount = stats ? stats.reviewsCount : 0;
+      // Đảm bảo không undefined
+      obj.averageRating = obj.averageRating || 0;
+      obj.reviewsCount = obj.reviewsCount || 0;
       return obj;
     });
 

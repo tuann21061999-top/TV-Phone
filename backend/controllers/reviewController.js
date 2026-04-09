@@ -1,5 +1,32 @@
 const Review = require("../models/Review");
 const Order = require("../models/Order");
+const Product = require("../models/Product");
+const mongoose = require("mongoose");
+
+const updateProductReviewStats = async (productId) => {
+  const stats = await Review.aggregate([
+    { $match: { productId: new mongoose.Types.ObjectId(productId), status: "active" } },
+    {
+      $group: {
+        _id: "$productId",
+        averageRating: { $avg: "$rating" },
+        reviewsCount: { $sum: 1 }
+      }
+    }
+  ]);
+
+  if (stats.length > 0) {
+    await Product.findByIdAndUpdate(productId, {
+      averageRating: Math.round(stats[0].averageRating * 10) / 10,
+      reviewsCount: stats[0].reviewsCount
+    });
+  } else {
+    await Product.findByIdAndUpdate(productId, {
+      averageRating: 0,
+      reviewsCount: 0
+    });
+  }
+};
 
 const reviewController = {
   // 1. KIỂM TRA ĐIỀU KIỆN ĐÁNH GIÁ (API MỚI)
@@ -59,6 +86,7 @@ const reviewController = {
       review.comment = comment;
       review.status = "active"; 
       await review.save();
+      await updateProductReviewStats(productId);
       return res.status(200).json({ message: "Cập nhật đánh giá thành công!", review });
     } else {
       // TẠO ĐÁNH GIÁ MỚI
@@ -71,6 +99,7 @@ const reviewController = {
         images: [] // Để mảng trống vì không up ảnh nữa
       });
       await newReview.save();
+      await updateProductReviewStats(productId);
       return res.status(201).json({ message: "Cảm ơn bạn đã đánh giá!", review: newReview });
     }
   } catch (error) {
@@ -105,6 +134,7 @@ const reviewController = {
       const review = await Review.findById(req.params.id);
       review.status = review.status === "active" ? "hidden" : "active";
       await review.save();
+      await updateProductReviewStats(review.productId);
       res.status(200).json({ message: "Cập nhật thành công", review });
     } catch (error) {
       res.status(500).json({ message: "Lỗi cập nhật", error });
@@ -114,7 +144,11 @@ const reviewController = {
   // 6. Admin xóa đánh giá
   deleteReview: async (req, res) => {
     try {
+      const review = await Review.findById(req.params.id);
+      if (!review) return res.status(404).json({ message: "Không tìm thấy đánh giá" });
+      const productId = review.productId;
       await Review.findByIdAndDelete(req.params.id);
+      await updateProductReviewStats(productId);
       res.status(200).json({ message: "Đã xóa đánh giá thành công" });
     } catch (error) {
       res.status(500).json({ message: "Lỗi xóa đánh giá", error });
@@ -136,6 +170,58 @@ const reviewController = {
       res.status(200).json({ message: "Đã trả lời đánh giá", review });
     } catch (error) {
       res.status(500).json({ message: "Lỗi gửi câu trả lời", error });
+    }
+  },
+
+  // 8. ADMIN: Đồng bộ lại averageRating & reviewsCount cho TOÀN BỘ sản phẩm
+  //    Dùng khi dữ liệu bị lệch (có sao nhưng reviewsCount = 0)
+  syncAllReviewStats: async (req, res) => {
+    try {
+      const allProducts = await Product.find({}).select("_id name averageRating reviewsCount");
+      let fixedCount = 0;
+      const mismatchList = [];
+
+      for (const product of allProducts) {
+        const stats = await Review.aggregate([
+          { $match: { productId: product._id, status: "active" } },
+          {
+            $group: {
+              _id: "$productId",
+              averageRating: { $avg: "$rating" },
+              reviewsCount: { $sum: 1 }
+            }
+          }
+        ]);
+
+        const correctAvg = stats.length > 0 ? Math.round(stats[0].averageRating * 10) / 10 : 0;
+        const correctCount = stats.length > 0 ? stats[0].reviewsCount : 0;
+        const currentAvg = product.averageRating || 0;
+        const currentCount = product.reviewsCount || 0;
+
+        if (currentAvg !== correctAvg || currentCount !== correctCount) {
+          mismatchList.push({
+            name: product.name,
+            old: { averageRating: currentAvg, reviewsCount: currentCount },
+            fixed: { averageRating: correctAvg, reviewsCount: correctCount }
+          });
+
+          await Product.findByIdAndUpdate(product._id, {
+            averageRating: correctAvg,
+            reviewsCount: correctCount
+          });
+          fixedCount++;
+        }
+      }
+
+      res.status(200).json({
+        message: `Đồng bộ hoàn tất. Đã sửa ${fixedCount}/${allProducts.length} sản phẩm.`,
+        fixedCount,
+        totalProducts: allProducts.length,
+        details: mismatchList
+      });
+    } catch (error) {
+      console.error("Lỗi sync review stats:", error);
+      res.status(500).json({ message: "Lỗi đồng bộ", error: error.message });
     }
   }
 };

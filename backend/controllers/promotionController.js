@@ -1,5 +1,7 @@
 const Product = require("../models/Product");
 const PromotionModel = require("../models/Promotion");
+const Favorite = require("../models/Favorite");
+const Notification = require("../models/Notification");
 
 const promotionController = {
     /* =====================================================
@@ -93,11 +95,12 @@ const promotionController = {
             let lowestOriginalPrice = Infinity;
             let lowestDiscountedPrice = Infinity;
 
-            // Xoay vòng cập nhật TẤT CẢ variants của sản phẩm
             product.variants.forEach(variant => {
                 let updatedDiscountPrice = null;
                 if (discountType === "fixed") {
-                    if (discountValue < variant.price) {
+                    if (discountValue >= variant.price) {
+                        updatedDiscountPrice = variant.importPrice || 0;
+                    } else {
                         updatedDiscountPrice = variant.price - discountValue;
                     }
                 } else if (discountType === "percentage") {
@@ -237,7 +240,7 @@ const promotionController = {
                 query["variants"].$elemMatch.isShockDeal = true;
             }
 
-            const products = await Product.find(query).select("name slug brand colorImages variants condition productType");
+            const products = await Product.find(query).select("name slug brand colorImages variants condition productType averageRating reviewsCount");
 
             const filteredProducts = products.map(p => {
                 const doc = p.toObject();
@@ -281,7 +284,7 @@ const promotionController = {
             activePromos.forEach(p => {
                 const percent = p.originalPrice > 0 ? ((p.originalPrice - p.discountedPrice) / p.originalPrice) * 100 : 0;
                 const bestPercent = bestPromo.originalPrice > 0 ? ((bestPromo.originalPrice - bestPromo.discountedPrice) / bestPromo.originalPrice) * 100 : 0;
-                
+
                 if (percent > bestPercent) {
                     bestPromo = p;
                 }

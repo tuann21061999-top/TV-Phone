@@ -49,6 +49,9 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
     let bestBasePrice = Infinity;
     let bestFinalPrice = Infinity;
     let bestDiscountPercent = 0;
+    let isShock = false;
+    let totalLimit = 0;
+    let totalSold = 0;
 
     product.variants.forEach(v => {
       const now = new Date();
@@ -57,6 +60,14 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
 
       if (v.discountPrice != null && v.promotionEnd && new Date(v.promotionEnd) > now) {
         currentActivePrice = v.discountPrice;
+        if (v.isShockDeal) isShock = true;
+        
+        // Summing limits for discounted variants
+        if (v.quantityLimit > 0) {
+            totalLimit += v.quantityLimit;
+            totalSold += (v.soldQuantity || 0);
+        }
+
         if (v.discountType === "percentage") {
           currentDiscountPercent = v.discountValue;
         } else if (v.discountType === "fixed") {
@@ -74,12 +85,17 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
     return {
       basePrice: bestBasePrice === Infinity ? 0 : bestBasePrice,
       finalPrice: bestFinalPrice === Infinity ? 0 : bestFinalPrice,
-      discountPercent: bestDiscountPercent
+      discountPercent: bestDiscountPercent,
+      isShockDeal: isShock,
+      totalLimit,
+      totalSold
     };
   };
 
-  const { basePrice, finalPrice, discountPercent } = getPricingInfo();
+  const { basePrice, finalPrice, discountPercent, isShockDeal, totalLimit, totalSold } = getPricingInfo();
   const isDiscounted = finalPrice < basePrice;
+  const quantityLeft = Math.max(0, totalLimit - totalSold);
+  const progressPercent = totalLimit > 0 ? Math.min((totalSold / totalLimit) * 100, 100) : 0;
 
   return (
     <div
@@ -133,15 +149,29 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
               />
             ))}
           </div>
-          <span className="text-xs text-gray-400">({product.reviewsCount || 0})</span>
+          <span className="text-xs text-gray-400">({product.reviewsCount || 0} đánh giá)</span>
         </div>
 
         <div className="flex justify-between items-end mt-auto">
-          <div className="flex flex-col gap-0.5">
+          <div className="flex flex-col gap-0.5 w-full">
             {isDiscounted ? (
               <>
                 <span className="text-xs text-gray-400 line-through">{formatPrice(basePrice)}</span>
-                <span className="text-lg font-bold text-gray-900">{formatPrice(finalPrice)}</span>
+                <span className="text-lg font-bold text-red-500">{formatPrice(finalPrice)}</span>
+                {totalLimit > 0 && (
+                  <div className="w-full mt-2">
+                    <div className="w-full h-1.5 bg-red-100/50 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full" style={{ width: `${progressPercent}%` }} />
+                    </div>
+                    <div className="flex justify-start text-[10px] items-center gap-1.5 font-semibold text-red-500 mt-1">
+                       <span className="relative flex h-1.5 w-1.5">
+                         {quantityLeft > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>}
+                         <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
+                       </span>
+                       {quantityLeft > 0 ? `Còn ${quantityLeft} suất` : "Đã hết suất"}
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <span className="text-lg font-bold text-gray-900">{formatPrice(basePrice)}</span>
