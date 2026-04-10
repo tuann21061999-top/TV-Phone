@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, Trash2, Save, X, Edit3, Eye, EyeOff, Search, Settings, ImageIcon, Layers, Zap, ListPlus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Trash2, Save, X, Edit3, Eye, EyeOff, Search, Settings, ImageIcon, Layers, Zap, ListPlus, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { useProductManager } from "./useProductManager";
 import BulkActionsPanel from "./BulkActionsPanel";
