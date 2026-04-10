@@ -61,7 +61,7 @@ const CheckoutPage = () => {
   const fetchUserProfile = async (token) => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
-      const userRes = await axios.get("http://localhost:5000/api/users/profile", { headers });
+      const userRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/profile`, { headers });
 
       // ĐOẠN CODE BỊ THIẾU ĐỂ LƯU ĐỊA CHỈ:
       const user = userRes.data;
@@ -93,7 +93,7 @@ const CheckoutPage = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) return;
-      const { data } = await axios.get("http://localhost:5000/api/vouchers/my-vouchers", {
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/vouchers/my-vouchers`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMyVouchers(data || []);
@@ -126,7 +126,7 @@ const CheckoutPage = () => {
         if (location.state?.isBuyNow) {
           setCheckoutItems(location.state.items);
         } else {
-          const cartRes = await axios.get("http://localhost:5000/api/cart", { headers });
+          const cartRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/cart`, { headers });
           if (!cartRes.data || cartRes.data.items.length === 0) {
             toast.error("Giỏ hàng trống!");
             navigate("/cart");
@@ -206,7 +206,7 @@ const CheckoutPage = () => {
     try {
       const token = localStorage.getItem("token");
       const tokenHeader = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.post("http://localhost:5000/api/users/address", addressData, tokenHeader);
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/users/address`, addressData, tokenHeader);
       toast.success("Thêm địa chỉ thành công!");
       setShowAddressModal(false);
       await fetchUserProfile(token);
@@ -228,7 +228,7 @@ const CheckoutPage = () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:5000/api/vouchers/apply",
+        `${import.meta.env.VITE_API_URL}/api/vouchers/apply`,
         { code, orderTotal: subTotal },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -289,7 +289,7 @@ const CheckoutPage = () => {
       const token = localStorage.getItem("token");
 
       // 1. Tạo đơn hàng
-      const res = await axios.post("http://localhost:5000/api/orders/checkout", orderPayload, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/orders/checkout`, orderPayload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

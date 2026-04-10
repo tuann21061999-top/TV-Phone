@@ -22,7 +22,7 @@ const ManageTags = () => {
   const fetchTags = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5000/api/tags');
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/tags`);
       setTags(res.data);
     } catch (error) {
       toast.error('Lỗi khi tải danh sách tags');
@@ -34,7 +34,7 @@ const ManageTags = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/categories');
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories`);
       setCategories(res.data);
     } catch (error) {
       console.error('Lỗi tải categories:', error);
@@ -87,10 +87,10 @@ const ManageTags = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       if (editingTag) {
-        await axios.put(`http://localhost:5000/api/tags/${editingTag._id}`, formData, config);
+        await axios.put(`${import.meta.env.VITE_API_URL}/api/tags/${editingTag._id}`, formData, config);
         toast.success('Cập nhật tag thành công');
       } else {
-        await axios.post('http://localhost:5000/api/tags', formData, config);
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/tags`, formData, config);
         toast.success('Tạo tag mới thành công');
       }
       handleCloseModal();
@@ -104,7 +104,7 @@ const ManageTags = () => {
     if (!window.confirm('Bạn có chắc chắn muốn xóa tag này?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/tags/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/tags/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Xóa tag thành công');

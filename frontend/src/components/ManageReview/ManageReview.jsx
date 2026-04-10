@@ -16,7 +16,7 @@ const ManageReview = () => {
   const fetchReviews = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/reviews/admin/all", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/reviews/admin/all`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setReviews(res.data);
@@ -32,7 +32,7 @@ const ManageReview = () => {
   const toggleStatus = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/api/reviews/admin/${id}/toggle-status`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/reviews/admin/${id}/toggle-status`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Đã thay đổi trạng thái hiển thị");
       fetchReviews();
     } catch (error) { toast.error("Lỗi khi thay đổi trạng thái"); }
@@ -42,7 +42,7 @@ const ManageReview = () => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa vĩnh viễn đánh giá này?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/reviews/admin/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/reviews/admin/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Đã xóa đánh giá thành công");
       fetchReviews();
     } catch (error) { toast.error("Lỗi khi xóa đánh giá"); }
@@ -61,7 +61,7 @@ const ManageReview = () => {
     if (!replyText.trim()) { toast.error("Vui lòng nhập câu trả lời"); return; }
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/api/reviews/admin/${id}/reply`, { reply: replyText }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/reviews/admin/${id}/reply`, { reply: replyText }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Đã gửi phản hồi thành công!");
       setReplyingId(null); 
       setReplyText(""); 

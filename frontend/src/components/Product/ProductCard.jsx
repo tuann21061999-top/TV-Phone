@@ -28,7 +28,7 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
 
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/favorites/toggle",
+        `${import.meta.env.VITE_API_URL}/api/favorites/toggle`,
         { productId: product._id },
         { headers: { Authorization: `Bearer ${token}` } }
       );

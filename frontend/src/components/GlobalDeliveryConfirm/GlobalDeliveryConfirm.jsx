@@ -11,7 +11,7 @@ const GlobalDeliveryConfirm = () => {
     if (!token) return;
 
     try {
-      const res = await axios.get("http://localhost:5000/api/orders/notifications/pending-delivery", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/orders/notifications/pending-delivery`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPendingOrders(res.data);
@@ -33,7 +33,7 @@ const GlobalDeliveryConfirm = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/orders/${orderId}/confirm-delivery`,
+        `${import.meta.env.VITE_API_URL}/api/orders/${orderId}/confirm-delivery`,
         { isAccepted },
         { headers: { Authorization: `Bearer ${token}` } }
       );

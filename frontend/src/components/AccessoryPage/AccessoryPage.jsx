@@ -68,7 +68,7 @@ function AccessoriesPage() {
       try {
         setLoading(true);
         const { data } = await axios.get(
-          "http://localhost:5000/api/products?productType=accessory"
+          `${import.meta.env.VITE_API_URL}/api/products?productType=accessory`
         );
 
         const accessories = data.filter(
@@ -88,7 +88,7 @@ function AccessoriesPage() {
     // Fetch favorites nếu đã đăng nhập
     const token = localStorage.getItem("token");
     if (token) {
-      axios.get("http://localhost:5000/api/favorites", {
+      axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         const ids = new Set(res.data.map(p => p._id));
@@ -108,7 +108,7 @@ function AccessoriesPage() {
     }
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/favorites/toggle",
+        `${import.meta.env.VITE_API_URL}/api/favorites/toggle`,
         { productId },
         { headers: { Authorization: `Bearer ${token}` } }
       );

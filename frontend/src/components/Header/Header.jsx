@@ -38,7 +38,7 @@ function Header() {
       if (searchTerm.trim()) {
         setIsSearching(true);
         try {
-          const { data } = await axios.get(`http://localhost:5000/api/products?search=${encodeURIComponent(searchTerm.trim())}`);
+          const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products?search=${encodeURIComponent(searchTerm.trim())}`);
 
           // THUẬT TOÁN ƯU TIÊN ĐIỆN THOẠI TRƯỚC
           const sortedData = data.sort((a, b) => {
@@ -85,7 +85,7 @@ function Header() {
         return;
       }
       try {
-        const { data } = await axios.get("http://localhost:5000/api/cart", {
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/cart`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCartCount(data.items?.length || 0);
@@ -97,7 +97,7 @@ function Header() {
     const fetchUserProfile = async () => {
       if (!token) return;
       try {
-        const { data } = await axios.get("http://localhost:5000/api/users/profile", {
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(data);
@@ -109,7 +109,7 @@ function Header() {
     const fetchNotifications = async () => {
       if (!token) return;
       try {
-        const { data } = await axios.get("http://localhost:5000/api/notifications", {
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/notifications`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setNotifications(data.notifications || []);
@@ -130,7 +130,7 @@ function Header() {
   const handleNotificationClick = async (notif) => {
     try {
       if (!notif.isRead) {
-        await axios.put(`http://localhost:5000/api/notifications/${notif._id}/read`, {}, {
+        await axios.put(`${import.meta.env.VITE_API_URL}/api/notifications/${notif._id}/read`, {}, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUnreadNotifyCount(prev => Math.max(0, prev - 1));

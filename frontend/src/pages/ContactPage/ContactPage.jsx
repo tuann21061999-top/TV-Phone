@@ -21,7 +21,7 @@ function ContactPage() {
   const fetchMyFeedbacks = useCallback(async () => {
     try {
       setLoadingHistory(true);
-      const res = await axios.get("http://localhost:5000/api/feedbacks/mine", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/feedbacks/mine`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMyFeedbacks(res.data);
@@ -53,7 +53,7 @@ function ContactPage() {
     setIsSubmitting(true);
     try {
       const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-      await axios.post("http://localhost:5000/api/feedbacks", formData, config);
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/feedbacks`, formData, config);
       toast.success("Gửi lời nhắn thành công. Chúng tôi sẽ sớm liên hệ!");
       setFormData({ name: "", email: "", subject: "", message: "" });
 

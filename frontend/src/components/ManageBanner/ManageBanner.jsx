@@ -33,7 +33,7 @@ const ManageBanner = () => {
   const fetchProducts = async () => {
     try {
       // Gọi API lấy danh sách sản phẩm (Tùy theo endpoint của bạn, ví dụ ở đây là /api/products)
-      const res = await axios.get("http://localhost:5000/api/products");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
       // Giả sử API trả về mảng sản phẩm nằm trong res.data hoặc res.data.products
       setProducts(res.data.products || res.data); 
     } catch (error) {
@@ -44,7 +44,7 @@ const ManageBanner = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/banners/admin/all", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/banners/admin/all`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBanners(res.data);
@@ -133,10 +133,10 @@ const ManageBanner = () => {
       };
 
       if (isEditing) {
-        await axios.put(`http://localhost:5000/api/banners/admin/${editId}`, submitData, config);
+        await axios.put(`${import.meta.env.VITE_API_URL}/api/banners/admin/${editId}`, submitData, config);
         toast.success("Cập nhật Banner thành công!");
       } else {
-        await axios.post("http://localhost:5000/api/banners/admin", submitData, config);
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/banners/admin`, submitData, config);
         toast.success("Thêm Banner thành công!");
       }
       setShowModal(false);
@@ -157,7 +157,7 @@ const ManageBanner = () => {
   const toggleStatus = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/api/banners/admin/${id}/toggle-status`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/banners/admin/${id}/toggle-status`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Thay đổi trạng thái thành công!");
       fetchBanners();
     } catch (error) { toast.error("Lỗi khi thay đổi trạng thái!"); }
@@ -167,7 +167,7 @@ const ManageBanner = () => {
     if (!window.confirm("Bạn có chắc muốn xóa vĩnh viễn banner này?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/banners/admin/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/banners/admin/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success("Xóa banner thành công!");
       fetchBanners();
     } catch (error) { toast.error("Lỗi khi xóa!"); }

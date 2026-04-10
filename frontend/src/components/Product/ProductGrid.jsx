@@ -16,7 +16,7 @@ function ProductGrid() {
       try {
         setLoading(true);
         // Lấy tất cả sản phẩm
-        const res = await axios.get("http://localhost:5000/api/products");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
         const allProducts = Array.isArray(res.data) ? res.data : res.data.data || [];
 
         // Chỉ lấy các sản phẩm HOT (Nổi bật)
@@ -33,7 +33,7 @@ function ProductGrid() {
     // Lấy danh sách yêu thích nếu đã đăng nhập
     const token = localStorage.getItem("token");
     if (token) {
-      axios.get("http://localhost:5000/api/favorites", {
+      axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         const ids = new Set(res.data.map(p => p._id));

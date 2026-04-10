@@ -30,7 +30,7 @@ function ManageVoucher() {
     /* =============== FETCH =============== */
     const fetchVouchers = async () => {
         try {
-            const { data } = await axios.get("http://localhost:5000/api/vouchers/admin", { headers });
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/vouchers/admin`, { headers });
             setVouchers(data);
         } catch (error) {
             toast.error("Lỗi tải danh sách voucher!");
@@ -98,10 +98,10 @@ function ManageVoucher() {
 
         try {
             if (editingId) {
-                await axios.put(`http://localhost:5000/api/vouchers/admin/${editingId}`, payload, { headers });
+                await axios.put(`${import.meta.env.VITE_API_URL}/api/vouchers/admin/${editingId}`, payload, { headers });
                 toast.success("Cập nhật voucher thành công!");
             } else {
-                await axios.post("http://localhost:5000/api/vouchers/admin", payload, { headers });
+                await axios.post(`${import.meta.env.VITE_API_URL}/api/vouchers/admin`, payload, { headers });
                 toast.success("Tạo voucher thành công!");
             }
             setShowModal(false);
@@ -116,7 +116,7 @@ function ManageVoucher() {
         if (!window.confirm("Bạn chắc chắn muốn xóa voucher này?")) return;
 
         try {
-            await axios.delete(`http://localhost:5000/api/vouchers/admin/${id}`, { headers });
+            await axios.delete(`${import.meta.env.VITE_API_URL}/api/vouchers/admin/${id}`, { headers });
             toast.success("Xóa voucher thành công!");
             fetchVouchers();
         } catch (error) {

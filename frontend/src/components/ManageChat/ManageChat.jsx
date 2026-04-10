@@ -4,7 +4,7 @@ import axios from "axios";
 import { Search, Send, MessageSquare, User, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
-const SOCKET_URL = "http://localhost:5000";
+const SOCKET_URL = `${import.meta.env.VITE_API_URL}`;
 
 function ManageChat() {
     const [conversations, setConversations] = useState([]);
@@ -29,7 +29,7 @@ function ManageChat() {
     useEffect(() => {
         const init = async () => {
             try {
-                const { data } = await axios.get("http://localhost:5000/api/users/profile", { headers });
+                const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/profile`, { headers });
                 setAdminId(data._id);
 
                 // Kết nối socket
@@ -74,7 +74,7 @@ function ManageChat() {
     const fetchConversations = async (tabStr = activeTab) => {
         try {
             const { data } = await axios.get(
-                `http://localhost:5000/api/chat/admin/conversations?tab=${tabStr}`,
+                `${import.meta.env.VITE_API_URL}/api/chat/admin/conversations?tab=${tabStr}`,
                 { headers }
             );
             setConversations(data);
@@ -91,13 +91,13 @@ function ManageChat() {
 
         try {
             const { data } = await axios.get(
-                `http://localhost:5000/api/chat/conversation/${userId}`,
+                `${import.meta.env.VITE_API_URL}/api/chat/conversation/${userId}`,
                 { headers }
             );
             setMessages(data);
 
             // Đánh dấu đã đọc
-            await axios.put(`http://localhost:5000/api/chat/mark-read/${userId}`, {}, { headers });
+            await axios.put(`${import.meta.env.VITE_API_URL}/api/chat/mark-read/${userId}`, {}, { headers });
 
             // Cập nhật unread count
             setConversations((prev) =>
@@ -114,7 +114,7 @@ function ManageChat() {
         if (!window.confirm("Bạn có chắc chắn muốn kết thúc và xóa toàn bộ dữ liệu trò chuyện này?")) return;
 
         try {
-            await axios.delete(`http://localhost:5000/api/chat/admin/conversation/${selectedUserId}`, { headers });
+            await axios.delete(`${import.meta.env.VITE_API_URL}/api/chat/admin/conversation/${selectedUserId}`, { headers });
             toast.success("Đã xóa và kết thúc trò chuyện thành công");
             setSelectedUserId(null);
             setSelectedUserName("");

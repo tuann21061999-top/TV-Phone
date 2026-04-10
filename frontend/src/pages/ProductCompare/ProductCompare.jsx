@@ -25,8 +25,8 @@ function ProductCompare() {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const fetchP1 = p1Slug ? axios.get(`http://localhost:5000/api/products/${p1Slug}`) : Promise.resolve({ data: null });
-        const fetchP2 = p2Slug ? axios.get(`http://localhost:5000/api/products/${p2Slug}`) : Promise.resolve({ data: null });
+        const fetchP1 = p1Slug ? axios.get(`${import.meta.env.VITE_API_URL}/api/products/${p1Slug}`) : Promise.resolve({ data: null });
+        const fetchP2 = p2Slug ? axios.get(`${import.meta.env.VITE_API_URL}/api/products/${p2Slug}`) : Promise.resolve({ data: null });
 
         const [res1, res2] = await Promise.all([fetchP1, fetchP2]);
         setProduct1(res1.data?.data || res1.data);
@@ -48,7 +48,7 @@ function ProductCompare() {
         debounceTimer = setTimeout(async () => {
             try {
                 // Giới hạn tìm kiếm là điện thoại để so sánh cho đồng bộ
-                const res = await axios.get(`http://localhost:5000/api/products?search=${searchCompare}&type=device`);
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products?search=${searchCompare}&type=device`);
                 const otherSlug = activeSearchSlot === 'p1' ? p2Slug : p1Slug;
                 const filtered = (res.data || []).filter(p => p.slug !== otherSlug).slice(0, 10);
                 setCompareResults(filtered);

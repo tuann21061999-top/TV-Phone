@@ -14,7 +14,7 @@ function Promotion() {
   useEffect(() => {
     const fetchBestPromotion = async () => {
       try {
-        const { data } = await axios.get("http://localhost:5000/api/promotions/public/best");
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/promotions/public/best`);
         if (data) {
           setBestProduct(data);
           

@@ -29,7 +29,7 @@ export default function BulkActionsPanel({ selectedIds, clearSelection, refreshD
     const loadingToast = toast.loading("Đang xử lý hàng loạt...");
     try {
       if (actionType === 'delete') {
-        await axios.delete("http://localhost:5000/api/products/bulk-delete", {
+        await axios.delete(`${import.meta.env.VITE_API_URL}/api/products/bulk-delete`, {
           headers: { Authorization: `Bearer ${token}` },
           data: { productIds: selectedIds }
         });
@@ -40,7 +40,7 @@ export default function BulkActionsPanel({ selectedIds, clearSelection, refreshD
         if (actionType === 'tags') updateData.tags = selectedTags;
         if (actionType === 'compatible') updateData.compatibleWith = selectedCompatible;
 
-        await axios.put("http://localhost:5000/api/products/bulk-update", {
+        await axios.put(`${import.meta.env.VITE_API_URL}/api/products/bulk-update`, {
           productIds: selectedIds,
           updateData
         }, {

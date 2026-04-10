@@ -50,7 +50,7 @@ function Navbar() {
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const { data } = await axios.get("http://localhost:5000/api/products");
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
         if (data && Array.isArray(data)) {
           const devices = data.filter(p => p.productType === "device").map(p => p.brand);
           const electronics = data.filter(p => p.productType === "electronic").map(p => p.brand);

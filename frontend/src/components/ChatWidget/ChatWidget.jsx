@@ -4,7 +4,7 @@ import axios from "axios";
 import { MessageCircle, X, Send, Headphones } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const SOCKET_URL = "http://localhost:5000";
+const SOCKET_URL = `${import.meta.env.VITE_API_URL}`;
 
 function ChatWidget() {
     const navigate = useNavigate();
@@ -34,7 +34,7 @@ function ChatWidget() {
 
         const fetchUser = async () => {
             try {
-                const { data } = await axios.get("http://localhost:5000/api/users/profile", {
+                const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -89,21 +89,21 @@ function ChatWidget() {
                 const headers = { Authorization: `Bearer ${token}` };
 
                 // 1. Lấy admin đầu tiên
-                const adminRes = await axios.get("http://localhost:5000/api/chat/admins", { headers });
+                const adminRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/chat/admins`, { headers });
                 if (adminRes.data.length === 0) return;
                 const admin = adminRes.data[0];
                 setAdminId(admin._id);
 
                 // 2. Lấy lịch sử chat
                 const chatRes = await axios.get(
-                    `http://localhost:5000/api/chat/conversation/${admin._id}`,
+                    `${import.meta.env.VITE_API_URL}/api/chat/conversation/${admin._id}`,
                     { headers }
                 );
                 setMessages(chatRes.data);
                 setHasUnread(false);
 
                 // 3. Đánh dấu đã đọc
-                await axios.put(`http://localhost:5000/api/chat/mark-read/${admin._id}`, {}, { headers });
+                await axios.put(`${import.meta.env.VITE_API_URL}/api/chat/mark-read/${admin._id}`, {}, { headers });
             } catch (error) {
                 console.error("Lỗi init chat:", error);
             } finally {
@@ -141,7 +141,7 @@ function ChatWidget() {
                     text: m.content
                 }));
 
-                const res = await axios.post("http://localhost:5000/api/ai/chat", {
+                const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/ai/chat`, {
                     message: userMsg,
                     history: history
                 });

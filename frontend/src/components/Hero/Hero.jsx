@@ -10,7 +10,7 @@ function Hero() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/banners"); 
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/banners`); 
         setBanners(res.data);
       } catch (error) {
         console.error("Lỗi khi lấy banner:", error);

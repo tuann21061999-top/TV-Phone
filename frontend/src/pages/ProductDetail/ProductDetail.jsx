@@ -51,7 +51,7 @@ function ProductDetail() {
       try {
         setLoading(true);
         const res = await axios.get(
-          `http://localhost:5000/api/products/${slug}`
+          `${import.meta.env.VITE_API_URL}/api/products/${slug}`
         );
         const data = res.data.data || res.data;
         setProduct(data);
@@ -91,7 +91,7 @@ function ProductDetail() {
         const token = localStorage.getItem("token");
         if (token && data && data._id) {
           axios.post(
-            "http://localhost:5000/api/view-history/record",
+            `${import.meta.env.VITE_API_URL}/api/view-history/record`,
             { productId: data._id, productName: data.name },
             { headers: { Authorization: `Bearer ${token}` } }
           ).catch(err => console.error("Lỗi lưu lịch sử xem:", err));
@@ -111,7 +111,7 @@ function ProductDetail() {
     if (!product) return;
     const token = localStorage.getItem("token");
     if (token) {
-      axios.get("http://localhost:5000/api/favorites", {
+      axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         const favIds = new Set(res.data.map(p => p._id));
@@ -130,7 +130,7 @@ function ProductDetail() {
     }
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/favorites/toggle",
+        `${import.meta.env.VITE_API_URL}/api/favorites/toggle`,
         { productId: product._id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -385,7 +385,7 @@ function ProductDetail() {
         conditionLevel: selectedCondition || null
       };
       const res = await axios.post(
-        "http://localhost:5000/api/cart/add",
+        `${import.meta.env.VITE_API_URL}/api/cart/add`,
         cartData,
         {
           headers: { Authorization: `Bearer ${token}` }

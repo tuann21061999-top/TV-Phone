@@ -50,7 +50,7 @@ function PhonePage() {
       try {
         setLoading(true);
         const res = await axios.get(
-          "http://localhost:5000/api/products?productType=device"
+          `${import.meta.env.VITE_API_URL}/api/products?productType=device`
         );
 
         const devices = res.data.filter(p => p.productType === "device");
@@ -67,7 +67,7 @@ function PhonePage() {
     // Fetch favorites nếu đã đăng nhập
     const token = localStorage.getItem("token");
     if (token) {
-      axios.get("http://localhost:5000/api/favorites", {
+      axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         const ids = new Set(res.data.map(p => p._id));
@@ -86,7 +86,7 @@ function PhonePage() {
     }
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/favorites/toggle",
+        `${import.meta.env.VITE_API_URL}/api/favorites/toggle`,
         { productId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
