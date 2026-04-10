@@ -29,7 +29,7 @@ const ManageOrder = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/orders/admin/all", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/orders/admin/all`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setOrders(res.data);
@@ -51,7 +51,7 @@ const ManageOrder = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/orders/admin/${orderId}/status`,
+        `${import.meta.env.VITE_API_URL}/api/orders/admin/${orderId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -69,7 +69,7 @@ const ManageOrder = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/orders/admin/${orderId}/return-action`,
+        `${import.meta.env.VITE_API_URL}/api/orders/admin/${orderId}/return-action`,
         { action, rejectReason: reason },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -283,7 +283,7 @@ const ManageOrder = () => {
                     <button className="border-none py-2 px-5 rounded-lg text-[13px] font-bold cursor-pointer text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm" onClick={async () => {
                       try {
                         const token = localStorage.getItem("token");
-                        await axios.put(`http://localhost:5000/api/orders/admin/${order._id}/notify-delivery`, {}, {
+                        await axios.put(`${import.meta.env.VITE_API_URL}/api/orders/admin/${order._id}/notify-delivery`, {}, {
                           headers: { Authorization: `Bearer ${token}` }
                         });
                         toast.success("Đã gửi yêu cầu xác nhận cho khách!");

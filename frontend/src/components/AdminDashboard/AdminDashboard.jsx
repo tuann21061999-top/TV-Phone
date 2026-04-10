@@ -28,8 +28,8 @@ const AdminDashboard = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const [dashRes, favRes] = await Promise.all([
-        axios.get(`http://localhost:5000/api/orders/admin/stats/dashboard?period=${filterPeriod}&year=${filterYear}&month=${filterMonth}&topProductLimit=${topProductLimit}`, { headers }),
-        axios.get("http://localhost:5000/api/favorites/admin/stats", { headers }).catch(() => ({ data: [] })),
+        axios.get(`${import.meta.env.VITE_API_URL}/api/orders/admin/stats/dashboard?period=${filterPeriod}&year=${filterYear}&month=${filterMonth}&topProductLimit=${topProductLimit}`, { headers }),
+        axios.get(`${import.meta.env.VITE_API_URL}/api/favorites/admin/stats`, { headers }).catch(() => ({ data: [] })),
       ]);
 
       setData(dashRes.data);

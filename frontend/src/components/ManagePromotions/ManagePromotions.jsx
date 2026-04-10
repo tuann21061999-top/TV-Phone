@@ -24,7 +24,7 @@ const ManagePromotions = () => {
         try {
             setLoading(true);
             const token = localStorage.getItem("token");
-            const res = await axios.get("http://localhost:5000/api/promotions/admin/promotions", {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/promotions/admin/promotions`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPromotions(res.data);
@@ -96,7 +96,7 @@ const ManagePromotions = () => {
             const token = localStorage.getItem("token");
             // Gọi API cấp sản phẩm (không có variantId nữa)
             const res = await axios.put(
-                `http://localhost:5000/api/promotions/admin/promotions/${selectedProduct.productId}`,
+                `${import.meta.env.VITE_API_URL}/api/promotions/admin/promotions/${selectedProduct.productId}`,
                 { discountType, discountValue: Number(discountValue), promotionEnd, isShockDeal, quantityLimit: Number(quantityLimit) || 0 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -120,7 +120,7 @@ const ManagePromotions = () => {
             const token = localStorage.getItem("token");
             // Gọi API cấp sản phẩm reset
             await axios.put(
-                `http://localhost:5000/api/promotions/admin/promotions/${product.productId}/reset`,
+                `${import.meta.env.VITE_API_URL}/api/promotions/admin/promotions/${product.productId}/reset`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );

@@ -127,8 +127,8 @@ const Promotions = () => {
         const fetchPromotions = async () => {
             try {
                 setLoading(true);
-                const resAll = await axios.get("http://localhost:5000/api/promotions/public/promotions?type=all");
-                const resShock = await axios.get("http://localhost:5000/api/promotions/public/promotions?type=shock");
+                const resAll = await axios.get(`${import.meta.env.VITE_API_URL}/api/promotions/public/promotions?type=all`);
+                const resShock = await axios.get(`${import.meta.env.VITE_API_URL}/api/promotions/public/promotions?type=shock`);
 
                 setAllPromotions(resAll.data);
                 

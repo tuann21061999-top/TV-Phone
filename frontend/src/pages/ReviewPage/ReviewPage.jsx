@@ -15,7 +15,7 @@ function ReviewPage() {
         const fetchProduct = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`http://localhost:5000/api/products/${slug}`);
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products/${slug}`);
                 setProduct(res.data.data || res.data);
             } catch (error) {
                 console.error("Lỗi lấy thông tin sản phẩm:", error);

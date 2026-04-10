@@ -6,7 +6,7 @@ import {
     Type, ArrowUp, ArrowDown, Link2
 } from "lucide-react";
 
-const API = "http://localhost:5000/api";
+const API = `${import.meta.env.VITE_API_URL}/api`;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const CATEGORIES = ["Đánh giá", "Mẹo hay", "Thị trường", "Khuyến mãi", "Thủ thuật", "Custom ROM", "Khác"];
 

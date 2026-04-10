@@ -17,7 +17,7 @@ function NewsDetail() {
         const fetchArticle = async () => {
             try {
                 setLoading(true);
-                const { data } = await axios.get(`http://localhost:5000/api/news/${slug}`);
+                const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/news/${slug}`);
                 setArticle(data.article);
                 setRelatedArticles(data.relatedArticles || []);
             } catch (error) {

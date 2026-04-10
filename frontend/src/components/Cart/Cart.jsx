@@ -28,7 +28,7 @@ const Cart = () => {
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/cart", fetchOptions);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/cart`, fetchOptions);
         const data = await res.json();
         setCart(data);
       } catch (err) {
@@ -42,7 +42,7 @@ const Cart = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-        const { data } = await axios.get("http://localhost:5000/api/vouchers/my-vouchers", {
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/vouchers/my-vouchers`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setMyVouchers(data || []);
@@ -61,7 +61,7 @@ const Cart = () => {
     if (!code) return;
     setApplying(true);
     try {
-      const { data } = await axios.post("http://localhost:5000/api/vouchers/apply", {
+      const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/vouchers/apply`, {
         code,
         orderTotal: cart.total
       }, {
@@ -88,7 +88,7 @@ const Cart = () => {
   const handleUpdateQuantity = async (itemId, newQty) => {
     if (newQty < 1) return;
     try {
-      const res = await fetch("http://localhost:5000/api/cart/update", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/cart/update`, {
         ...fetchOptions,
         method: "PUT",
         body: JSON.stringify({ itemId, quantity: newQty }),
@@ -104,7 +104,7 @@ const Cart = () => {
   const handleRemoveItem = async (itemId) => {
     if (!window.confirm("Bạn có muốn xóa sản phẩm này?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/cart/remove/${itemId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/cart/remove/${itemId}`, {
         ...fetchOptions,
         method: "DELETE",
       });

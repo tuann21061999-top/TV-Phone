@@ -24,7 +24,7 @@ const ProductReview = ({ productId }) => {
   // Fetch Danh sách Reviews
   const fetchReviews = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/reviews/${productId}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/reviews/${productId}`);
       setReviews(res.data);
     } catch (error) {
       console.error("Lỗi tải đánh giá:", error);
@@ -44,7 +44,7 @@ const ProductReview = ({ productId }) => {
     }
 
     try {
-      const res = await axios.get(`http://localhost:5000/api/reviews/check-eligibility/${productId}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/reviews/check-eligibility/${productId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -87,7 +87,7 @@ const ProductReview = ({ productId }) => {
     setIsSubmitting(true);
     try {
       // GỬI DỮ LIỆU DẠNG JSON (BỎ FORM DATA VÀ IMAGE)
-      await axios.post("http://localhost:5000/api/reviews", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/reviews`, {
         productId,
         rating,
         comment

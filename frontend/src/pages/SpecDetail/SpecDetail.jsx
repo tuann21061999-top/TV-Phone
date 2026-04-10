@@ -32,7 +32,7 @@ function SpecDetail() {
         const fetchProduct = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`http://localhost:5000/api/products/${slug}`);
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products/${slug}`);
                 setProduct(res.data.data || res.data);
             } catch (error) {
                 console.error("Lỗi lấy thông số chi tiết:", error);
@@ -50,7 +50,7 @@ function SpecDetail() {
             debounceTimer = setTimeout(async () => {
                 try {
                     const typeParam = product?.productType === 'device' ? '&type=device' : '';
-                    const res = await axios.get(`http://localhost:5000/api/products?search=${searchCompare}${typeParam}`);
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/products?search=${searchCompare}${typeParam}`);
                     // Filter out the current product from search results, increase limit to 15
                     const filtered = (res.data || []).filter(p => p.slug !== slug).slice(0, 15);
                     setCompareResults(filtered);

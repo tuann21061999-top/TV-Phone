@@ -17,7 +17,7 @@ function News() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const { data } = await axios.get("http://localhost:5000/api/news");
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/news`);
         setNewsList(data);
       } catch (error) {
         toast.error("Không thể tải danh sách tin tức");

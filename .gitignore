@@ -33,3 +33,7 @@ skills-lock.json
 
 # Documentation
 system_architecture.md
+
+# Frontend ENV
+frontend/.env
+frontend/.env.production

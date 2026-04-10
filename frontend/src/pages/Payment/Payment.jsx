@@ -34,7 +34,7 @@ const Payment = () => {
       }
 
       const { data } = await axios.post(
-        "http://localhost:5000/api/payments/create-payment",
+        `${import.meta.env.VITE_API_URL}/api/payments/create-payment`,
         {
           orderId,
           paymentMethod: activePaymentMethod

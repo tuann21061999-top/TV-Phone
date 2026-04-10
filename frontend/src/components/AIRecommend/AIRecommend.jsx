@@ -13,7 +13,7 @@ const AIRecommend = () => {
         const fetchRecommendations = async () => {
             try {
                 const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-                const { data } = await axios.get("http://localhost:5000/api/ai/recommendations", config);
+                const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/ai/recommendations`, config);
                 setRecommendations(data.recommendations || []);
             } catch (error) {
                 console.error("Lỗi AI Recommendation:", error);
@@ -26,7 +26,7 @@ const AIRecommend = () => {
 
         // Lấy danh sách yêu thích nếu đã đăng nhập
         if (token) {
-            axios.get("http://localhost:5000/api/favorites", {
+            axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
                 headers: { Authorization: `Bearer ${token}` }
             }).then(res => {
                 const ids = new Set(res.data.map(p => p._id));

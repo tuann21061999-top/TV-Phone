@@ -21,7 +21,7 @@ const ManageFeedback = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/feedbacks/admin", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/feedbacks/admin`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setFeedbacks(res.data);
@@ -55,7 +55,7 @@ const ManageFeedback = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/feedbacks/admin/${selectedFeedback._id}`,
+        `${import.meta.env.VITE_API_URL}/api/feedbacks/admin/${selectedFeedback._id}`,
         { status: updateStatus, adminNote },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -73,7 +73,7 @@ const ManageFeedback = () => {
     if (!window.confirm("Bạn có chắc muốn xóa vĩnh viễn phản hồi này?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/feedbacks/admin/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/feedbacks/admin/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Đã xóa phản hồi");

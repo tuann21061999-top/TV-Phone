@@ -43,7 +43,7 @@ function AdminPage() {
         const headers = { Authorization: `Bearer ${token}` };
 
         // Lấy orders
-        const ordersRes = await axios.get("http://localhost:5000/api/orders/admin/all", { headers });
+        const ordersRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/orders/admin/all`, { headers });
         const newOrders = ordersRes.data.filter(o => o.status === "waiting_approval" || o.status === "paid" || o.status === "pending").length;
         if (activeTab !== "orders") {
           setOrderBadge(newOrders);
@@ -52,7 +52,7 @@ function AdminPage() {
         }
 
         // Lấy chats
-        const chatsRes = await axios.get("http://localhost:5000/api/chat/admin/conversations", { headers });
+        const chatsRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/chat/admin/conversations`, { headers });
         const unreadChats = chatsRes.data.reduce((sum, c) => sum + (c.unreadCount || 0), 0);
         if (activeTab !== "chat") {
           setChatBadge(unreadChats);
@@ -61,7 +61,7 @@ function AdminPage() {
         }
 
         // Lấy reviews
-        const reviewsRes = await axios.get("http://localhost:5000/api/reviews/admin/all", { headers });
+        const reviewsRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/reviews/admin/all`, { headers });
         const unrepliedReviews = reviewsRes.data.filter(r => !r.adminReply).length;
         if (activeTab !== "reviews") {
           setReviewBadge(unrepliedReviews);

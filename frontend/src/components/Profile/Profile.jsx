@@ -99,7 +99,7 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       const { data } = await axios.put(
-        "http://localhost:5000/api/users/update-avatar",
+        `${import.meta.env.VITE_API_URL}/api/users/update-avatar`,
         formData,
         { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }
       );
@@ -120,7 +120,7 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       const { data } = await axios.put(
-        "http://localhost:5000/api/users/update",
+        `${import.meta.env.VITE_API_URL}/api/users/update`,
         { avatar: "" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -167,7 +167,7 @@ const Profile = () => {
     const tokenHeader = { headers: { Authorization: `Bearer ${token}` } };
 
     try {
-      const { data: userData } = await axios.get("http://localhost:5000/api/users/profile", tokenHeader);
+      const { data: userData } = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/profile`, tokenHeader);
       if (userData.role === "admin") {
         navigate("/admin");
         return;
@@ -176,7 +176,7 @@ const Profile = () => {
       setEditFormData({ name: userData.name || "", phone: userData.phone || "" });
 
       setLoadingOrders(true);
-      const { data: orderData } = await axios.get("http://localhost:5000/api/orders/my-orders", tokenHeader);
+      const { data: orderData } = await axios.get(`${import.meta.env.VITE_API_URL}/api/orders/my-orders`, tokenHeader);
       setOrders(orderData);
 
     } catch (error) {
@@ -192,7 +192,7 @@ const Profile = () => {
     const fetchRedeemed = async () => {
       try {
         const token = localStorage.getItem("token");
-        const { data } = await axios.get("http://localhost:5000/api/vouchers/redemption-history", {
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/vouchers/redemption-history`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRedeemedTiers(data.map(r => r.tier));
@@ -210,7 +210,7 @@ const Profile = () => {
         setLoadingFavorites(true);
         try {
           const token = localStorage.getItem("token");
-          const { data } = await axios.get("http://localhost:5000/api/favorites", {
+          const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setFavorites(data);
@@ -231,7 +231,7 @@ const Profile = () => {
         setLoadingVouchers(true);
         try {
           const token = localStorage.getItem("token");
-          const { data } = await axios.get("http://localhost:5000/api/vouchers/my-vouchers", {
+          const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/vouchers/my-vouchers`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setMyVouchers(data);
@@ -252,14 +252,14 @@ const Profile = () => {
     }
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:5000/api/vouchers/save", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/vouchers/save`, {
         code: voucherInput.trim()
       }, { headers: { Authorization: `Bearer ${token}` } });
       toast.success(`Lưu mã ${voucherInput.toUpperCase()} thành công!`);
       setVoucherInput("");
 
       // Tải lại danh sách voucher để hiển thị mã vừa lưu
-      const { data } = await axios.get("http://localhost:5000/api/vouchers/my-vouchers", {
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/vouchers/my-vouchers`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMyVouchers(data);
@@ -330,7 +330,7 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       const { data } = await axios.put(
-        "http://localhost:5000/api/users/update",
+        `${import.meta.env.VITE_API_URL}/api/users/update`,
         editFormData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -349,7 +349,7 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/orders/${orderId}/cancel`,
+        `${import.meta.env.VITE_API_URL}/api/orders/${orderId}/cancel`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -390,7 +390,7 @@ const Profile = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:5000/api/orders/${returnOrderId}/return`,
+        `${import.meta.env.VITE_API_URL}/api/orders/${returnOrderId}/return`,
         formData,
         { headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" } }
       );
@@ -439,9 +439,9 @@ const Profile = () => {
   const saveAddress = async (addressData) => {
     try {
       if (editingAddress) {
-        await axios.put(`http://localhost:5000/api/users/address/${editingAddress._id}`, addressData, tokenHeader);
+        await axios.put(`${import.meta.env.VITE_API_URL}/api/users/address/${editingAddress._id}`, addressData, tokenHeader);
       } else {
-        await axios.post("http://localhost:5000/api/users/address", addressData, tokenHeader);
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/users/address`, addressData, tokenHeader);
       }
       await fetchUserAndOrders();
       setEditingAddress(null);
@@ -451,7 +451,7 @@ const Profile = () => {
 
   const deleteAddress = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/users/address/${id}`, tokenHeader);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/address/${id}`, tokenHeader);
       setUser(prev => ({ ...prev, addresses: prev.addresses.filter(a => a._id !== id) }));
     } catch { alert("Lỗi xóa địa chỉ"); }
   };
@@ -459,9 +459,9 @@ const Profile = () => {
   const savePayment = async (paymentData) => {
     try {
       if (editingPayment) {
-        await axios.put(`http://localhost:5000/api/users/payment/${editingPayment._id}`, paymentData, tokenHeader);
+        await axios.put(`${import.meta.env.VITE_API_URL}/api/users/payment/${editingPayment._id}`, paymentData, tokenHeader);
       } else {
-        await axios.post("http://localhost:5000/api/users/payment", paymentData, tokenHeader);
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/users/payment`, paymentData, tokenHeader);
       }
       await fetchUserAndOrders();
       setEditingPayment(null);
@@ -471,7 +471,7 @@ const Profile = () => {
 
   const deletePayment = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/users/payment/${id}`, tokenHeader);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/payment/${id}`, tokenHeader);
       setUser(prev => ({ ...prev, paymentMethods: prev.paymentMethods.filter(p => p._id !== id) }));
     } catch { alert("Lỗi xóa phương thức"); }
   };
@@ -557,7 +557,7 @@ const Profile = () => {
               const handleRedeem = async (tier) => {
                 try {
                   const token = localStorage.getItem("token");
-                  const { data } = await axios.post("http://localhost:5000/api/vouchers/redeem-points",
+                  const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/vouchers/redeem-points`,
                     { tier },
                     { headers: { Authorization: `Bearer ${token}` } }
                   );

@@ -16,7 +16,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
 
   const token = localStorage.getItem("token");
   const api = axios.create({
-    baseURL: "http://localhost:5000/api/products",
+    baseURL: `${import.meta.env.VITE_API_URL}/api/products`,
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -31,7 +31,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
 
   const fetchTags = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/tags");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/tags`);
       setTagsList(res.data.filter(t => t.isActive));
     } catch (err) {
       console.error("Lỗi tải tags", err);
@@ -228,7 +228,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
         if (updatedColorImages[i].imageFile) {
           const formData = new FormData();
           formData.append("image", updatedColorImages[i].imageFile);
-          const uploadRes = await axios.post("http://localhost:5000/api/upload", formData);
+          const uploadRes = await axios.post(`${import.meta.env.VITE_API_URL}/api/upload`, formData);
           updatedColorImages[i].imageUrl = uploadRes.data.imageUrl;
           delete updatedColorImages[i].imageFile;
         }
@@ -241,7 +241,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
           if (form.detailImages[i].imageFile) {
             const formData = new FormData();
             formData.append("image", form.detailImages[i].imageFile);
-            const uploadRes = await axios.post("http://localhost:5000/api/upload", formData);
+            const uploadRes = await axios.post(`${import.meta.env.VITE_API_URL}/api/upload`, formData);
             updatedDetailImages.push(uploadRes.data.imageUrl);
           } else if (form.detailImages[i].imageUrl && !form.detailImages[i].imageUrl.startsWith('blob:')) {
             // Giữ lại URL cũ nếu không có file mới
@@ -256,7 +256,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
       const safeCategoryName = form.categoryName || "Điện thoại";
 
       try {
-        const catRes = await axios.post("http://localhost:5000/api/categories",
+        const catRes = await axios.post(`${import.meta.env.VITE_API_URL}/api/categories`,
           { name: safeCategoryName.trim() },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -264,7 +264,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
       } catch (err) {
         console.log(err);
         // Nếu đã tồn tại, lấy ID từ danh sách
-        const list = await axios.get("http://localhost:5000/api/categories");
+        const list = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories`);
         const found = list.data.find(c => c.name.toLowerCase() === safeCategoryName.trim().toLowerCase());
         if (found) finalCategoryId = found._id;
         else throw new Error("Không thể xác định danh mục");

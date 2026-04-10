@@ -19,7 +19,7 @@ function SearchPage() {
     // Lấy danh sách yêu thích khi load trang Search
     const token = localStorage.getItem("token");
     if (token) {
-      axios.get("http://localhost:5000/api/favorites", {
+      axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         const ids = new Set(res.data.map(p => p._id));
@@ -39,7 +39,7 @@ function SearchPage() {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`http://localhost:5000/api/products?search=${encodeURIComponent(query)}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/products?search=${encodeURIComponent(query)}`);
         setProducts(response.data);
       } catch (err) {
         console.error("Lỗi khi tìm kiếm:", err);
