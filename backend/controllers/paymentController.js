@@ -35,7 +35,7 @@ class PaymentController {
           vnp_TxnRef: order._id.toString(), 
           vnp_OrderInfo: `Thanh toan don hang ${order._id}`,
           vnp_OrderType: ProductCode.Other,
-          vnp_ReturnUrl: `http:///tv-phone.onrender.com/api/payments/vnpay-callback`, 
+          vnp_ReturnUrl: `http://tv-phone.onrender.com/api/payments/vnpay-callback`, 
           vnp_Locale: VnpLocale.VN,
           vnp_CreateDate: dateFormat(new Date()),
         });
@@ -167,18 +167,18 @@ class PaymentController {
               );
             }
           }
-          return res.redirect(`http://localhost:5173/payment-result?status=success&orderId=${orderId}`);
+          return res.redirect(`https://tv-phone.onrender.com/payment-result?status=success&orderId=${orderId}`);
         } else {
           // Giao dịch không thành công
           await Order.findByIdAndUpdate(orderId, { status: "unsuccessful" });
-          return res.redirect(`http://localhost:5173/payment-result?status=error`);
+          return res.redirect(`https://tv-phone.onrender.com/payment-result?status=error`);
         }
       } else {
         // Có người cố tình Fake link VNPay
-        return res.redirect(`http://localhost:5173/payment-result?status=invalid_signature`);
+        return res.redirect(`https://tv-phone.onrender.com/payment-result?status=invalid_signature`);
       }
     } catch (error) {
-      res.redirect(`http://localhost:3000/payment-fail`);
+      res.redirect(`https://tv-phone.onrender.com/payment-fail`);
     }
   }
 
@@ -244,11 +244,11 @@ class PaymentController {
 
       // Cho phép bypass localhost để test dễ hơn do url có thể bị encode làm sai lệch Hash
       if (signature !== expectedSignature && req.hostname !== 'localhost' && req.hostname !== '127.0.0.1') {
-        return res.redirect(`http://localhost:5173/payment-result?status=invalid_signature`);
+        return res.redirect(`https://tv-phone.onrender.com/payment-result?status=invalid_signature`);
       }
 
       const orderIdParts = orderId ? orderId.split("_") : [];
-      if (orderIdParts.length === 0) return res.redirect(`http://localhost:5173/payment-result?status=error`);
+      if (orderIdParts.length === 0) return res.redirect(`https://tv-phone.onrender.com/payment-result?status=error`);
       
       const realOrderId = orderIdParts.length > 1 ? orderIdParts[1] : orderIdParts[0];
       const order = await Order.findById(realOrderId);
@@ -267,16 +267,16 @@ class PaymentController {
             );
           }
         }
-        return res.redirect(`http://localhost:5173/payment-result?status=success&orderId=${realOrderId}`);
+        return res.redirect(`https://tv-phone.onrender.com/payment-result?status=success&orderId=${realOrderId}`);
       } else {
         if(order && order.status === "pending") {
             await Order.findByIdAndUpdate(realOrderId, { status: "unsuccessful" });
         }
-        return res.redirect(`http://localhost:5173/payment-result?status=error`);
+        return res.redirect(`https://tv-phone.onrender.com/payment-result?status=error`);
       }
     } catch (error) {
       console.error(error);
-      return res.redirect(`http://localhost:5173/payment-result?status=error`);
+      return res.redirect(`https://tv-phone.onrender.com/payment-result?status=error`);
     }
   }
 }
