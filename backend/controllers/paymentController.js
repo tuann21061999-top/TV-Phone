@@ -35,7 +35,7 @@ class PaymentController {
           vnp_TxnRef: order._id.toString(), 
           vnp_OrderInfo: `Thanh toan don hang ${order._id}`,
           vnp_OrderType: ProductCode.Other,
-          vnp_ReturnUrl: `http://localhost:5000/api/payments/vnpay-callback`, 
+          vnp_ReturnUrl: `http:///tv-phone.onrender.com/api/payments/vnpay-callback`, 
           vnp_Locale: VnpLocale.VN,
           vnp_CreateDate: dateFormat(new Date()),
         });
@@ -51,7 +51,7 @@ class PaymentController {
         const amountStr = amount.toString();
         
         // redirectUrl is where the browser returns. Pointing back to our backend to update DB first.
-        const redirectUrl = `http://localhost:5000/api/payments/momo-return`; 
+        const redirectUrl = `http://tv-phone.onrender.com/api/payments/momo-return`; 
         
         // ipnUrl is the server-to-server callback (webhook) MoMo calls to update our DB silently.
         const ipnUrl = `https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b`; 
