@@ -13,7 +13,7 @@ const sendEmail = async (options) => {
 
         // Tùy chọn gửi email
         const mailOptions = {
-            from: `TV-Phone Store <${process.env.EMAIL_USER.trim()}>`,
+            from: `V&T Nexis <${process.env.EMAIL_USER.trim()}>`,
             to: options.to,
             subject: options.subject,
             html: options.html

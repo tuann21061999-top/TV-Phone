@@ -101,7 +101,7 @@ function ContactPage() {
 
       {/* HEADER */}
       <div className="text-center mb-10">
-        <h1 className="text-3xl font-extrabold text-slate-900 mb-3">Liên hệ với TechNova</h1>
+        <h1 className="text-3xl font-extrabold text-slate-900 mb-3">Liên hệ với V&T Nexis</h1>
         <p className="text-slate-500 text-base max-w-[600px] mx-auto">
           Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn 24/7. Hãy gửi lời nhắn nếu bạn có bất kỳ thắc mắc nào.
         </p>
@@ -245,7 +245,7 @@ function ContactPage() {
                         {fb.adminNote ? (
                           <div className="mt-4 p-4 bg-emerald-50 border border-emerald-100 rounded-lg">
                             <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 mb-1.5">
-                              <CheckCircle size={14} /> TechNova phản hồi:
+                              <CheckCircle size={14} /> V&T Nexis phản hồi:
                             </div>
                             <p className="m-0 text-sm text-emerald-900 leading-relaxed">{fb.adminNote}</p>
                           </div>
@@ -273,7 +273,7 @@ function ContactPage() {
             {[
               { icon: <MapPin size={20} color="#1D4ED8" />, title: "Địa chỉ Showroom", content: "12 Nguyễn Văn Bảo, Gò Vấp, Hồ Chí Minh" },
               { icon: <Phone size={20} color="#1D4ED8" />, title: "Hotline Hỗ Trợ",   content: <><strong>1900 1234 567</strong> (24/7)</> },
-              { icon: <Mail size={20} color="#1D4ED8" />,  title: "Email Liên Hệ",    content: "support@technova.vn" },
+              { icon: <Mail size={20} color="#1D4ED8" />,  title: "Email Liên Hệ",    content: "support@vtnexis.vn" },
             ].map(({ icon, title, content }) => (
               <div key={title} className="flex items-center gap-4">
                 <div className="bg-blue-50 p-3 rounded-xl flex items-center justify-center shrink-0">

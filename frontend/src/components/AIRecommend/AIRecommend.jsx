@@ -6,7 +6,7 @@ import ProductCard from '../Product/ProductCard';
 const AIRecommend = () => {
     const [recommendations, setRecommendations] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [favoriteIds, setFavoriteIds] = useState(new Set()); // Thêm state lưu tim
+    const [favoriteIds, setFavoriteIds] = useState(new Set()); 
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -24,7 +24,6 @@ const AIRecommend = () => {
 
         fetchRecommendations();
 
-        // Lấy danh sách yêu thích nếu đã đăng nhập
         if (token) {
             axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -52,8 +51,8 @@ const AIRecommend = () => {
         const updatePages = () => {
             if (carouselRef.current && recommendations.length > 0) {
                 const containerWidth = carouselRef.current.clientWidth;
-                // Item width is ~320px
-                const itemsPerPage = Math.max(1, Math.floor(containerWidth / 320));
+                const itemWidth = window.innerWidth < 768 ? 150 : 280; // Chiều rộng ước tính của 1 item
+                const itemsPerPage = Math.max(1, Math.floor(containerWidth / itemWidth));
                 setTotalPages(Math.ceil(recommendations.length / itemsPerPage));
             }
         };
@@ -72,7 +71,9 @@ const AIRecommend = () => {
     const scroll = (direction) => {
         if (carouselRef.current) {
             const containerWidth = carouselRef.current.clientWidth;
-            const amount = direction === 'left' ? -containerWidth : containerWidth;
+            // Trên mobile vuốt từng đoạn nhỏ, trên PC cuộn hết 1 khung
+            const scrollAmount = window.innerWidth < 768 ? containerWidth / 1.5 : containerWidth;
+            const amount = direction === 'left' ? -scrollAmount : scrollAmount;
             carouselRef.current.scrollBy({ left: amount, behavior: 'smooth' });
         }
     };
@@ -87,20 +88,20 @@ const AIRecommend = () => {
     if (loading || recommendations.length === 0) return null;
 
     return (
-        <section className="my-[50px] container mx-auto px-4 relative">
+        <section className="my-6 md:my-[50px] container mx-auto px-0 md:px-4 relative group">
 
             {/* HEADER */}
-            <div className="mb-[25px] text-center">
-                <div className="inline-flex items-center gap-3 bg-gradient-to-r from-green-50 to-pink-50 px-6 py-2.5 rounded-full border border-pink-200 shadow-sm">
-                    <Sparkles className="text-rose-600 animate-pulse" size={24} />
-                    <h2 className="text-2xl font-extrabold m-0 bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">
+            <div className="mb-4 md:mb-[25px] text-left md:text-center px-4 md:px-0">
+                <div className="inline-flex items-center gap-1.5 md:gap-3 bg-gradient-to-r from-green-50 to-pink-50 px-3 py-1.5 md:px-6 md:py-2.5 rounded-full border border-pink-200 shadow-sm">
+                    <Sparkles className="text-rose-600 animate-pulse w-4 h-4 md:w-6 md:h-6" />
+                    <h2 className="text-[16px] md:text-2xl font-extrabold m-0 bg-gradient-to-r from-blue-600 to-pink-600 bg-clip-text text-transparent">
                         Dành Riêng Cho Bạn
                     </h2>
-                    <span className="bg-gradient-to-br from-[#FF6B6B] to-[#FF8E53] text-white text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    <span className="bg-gradient-to-br from-[#FF6B6B] to-[#FF8E53] text-white text-[9px] md:text-[11px] font-bold px-2 py-0.5 md:px-2.5 md:py-1 rounded-full uppercase tracking-wider hidden sm:inline-block">
                         AI Powered
                     </span>
                 </div>
-                <p className="mt-2.5 text-slate-500 text-[15px]">
+                <p className="mt-1 md:mt-2.5 text-slate-500 text-[12px] md:text-[15px]">
                     Gợi ý thông minh dựa trên sở thích và hành vi mua sắm của bạn.
                 </p>
             </div>
@@ -108,25 +109,26 @@ const AIRecommend = () => {
             {/* CAROUSEL CONTAINER */}
             <div className="relative flex items-center w-full">
 
-                {/* NÚT TRÁI */}
+                {/* NÚT TRÁI (Hiển thị cả Mobile & PC) */}
                 <button
-                    className="absolute top-1/2 -translate-y-1/2 -left-3 md:-left-5 z-20 bg-white border border-slate-200 rounded-full w-10 h-10 md:w-11 md:h-11 flex items-center justify-center cursor-pointer shadow-md text-slate-700 transition-all duration-200 hover:bg-slate-50 hover:text-rose-600 hover:shadow-lg"
+                    className="absolute top-1/2 -translate-y-1/2 left-1 md:-left-5 z-20 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-full w-8 h-8 md:w-11 md:h-11 flex items-center justify-center cursor-pointer shadow-md text-slate-700 transition-all duration-300 hover:bg-white hover:text-rose-600 md:hover:scale-110"
                     onClick={() => scroll('left')}
-                    style={{ opacity: currentIndex === 0 ? 0.5 : 1, pointerEvents: currentIndex === 0 ? 'none' : 'auto' }}
+                    style={{ opacity: currentIndex === 0 ? 0 : 1, pointerEvents: currentIndex === 0 ? 'none' : 'auto' }}
                 >
-                    <ChevronLeft size={24} />
+                    <ChevronLeft size={20} className="md:w-6 md:h-6" />
                 </button>
 
                 {/* GRID SẢN PHẨM */}
                 <div
-                    className="flex gap-5 overflow-x-auto pb-5 pt-2.5 scroll-smooth items-stretch w-full snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+                    className="flex gap-2.5 md:gap-5 overflow-x-auto px-4 md:px-0 pb-4 pt-2 scroll-smooth items-stretch w-full snap-x snap-mandatory scrollbar-hide [&::-webkit-scrollbar]:hidden"
                     ref={carouselRef}
                     onScroll={handleScroll}
                 >
                     {recommendations.map((item, idx) => {
                         if (!item.product) return null;
                         return (
-                            <div key={idx} className="snap-start min-w-[280px] max-w-[300px] rounded-xl bg-white shrink-0 flex flex-col">
+                            // THU NHỎ KÍCH THƯỚC: Mobile w-[140px-150px], Desktop w-[260px-280px]
+                            <div key={idx} className="snap-start w-[140px] xs:w-[150px] sm:w-[170px] md:w-auto md:min-w-[280px] md:max-w-[300px] shrink-0 rounded-xl bg-white flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.04)] md:shadow-none transition-transform hover:-translate-y-1">
                                 <div className="relative z-10">
                                     <ProductCard
                                         product={item.product}
@@ -134,8 +136,12 @@ const AIRecommend = () => {
                                         onFavoriteToggle={handleFavoriteToggle}
                                     />
                                 </div>
-                                <div className="-mt-2.5 p-3.5 bg-slate-50 rounded-b-xl border border-slate-200 border-t-0 flex-grow relative z-0">
-                                    <div className="text-[13.5px] text-slate-700 italic leading-relaxed pl-2.5 border-l-[3px] border-rose-500">
+                                <div className="-mt-1.5 md:-mt-2.5 p-2 md:p-3.5 bg-slate-50/80 md:bg-slate-50 rounded-b-xl border border-slate-100 md:border-slate-200 border-t-0 flex-grow relative z-0 flex flex-col justify-center">
+                                    {/* CẮT DÒNG (line-clamp-2) ĐỂ THẺ KHÔNG BỊ CAO */}
+                                    <div 
+                                        className="text-[10.5px] md:text-[13px] text-slate-600 italic leading-snug md:leading-relaxed pl-2 md:pl-2.5 border-l-[2px] md:border-l-[3px] border-rose-400 line-clamp-2 md:line-clamp-3" 
+                                        title={item.reason}
+                                    >
                                         "{item.reason}"
                                     </div>
                                 </div>
@@ -144,22 +150,22 @@ const AIRecommend = () => {
                     })}
                 </div>
 
-                {/* NÚT PHẢI */}
+                {/* NÚT PHẢI (Hiển thị cả Mobile & PC) */}
                 <button
-                    className="absolute top-1/2 -translate-y-1/2 -right-3 md:-right-5 z-20 bg-white border border-slate-200 rounded-full w-10 h-10 md:w-11 md:h-11 flex items-center justify-center cursor-pointer shadow-md text-slate-700 transition-all duration-200 hover:bg-slate-50 hover:text-rose-600 hover:shadow-lg"
+                    className="absolute top-1/2 -translate-y-1/2 right-1 md:-right-5 z-20 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-full w-8 h-8 md:w-11 md:h-11 flex items-center justify-center cursor-pointer shadow-md text-slate-700 transition-all duration-300 hover:bg-white hover:text-rose-600 md:hover:scale-110"
                     onClick={() => scroll('right')}
-                    style={{ opacity: currentIndex >= totalPages - 1 ? 0.5 : 1, pointerEvents: currentIndex >= totalPages - 1 ? 'none' : 'auto' }}
+                    style={{ opacity: currentIndex >= totalPages - 1 ? 0 : 1, pointerEvents: currentIndex >= totalPages - 1 ? 'none' : 'auto' }}
                 >
-                    <ChevronRight size={24} />
+                    <ChevronRight size={20} className="md:w-6 md:h-6" />
                 </button>
             </div>
 
             {/* CAROUSEL DOTS */}
-            <div className="flex justify-center gap-2 mt-2.5">
+            <div className="flex justify-center gap-1.5 md:gap-2 mt-1 md:mt-2">
                 {[...Array(totalPages)].map((_, idx) => (
                     <div
                         key={`dot-${idx}`}
-                        className={`h-2.5 rounded-full cursor-pointer transition-all duration-300 ${currentIndex === idx ? 'bg-rose-600 w-6' : 'bg-slate-300 w-2.5'}`}
+                        className={`h-1.5 md:h-2.5 rounded-full cursor-pointer transition-all duration-300 ${currentIndex === idx ? 'bg-rose-600 w-4 md:w-6' : 'bg-slate-300 w-1.5 md:w-2.5'}`}
                         onClick={() => scrollToIndex(idx)}
                     />
                 ))}

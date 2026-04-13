@@ -332,52 +332,52 @@ return (
 
     {/* CHECKOUT HEADER */}
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-      <div className="w-full max-w-[1400px] mx-auto px-4 md:px-10 py-4 flex justify-between items-center flex-wrap gap-3">
-        <Link to="/" className="flex items-center gap-2.5 no-underline text-xl font-extrabold text-blue-600">
-          <div className="w-7 h-7 bg-blue-600 rounded-md" />
-          <span>TechNova</span>
+      <div className="w-full max-w-[1400px] mx-auto px-3 md:px-10 py-3 md:py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <Link to="/" className="flex items-center gap-2.5 no-underline text-lg md:text-xl font-extrabold text-blue-600">
+          <div className="w-6 h-6 md:w-7 md:h-7 bg-blue-600 rounded-md shrink-0" />
+          <span>V&T Nexis</span>
         </Link>
-        <div className="flex items-center gap-2 text-sm text-slate-500">
+        <div className="flex items-center gap-1.5 md:gap-2 text-[13px] md:text-sm text-slate-500 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 whitespace-nowrap no-scrollbar scroll-smooth">
           {location.state?.isBuyNow ? (
             <>
               <Link to="#" onClick={(e) => { e.preventDefault(); navigate(-1); }} className="text-blue-600 no-underline">Sản phẩm</Link>
-              <ChevronRight size={14} />
+              <ChevronRight size={14} className="shrink-0" />
             </>
           ) : (
             <>
               <Link to="/cart" className="text-blue-600 no-underline">Giỏ hàng</Link>
-              <ChevronRight size={14} />
+              <ChevronRight size={14} className="shrink-0" />
             </>
           )}
-          <span className="text-slate-800 font-semibold">Thanh toán</span>
-          <ChevronRight size={14} />
-          <span>Hoàn tất</span>
+          <span className="text-slate-800 font-semibold shrink-0">Thanh toán</span>
+          <ChevronRight size={14} className="shrink-0" />
+          <span className="shrink-0">Hoàn tất</span>
         </div>
       </div>
     </header>
 
     {/* MAIN: 1 cột mobile → 2 cột từ lg */}
-    <main className="w-full max-w-[1400px] mx-auto mt-8 px-4 md:px-10 pb-10 grid grid-cols-1 lg:grid-cols-[1.7fr_1.3fr] gap-8 items-start">
+    <main className="w-full max-w-[1400px] mx-auto mt-4 md:mt-8 px-3 md:px-10 pb-10 grid grid-cols-1 lg:grid-cols-[1.7fr_1.3fr] gap-4 md:gap-8 items-start">
 
       {/* CỘT TRÁI */}
       <div>
 
         {/* SECTION 1: ĐỊA CHỈ */}
-        <section className="bg-white rounded-xl p-6 mb-5 shadow-sm border border-slate-100">
-          <div className="flex flex-wrap justify-between items-center gap-3 mb-5">
-            <h2 className="flex items-center gap-2.5 text-lg font-bold text-slate-900 m-0 [&>svg]:text-blue-600">
-              <MapPin size={20} /> Thông tin giao hàng
+        <section className="bg-white rounded-xl p-4 md:p-6 mb-4 md:mb-5 shadow-sm border border-slate-100">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-5">
+            <h2 className="flex items-center gap-2 text-base md:text-lg font-bold text-slate-900 m-0 [&>svg]:text-blue-600 shrink-0">
+              <MapPin size={20} className="shrink-0" /> Thông tin giao hàng
             </h2>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {shippingInfo.province && (
-                <div className="flex items-center gap-2 bg-green-50 border border-green-200 px-3 py-2 rounded-lg text-sm text-green-800 font-medium">
-                  <CheckCircle2 size={16} color="#059669" />
-                  <span className="italic">{getEstimatedDeliveryDate(shippingInfo.province, shippingFee)}</span>
+                <div className="flex items-start sm:items-center gap-2 bg-green-50 border border-green-200 px-3 py-2 rounded-lg text-[13px] sm:text-sm text-green-800 font-medium w-full sm:w-auto">
+                  <CheckCircle2 size={16} color="#059669" className="shrink-0 mt-0.5 sm:mt-0" />
+                  <span className="italic font-normal leading-snug">{getEstimatedDeliveryDate(shippingInfo.province, shippingFee)}</span>
                 </div>
               )}
               <button
                 onClick={() => setShowAddressModal(true)}
-                className="flex items-center gap-1.5 bg-transparent border-none text-blue-600 font-semibold text-sm cursor-pointer px-3 py-1.5 rounded-md hover:bg-blue-50 transition-colors"
+                className="flex items-center justify-center gap-1.5 bg-blue-50 sm:bg-transparent border border-blue-100 sm:border-none text-blue-600 font-semibold text-sm cursor-pointer px-3 py-2 rounded-lg hover:bg-blue-100 transition-colors w-full sm:w-auto"
               >
                 <Plus size={16} /> Thêm địa chỉ mới
               </button>
@@ -426,47 +426,47 @@ return (
         </section>
 
         {/* SECTION 2: VẬN CHUYỂN */}
-        <section className="bg-white rounded-xl p-6 mb-5 shadow-sm border border-slate-100">
-          <h2 className="flex items-center gap-2.5 text-lg font-bold text-slate-900 mb-5 [&>svg]:text-blue-600">
+        <section className="bg-white rounded-xl p-4 md:p-6 mb-4 md:mb-5 shadow-sm border border-slate-100">
+          <h2 className="flex items-center gap-2.5 text-base md:text-lg font-bold text-slate-900 mb-4 md:mb-5 [&>svg]:text-blue-600">
             <Truck size={20} /> Phương thức vận chuyển
           </h2>
           <div className="space-y-3">
             {[
               { fee: 30000, title: "Giao hàng nhanh",   desc: "Dự kiến giao hàng: 2-3 ngày làm việc",                   label: "30.000đ" },
-              { fee: 55000, title: "Giao hàng Hỏa tốc", desc: "Giao ngay trong vòng 2-4 giờ (Chỉ áp dụng nội thành)", label: "55.000đ" },
+              { fee: 55000, title: "Giao hàng Hỏa tốc", desc: "Giao ngay trong 2-4 giờ (Chỉ áp dụng nội thành)", label: "55.000đ" },
             ].map(({ fee, title, desc, label }) => (
-              <label key={fee} className={`flex items-center justify-between px-4 py-4 border rounded-lg cursor-pointer transition-all
+              <label key={fee} className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 px-4 py-3 md:py-4 border rounded-lg cursor-pointer transition-all
                 ${shippingFee === fee ? "border-blue-600 bg-blue-50" : "border-slate-300 hover:bg-slate-50"}`}>
-                <div className="flex items-center gap-3">
-                  <input type="radio" name="shipping" checked={shippingFee === fee} onChange={() => setShippingFee(fee)} className="w-[18px] h-[18px] accent-blue-600 cursor-pointer" />
+                <div className="flex items-start sm:items-center gap-3">
+                  <input type="radio" name="shipping" checked={shippingFee === fee} onChange={() => setShippingFee(fee)} className="w-[18px] h-[18px] accent-blue-600 cursor-pointer mt-0.5 sm:mt-0 shrink-0" />
                   <div>
-                    <h4 className="text-sm font-semibold m-0 mb-1">{title}</h4>
-                    <p className="text-xs text-slate-500 m-0">{desc}</p>
+                    <h4 className="text-[13px] md:text-sm font-semibold m-0 mb-0.5 md:mb-1">{title}</h4>
+                    <p className="text-[11px] md:text-xs text-slate-500 m-0 leading-snug">{desc}</p>
                   </div>
                 </div>
-                <span className="font-bold text-blue-600 shrink-0 ml-3">{label}</span>
+                <span className="font-bold text-blue-600 text-sm md:text-base shrink-0 sm:ml-3 ml-7">{label}</span>
               </label>
             ))}
           </div>
         </section>
 
         {/* SECTION 3: BẢO HÀNH */}
-        <section className="bg-white rounded-xl p-6 mb-5 shadow-sm border border-slate-100">
-          <h2 className="flex items-center gap-2.5 text-lg font-bold text-slate-900 mb-5 [&>svg]:text-blue-600">
+        <section className="bg-white rounded-xl p-4 md:p-6 mb-4 md:mb-5 shadow-sm border border-slate-100">
+          <h2 className="flex items-center gap-2.5 text-base md:text-lg font-bold text-slate-900 mb-4 md:mb-5 [&>svg]:text-blue-600">
             <Shield size={20} /> Gói bảo hành (Tùy chọn)
           </h2>
           <div className="space-y-3">
             {warrantyOptions.map((warranty) => (
-              <label key={warranty.id} className={`flex items-center justify-between px-4 py-4 border rounded-lg cursor-pointer transition-all
+              <label key={warranty.id} className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0 px-4 py-3 md:py-4 border rounded-lg cursor-pointer transition-all
                 ${selectedWarranty.id === warranty.id ? "border-blue-600 bg-blue-50" : "border-slate-300 hover:bg-slate-50"}`}>
-                <div className="flex items-center gap-3">
-                  <input type="radio" name="warranty" checked={selectedWarranty.id === warranty.id} onChange={() => setSelectedWarranty(warranty)} className="w-[18px] h-[18px] accent-blue-600 cursor-pointer" />
+                <div className="flex items-start sm:items-center gap-3">
+                  <input type="radio" name="warranty" checked={selectedWarranty.id === warranty.id} onChange={() => setSelectedWarranty(warranty)} className="w-[18px] h-[18px] accent-blue-600 cursor-pointer mt-0.5 sm:mt-0 shrink-0" />
                   <div>
-                    <h4 className="text-sm font-semibold m-0 mb-1">{warranty.name} ({warranty.duration})</h4>
-                    <p className="text-xs text-slate-500 m-0">{warranty.desc}</p>
+                    <h4 className="text-[13px] md:text-sm font-semibold m-0 mb-0.5 md:mb-1">{warranty.name} ({warranty.duration})</h4>
+                    <p className="text-[11px] md:text-xs text-slate-500 m-0 leading-snug">{warranty.desc}</p>
                   </div>
                 </div>
-                <span className="font-bold text-blue-600 shrink-0 ml-3">
+                <span className="font-bold text-blue-600 text-sm md:text-base shrink-0 sm:ml-3 ml-7">
                   {warranty.price === 0 ? "Miễn phí" : `+${warranty.price.toLocaleString()}đ`}
                 </span>
               </label>
@@ -475,8 +475,8 @@ return (
         </section>
 
         {/* SECTION 4: THANH TOÁN */}
-        <section className="bg-white rounded-xl p-6 mb-5 shadow-sm border border-slate-100">
-          <h2 className="flex items-center gap-2.5 text-lg font-bold text-slate-900 mb-5 [&>svg]:text-blue-600">
+        <section className="bg-white rounded-xl p-4 md:p-6 mb-4 md:mb-5 shadow-sm border border-slate-100">
+          <h2 className="flex items-center gap-2.5 text-base md:text-lg font-bold text-slate-900 mb-4 md:mb-5 [&>svg]:text-blue-600">
             <Wallet size={20} /> Phương thức thanh toán
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -485,11 +485,11 @@ return (
               { method: "VNPAY", emoji: "🏦", label: "Thanh toán qua VNPay" },
               { method: "MOMO",  emoji: "📱", label: "Thanh toán qua MoMo" },
             ].map(({ method, emoji, label }) => (
-              <label key={method} className={`flex items-center gap-3 px-4 py-4 border rounded-lg cursor-pointer transition-all
+              <label key={method} className={`flex items-center gap-3 px-4 py-3 md:py-4 border rounded-lg cursor-pointer transition-all
                 ${paymentMethod === method ? "border-blue-600 bg-blue-50" : "border-slate-300 hover:bg-slate-50"}`}>
-                <input type="radio" name="payment" checked={paymentMethod === method} onChange={() => setPaymentMethod(method)} className="accent-blue-600" />
-                <span className="text-xl">{emoji}</span>
-                <span className="text-sm font-medium">{label}</span>
+                <input type="radio" name="payment" checked={paymentMethod === method} onChange={() => setPaymentMethod(method)} className="accent-blue-600 shrink-0 w-[18px] h-[18px]" />
+                <span className="text-lg md:text-xl shrink-0">{emoji}</span>
+                <span className="text-[13px] md:text-sm font-medium leading-snug">{label}</span>
               </label>
             ))}
           </div>
@@ -498,8 +498,8 @@ return (
 
       {/* CỘT PHẢI: TÓM TẮT — sticky từ lg trở lên */}
       <aside className="lg:sticky lg:top-[90px]">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
-          <h3 className="text-lg font-bold mb-5 pb-4 border-b border-slate-200">Tóm tắt đơn hàng</h3>
+        <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-slate-100">
+          <h3 className="text-base md:text-lg font-bold mb-4 md:mb-5 pb-3 md:pb-4 border-b border-slate-200">Tóm tắt đơn hàng</h3>
 
           {/* ITEMS */}
           <div className="max-h-[300px] overflow-y-auto mb-6 space-y-4">
@@ -535,11 +535,11 @@ return (
                 className="flex-1 px-3 py-2.5 border border-slate-300 rounded-lg outline-none text-sm disabled:bg-slate-100 disabled:text-slate-400 focus:border-blue-400 transition-colors"
               />
               {appliedVoucherCode ? (
-                <button onClick={handleRemoveVoucher} className="px-4 bg-red-50 text-red-500 border-none rounded-lg font-semibold cursor-pointer hover:bg-red-100 transition-colors text-sm">
+                <button onClick={handleRemoveVoucher} className="px-3 md:px-4 bg-red-50 text-red-500 border-none rounded-lg font-semibold cursor-pointer hover:bg-red-100 transition-colors text-sm shrink-0 whitespace-nowrap">
                   Hủy mã
                 </button>
               ) : (
-                <button onClick={handleApplyVoucher} className="px-4 bg-blue-50 text-blue-600 border-none rounded-lg font-semibold cursor-pointer hover:bg-blue-100 transition-colors text-sm">
+                <button onClick={handleApplyVoucher} className="px-3 md:px-4 bg-blue-50 text-blue-600 border-none rounded-lg font-semibold cursor-pointer hover:bg-blue-100 transition-colors text-sm shrink-0 whitespace-nowrap">
                   Áp dụng
                 </button>
               )}
@@ -616,7 +616,7 @@ return (
           {/* NÚT ĐẶT HÀNG */}
           <button
             onClick={handleSubmit}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white border-none py-4 rounded-lg text-base font-bold cursor-pointer flex items-center justify-center gap-2 transition-colors"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white border-none py-3.5 md:py-4 rounded-lg text-[15px] md:text-base font-bold cursor-pointer flex items-center justify-center gap-2 transition-colors"
           >
             {paymentMethod === "COD" ? "ĐẶT HÀNG NGAY" : "TIẾN HÀNH THANH TOÁN"} <ChevronRight size={18} />
           </button>

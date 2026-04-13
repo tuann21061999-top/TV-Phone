@@ -48,7 +48,7 @@ const ReviewOrder = () => {
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-slate-800 m-0 mb-3">Đặt hàng thành công!</h1>
           <p className="text-slate-500 text-[15px] max-w-[400px] m-0 leading-relaxed">
-            Cảm ơn bạn đã mua hàng tại <span className="font-semibold text-blue-600">TechNova</span>. 
+            Cảm ơn bạn đã mua hàng tại <span className="font-semibold text-blue-600">V&T Nexis</span>. 
             Đơn hàng của bạn đang chờ xác nhận.
           </p>
         </div>

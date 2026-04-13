@@ -116,10 +116,10 @@ const LoginPage = () => {
                     <div className="bg-blue-600 text-white p-1.5 rounded-lg flex items-center justify-center">
                       <Smartphone size={18} />
                     </div>
-                    <span>TechStore</span>
+                    <span>V&T Nexis</span>
                   </div>
                   <h1 className="text-[24px] mb-2 font-bold m-0 text-slate-900">Đăng nhập</h1>
-                  <p className="text-[14px] text-slate-500 m-0">Chào mừng bạn quay trở lại với TechStore</p>
+                  <p className="text-[14px] text-slate-500 m-0">Chào mừng bạn quay trở lại với V&T Nexis</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="px-[30px] pb-[30px]">

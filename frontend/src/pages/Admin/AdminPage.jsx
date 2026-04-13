@@ -22,12 +22,13 @@ import {
   ShoppingBag, FileText, Users, BarChart3,
   Package, Smartphone, MousePointer2, Settings,
   LogOut, LayoutDashboard, MessageSquare, Ticket, Flame,
-  Newspaper, Tag
+  Newspaper, Tag, Menu, X
 } from "lucide-react";
 
 function AdminPage() {
   // Đặt Dashboard làm trang mặc định
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   // Badge States
@@ -84,6 +85,7 @@ function AdminPage() {
     if (tab === "orders") setOrderBadge(0);
     if (tab === "chat") setChatBadge(0);
     if (tab === "reviews") setReviewBadge(0);
+    setIsSidebarOpen(false);
   };
   const getTabTitle = () => {
     switch (activeTab) {
@@ -118,10 +120,20 @@ function AdminPage() {
 
   return (
     <div className="fixed inset-0 z-[100] bg-slate-50 flex flex-col overflow-hidden text-left">
-      <div className="flex h-screen w-full overflow-hidden">
+      <div className="flex h-screen w-full overflow-hidden relative">
+
+        {/* MOBILE OVERLAY */}
+        {isSidebarOpen && (
+            <div className="fixed inset-0 bg-black/60 z-[1000] lg:hidden" onClick={() => setIsSidebarOpen(false)}></div>
+        )}
 
         {/* SIDEBAR */}
-        <aside className="w-[280px] h-full bg-[#0b1120] flex flex-col flex-shrink-0 border-r border-white/5 shadow-[4px_0_24px_rgba(0,0,0,0.1)]">
+        <aside className={`fixed lg:static top-0 left-0 h-full w-[280px] bg-[#0b1120] z-[1001] transform transition-transform duration-300 lg:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col flex-shrink-0 border-r border-white/5 shadow-[4px_0_24px_rgba(0,0,0,0.1)]`}>
+          
+          {/* Nút đóng Sidebar trên Mobile */}
+          <button className="lg:hidden absolute top-4 right-4 bg-transparent border-none cursor-pointer text-slate-400 hover:text-white" onClick={() => setIsSidebarOpen(false)}>
+              <X size={24} />
+          </button>
 
           {/* BRAND */}
           <div className="flex items-center gap-4 px-6 py-8 text-white">
@@ -246,10 +258,25 @@ function AdminPage() {
         </aside>
 
         {/* MAIN CONTENT */}
-        <main className="flex-1 min-w-0 h-full overflow-y-auto p-10 bg-slate-50 box-border">
-          <div className="mb-8">
-            <h1 className="text-[28px] font-extrabold text-slate-900 m-0 tracking-tight">{getTabTitle()}</h1>
+        <main className="flex-1 min-w-0 h-full overflow-y-auto bg-slate-50 box-border flex flex-col">
+          
+          {/* MOBILE TOPBAR */}
+          <div className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-slate-200">
+             <div className="flex items-center gap-3">
+                 <button className="bg-transparent border-none p-1 cursor-pointer text-slate-700 flex items-center" onClick={() => setIsSidebarOpen(true)}>
+                     <Menu size={26} strokeWidth={2.5} />
+                 </button>
+                 <h2 className="text-[18px] font-bold text-slate-900 m-0">Admin Panel</h2>
+             </div>
+             <button className="bg-slate-100 p-2 border-none rounded-full cursor-pointer hover:bg-slate-200 transition-colors" onClick={() => navigate("/")} title="Về trang chủ">
+                 <ShoppingBag size={18} className="text-slate-600" />
+             </button>
           </div>
+
+          <div className="p-4 md:p-10 flex-1">
+            <div className="mb-6 md:mb-8">
+              <h1 className="text-[22px] md:text-[28px] font-extrabold text-slate-900 m-0 tracking-tight">{getTabTitle()}</h1>
+            </div>
 
           <div className="w-full min-h-[500px] box-border animate-[fadeIn_0.4s_ease-out]">
             {activeTab === "dashboard" && <AdminDashboard />}
@@ -277,10 +304,12 @@ function AdminPage() {
               </div>
             )}
           </div>
+        </div>
         </main>
       </div>
     </div>
   );
+
 }
 
 export default AdminPage;

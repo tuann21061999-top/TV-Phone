@@ -115,6 +115,14 @@ function ManageChat() {
 
         try {
             await axios.delete(`${import.meta.env.VITE_API_URL}/api/chat/admin/conversation/${selectedUserId}`, { headers });
+            
+            if (socketRef.current && adminId) {
+                socketRef.current.emit("end_conversation", {
+                    adminId,
+                    userId: selectedUserId
+                });
+            }
+
             toast.success("Đã xóa và kết thúc trò chuyện thành công");
             setSelectedUserId(null);
             setSelectedUserName("");

@@ -11,7 +11,7 @@ const ManageReview = () => {
   const [replyingId, setReplyingId] = useState(null);
   const [replyText, setReplyText] = useState("");
 
-  const autoReplyTemplate = "Chào bạn, cảm ơn bạn đã tin tưởng và ủng hộ sản phẩm của TechNova. Rất vui khi biết bạn hài lòng với chất lượng sản phẩm và dịch vụ hỗ trợ của đội ngũ. Chúc bạn có những trải nghiệm tuyệt vời cùng sản phẩm mới!";
+  const autoReplyTemplate = "Chào bạn, cảm ơn bạn đã tin tưởng và ủng hộ sản phẩm của V&T Nexis. Rất vui khi biết bạn hài lòng với chất lượng sản phẩm và dịch vụ hỗ trợ của đội ngũ. Chúc bạn có những trải nghiệm tuyệt vời cùng sản phẩm mới!";
 
   const fetchReviews = async () => {
     try {

@@ -34,10 +34,10 @@ function Footer() {
           <div className="min-[900px]:pr-10">
             <div className="flex items-center gap-2 font-extrabold text-[24px] mb-[15px] text-[#f8fafc]">
               <Zap size={24} className="text-[#38bdf8]" />
-              <span>TechNova</span>
+              <span>V&T Nexis</span>
             </div>
             <p className="text-[15px] text-[#94a3b8] mb-6 leading-[1.7]">
-              Tương lai công nghệ trong tầm tay bạn. Khám phá các thiết bị di động và đồ điện tử đẳng cấp nhất cùng TechNova.
+              Tương lai công nghệ trong tầm tay bạn. Khám phá các thiết bị di động và đồ điện tử đẳng cấp nhất cùng V&T Nexis.
             </p>
             <div className="flex gap-3">
               <a href="#" className="inline-flex w-10 h-10 rounded-full bg-white/5 items-center justify-center text-[#f8fafc] transition-all duration-300 hover:bg-[#38bdf8] hover:text-[#0f172a] hover:-translate-y-[3px] hover:shadow-[0_4px_15px_rgba(56,189,248,0.3)]">
@@ -75,7 +75,7 @@ function Footer() {
               </div>
               <div className="flex items-start gap-3 text-[15px] text-[#94a3b8] leading-[1.5]">
                 <Mail size={18} className="text-[#38bdf8] mt-[2px] shrink-0" />
-                <span>Email: contact@technova.vn</span>
+                <span>Email: contact@vtnexis.vn</span>
               </div>
             </div>
           </div>
@@ -84,7 +84,7 @@ function Footer() {
 
         {/* Footer Bottom */}
         <div className="border-t border-white/5 pt-6 flex justify-between items-center flex-wrap text-[#64748b] text-[14px] max-[900px]:flex-col max-[900px]:gap-[15px] max-[900px]:text-center">
-          <p className="m-0">© 2024 TechNova Inc. All rights reserved.</p>
+          <p className="m-0">© 2024 V&T Nexis Inc. All rights reserved.</p>
           <div className="flex gap-[25px]">
             <Link to="/privacy-policy" className="no-underline text-[#64748b] transition-colors duration-300 hover:text-[#f8fafc]">Chính sách bảo mật</Link>
             <Link to="/terms-of-service" className="no-underline text-[#64748b] transition-colors duration-300 hover:text-[#f8fafc]">Điều khoản bảo hành</Link>

@@ -33,7 +33,7 @@ exports.sendRegisterOTP = async (req, res) => {
 
     const emailOptions = {
         to: email,
-        subject: "Mã Xác nhận Đăng ký tài khoản TechStore",
+        subject: "Mã Xác nhận Đăng ký tài khoản V&T Nexis",
         html: `<h2>Xác nhận Đăng ký</h2><p>Mã OTP của bạn là: <b>${otpCode}</b>. Mã có hiệu lực trong 5 phút.</p>`
     };
     await sendEmail(emailOptions);
@@ -229,7 +229,7 @@ exports.forgotPassword = async (req, res) => {
     // SỬ DỤNG HÀM GỬI EMAIL THẬT SỰ
     const emailOptions = {
         to: email,
-        subject: "Mã Khôi phục Mật khẩu TechStore",
+        subject: "Mã Khôi phục Mật khẩu V&T Nexis",
         html: `<h2>Khôi phục mật khẩu</h2><p>Mã OTP của bạn là: <b>${otpCode}</b>. Mã có hiệu lực trong 5 phút.</p>`
     };
     await sendEmail(emailOptions);

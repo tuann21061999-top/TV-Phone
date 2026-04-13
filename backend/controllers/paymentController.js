@@ -1,9 +1,9 @@
 const Order = require("../models/Order");
-const Product = require("../models/Product"); // Gọi thêm Product để trừ kho
+const Product = require("../models/Product");
 const { VNPay, ProductCode, VnpLocale, dateFormat } = require("vnpay");
 const crypto = require("crypto");
 const https = require("https");
-const qs = require("qs"); // Thư viện gốc của Nodejs dùng cho cấu hình URL Query
+const qs = require("qs");
 
 const vnpay = new VNPay({
   tmnCode: "64DFOLZV",
@@ -30,12 +30,13 @@ class PaymentController {
       // --- XỬ LÝ VNPAY ---
       if (paymentMethod === "VNPAY") {
         const vnpUrl = vnpay.buildPaymentUrl({
-          vnp_Amount: amount, // Thư viện vnpayjs đã tự động nhân 100 bên trong
+          vnp_Amount: amount,
           vnp_IpAddr: req.headers["x-forwarded-for"] || req.connection.remoteAddress || "127.0.0.1",
           vnp_TxnRef: order._id.toString(), 
           vnp_OrderInfo: `Thanh toan don hang ${order._id}`,
           vnp_OrderType: ProductCode.Other,
-          vnp_ReturnUrl: `https://tv-phone.onrender.com/api/payments/vnpay-callback`, 
+          // SỬ DỤNG BIẾN MÔI TRƯỜNG BACKEND
+          vnp_ReturnUrl: `${process.env.BACKEND_URL}/api/payments/vnpay-callback`, 
           vnp_Locale: VnpLocale.VN,
           vnp_CreateDate: dateFormat(new Date()),
         });
@@ -50,36 +51,31 @@ class PaymentController {
         const partnerCode = "MOMO";
         const amountStr = amount.toString();
         
-        // redirectUrl is where the browser returns. Pointing back to our backend to update DB first.
-        const redirectUrl = `https://tv-phone.onrender.com/api/payments/momo-return`; 
+        // SỬ DỤNG BIẾN MÔI TRƯỜNG BACKEND
+        const redirectUrl = `${process.env.BACKEND_URL}/api/payments/momo-return`; 
         
-        // ipnUrl is the server-to-server callback (webhook) MoMo calls to update our DB silently.
         const ipnUrl = `https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b`; 
-        // In local development, MoMo can't reach localhost. Let's use the provided webhook or an empty one for now.
-        // Actually, we must supply a valid URL format.
         
-        const orderId = partnerCode + new Date().getTime() + "_" + order._id.toString();
-        const requestId = orderId;
-        const orderInfo = `Thanh toan đơn hàng TechNova ${order._id}`;
+        const orderId_momo = partnerCode + new Date().getTime() + "_" + order._id.toString();
+        const requestId = orderId_momo;
+        const orderInfo = `Thanh toan đơn hàng V&T Nexis ${order._id}`;
         const requestType = "payWithMethod"; 
         const extraData = ""; 
         const orderGroupId = "";
         const autoCapture = true;
         const lang = "vi";
 
-        // From user sample:
-        // accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType
-        const rawSignature = "accessKey=" + accessKey + "&amount=" + amountStr + "&extraData=" + extraData + "&ipnUrl=" + ipnUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&partnerCode=" + partnerCode + "&redirectUrl=" + redirectUrl + "&requestId=" + requestId + "&requestType=" + requestType;
+        const rawSignature = "accessKey=" + accessKey + "&amount=" + amountStr + "&extraData=" + extraData + "&ipnUrl=" + ipnUrl + "&orderId=" + orderId_momo + "&orderInfo=" + orderInfo + "&partnerCode=" + partnerCode + "&redirectUrl=" + redirectUrl + "&requestId=" + requestId + "&requestType=" + requestType;
         
         const signature = crypto.createHmac("sha256", secretKey).update(rawSignature).digest("hex");
 
         const requestBody = JSON.stringify({
           partnerCode: partnerCode,
-          partnerName: "TechNova",
+          partnerName: "V&T Nexis",
           storeId: "MomoTestStore",
           requestId: requestId,
           amount: amountStr,
-          orderId: orderId,
+          orderId: orderId_momo,
           orderInfo: orderInfo,
           redirectUrl: redirectUrl,
           ipnUrl: ipnUrl,
@@ -129,11 +125,9 @@ class PaymentController {
       let vnp_Params = req.query;
       const secureHash = vnp_Params['vnp_SecureHash'];
 
-      // Xóa các tham số hash để tạo hash mới và kiểm chứng
       delete vnp_Params['vnp_SecureHash'];
       delete vnp_Params['vnp_SecureHashType'];
 
-      // Sắp xếp params theo thứ tự
       vnp_Params = Object.keys(vnp_Params).sort().reduce((result, key) => {
         result[key] = vnp_Params[key];
         return result;
@@ -146,12 +140,8 @@ class PaymentController {
 
       const orderId = vnp_Params['vnp_TxnRef'];
 
-      // FIX LỖI BẢO MẬT: Phải kiểm tra chữ ký trước khi Update Database
-      // Tạm thời trên môi trường test localhost, đôi khi URL bị encode sai dẫn đến hash không khớp.
-      // Trong thực tế, phải dùng condition: if(secureHash === signed)
-      if (secureHash === signed || req.hostname === 'localhost' || req.hostname === '127.0.0.1' || req.hostname === 'tv-phone.onrender.com') {
+      if (secureHash === signed || req.hostname === 'localhost' || req.hostname === '127.0.0.1') {
         if (vnp_Params['vnp_ResponseCode'] === "00") {
-          // Thanh toán thành công -> Cập nhật và trừ kho
           const order = await Order.findById(orderId);
           if (order && order.status === "pending") {
             order.status = "paid";
@@ -159,7 +149,6 @@ class PaymentController {
             order.paidAt = new Date();
             await order.save();
 
-            // Lúc này khách đã chuyển khoản thật, mới thực hiện trừ kho hàng
             for (const item of order.items) {
               await Product.updateOne(
                 { _id: item.productId, "variants._id": item.variantId },
@@ -167,18 +156,17 @@ class PaymentController {
               );
             }
           }
-          return res.redirect(`https://vtnexis.vercel.app/payment-result?status=success&orderId=${orderId}`);
+          // SỬ DỤNG BIẾN MÔI TRƯỜNG FRONTEND
+          return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=success&orderId=${orderId}`);
         } else {
-          // Giao dịch không thành công
           await Order.findByIdAndUpdate(orderId, { status: "unsuccessful" });
-          return res.redirect(`https://vtnexis.vercel.app/payment-result?status=error`);
+          return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=error`);
         }
       } else {
-        // Có người cố tình Fake link VNPay
-        return res.redirect(`https://vtnexis.vercel.app/payment-result?status=invalid_signature`);
+        return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=invalid_signature`);
       }
     } catch (error) {
-      res.redirect(`https://vtnexis.vercel.app/payment-fail`);
+      return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=error`);
     }
   }
 
@@ -192,7 +180,6 @@ class PaymentController {
       const secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
       const accessKey = "F8BBA842ECF85";
 
-      // FIX LỖI BẢO MẬT: Kiểm tra chữ ký từ MoMo
       const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&message=${message}&orderId=${orderId}&orderInfo=${orderInfo}&orderType=${orderType}&partnerCode=${partnerCode}&payType=${payType}&requestId=${requestId}&responseTime=${responseTime}&resultCode=${resultCode}&transId=${transId}`;
       const expectedSignature = crypto.createHmac("sha256", secretKey).update(rawSignature).digest("hex");
 
@@ -201,17 +188,16 @@ class PaymentController {
       }
 
       const orderIdParts = orderId.split("_");
-      const realOrderId = orderIdParts.length > 1 ? orderIdParts[1] : orderIdParts[0]; // because we appended _id
+      const realOrderId = orderIdParts.length > 1 ? orderIdParts[1] : orderIdParts[0]; 
       const order = await Order.findById(realOrderId);
 
-      if (resultCode == 0) { // resultCode 0 = Thành công
+      if (resultCode == 0) { 
         if (order && order.status === "pending") {
           order.status = "paid";
           order.isPaid = true;
           order.paidAt = new Date();
           await order.save();
 
-          // Trừ kho hàng
           for (const item of order.items) {
             await Product.updateOne(
               { _id: item.productId, "variants._id": item.variantId },
@@ -242,18 +228,18 @@ class PaymentController {
       const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&message=${message}&orderId=${orderId}&orderInfo=${orderInfo}&orderType=${orderType}&partnerCode=${partnerCode}&payType=${payType}&requestId=${requestId}&responseTime=${responseTime}&resultCode=${resultCode}&transId=${transId}`;
       const expectedSignature = crypto.createHmac("sha256", secretKey).update(rawSignature).digest("hex");
 
-      // Cho phép bypass localhost để test dễ hơn do url có thể bị encode làm sai lệch Hash
-      if (signature !== expectedSignature && req.hostname !== 'localhost' && req.hostname !== '127.0.0.1' && req.hostname !== 'tv-phone.onrender.com') {
-        return res.redirect(`https://vtnexis.vercel.app/payment-result?status=invalid_signature`);
+      if (signature !== expectedSignature && req.hostname !== 'localhost' && req.hostname !== '127.0.0.1') {
+        // SỬ DỤNG BIẾN MÔI TRƯỜNG FRONTEND
+        return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=invalid_signature`);
       }
 
       const orderIdParts = orderId ? orderId.split("_") : [];
-      if (orderIdParts.length === 0) return res.redirect(`https://vtnexis.vercel.app/payment-result?status=error`);
+      if (orderIdParts.length === 0) return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=error`);
       
       const realOrderId = orderIdParts.length > 1 ? orderIdParts[1] : orderIdParts[0];
       const order = await Order.findById(realOrderId);
 
-      if (resultCode == 0) { // Thành công
+      if (resultCode == 0) { 
         if (order && order.status === "pending") {
           order.status = "paid";
           order.isPaid = true;
@@ -267,16 +253,16 @@ class PaymentController {
             );
           }
         }
-        return res.redirect(`https://vtnexis.vercel.app/payment-result?status=success&orderId=${realOrderId}`);
+        return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=success&orderId=${realOrderId}`);
       } else {
         if(order && order.status === "pending") {
             await Order.findByIdAndUpdate(realOrderId, { status: "unsuccessful" });
         }
-        return res.redirect(`https://vtnexis.vercel.app/payment-result?status=error`);
+        return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=error`);
       }
     } catch (error) {
       console.error(error);
-      return res.redirect(`https://vtnexis.vercel.app/payment-result?status=error`);
+      return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=error`);
     }
   }
 }

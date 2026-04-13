@@ -36,8 +36,6 @@ const ProductReview = ({ productId }) => {
   // Kiểm tra quyền (Đã mua hàng chưa)
   const checkUserEligibility = async () => {
     const token = localStorage.getItem("token");
-
-    // Nếu khách vãng lai -> Dừng
     if (!token) {
       setCanReview(false);
       return;
@@ -47,11 +45,7 @@ const ProductReview = ({ productId }) => {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/reviews/check-eligibility/${productId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
-      // 1. Mở khóa nút viết đánh giá
       setCanReview(res.data.canReview);
-
-      // 2. Tự động điền dữ liệu cũ nếu khách đã từng đánh giá (Tính năng Sửa đánh giá)
       if (res.data.existingReview) {
         setIsEditing(true);
         setRating(res.data.existingReview.rating);
@@ -61,7 +55,6 @@ const ProductReview = ({ productId }) => {
         setRating(5);
         setComment("");
       }
-
     } catch (error) {
       setCanReview(false);
       if (error.response?.status !== 401) {
@@ -75,10 +68,8 @@ const ProductReview = ({ productId }) => {
       fetchReviews();
       checkUserEligibility();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
-  // --- GỬI ĐÁNH GIÁ (JSON THUẦN) ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!token) { toast.error("Vui lòng đăng nhập!"); return; }
@@ -86,7 +77,6 @@ const ProductReview = ({ productId }) => {
 
     setIsSubmitting(true);
     try {
-      // GỬI DỮ LIỆU DẠNG JSON (BỎ FORM DATA VÀ IMAGE)
       await axios.post(`${import.meta.env.VITE_API_URL}/api/reviews`, {
         productId,
         rating,
@@ -122,213 +112,221 @@ const ProductReview = ({ productId }) => {
   if (sortBy === "oldest") displayReviews.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
   return (
-  <div className="bg-white rounded-2xl p-8 mt-8 shadow-sm border border-slate-100 font-sans text-slate-800">
+    <div className="bg-white rounded-2xl p-4 md:p-8 mt-6 md:mt-8 shadow-sm border border-slate-100 font-sans text-slate-800">
 
-    {/* HEADER */}
-    <div className="flex justify-between items-start mb-6">
-      <div>
-        <h2 className="text-2xl font-bold m-0 mb-1.5">Đánh giá từ khách hàng</h2>
-        <p className="text-sm text-slate-500 m-0">Dựa trên {totalReviews.toLocaleString()} đánh giá thực tế từ người dùng</p>
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div>
+          <h2 className="text-xl md:text-2xl font-bold m-0 mb-1">Đánh giá từ khách hàng</h2>
+          <p className="text-[13px] md:text-sm text-slate-500 m-0">Dựa trên {totalReviews.toLocaleString()} đánh giá thực tế</p>
+        </div>
+
+        {!token ? (
+          <p className="text-[13px] text-slate-500 italic">Vui lòng đăng nhập để đánh giá.</p>
+        ) : !canReview ? (
+          <p className="text-[13px] text-amber-600 bg-amber-50 p-2 rounded-lg flex items-center gap-1.5 font-medium border border-amber-100">
+            <ShieldCheck size={16} /> Chỉ khách hàng đã nhận hàng mới được đánh giá.
+          </p>
+        ) : (
+          <button
+            className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white border-none px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-sm"
+            onClick={() => setShowForm(!showForm)}
+          >
+            <Edit size={16} /> {isEditing ? "Sửa đánh giá của bạn" : "Viết đánh giá"}
+          </button>
+        )}
       </div>
 
-      {!token ? (
-        <p className="text-sm text-slate-500">Vui lòng đăng nhập để đánh giá.</p>
-      ) : !canReview ? (
-        <p className="text-sm text-amber-500 flex items-center gap-1.5">
-          <ShieldCheck size={16} /> Chỉ khách hàng đã mua và nhận hàng mới được đánh giá.
-        </p>
-      ) : (
-        <button
-          className="bg-blue-600 hover:bg-blue-700 text-white border-none px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 cursor-pointer transition-colors"
-          onClick={() => setShowForm(!showForm)}
-        >
-          <Edit size={16} /> {isEditing ? "Sửa đánh giá của bạn" : "Viết đánh giá"}
-        </button>
-      )}
-    </div>
+      {/* SUMMARY BOX - Responsive: Dọc trên Mobile, Ngang trên PC */}
+      <div className="flex flex-col md:flex-row items-center bg-slate-50/50 rounded-2xl border border-slate-100 mb-8 overflow-hidden">
+        <div className="w-full md:w-[35%] p-6 md:p-8 text-center border-b md:border-b-0 md:border-r border-slate-200 bg-white md:bg-transparent">
+          <div className="text-5xl md:text-6xl font-black text-slate-800 leading-none mb-3">{avgRating}</div>
+          <div className="flex justify-center gap-1 mb-2">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star
+                key={star}
+                size={22}
+                fill={star <= Math.round(avgRating) ? "#F59E0B" : "none"}
+                color={star <= Math.round(avgRating) ? "#F59E0B" : "#CBD5E1"}
+              />
+            ))}
+          </div>
+          <div className="text-[13px] text-slate-500 font-medium">{totalReviews.toLocaleString()} lượt đánh giá</div>
+        </div>
 
-    {/* SUMMARY BOX */}
-    <div className="flex items-center bg-white rounded-xl border border-slate-200 mb-6">
-      <div className="w-[30%] p-8 text-center border-r border-slate-200">
-        <div className="text-5xl font-extrabold text-slate-800 leading-none mb-2">{avgRating}</div>
-        <div className="flex justify-center gap-1 mb-2">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <Star
-              key={star}
-              size={20}
-              fill={star <= Math.round(avgRating) ? "#2563EB" : "none"}
-              color={star <= Math.round(avgRating) ? "#2563EB" : "#CBD5E1"}
-            />
+        <div className="w-full md:w-[65%] p-6 md:px-10 md:py-8 flex flex-col gap-3">
+          {[5, 4, 3, 2, 1].map(star => (
+            <div key={star} className="flex items-center gap-3 md:gap-4">
+              <span className="text-[13px] font-bold text-slate-600 w-11 shrink-0">{star} sao</span>
+              <div className="flex-1 h-2.5 bg-white rounded-full overflow-hidden border border-slate-100">
+                <div
+                  className="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-700"
+                  style={{ width: `${getPercent(star)}%` }}
+                />
+              </div>
+              <span className="text-[13px] font-semibold text-slate-500 w-9 text-right">{getPercent(star)}%</span>
+            </div>
           ))}
         </div>
-        <div className="text-xs text-slate-500">{totalReviews.toLocaleString()} lượt đánh giá</div>
       </div>
 
-      <div className="w-[70%] px-10 py-8 flex flex-col gap-3">
-        {[5, 4, 3, 2, 1].map(star => (
-          <div key={star} className="flex items-center gap-4">
-            <span className="text-xs font-semibold text-slate-500 w-11">{star} sao</span>
-            <div className="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-blue-600 rounded-full transition-all"
-                style={{ width: `${getPercent(star)}%` }}
-              />
-            </div>
-            <span className="text-xs text-slate-500 w-9 text-right">{getPercent(star)}%</span>
-          </div>
-        ))}
-      </div>
-    </div>
-
-    {/* FORM VIẾT ĐÁNH GIÁ */}
-    {showForm && (
-      <div className="bg-slate-50 p-6 rounded-xl mb-6 border border-slate-200">
-        <h4 className="text-base font-semibold m-0 mb-4">
-          {isEditing ? "Cập nhật đánh giá của bạn" : "Gửi đánh giá của bạn"}
-        </h4>
-        <form onSubmit={handleSubmit}>
-          <div className="flex items-center gap-3 mb-4 text-sm font-semibold">
-            <span>Chất lượng sản phẩm:</span>
-            <div className="flex gap-1 cursor-pointer">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  size={28}
-                  className="cursor-pointer"
-                  fill={star <= rating ? "#F59E0B" : "none"}
-                  color={star <= rating ? "#F59E0B" : "#CBD5E1"}
-                  onClick={() => setRating(star)}
-                />
-              ))}
-            </div>
-          </div>
-
-          <textarea
-            placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..."
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            rows="4"
-            className="w-full p-4 border border-slate-200 rounded-lg font-sans text-sm mb-4 resize-y box-border focus:border-blue-400 focus:outline-none"
-          />
-
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setShowForm(false)}
-              className="bg-white border border-slate-200 px-5 py-2.5 rounded-lg font-semibold cursor-pointer text-slate-500 hover:bg-slate-50 transition-colors"
-            >
-              Hủy
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting || !token}
-              className="bg-blue-600 border-none text-white px-6 py-2.5 rounded-lg font-semibold cursor-pointer hover:bg-blue-700 transition-colors disabled:opacity-60 flex items-center gap-2"
-            >
-              {isSubmitting
-                ? <><Loader2 size={16} className="animate-spin" /> Đang gửi...</>
-                : (isEditing ? "Cập nhật" : "Gửi đánh giá")}
-            </button>
-          </div>
-        </form>
-      </div>
-    )}
-
-    {/* FILTER & SORT */}
-    <div className="flex justify-between items-center pb-5 border-b border-slate-200 mb-6">
-      <div className="flex gap-2.5">
-        {["all", "5", "4", "3"].map((f) => (
-          <button
-            key={f}
-            onClick={() => setActiveFilter(f)}
-            className={`border px-4 py-2 rounded-full text-xs font-semibold cursor-pointer transition-colors
-              ${activeFilter === f
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300"
-              }`}
-          >
-            {f === "all" ? "Tất cả" : `${f} sao`}
-          </button>
-        ))}
-      </div>
-      <div className="flex items-center gap-2 text-xs text-slate-500">
-        <span>Sắp xếp:</span>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="border-none bg-transparent text-xs font-semibold text-slate-800 outline-none cursor-pointer"
-        >
-          <option value="newest">Mới nhất</option>
-          <option value="oldest">Cũ nhất</option>
-        </select>
-      </div>
-    </div>
-
-    {/* DANH SÁCH REVIEW */}
-    <div className="flex flex-col gap-6">
-      {loading ? (
-        <p className="text-center text-slate-400 py-8">Đang tải đánh giá...</p>
-      ) : displayReviews.length === 0 ? (
-        <p className="text-center text-slate-400 py-8">Không có đánh giá nào phù hợp.</p>
-      ) : (
-        displayReviews.map((rev) => (
-          <div key={rev._id} className="flex gap-4 border-b border-slate-50 pb-6 last:border-none last:pb-0">
-            <div className="w-12 h-12 rounded-full overflow-hidden shrink-0">
-              <UserCircle size={48} color="#94A3B8" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-1">
-                <strong className="text-sm text-slate-800">{rev.username}</strong>
-                <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">
-                  <ShieldCheck size={14} /> ĐÃ MUA HÀNG
-                </span>
+      {/* FORM VIẾT ĐÁNH GIÁ (GIỮ NGUYÊN LOGIC) */}
+      {showForm && (
+        <div className="bg-white p-5 md:p-6 rounded-xl mb-8 border-2 border-blue-100 shadow-lg animate-[slideUp_0.3s_ease]">
+          <h4 className="text-base font-bold m-0 mb-4 text-slate-800">
+            {isEditing ? "Cập nhật đánh giá của bạn" : "Gửi đánh giá của bạn"}
+          </h4>
+          <form onSubmit={handleSubmit}>
+            <div className="flex items-center gap-4 mb-5 p-3 bg-slate-50 rounded-lg">
+              <span className="text-sm font-bold text-slate-700">Chất lượng:</span>
+              <div className="flex gap-1.5">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    size={32}
+                    className="cursor-pointer active:scale-125 transition-transform"
+                    fill={star <= rating ? "#F59E0B" : "none"}
+                    color={star <= rating ? "#F59E0B" : "#CBD5E1"}
+                    onClick={() => setRating(star)}
+                  />
+                ))}
               </div>
-
-              <div className="flex items-center gap-3 mb-3">
-                <div className="flex gap-0.5">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      size={14}
-                      fill={star <= rev.rating ? "#2563EB" : "none"}
-                      color={star <= rev.rating ? "#2563EB" : "#CBD5E1"}
-                    />
-                  ))}
-                </div>
-                <span className="text-xs text-slate-400">
-                  {new Date(rev.createdAt).toLocaleDateString('vi-VN')}
-                </span>
-              </div>
-
-              <p className="text-sm text-slate-600 leading-relaxed m-0 mb-4">{rev.comment}</p>
-
-              <div className="flex items-center gap-4">
-                <button className="bg-white border border-slate-200 px-3 py-1.5 rounded-md text-xs font-semibold text-slate-500 flex items-center gap-1.5 cursor-pointer hover:bg-slate-50 hover:border-slate-300 transition-colors">
-                  <ThumbsUp size={14} /> Hữu ích
-                </button>
-                <button className="bg-none border-none text-slate-400 text-xs cursor-pointer p-0 hover:text-slate-800 hover:underline transition-colors">
-                  Báo cáo vi phạm
-                </button>
-              </div>
-
-              {rev.adminReply && (
-                <div className="bg-slate-50 border-l-4 border-blue-600 pl-4 pr-4 py-4 rounded-r-lg mt-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <strong className="text-sm text-slate-800">TechNova Shop</strong>
-                    <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-1.5 py-0.5 rounded">QUẢN TRỊ VIÊN</span>
-                    <span className="text-xs text-slate-400 ml-auto">
-                      {new Date(rev.adminReplyDate || rev.updatedAt).toLocaleDateString('vi-VN')}
-                    </span>
-                  </div>
-                  <p className="m-0 text-sm text-slate-500 italic leading-relaxed">"{rev.adminReply}"</p>
-                </div>
-              )}
             </div>
-          </div>
-        ))
+
+            <textarea
+              placeholder="Chia sẻ cảm nhận của bạn về sản phẩm (ví dụ: giao hàng nhanh, máy đẹp, chụp ảnh nét...)"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              rows="4"
+              className="w-full p-4 border border-slate-200 rounded-xl font-sans text-[14.5px] mb-4 resize-y box-border focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+            />
+
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="px-6 py-2.5 rounded-lg font-bold cursor-pointer text-slate-500 hover:bg-slate-100 transition-colors border-none bg-transparent"
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting || !token}
+                className="bg-blue-600 border-none text-white px-8 py-2.5 rounded-lg font-bold cursor-pointer hover:bg-blue-700 transition-all shadow-md disabled:opacity-50 flex items-center gap-2"
+              >
+                {isSubmitting
+                  ? <><Loader2 size={18} className="animate-spin" /> Đang gửi...</>
+                  : (isEditing ? "Cập nhật" : "Gửi đánh giá")}
+              </button>
+            </div>
+          </form>
+        </div>
       )}
+
+      {/* FILTER & SORT - Fix tràn trên Mobile */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-slate-100 mb-8">
+        {/* VUỐT NGANG BỘ LỌC SAO */}
+        <div className="flex gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 scrollbar-hide [&::-webkit-scrollbar]:hidden">
+          {["all", "5", "4", "3"].map((f) => (
+            <button
+              key={f}
+              onClick={() => setActiveFilter(f)}
+              className={`whitespace-nowrap px-4 py-2 rounded-full text-[13px] font-bold transition-all border shrink-0
+                ${activeFilter === f
+                  ? "bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-600/20"
+                  : "bg-white border-slate-200 text-slate-600 hover:border-slate-300 active:bg-slate-50"
+                }`}
+            >
+              {f === "all" ? "Tất cả" : `${f} sao`}
+            </button>
+          ))}
+        </div>
+        
+        <div className="flex items-center gap-3 text-[13px] text-slate-500 bg-slate-100/50 px-3 py-1.5 rounded-lg w-full sm:w-auto justify-between sm:justify-start">
+          <span className="font-medium whitespace-nowrap">Sắp xếp theo:</span>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="border-none bg-transparent text-[13px] font-bold text-slate-800 outline-none cursor-pointer p-0"
+          >
+            <option value="newest">Mới nhất</option>
+            <option value="oldest">Cũ nhất</option>
+          </select>
+        </div>
+      </div>
+
+      {/* DANH SÁCH REVIEW */}
+      <div className="flex flex-col gap-8">
+        {loading ? (
+          <div className="flex justify-center py-12"><Loader2 className="animate-spin text-slate-300" size={40} /></div>
+        ) : displayReviews.length === 0 ? (
+          <div className="text-center py-16 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+            <p className="text-slate-400 font-medium m-0">Chưa có đánh giá nào phù hợp.</p>
+          </div>
+        ) : (
+          displayReviews.map((rev) => (
+            <div key={rev._id} className="flex gap-3 md:gap-5 border-b border-slate-50 pb-8 last:border-none last:pb-0">
+              <div className="shrink-0 pt-1">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200">
+                  <UserCircle size={32} strokeWidth={1.5} />
+                </div>
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-2">
+                  <strong className="text-[15px] md:text-base text-slate-900 truncate">{rev.username}</strong>
+                  <span className="flex items-center gap-1 text-[10px] md:text-[11px] font-black text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                    <ShieldCheck size={13} className="shrink-0" /> Đã mua hàng
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex gap-0.5 shrink-0">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={14}
+                        fill={star <= rev.rating ? "#F59E0B" : "none"}
+                        color={star <= rev.rating ? "#F59E0B" : "#CBD5E1"}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-[11px] md:text-xs text-slate-400 font-medium">
+                    {new Date(rev.createdAt).toLocaleDateString('vi-VN')}
+                  </span>
+                </div>
+
+                <p className="text-sm md:text-[15px] text-slate-700 leading-relaxed m-0 mb-4 whitespace-pre-wrap break-words">{rev.comment}</p>
+
+                <div className="flex items-center gap-4">
+                  <button className="bg-white border border-slate-200 px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 flex items-center gap-1.5 cursor-pointer hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95">
+                    <ThumbsUp size={14} /> Hữu ích
+                  </button>
+                  <button className="bg-none border-none text-slate-400 text-[11px] md:text-xs font-medium cursor-pointer p-0 hover:text-slate-800 hover:underline transition-colors">
+                    Báo cáo vi phạm
+                  </button>
+                </div>
+
+                {rev.adminReply && (
+                  <div className="bg-blue-50/50 border-l-4 border-blue-500 px-4 md:px-5 py-4 rounded-r-2xl mt-5">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-[10px] text-white font-bold shrink-0">V&T</div>
+                      <strong className="text-[13px] md:text-sm text-blue-800">V&T Nexis Shop</strong>
+                      <span className="bg-blue-600 text-white text-[8px] md:text-[9px] font-black px-1.5 py-0.5 rounded-sm uppercase">Quản trị viên</span>
+                      <span className="text-[10px] md:text-xs text-slate-400 ml-auto font-medium">
+                        {new Date(rev.adminReplyDate || rev.updatedAt).toLocaleDateString('vi-VN')}
+                      </span>
+                    </div>
+                    <p className="m-0 text-[13.5px] md:text-sm text-slate-600 italic leading-relaxed">"{rev.adminReply}"</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default ProductReview;

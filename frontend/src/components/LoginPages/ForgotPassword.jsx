@@ -81,7 +81,7 @@ const ForgotPassword = () => {
                                 <div className="bg-blue-600 text-white p-1.5 rounded-lg flex items-center justify-center">
                                     <Smartphone size={18} />
                                 </div>
-                                <span>TechStore</span>
+                                <span>V&T Nexis</span>
                             </div>
                             <h1 className="text-[24px] mb-2 font-bold m-0 text-slate-900">Khôi phục mật khẩu</h1>
                             <p className="text-[14px] text-slate-500 m-0">

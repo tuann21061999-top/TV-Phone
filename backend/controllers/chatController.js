@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 
 const chatController = {
     /* =====================================================
-       LẤY LỊCH SỬ CHAT GIỮA 2 NGƯỜI
+       LẤY LỊCH SỬ CHAT GIỮA KHÁCH HÀNG VÀ (CÁC) ADMIN
        GET /api/chat/conversation/:userId
        ===================================================== */
     getConversation: async (req, res) => {
@@ -12,14 +12,37 @@ const chatController = {
             const myId = req.user.id;
             const partnerId = req.params.userId;
 
-            const messages = await Message.find({
-                $or: [
-                    { senderId: myId, receiverId: partnerId },
-                    { senderId: partnerId, receiverId: myId },
-                ],
-            })
-                .sort({ createdAt: 1 }) // Cũ nhất trước
-                .limit(200); // Giới hạn để tránh quá tải
+            // Kiểm tra xem người đang request có phải admin không
+            const currentUser = await User.findById(myId);
+            const isAdmin = currentUser && currentUser.role === "admin";
+
+            let matchCondition = {};
+
+            if (isAdmin) {
+                // Nếu là Admin: Lấy TẤT CẢ tin nhắn của khách hàng này (partnerId)
+                // với BẤT KỲ admin nào trong hệ thống.
+                const admins = await User.find({ role: "admin" }).select("_id");
+                const adminIds = admins.map(a => a._id);
+
+                matchCondition = {
+                    $or: [
+                        { senderId: { $in: adminIds }, receiverId: partnerId },
+                        { senderId: partnerId, receiverId: { $in: adminIds } },
+                    ]
+                };
+            } else {
+                // Nếu là Khách: Chỉ lấy tin nhắn đích danh của họ
+                matchCondition = {
+                    $or: [
+                        { senderId: myId, receiverId: partnerId },
+                        { senderId: partnerId, receiverId: myId },
+                    ]
+                };
+            }
+
+            const messages = await Message.find(matchCondition)
+                .sort({ createdAt: 1 }) 
+                .limit(200); 
 
             res.status(200).json(messages);
         } catch (error) {
@@ -30,27 +53,30 @@ const chatController = {
 
     /* =====================================================
        ADMIN: LẤY DANH SÁCH TẤT CẢ CONVERSATION
-       Gom nhóm theo user, lấy tin nhắn cuối + số tin chưa đọc
        GET /api/chat/admin/conversations
        ===================================================== */
     getAdminConversations: async (req, res) => {
         try {
-            // Chuyển sang ObjectId vì aggregate cần so sánh chính xác kiểu dữ liệu
-            const adminId = new mongoose.Types.ObjectId(req.user.id);
+            // Lấy danh sách ID của TẤT CẢ admin hiện có
+            const admins = await User.find({ role: "admin" }).select("_id");
+            const adminIds = admins.map(a => new mongoose.Types.ObjectId(a._id));
 
-            // Tìm tất cả tin nhắn liên quan đến admin
+            // Tìm tất cả tin nhắn mà người gửi HOẶC người nhận là MỘT TRONG SỐ CÁC ADMIN
             const conversations = await Message.aggregate([
                 {
                     $match: {
-                        $or: [{ senderId: adminId }, { receiverId: adminId }],
+                        $or: [
+                            { senderId: { $in: adminIds } },
+                            { receiverId: { $in: adminIds } }
+                        ],
                     },
                 },
                 {
-                    // Lấy ID của người kia (không phải admin)
+                    // Lấy ID của Khách hàng (người không nằm trong mảng adminIds)
                     $addFields: {
                         partnerId: {
                             $cond: [
-                                { $eq: ["$senderId", adminId] },
+                                { $in: ["$senderId", adminIds] },
                                 "$receiverId",
                                 "$senderId",
                             ],
@@ -69,7 +95,8 @@ const chatController = {
                                 $cond: [
                                     {
                                         $and: [
-                                            { $ne: ["$senderId", adminId] },
+                                            // Đếm tin chưa đọc nếu người gửi KHÔNG PHẢI là admin (tức là khách nhắn)
+                                            { $not: { $in: ["$senderId", adminIds] } },
                                             { $eq: ["$isRead", false] },
                                         ],
                                     },
@@ -88,7 +115,6 @@ const chatController = {
                 { $sort: { lastMessageTime: -1 } },
             ]);
 
-            // Nạp thêm thông tin user
             const populatedConversations = await Promise.all(
                 conversations.map(async (conv) => {
                     const user = await User.findById(conv._id).select("name email");
@@ -116,11 +142,14 @@ const chatController = {
        ===================================================== */
     markAsRead: async (req, res) => {
         try {
-            const myId = req.user.id;
             const partnerId = req.params.userId;
+            
+            // Bất kỳ admin nào đọc cũng sẽ đánh dấu là đã đọc cho cả hệ thống
+            const admins = await User.find({ role: "admin" }).select("_id");
+            const adminIds = admins.map(a => a._id);
 
             await Message.updateMany(
-                { senderId: partnerId, receiverId: myId, isRead: false },
+                { senderId: partnerId, receiverId: { $in: adminIds }, isRead: false },
                 { $set: { isRead: true } }
             );
 
@@ -131,7 +160,7 @@ const chatController = {
     },
 
     /* =====================================================
-       LẤY DANH SÁCH ADMIN (để user biết gửi cho ai)
+       LẤY DANH SÁCH ADMIN
        GET /api/chat/admins
        ===================================================== */
     getAdmins: async (req, res) => {
@@ -149,14 +178,17 @@ const chatController = {
        ===================================================== */
     endConversation: async (req, res) => {
         try {
-            const adminId = req.user.id;
             const partnerId = req.params.userId;
 
+            const admins = await User.find({ role: "admin" }).select("_id");
+            const adminIds = admins.map(a => a._id);
+
+            // Gom lịch sử vào kho lưu trữ chung, không phân biệt admin nào đã ấn kết thúc
             await Message.updateMany(
                 {
                     $or: [
-                        { senderId: adminId, receiverId: partnerId },
-                        { senderId: partnerId, receiverId: adminId },
+                        { senderId: { $in: adminIds }, receiverId: partnerId },
+                        { senderId: partnerId, receiverId: { $in: adminIds } },
                     ],
                 },
                 { $set: { isArchived: true } }

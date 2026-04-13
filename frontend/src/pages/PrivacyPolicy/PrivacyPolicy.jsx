@@ -9,7 +9,7 @@ const sections = [
     title: "1. Thông tin chúng tôi thu thập",
     content: [
       "**Thông tin cá nhân**: Khi bạn đăng ký tài khoản hoặc thực hiện mua hàng, chúng tôi thu thập họ tên, địa chỉ email, số điện thoại và địa chỉ giao hàng.",
-      "**Thông tin thanh toán**: Thông tin thẻ tín dụng/ghi nợ được mã hóa và xử lý bởi các đối tác thanh toán bên thứ ba uy tín (VNPay, Momo). TechNova không lưu trữ thông tin thẻ của bạn.",
+      "**Thông tin thanh toán**: Thông tin thẻ tín dụng/ghi nợ được mã hóa và xử lý bởi các đối tác thanh toán bên thứ ba uy tín (VNPay, Momo). V&T Nexis không lưu trữ thông tin thẻ của bạn.",
       "**Dữ liệu sử dụng**: Chúng tôi tự động ghi lại địa chỉ IP, loại trình duyệt, lịch sử duyệt web và hành vi mua sắm nhằm cải thiện trải nghiệm dịch vụ.",
     ],
   },
@@ -27,7 +27,7 @@ const sections = [
     icon: <Lock size={22} />,
     title: "3. Bảo mật thông tin",
     content: [
-      "TechNova áp dụng các tiêu chuẩn bảo mật SSL/TLS để mã hóa toàn bộ dữ liệu truyền tải giữa trình duyệt và máy chủ.",
+      "V&T Nexis áp dụng các tiêu chuẩn bảo mật SSL/TLS để mã hóa toàn bộ dữ liệu truyền tải giữa trình duyệt và máy chủ.",
       "Dữ liệu của bạn được lưu trữ trên hạ tầng đám mây có chứng chỉ bảo mật ISO 27001.",
       "Chúng tôi giới hạn quyền truy cập thông tin khách hàng chỉ cho nhân viên có thẩm quyền và được đào tạo về bảo mật.",
     ],
@@ -74,7 +74,7 @@ function PrivacyPolicy() {
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold mb-4 text-slate-900">Chính sách Bảo mật</h1>
           <p className="text-base md:text-lg text-slate-600 leading-relaxed mb-5">
-            Tại TechNova, chúng tôi đặt sự riêng tư và bảo mật thông tin của bạn lên hàng đầu. 
+            Tại V&T Nexis, chúng tôi đặt sự riêng tư và bảo mật thông tin của bạn lên hàng đầu. 
             Trang này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu cá nhân của bạn.
           </p>
           <span className="inline-block bg-blue-50 border border-blue-200 rounded-full px-4 py-1.5 text-[13px] text-blue-600 font-medium">
@@ -88,7 +88,7 @@ function PrivacyPolicy() {
         {/* INTRO CARD */}
         <div className="bg-blue-50 border border-blue-200 border-l-4 border-l-blue-600 rounded-xl p-5 md:p-6 mb-8 text-[15px] text-slate-800 leading-relaxed">
           <p className="m-0">
-            Bằng cách sử dụng website <strong className="text-blue-900 font-bold">technova.vn</strong>, bạn đồng ý với các điều khoản được mô tả trong chính sách này. 
+            Bằng cách sử dụng website <strong className="text-blue-900 font-bold">vtnexis.vn</strong>, bạn đồng ý với các điều khoản được mô tả trong chính sách này. 
             Chúng tôi cam kết tuân thủ Luật An toàn thông tin mạng và các quy định bảo vệ dữ liệu cá nhân hiện hành của Việt Nam.
           </p>
         </div>
@@ -124,8 +124,8 @@ function PrivacyPolicy() {
             <h3 className="text-lg font-bold m-0 mb-2">Liên hệ về vấn đề bảo mật</h3>
             <p className="m-0 text-[15px] leading-relaxed text-blue-50/90">
               Nếu bạn có bất kỳ câu hỏi nào liên quan đến chính sách này, vui lòng gửi email cho chúng tôi tại 
-              <a href="mailto:privacy@technova.vn" className="text-yellow-400 font-semibold underline ml-1 hover:text-yellow-300 transition-colors">
-                privacy@technova.vn
+              <a href="mailto:privacy@vtnexis.vn" className="text-yellow-400 font-semibold underline ml-1 hover:text-yellow-300 transition-colors">
+                privacy@vtnexis.vn
               </a> hoặc gọi hotline <strong className="text-white">1900 1234</strong>.
             </p>
           </div>

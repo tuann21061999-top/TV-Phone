@@ -163,12 +163,12 @@ function ProductCompare() {
   const hasProducts = product1 || product2;
 
   return (
-    <div className="bg-slate-50 min-h-screen font-sans">
+    <div className="bg-slate-50 min-h-screen font-sans pb-10">
       <Header />
 
-      <div className="max-w-[1200px] mx-auto px-6 py-6">
+      <div className="max-w-[1200px] mx-auto px-3 sm:px-4 md:px-6 py-4 md:py-6">
         {/* BREADCRUMB */}
-        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-8 flex-wrap">
+        <nav className="flex items-center gap-1.5 md:gap-2 text-[12px] md:text-sm text-slate-500 mb-5 md:mb-8 flex-wrap">
           <Link to="/" className="hover:text-blue-600 transition-colors">Trang chủ</Link> 
           <ChevronRight size={14} />
           <Link to="/phones" className="hover:text-blue-600 transition-colors">Điện thoại</Link> 
@@ -176,17 +176,18 @@ function ProductCompare() {
           <span className="text-slate-900 font-semibold">So sánh sản phẩm</span>
         </nav>
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-slate-800 mb-2">So sánh chi tiết</h1>
-          <p className="text-slate-500 text-[15px]">Đối chiếu thông số kỹ thuật giữa các siêu phẩm công nghệ hàng đầu.</p>
+        <div className="mb-5 md:mb-8">
+          <h1 className="text-xl md:text-3xl font-extrabold text-slate-800 mb-1.5 md:mb-2">So sánh chi tiết</h1>
+          <p className="text-slate-500 text-[13px] md:text-[15px]">Đối chiếu thông số kỹ thuật giữa các siêu phẩm công nghệ hàng đầu.</p>
         </div>
 
         {hasProducts ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="bg-white rounded-xl md:rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             
             {/* STICKY HEADER CHO CÁC SẢN PHẨM */}
-            <div className="flex items-stretch bg-slate-50 border-b border-slate-200 sticky top-[70px] z-[100] p-5 gap-5">
-              <div className="flex-[0.8] hidden md:flex items-center">
+            {/* Cập nhật top-[50px] hoặc top-[60px] tùy thuộc vào chiều cao Header thực tế của bạn trên Mobile */}
+            <div className="flex items-stretch bg-slate-50 border-b border-slate-200 sticky top-12 md:top-[70px] z-[40] p-2 sm:p-3 md:p-5 gap-2 sm:gap-3 md:gap-5">
+              <div className="flex-[0.8] hidden md:flex items-center px-2">
                 <div>
                   <h3 className="text-blue-700 font-bold text-lg mb-1">Thông số so sánh</h3>
                   <p className="text-slate-400 text-[13px] m-0">Chọn tối đa 2 sản phẩm để so sánh</p>
@@ -196,25 +197,25 @@ function ProductCompare() {
               {/* PRODUCT 1 */}
               <div className="flex-1 flex justify-center">
                 {product1 ? (
-                  <div className="bg-white rounded-xl p-5 text-center relative w-full max-w-[250px] shadow-sm border border-slate-100 flex flex-col items-center transition-all hover:shadow-md">
+                  <div className="bg-white rounded-lg md:rounded-xl p-2.5 sm:p-4 md:p-5 text-center relative w-full max-w-[160px] sm:max-w-[200px] md:max-w-[250px] shadow-sm border border-slate-100 flex flex-col items-center transition-all hover:shadow-md">
                     <button 
-                      className="absolute top-2 right-2 bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 border-none rounded-full w-7 h-7 flex items-center justify-center cursor-pointer transition-colors" 
+                      className="absolute top-1 right-1 md:top-2 md:right-2 bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 border-none rounded-full w-6 h-6 md:w-7 md:h-7 flex items-center justify-center cursor-pointer transition-colors" 
                       onClick={() => handleRemoveProduct(true)}
                     >
-                      <X size={16} />
+                      <X size={14} className="md:w-4 md:h-4" />
                     </button>
-                    <img src={getMainImage(product1)} alt={product1.name} className="w-24 h-24 md:w-36 md:h-36 object-contain mb-4" />
-                    <h3 className="text-sm md:text-base font-bold text-slate-800 mb-2 line-clamp-2 h-10 md:h-12">{product1.name}</h3>
-                    <div className="text-blue-600 font-extrabold text-base md:text-lg mb-4">{getMinPrice(product1).toLocaleString()}đ</div>
-                    <Link to={`/product/${product1.slug}`} className="bg-blue-600 text-white py-2 px-4 rounded-lg font-bold text-[13px] w-full text-center transition-colors hover:bg-blue-700">Mua ngay</Link>
+                    <img src={getMainImage(product1)} alt={product1.name} className="w-16 h-16 sm:w-20 sm:h-20 md:w-36 md:h-36 object-contain mb-2 md:mb-4" />
+                    <h3 className="text-[11.5px] sm:text-[13px] md:text-base font-bold text-slate-800 mb-1 md:mb-2 line-clamp-2 h-8 sm:h-10 md:h-12 leading-tight">{product1.name}</h3>
+                    <div className="text-blue-600 font-extrabold text-[13px] sm:text-[15px] md:text-lg mb-2 md:mb-4">{getMinPrice(product1).toLocaleString()}đ</div>
+                    <Link to={`/product/${product1.slug}`} className="bg-blue-600 text-white py-1.5 px-2 md:py-2 md:px-4 rounded-md md:rounded-lg font-bold text-[11px] sm:text-[12px] md:text-[13px] w-full text-center transition-colors hover:bg-blue-700">Mua ngay</Link>
                   </div>
                 ) : (
-                  <div className="bg-white border-2 border-dashed border-slate-200 rounded-xl w-full max-w-[250px] flex flex-col items-center justify-center p-8 md:p-10 text-slate-400">
+                  <div className="bg-white border-2 border-dashed border-slate-200 rounded-lg md:rounded-xl w-full max-w-[160px] sm:max-w-[200px] md:max-w-[250px] flex flex-col items-center justify-center p-4 sm:p-6 md:p-10 text-slate-400">
                     {!activeSearchSlot || activeSearchSlot !== 'p1' ? (
                       <>
-                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-2xl mb-3 text-slate-300">+</div>
-                        <p className="text-sm font-medium mb-4">Thêm sản phẩm</p>
-                        <button className="bg-white border border-blue-600 text-blue-600 py-2 px-4 rounded-lg text-xs font-bold transition-colors hover:bg-blue-50" onClick={() => setActiveSearchSlot('p1')}>
+                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-100 flex items-center justify-center text-xl md:text-2xl mb-2 md:mb-3 text-slate-300">+</div>
+                        <p className="text-[11.5px] md:text-sm font-medium mb-3 md:mb-4 text-center">Thêm sản phẩm</p>
+                        <button className="bg-white border border-blue-600 text-blue-600 py-1.5 px-2.5 md:py-2 md:px-4 rounded-md md:rounded-lg text-[10.5px] md:text-xs font-bold transition-colors hover:bg-blue-50" onClick={() => setActiveSearchSlot('p1')}>
                           Tìm kiếm
                         </button>
                       </>
@@ -227,25 +228,25 @@ function ProductCompare() {
                             value={searchCompare}
                             onChange={(e) => setSearchCompare(e.target.value)}
                             autoFocus
-                            className="w-full p-2.5 px-4 border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-800"
+                            className="w-full p-2 px-2 md:p-2.5 md:px-4 border border-slate-300 rounded-md md:rounded-lg text-[12px] md:text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-800"
                           />
-                          {isSearching && <span className="absolute right-3 top-3 text-[10px] text-slate-400 animate-pulse">...</span>}
+                          {isSearching && <span className="absolute right-2 top-2.5 text-[10px] text-slate-400 animate-pulse">...</span>}
                         </div>
                         {compareResults.length > 0 && (
-                          <div className="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-xl z-50 mt-2 shadow-2xl max-h-[250px] overflow-y-auto">
+                          <div className="absolute top-full left-[-20px] right-[-20px] md:left-0 md:right-0 bg-white border border-slate-200 rounded-lg md:rounded-xl z-[60] mt-1 md:mt-2 shadow-2xl max-h-[200px] md:max-h-[250px] overflow-y-auto w-[200px] sm:w-auto">
                               {compareResults.map(p => (
                                 <div 
                                   key={p._id} 
-                                  className="p-3 flex items-center gap-3 cursor-pointer border-b border-slate-50 last:border-none hover:bg-slate-50 transition-colors"
+                                  className="p-2 md:p-3 flex items-center gap-2 md:gap-3 cursor-pointer border-b border-slate-50 last:border-none hover:bg-slate-50 transition-colors"
                                   onClick={() => handleSelectProduct(p.slug)}
                                 >
-                                  <img src={p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl} alt={p.name} className="w-8 h-8 object-contain" />
-                                  <div className="flex-1 text-[13px] font-semibold text-slate-700 truncate">{p.name}</div>
+                                  <img src={p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl} alt={p.name} className="w-6 h-6 md:w-8 md:h-8 object-contain" />
+                                  <div className="flex-1 text-[11px] md:text-[13px] font-semibold text-slate-700 truncate">{p.name}</div>
                                 </div>
                               ))}
                           </div>
                         )}
-                        <button className="mt-3 text-xs bg-transparent border-none text-slate-400 cursor-pointer hover:text-slate-600 w-full" onClick={() => { setActiveSearchSlot(null); setSearchCompare(''); }}>Hủy</button>
+                        <button className="mt-2 md:mt-3 text-[11px] md:text-xs bg-transparent border-none text-slate-400 cursor-pointer hover:text-slate-600 w-full" onClick={() => { setActiveSearchSlot(null); setSearchCompare(''); }}>Hủy</button>
                       </div>
                     )}
                   </div>
@@ -255,25 +256,25 @@ function ProductCompare() {
               {/* PRODUCT 2 */}
               <div className="flex-1 flex justify-center">
                 {product2 ? (
-                  <div className="bg-white rounded-xl p-5 text-center relative w-full max-w-[250px] shadow-sm border border-slate-100 flex flex-col items-center transition-all hover:shadow-md">
+                  <div className="bg-white rounded-lg md:rounded-xl p-2.5 sm:p-4 md:p-5 text-center relative w-full max-w-[160px] sm:max-w-[200px] md:max-w-[250px] shadow-sm border border-slate-100 flex flex-col items-center transition-all hover:shadow-md">
                     <button 
-                      className="absolute top-2 right-2 bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 border-none rounded-full w-7 h-7 flex items-center justify-center cursor-pointer transition-colors" 
+                      className="absolute top-1 right-1 md:top-2 md:right-2 bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-500 border-none rounded-full w-6 h-6 md:w-7 md:h-7 flex items-center justify-center cursor-pointer transition-colors" 
                       onClick={() => handleRemoveProduct(false)}
                     >
-                      <X size={16} />
+                      <X size={14} className="md:w-4 md:h-4" />
                     </button>
-                    <img src={getMainImage(product2)} alt={product2.name} className="w-24 h-24 md:w-36 md:h-36 object-contain mb-4" />
-                    <h3 className="text-sm md:text-base font-bold text-slate-800 mb-2 line-clamp-2 h-10 md:h-12">{product2.name}</h3>
-                    <div className="text-blue-600 font-extrabold text-base md:text-lg mb-4">{getMinPrice(product2).toLocaleString()}đ</div>
-                    <Link to={`/product/${product2.slug}`} className="bg-blue-600 text-white py-2 px-4 rounded-lg font-bold text-[13px] w-full text-center transition-colors hover:bg-blue-700">Mua ngay</Link>
+                    <img src={getMainImage(product2)} alt={product2.name} className="w-16 h-16 sm:w-20 sm:h-20 md:w-36 md:h-36 object-contain mb-2 md:mb-4" />
+                    <h3 className="text-[11.5px] sm:text-[13px] md:text-base font-bold text-slate-800 mb-1 md:mb-2 line-clamp-2 h-8 sm:h-10 md:h-12 leading-tight">{product2.name}</h3>
+                    <div className="text-blue-600 font-extrabold text-[13px] sm:text-[15px] md:text-lg mb-2 md:mb-4">{getMinPrice(product2).toLocaleString()}đ</div>
+                    <Link to={`/product/${product2.slug}`} className="bg-blue-600 text-white py-1.5 px-2 md:py-2 md:px-4 rounded-md md:rounded-lg font-bold text-[11px] sm:text-[12px] md:text-[13px] w-full text-center transition-colors hover:bg-blue-700">Mua ngay</Link>
                   </div>
                 ) : (
-                  <div className="bg-white border-2 border-dashed border-slate-200 rounded-xl w-full max-w-[250px] flex flex-col items-center justify-center p-8 md:p-10 text-slate-400">
+                  <div className="bg-white border-2 border-dashed border-slate-200 rounded-lg md:rounded-xl w-full max-w-[160px] sm:max-w-[200px] md:max-w-[250px] flex flex-col items-center justify-center p-4 sm:p-6 md:p-10 text-slate-400">
                     {!activeSearchSlot || activeSearchSlot !== 'p2' ? (
                       <>
-                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-2xl mb-3 text-slate-300">+</div>
-                        <p className="text-sm font-medium mb-4">Thêm sản phẩm</p>
-                        <button className="bg-white border border-blue-600 text-blue-600 py-2 px-4 rounded-lg text-xs font-bold transition-colors hover:bg-blue-50" onClick={() => setActiveSearchSlot('p2')}>
+                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-100 flex items-center justify-center text-xl md:text-2xl mb-2 md:mb-3 text-slate-300">+</div>
+                        <p className="text-[11.5px] md:text-sm font-medium mb-3 md:mb-4 text-center">Thêm sản phẩm</p>
+                        <button className="bg-white border border-blue-600 text-blue-600 py-1.5 px-2.5 md:py-2 md:px-4 rounded-md md:rounded-lg text-[10.5px] md:text-xs font-bold transition-colors hover:bg-blue-50" onClick={() => setActiveSearchSlot('p2')}>
                           Tìm kiếm
                         </button>
                       </>
@@ -286,25 +287,25 @@ function ProductCompare() {
                             value={searchCompare}
                             onChange={(e) => setSearchCompare(e.target.value)}
                             autoFocus
-                            className="w-full p-2.5 px-4 border border-slate-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-800"
+                            className="w-full p-2 px-2 md:p-2.5 md:px-4 border border-slate-300 rounded-md md:rounded-lg text-[12px] md:text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-800"
                           />
-                          {isSearching && <span className="absolute right-3 top-3 text-[10px] text-slate-400 animate-pulse">...</span>}
+                          {isSearching && <span className="absolute right-2 top-2.5 text-[10px] text-slate-400 animate-pulse">...</span>}
                         </div>
                         {compareResults.length > 0 && (
-                          <div className="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-xl z-50 mt-2 shadow-2xl max-h-[250px] overflow-y-auto">
+                          <div className="absolute top-full left-[-50px] right-[-10px] md:left-0 md:right-0 bg-white border border-slate-200 rounded-lg md:rounded-xl z-[60] mt-1 md:mt-2 shadow-2xl max-h-[200px] md:max-h-[250px] overflow-y-auto w-[200px] sm:w-auto">
                               {compareResults.map(p => (
                                 <div 
                                   key={p._id} 
-                                  className="p-3 flex items-center gap-3 cursor-pointer border-b border-slate-50 last:border-none hover:bg-slate-50 transition-colors"
+                                  className="p-2 md:p-3 flex items-center gap-2 md:gap-3 cursor-pointer border-b border-slate-50 last:border-none hover:bg-slate-50 transition-colors"
                                   onClick={() => handleSelectProduct(p.slug)}
                                 >
-                                  <img src={p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl} alt={p.name} className="w-8 h-8 object-contain" />
-                                  <div className="flex-1 text-[13px] font-semibold text-slate-700 truncate">{p.name}</div>
+                                  <img src={p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl} alt={p.name} className="w-6 h-6 md:w-8 md:h-8 object-contain" />
+                                  <div className="flex-1 text-[11px] md:text-[13px] font-semibold text-slate-700 truncate">{p.name}</div>
                                 </div>
                               ))}
                           </div>
                         )}
-                        <button className="mt-3 text-xs bg-transparent border-none text-slate-400 cursor-pointer hover:text-slate-600 w-full" onClick={() => { setActiveSearchSlot(null); setSearchCompare(''); }}>Hủy</button>
+                        <button className="mt-2 md:mt-3 text-[11px] md:text-xs bg-transparent border-none text-slate-400 cursor-pointer hover:text-slate-600 w-full" onClick={() => { setActiveSearchSlot(null); setSearchCompare(''); }}>Hủy</button>
                       </div>
                     )}
                   </div>
@@ -314,23 +315,23 @@ function ProductCompare() {
 
             {/* BẢNG SO SÁNH */}
             <div className="p-0 md:p-5 md:pb-10 bg-white">
-              <div className="flex bg-slate-50 border-b-2 border-slate-200 py-4 font-bold text-slate-800 text-sm md:text-base">
-                <div className="flex-[0.8] px-5 text-left">Thông số kỹ thuật</div>
-                <div className="flex-1 px-5 text-center truncate">{product1?.name || "-"}</div>
-                <div className="flex-1 px-5 text-center truncate">{product2?.name || "-"}</div>
+              <div className="flex bg-slate-50 border-b-2 border-slate-200 py-3 md:py-4 font-bold text-slate-800 text-[12px] sm:text-[13px] md:text-base">
+                <div className="flex-[0.8] px-2 sm:px-3 md:px-5 text-left truncate">Thông số kỹ thuật</div>
+                <div className="flex-1 px-1.5 sm:px-3 md:px-5 text-center line-clamp-2 md:truncate">{product1?.name || "-"}</div>
+                <div className="flex-1 px-1.5 sm:px-3 md:px-5 text-center line-clamp-2 md:truncate">{product2?.name || "-"}</div>
               </div>
 
               {combinedSpecs.map((group, gIdx) => (
                 <div key={gIdx} className="w-full">
-                  <div className="bg-blue-50/50 text-blue-700 font-extrabold text-[12px] md:text-[13px] py-3 px-5 uppercase tracking-wider">
+                  <div className="bg-blue-50/50 text-blue-700 font-extrabold text-[11px] md:text-[13px] py-2 md:py-3 px-2 sm:px-3 md:px-5 uppercase tracking-wider">
                     {group.groupName}
                   </div>
                   
                   {group.items.map((item, iIdx) => (
-                    <div key={iIdx} className="flex border-b border-slate-100 transition-colors hover:bg-slate-50/50">
-                      <div className="flex-[0.8] px-5 py-4 text-[13px] md:text-sm text-slate-500 font-medium">{item.key}</div>
-                      <div className="flex-1 px-5 py-4 text-[13px] md:text-sm text-slate-800 font-semibold text-center leading-relaxed" dangerouslySetInnerHTML={{ __html: item.p1Value.replace(/\n/g, '<br/>') }}></div>
-                      <div className="flex-1 px-5 py-4 text-[13px] md:text-sm text-slate-800 font-semibold text-center leading-relaxed" dangerouslySetInnerHTML={{ __html: item.p2Value.replace(/\n/g, '<br/>') }}></div>
+                    <div key={iIdx} className="flex items-center border-b border-slate-100 transition-colors hover:bg-slate-50/50">
+                      <div className="flex-[0.8] px-2 sm:px-3 md:px-5 py-3 md:py-4 text-[11.5px] sm:text-[12.5px] md:text-sm text-slate-500 font-medium break-words">{item.key}</div>
+                      <div className="flex-1 px-1.5 sm:px-3 md:px-5 py-3 md:py-4 text-[11.5px] sm:text-[12.5px] md:text-sm text-slate-800 font-semibold text-center leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: item.p1Value.replace(/\n/g, '<br/>') }}></div>
+                      <div className="flex-1 px-1.5 sm:px-3 md:px-5 py-3 md:py-4 text-[11.5px] sm:text-[12.5px] md:text-sm text-slate-800 font-semibold text-center leading-relaxed break-words" dangerouslySetInnerHTML={{ __html: item.p2Value.replace(/\n/g, '<br/>') }}></div>
                     </div>
                   ))}
                 </div>
@@ -338,23 +339,23 @@ function ProductCompare() {
             </div>
 
             {/* Support Footer Banner */}
-            <div className="bg-slate-100/80 p-8 md:p-10 m-5 rounded-2xl border border-slate-200">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="bg-slate-100/80 p-5 md:p-10 m-0 md:m-5 rounded-none md:rounded-2xl border-t md:border border-slate-200">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
                 <div className="text-center md:text-left">
-                  <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-1">Vẫn còn phân vân?</h3>
-                  <p className="text-slate-500 m-0">Liên hệ đội ngũ tư vấn viên của TechNova để được hỗ trợ tốt nhất.</p>
+                  <h3 className="text-lg md:text-2xl font-bold text-slate-800 mb-1.5">Vẫn còn phân vân?</h3>
+                  <p className="text-slate-500 text-[13px] md:text-[15px] m-0">Liên hệ đội ngũ tư vấn viên của V&T Nexis để được hỗ trợ tốt nhất.</p>
                 </div>
-                <div className="flex gap-4 w-full md:w-auto">
-                  <Link to="/contact" className="flex-1 md:flex-none text-center border border-blue-600 text-blue-600 bg-white py-3 px-6 rounded-xl font-bold transition-all hover:bg-blue-50">Chat với chuyên gia</Link>
-                  <a href="tel:18001234" className="flex-1 md:flex-none text-center bg-blue-600 text-white py-3 px-6 rounded-xl font-bold transition-all hover:bg-blue-700 shadow-lg shadow-blue-600/20">Gọi 1800 1234</a>
+                <div className="flex flex-row md:flex-row gap-3 md:gap-4 w-full md:w-auto mt-2 md:mt-0">
+                  <Link to="/contact" className="flex-1 md:flex-none text-center border border-blue-600 text-blue-600 bg-white py-2.5 md:py-3 px-4 md:px-6 rounded-lg md:rounded-xl font-bold text-[13px] md:text-base transition-all hover:bg-blue-50">Chat với chuyên gia</Link>
+                  <a href="tel:18001234" className="flex-1 md:flex-none text-center bg-blue-600 text-white py-2.5 md:py-3 px-4 md:px-6 rounded-lg md:rounded-xl font-bold text-[13px] md:text-base transition-all hover:bg-blue-700 shadow-lg shadow-blue-600/20">Gọi 1800 1234</a>
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm">
-            <p className="text-slate-500 mb-6 text-lg">Vui lòng chọn sản phẩm để so sánh.</p>
-            <Link to="/phones" className="inline-block bg-blue-600 text-white py-3 px-8 rounded-xl font-bold transition-all hover:bg-blue-700 shadow-lg shadow-blue-600/20">Xem danh sách điện thoại</Link>
+          <div className="text-center py-16 md:py-20 bg-white rounded-xl md:rounded-2xl border border-slate-200 shadow-sm mx-0 md:mx-0">
+            <p className="text-slate-500 mb-5 md:mb-6 text-[15px] md:text-lg">Vui lòng chọn sản phẩm để so sánh.</p>
+            <Link to="/phones" className="inline-block bg-blue-600 text-white py-2.5 md:py-3 px-6 md:px-8 rounded-lg md:rounded-xl font-bold text-[14px] md:text-base transition-all hover:bg-blue-700 shadow-lg shadow-blue-600/20">Xem danh sách điện thoại</Link>
           </div>
         )}
       </div>

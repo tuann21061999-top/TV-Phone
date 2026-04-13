@@ -68,7 +68,6 @@ const Profile = () => {
   const [returnImages, setReturnImages] = useState([]);
   const [isSubmittingReturn, setIsSubmittingReturn] = useState(false);
 
-
   const filterOrderTabs = [
     { id: "all", label: "Tất cả" },
     { id: "waiting", label: "Chờ xác nhận" },
@@ -81,7 +80,6 @@ const Profile = () => {
 
   /* ================= FETCH PROFILE & ORDERS ================= */
   const handleAvatarChange = async (e) => {
-    // ... (Giữ nguyên như code của bạn)
     const file = e.target.files[0];
     if (!file) return;
 
@@ -114,12 +112,11 @@ const Profile = () => {
   };
 
   const removeAvatar = async () => {
-    // ... (Giữ nguyên như code của bạn)
     if (!window.confirm("Bạn có muốn xóa ảnh đại diện hiện tại?")) return;
 
     try {
       const token = localStorage.getItem("token");
-      const { data } = await axios.put(
+      await axios.put(
         `${import.meta.env.VITE_API_URL}/api/users/update`,
         { avatar: "" },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -133,15 +130,15 @@ const Profile = () => {
   };
 
   const renderSidebarAvatar = () => (
-    <div className="flex flex-col items-center px-5 pb-5 border-b border-slate-100 mb-4">
-      <div className="relative w-24 h-24 mb-4">
+    <div className="flex md:flex-col items-center md:px-5 pb-4 md:pb-5 border-b border-slate-100 mb-2 md:mb-4 px-5 gap-4 md:gap-0">
+      <div className="relative w-16 h-16 md:w-24 md:h-24 md:mb-4 shrink-0">
         {user.avatar ? (
-          <img src={user.avatar} alt="Avatar" className="w-full h-full rounded-full object-cover border-[3px] border-blue-50 shadow-[0_4px_12px_rgba(0,0,0,0.08)]" />
+          <img src={user.avatar} alt="Avatar" className="w-full h-full rounded-full object-cover border-[2px] md:border-[3px] border-blue-50 shadow-sm md:shadow-[0_4px_12px_rgba(0,0,0,0.08)]" />
         ) : (
           <img
             src={`https://ui-avatars.com/api/?name=${user.name}&background=0D9488&color=fff&size=128`}
             alt="Default Avatar"
-            className="w-full h-full rounded-full object-cover border-[3px] border-blue-50 shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
+            className="w-full h-full rounded-full object-cover border-[2px] md:border-[3px] border-blue-50 shadow-sm md:shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
           />
         )}
       </div>
@@ -154,9 +151,9 @@ const Profile = () => {
         onChange={handleAvatarChange}
       />
 
-      <div className="text-center">
-        <h4 className="m-0 mb-1.5 text-lg font-semibold text-slate-800">{user.name}</h4>
-        <p className="m-0 text-[13px] text-slate-500">{user.email}</p>
+      <div className="text-left md:text-center flex-1">
+        <h4 className="m-0 mb-1 md:mb-1.5 text-[17px] md:text-lg font-bold text-slate-800">{user.name}</h4>
+        <p className="m-0 text-[13px] md:text-[13px] text-slate-500 truncate max-w-[200px] md:max-w-full">{user.email}</p>
       </div>
     </div>
   );
@@ -188,7 +185,6 @@ const Profile = () => {
 
   useEffect(() => {
     fetchUserAndOrders();
-    // Pre-check which BONUS tiers the user already redeemed (persistent)
     const fetchRedeemed = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -203,7 +199,6 @@ const Profile = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fetch danh sách yêu thích khi chuyển tab
   useEffect(() => {
     if (activeTab === "favorites") {
       const fetchFavorites = async () => {
@@ -224,7 +219,6 @@ const Profile = () => {
     }
   }, [activeTab]);
 
-  // Fetch vouchers khi chuyển tab
   useEffect(() => {
     if (activeTab === "vouchers") {
       const fetchVouchers = async () => {
@@ -258,7 +252,6 @@ const Profile = () => {
       toast.success(`Lưu mã ${voucherInput.toUpperCase()} thành công!`);
       setVoucherInput("");
 
-      // Tải lại danh sách voucher để hiển thị mã vừa lưu
       const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/vouchers/my-vouchers`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -289,8 +282,7 @@ const Profile = () => {
 
   const getVoucherIcon = (voucher, index) => {
     const icons = [Truck, Percent, Gift, Ticket, Tag, Package];
-    const Icon = icons[index % icons.length];
-    return Icon;
+    return icons[index % icons.length];
   };
 
   const getVoucherLabel = (index) => {
@@ -308,7 +300,6 @@ const Profile = () => {
     return `Còn ${diffDays} ngày`;
   };
 
-  // Khi user bỏ yêu thích trong tab favorites → xóa khỏi danh sách
   const handleFavoriteToggle = (productId, isFavorited) => {
     if (!isFavorited) {
       setFavorites((prev) => prev.filter((p) => p._id !== productId));
@@ -342,7 +333,6 @@ const Profile = () => {
     }
   };
 
-  // ✅ THÊM MỚI: Hàm xử lý Khách hàng tự Hủy đơn
   const handleCancelOrder = async (orderId) => {
     if (!window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này không?")) return;
 
@@ -354,7 +344,7 @@ const Profile = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success("Đã hủy đơn hàng thành công.");
-      fetchUserAndOrders(); // Gọi lại để cập nhật danh sách
+      fetchUserAndOrders(); 
     } catch (error) {
       toast.error("Lỗi khi hủy đơn hàng, vui lòng thử lại.");
     }
@@ -362,7 +352,6 @@ const Profile = () => {
 
   /* ================= LỌC & HIỂN THỊ ĐƠN HÀNG ================= */
 
-  // Hàm xử lý trả hàng
   const handleReturnImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 5) {
@@ -482,14 +471,48 @@ const Profile = () => {
     <div className="bg-slate-50 min-h-screen font-sans">
       <Header />
 
-      <div className="w-full max-w-[1500px] mx-auto px-5 md:px-10 py-8 pb-16">
+      <div className="w-full max-w-[1500px] mx-auto px-4 md:px-10 py-6 md:py-8 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6 md:gap-8 items-start">
 
           {/* CỘT TRÁI: SIDEBAR */}
-          <aside className="bg-white rounded-xl py-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+          <aside className="bg-white rounded-xl py-4 md:py-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] mb-2 md:mb-0 md:sticky md:top-28 z-10 overflow-hidden">
+            {/* AVATAR: Hiển thị chung cho cả Mobile & Desktop */}
             {renderSidebarAvatar()}
 
-            <nav className="flex flex-col">
+            {/* MENU ĐIỀU HƯỚNG TRÊN MOBILE (Dạng lưới 4x2) */}
+            <nav className="grid grid-cols-4 gap-y-5 gap-x-1 md:hidden px-2 pt-2 pb-3">
+              {[
+                { id: "info", icon: User, label: "Tài khoản" },
+                { id: "orders", icon: Package, label: "Đơn hàng" },
+                { id: "favorites", icon: Heart, label: "Yêu thích" },
+                { id: "vouchers", icon: Tag, label: "Voucher" },
+                { id: "address", icon: MapPin, label: "Địa chỉ" },
+                { id: "payment", icon: ReceiptText, label: "Giao dịch" },
+                { id: "warranty", icon: ShieldCheck, label: "Bảo hành" },
+              ].map(tab => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button key={tab.id} onClick={() => setActiveTab(tab.id)} className="flex flex-col items-center gap-1.5 bg-transparent border-none cursor-pointer group">
+                    <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30 scale-105' : 'bg-slate-50 text-slate-600'}`}>
+                      <tab.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                    </div>
+                    <span className={`text-[11px] text-center px-1 tracking-tight leading-tight ${isActive ? 'text-blue-600 font-bold' : 'text-slate-600 font-medium'}`}>
+                      {tab.label}
+                    </span>
+                  </button>
+                )
+              })}
+              {/* Nút Đăng xuất riêng */}
+              <button onClick={handleLogout} className="flex flex-col items-center gap-1.5 bg-transparent border-none cursor-pointer group">
+                <div className="w-11 h-11 rounded-[14px] flex items-center justify-center transition-all duration-300 bg-red-50 text-red-500">
+                  <LogOut size={20} />
+                </div>
+                <span className="text-[11px] text-center px-1 tracking-tight leading-tight text-red-500 font-medium">Đăng xuất</span>
+              </button>
+            </nav>
+
+            {/* MENU ĐIỀU HƯỚNG TRÊN DESKTOP (Dọc) */}
+            <nav className="hidden md:flex flex-col">
               <button className={`flex items-center gap-3 w-full py-3 px-6 border-none bg-transparent text-sm cursor-pointer transition-all text-left ${activeTab === "info" ? "bg-blue-50 text-blue-600 font-medium border-l-[3px] border-blue-600" : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"}`} onClick={() => setActiveTab("info")}>
                 <User size={18} /> Thông tin cá nhân
               </button>
@@ -774,7 +797,6 @@ const Profile = () => {
               );
             })()}
 
-
             {/* TAB ORDERS */}
             {activeTab === "orders" && (
               <div className="bg-white rounded-xl p-6 md:p-7 shadow-sm border border-slate-100">
@@ -813,8 +835,6 @@ const Profile = () => {
                   <div className="flex flex-col gap-5">
                     {filteredOrders.map(order => (
                       <div key={order._id} className="border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm hover:border-slate-300 transition-colors">
-
-                        {/* Header Đơn hàng */}
                         <div className="flex justify-between items-center py-4 px-5 bg-slate-50 border-b border-slate-100">
                           <div className="flex items-center gap-2 text-sm text-slate-500">
                             <span className="text-blue-600 font-bold uppercase">#{order._id.slice(-6)}</span>
@@ -831,7 +851,6 @@ const Profile = () => {
                           </div>
                         </div>
 
-                        {/* Body (Danh sách sản phẩm) */}
                         <div className="p-5">
                           {order.items.map((item, index) => (
                             <div key={index} className="flex items-start gap-4 pb-4 mb-4 border-b border-dashed border-slate-100 last:border-0 last:pb-0 last:mb-0">
@@ -850,9 +869,7 @@ const Profile = () => {
                           ))}
                         </div>
 
-                        {/* Footer Đơn hàng */}
                         <div className="flex flex-col md:flex-row justify-between items-end md:items-center py-4 px-5 bg-slate-50 border-t border-slate-100 gap-4 md:gap-0">
-
                           <div className="w-full md:w-auto flex flex-col items-start">
                             <div className="text-sm text-slate-600">
                               Thành tiền: <strong className="text-[18px] text-red-500 ml-1.5 font-extrabold">{order.total.toLocaleString()}đ</strong>
@@ -869,7 +886,6 @@ const Profile = () => {
                               <Eye size={15} /> Xem chi tiết
                             </button>
 
-                            {/* NÚT THANH TOÁN TIẾP VÀ HỦY ĐƠN CHO ĐƠN PENDING */}
                             {order.status === 'pending' && ['VNPAY', 'MOMO'].includes(order.paymentMethod) && (
                               <>
                                 <button
@@ -895,7 +911,6 @@ const Profile = () => {
                               </>
                             )}
 
-                            {/* Nút hủy đơn cho đơn COD đang chờ duyệt */}
                             {order.status === 'waiting_approval' && (
                               <button
                                 className="flex items-center gap-1.5 py-2 px-3.5 bg-red-50 border border-red-200 text-red-500 rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-red-100 hover:border-red-300"
@@ -1011,10 +1026,9 @@ const Profile = () => {
               </div>
             )}
 
-            {/* TAB VOUCHERS - KHO VOUCHER */}
+            {/* TAB VOUCHERS */}
             {activeTab === "vouchers" && (
               <div className="flex flex-col gap-6">
-                {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 md:px-7 rounded-xl shadow-sm border border-slate-200 gap-4 md:gap-0">
                   <div>
                     <h2 className="m-0 text-[22px] font-bold text-slate-800">Kho Voucher của tôi</h2>
@@ -1036,7 +1050,6 @@ const Profile = () => {
                   </div>
                 </div>
 
-                {/* Voucher Grid */}
                 {loadingVouchers ? (
                   <div className="text-center py-16 text-slate-500 bg-white rounded-xl shadow-sm border border-slate-200">
                     <Loader2 className="animate-spin mx-auto mb-3 text-slate-400" size={32} />
@@ -1062,7 +1075,6 @@ const Profile = () => {
                           className="flex bg-white rounded-xl border border-slate-200 overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.1)] hover:border-slate-300 border-l-4"
                           style={{ borderLeftColor: colorScheme.border }}
                         >
-                          {/* Left Icon Section */}
                           <div className="flex flex-col items-center justify-center py-5 px-4 min-w-[100px] gap-2 border-r border-slate-100 border-dashed" style={{ backgroundColor: colorScheme.bg }}>
                             <VoucherIcon size={32} color={colorScheme.icon} />
                             <span className="text-[10px] font-extrabold tracking-wide uppercase" style={{ color: colorScheme.icon }}>
@@ -1070,7 +1082,6 @@ const Profile = () => {
                             </span>
                           </div>
 
-                          {/* Content */}
                           <div className="flex-1 p-4 pl-5 flex flex-col justify-between">
                             <div>
                               <h3 className="m-0 text-[15px] font-bold text-slate-800 leading-tight">
@@ -1122,10 +1133,9 @@ const Profile = () => {
               </div>
             )}
 
-            {/* TAB ADDRESS - REDESIGNED */}
+            {/* TAB ADDRESS */}
             {activeTab === "address" && (
               <div className="flex flex-col">
-                {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white rounded-xl py-5 px-6 mb-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)] border border-slate-200 gap-4 sm:gap-0">
                   <div>
                     <h2 className="text-[20px] font-bold text-slate-900 m-0 mb-1">Sổ địa chỉ</h2>
@@ -1143,7 +1153,6 @@ const Profile = () => {
                   </div>
                 </div>
 
-                {/* Empty state */}
                 {(!user.addresses || user.addresses.length === 0) && (
                   <div className="flex flex-col items-center text-center py-16 px-5 text-slate-400 bg-white border border-dashed border-slate-300 rounded-2xl">
                     <MapPin size={52} strokeWidth={1} className="text-slate-300 mb-4" />
@@ -1155,7 +1164,6 @@ const Profile = () => {
                   </div>
                 )}
 
-                {/* Address cards grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {user.addresses?.map((addr, index) => (
                     <div key={addr._id} className={`bg-white border rounded-2xl p-5 relative flex flex-col gap-3 transition-all duration-200 hover:shadow-[0_4px_16px_rgba(37,99,235,0.1)] hover:border-blue-300 ${index === 0 ? 'border-blue-500 bg-gradient-to-br from-blue-50 via-white to-white' : 'border-slate-200'}`}>
@@ -1194,7 +1202,7 @@ const Profile = () => {
               </div>
             )}
 
-            {/* TAB PAYMENT HISTORY - REDESIGNED */}
+            {/* TAB PAYMENT HISTORY */}
             {activeTab === "payment" && (() => {
               const paidOrders = orders.filter(o => ['paid', 'preparing', 'shipping', 'done'].includes(o.status));
               const totalSpent = paidOrders.reduce((sum, o) => sum + o.total, 0);
@@ -1205,14 +1213,11 @@ const Profile = () => {
               };
               return (
                 <div className="flex flex-col">
-
-                  {/* Header stats */}
                   <div className="bg-white rounded-xl py-5 px-6 mb-5 shadow-[0_1px_4px_rgba(0,0,0,0.06)] border border-slate-200">
                     <h2 className="text-[20px] font-bold text-slate-900 m-0 mb-1">Lịch sử thanh toán</h2>
                     <p className="text-[13px] text-slate-500 m-0">Tổng quan các giao dịch thành công của bạn</p>
                   </div>
 
-                  {/* Stat cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                     <div className="flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
                       <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-blue-50 text-blue-600"><ReceiptText size={22} /></div>
@@ -1230,7 +1235,6 @@ const Profile = () => {
                     </div>
                   </div>
 
-                  {/* Transaction list */}
                   {paidOrders.length === 0 ? (
                     <div className="flex flex-col items-center text-center py-16 px-5 text-slate-400 bg-white border border-dashed border-slate-300 rounded-2xl">
                       <ReceiptText size={52} strokeWidth={1} className="text-slate-300 mb-4" />
@@ -1269,23 +1273,20 @@ const Profile = () => {
                 </div>
               );
             })()}
-            {/* TAB WARRANTY - TRA CỨU BẢO HÀNH */}
+
+            {/* TAB WARRANTY */}
             {activeTab === "warranty" && (() => {
-              // 1. Lọc đơn hàng đã giao thành công
               const doneOrders = orders.filter(o => o.status === 'done');
 
               let warrantyItems = [];
               doneOrders.forEach(order => {
-                // Nếu có nhập số điện thoại tìm kiếm thì lọc theo SĐT
                 if (warrantyPhoneSearch && !order.shippingInfo?.phone?.includes(warrantyPhoneSearch)) return;
 
-                // 2. Đọc gói bảo hành để suy ra số tháng (Dựa vào CheckoutPage)
                 const wType = order.warrantyType || "Bảo hành cơ bản";
-                let months = 6; // Mặc định cơ bản là 6 tháng
+                let months = 6; 
                 if (wType.toLowerCase().includes('mở rộng') || wType.toLowerCase().includes('vàng')) months = 12;
                 if (wType.toLowerCase().includes('kim cương')) months = 24;
 
-                // 3. Tính toán ngày tháng
                 const purchaseDate = new Date(order.createdAt);
                 const endDate = new Date(purchaseDate);
                 endDate.setMonth(endDate.getMonth() + months);
@@ -1294,7 +1295,6 @@ const Profile = () => {
                 const diffTime = endDate - now;
                 const remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                // 4. Đẩy từng sản phẩm vào mảng
                 order.items.forEach(item => {
                   warrantyItems.push({
                     ...item,
@@ -1310,7 +1310,6 @@ const Profile = () => {
 
               return (
                 <div className="flex flex-col gap-6 animate-[fadeIn_0.3s_ease-out]">
-                  {/* Header & Search */}
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-xl shadow-sm border border-slate-200 gap-4 md:gap-0">
                     <div>
                       <h2 className="m-0 text-[22px] font-bold text-slate-800 flex items-center gap-2"><ShieldCheck size={24} className="text-blue-600" /> Tra cứu bảo hành</h2>
@@ -1333,7 +1332,6 @@ const Profile = () => {
                     </div>
                   </div>
 
-                  {/* Danh sách thiết bị */}
                   {warrantyItems.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 px-5 text-center bg-white rounded-xl border border-dashed border-slate-300 shadow-sm">
                       <ShieldCheck size={56} strokeWidth={1} className="text-slate-300 mb-4" />
@@ -1344,12 +1342,10 @@ const Profile = () => {
                     <div className="grid grid-cols-1 gap-4">
                       {warrantyItems.map((item, idx) => (
                         <div key={idx} className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col md:flex-row gap-5 items-start md:items-center shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md transition-shadow">
-                          {/* Ảnh SP */}
                           <div className="w-20 h-20 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center p-2 shrink-0">
                             <img src={item.image} alt={item.name} className="max-w-full max-h-full object-contain" />
                           </div>
 
-                          {/* Thông tin SP */}
                           <div className="flex-1 min-w-0">
                             <h4 className="m-0 text-[15px] font-bold text-slate-800 mb-1">{item.name}</h4>
                             <p className="m-0 text-[13px] text-slate-500 mb-2">Màu: {item.color} {item.storage ? `| ${item.storage}` : ''}</p>
@@ -1359,7 +1355,6 @@ const Profile = () => {
                             </div>
                           </div>
 
-                          {/* Thông tin thời hạn */}
                           <div className="flex flex-col items-start md:items-end gap-2 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-5 w-full md:w-auto">
                             <div className="text-[13px] text-slate-600">
                               Ngày mua: <strong className="text-slate-800">{item.purchaseDate.toLocaleDateString('vi-VN')}</strong>
@@ -1449,7 +1444,6 @@ const Profile = () => {
             </div>
           </div>
         </div>
-
       )}
 
       <Footer />
