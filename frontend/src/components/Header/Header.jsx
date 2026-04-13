@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar/Navbar";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, Search, Smartphone, Bell } from "lucide-react";
+import { 
+  ShoppingCart, User, Search, Smartphone, Bell, Menu, X, 
+  Home, Laptop, Headphones, Gift, Newspaper, Phone 
+} from "lucide-react";
 import axios from "axios";
 import logoImg from "../../assets/Logo3.png";
 
@@ -15,6 +18,7 @@ function Header() {
   const [notifications, setNotifications] = useState([]);
   const [unreadNotifyCount, setUnreadNotifyCount] = useState(0);
   const [isNotifyOpen, setIsNotifyOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -56,7 +60,7 @@ function Header() {
           setIsSearching(false);
         }
       } else {
-        setSearchResults([]);
+        searchResults([]);
         setIsSearchOpen(false);
       }
     }, 500); // Debounce 500ms
@@ -166,22 +170,30 @@ function Header() {
       </style>
 
       {/* FIX Z-INDEX: Thêm relative và z-[20000] vào div này để nổi lên trên Navbar */}
-      <div className="relative z-[20000] bg-transparent border-b border-white/10 px-4 pb-4 pt-[44px] h-[100px] flex items-end">
-        <div className="flex items-center justify-between max-w-[1400px] w-[95%] mx-auto">
+      <div className="relative z-[20000] bg-transparent border-b border-white/10 px-4 pb-3 pt-[30px] md:pb-4 md:pt-[44px] h-[80px] md:h-[100px] flex items-end">
+        <div className="flex items-center justify-between max-w-[1400px] w-full lg:w-[95%] mx-auto">
 
           {/* HEADER LEFT: LOGO & NAVBAR */}
-          <div className="flex items-center gap-10">
-            <Link to="/" className="inline-block leading-none no-underline transition-transform duration-300 hover:text-[#FACC15] hover:scale-105 group">
-              <img src={logoImg} alt="V&T Nexis Logo" className="h-[45px] w-auto object-contain transition-transform duration-300" />
+          <div className="flex items-center gap-3 lg:gap-10 shrink-0">
+            {/* MOBILE HAMBURGER */}
+            <button 
+                className="lg:hidden text-white bg-transparent border-none p-0 cursor-pointer flex items-center shrink-0 hover:text-yellow-400 transition-colors" 
+                onClick={() => setIsMobileMenuOpen(true)}
+            >
+                <Menu size={28} strokeWidth={2.5} />
+            </button>
+
+            <Link to="/" className="inline-block leading-none no-underline transition-transform duration-300 hover:text-[#FACC15] hover:scale-105 group shrink-0">
+              <img src={logoImg} alt="V&T Nexis Logo" className="h-[30px] md:h-[45px] w-auto object-contain transition-transform duration-300" />
             </Link>
             <Navbar />
           </div>
 
           {/* HEADER RIGHT: SEARCH & ICONS */}
-          <div className="flex items-center gap-[30px]">
+          <div className="flex items-center gap-4 lg:gap-[30px] shrink-0">
 
-            {/* SEARCH BAR (Glassmorphism) */}
-            <div className="relative w-[300px] search-wrapper">
+            {/* SEARCH BAR (Glassmorphism) - Hidden on mobile */}
+            <div className="relative hidden md:block w-[200px] lg:w-[300px] search-wrapper">
               <input
                 type="text"
                 placeholder="Tìm kiếm sản phẩm..."
@@ -234,7 +246,7 @@ function Header() {
               )}
             </div>
 
-            <div className="flex gap-6">
+            <div className="flex gap-4 lg:gap-6 shrink-0">
               {/* GIỎ HÀNG */}
               <Link to="/cart" className="text-white transition-all duration-200 flex items-center justify-center hover:text-[#FACC15] hover:-translate-y-[2px] relative cart-wrapper">
                 <ShoppingCart size={20} />
@@ -299,6 +311,109 @@ function Header() {
           </div>
         </div>
       </div>
+
+      {/* MOBILE MENU DRAWER */}
+      <div className={`fixed inset-0 z-[100000] transition-transform duration-300 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} lg:hidden flex`}>
+        {/* OVERLAY */}
+        {isMobileMenuOpen && (
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
+        )}
+        
+        {/* SIDEBAR CONTENT */}
+        <div className="relative w-[300px] h-full bg-white flex flex-col shadow-2xl overflow-hidden z-10 transition-transform duration-300">
+           <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+               <h3 className="text-slate-800 font-extrabold text-lg m-0">V&T Nexis</h3>
+               <button className="bg-slate-200/50 hover:bg-slate-200 p-2 rounded-full border-none transition-colors flex items-center justify-center cursor-pointer" onClick={() => setIsMobileMenuOpen(false)}>
+                   <X size={20} className="text-slate-600 shrink-0" />
+               </button>
+           </div>
+
+           {/* Mobile Search */}
+           <div className="p-4 border-b border-slate-100 flex-shrink-0">
+               <div className="relative w-full search-wrapper">
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm sản phẩm..."
+                    className="w-full py-2.5 pr-10 pl-4 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none text-[14px] focus:border-blue-500 shadow-sm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSearch();
+                            setIsMobileMenuOpen(false);
+                        }
+                    }}
+                  />
+                  <Search 
+                    size={18} 
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 cursor-pointer" 
+                    onClick={() => {
+                        handleSearch();
+                        setIsMobileMenuOpen(false);
+                    }} 
+                  />
+
+                  {/* Dropdown for Mobile Search */}
+                  {isSearchOpen && (searchTerm.trim().length > 0) && (
+                    <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white rounded-lg shadow-xl border border-slate-100 z-[99999] overflow-hidden flex flex-col">
+                      {isSearching ? (
+                        <div className="p-3 text-center text-slate-500 text-[13px]">Đang tìm...</div>
+                      ) : searchResults.length > 0 ? (
+                        <>
+                          {searchResults.map((product) => (
+                            <div
+                              key={product._id}
+                              className="flex items-center gap-3 py-2 px-3 cursor-pointer transition-colors border-b border-slate-50 last:border-none hover:bg-slate-50"
+                              onClick={() => {
+                                setIsSearchOpen(false);
+                                setSearchTerm("");
+                                setIsMobileMenuOpen(false);
+                                navigate(`/product/${product.slug || product._id}`);
+                              }}
+                            >
+                              <img src={product.colorImages?.[0]?.imageUrl || product.images?.[0] || "/no-image.png"} alt={product.name} className="w-8 h-8 object-contain rounded bg-white shrink-0" />
+                              <div>
+                                <h4 className="text-[12px] text-slate-800 m-0 mb-0.5 font-medium line-clamp-1">{product.name}</h4>
+                              </div>
+                            </div>
+                          ))}
+                        </>
+                      ) : (
+                        <div className="p-3 text-center text-slate-500 text-[13px]">Không tìm thấy.</div>
+                      )}
+                    </div>
+                  )}
+
+               </div>
+           </div>
+
+           {/* Quick Navigation Links */}
+           <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1.5 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-slate-200">
+               <Link to="/" onClick={()=>setIsMobileMenuOpen(false)} className="px-4 py-3.5 text-slate-700 font-semibold text-[15px] hover:bg-blue-50 hover:text-blue-600 rounded-xl no-underline transition-colors flex items-center gap-3">
+                   <Home size={20} /> Trang Chủ
+               </Link>
+               <Link to="/phones" onClick={()=>setIsMobileMenuOpen(false)} className="px-4 py-3.5 text-slate-700 font-semibold text-[15px] hover:bg-blue-50 hover:text-blue-600 rounded-xl no-underline transition-colors flex items-center gap-3">
+                   <Smartphone size={20} /> Điện thoại
+               </Link>
+               <Link to="/electronics" onClick={()=>setIsMobileMenuOpen(false)} className="px-4 py-3.5 text-slate-700 font-semibold text-[15px] hover:bg-blue-50 hover:text-blue-600 rounded-xl no-underline transition-colors flex items-center gap-3">
+                   <Laptop size={20} /> Đồ điện tử
+               </Link>
+               <Link to="/accessories" onClick={()=>setIsMobileMenuOpen(false)} className="px-4 py-3.5 text-slate-700 font-semibold text-[15px] hover:bg-blue-50 hover:text-blue-600 rounded-xl no-underline transition-colors flex items-center gap-3">
+                   <Headphones size={20} /> Phụ kiện
+               </Link>
+               <Link to="/promotions" onClick={()=>setIsMobileMenuOpen(false)} className="px-4 py-3.5 text-slate-700 font-semibold text-[15px] hover:bg-blue-50 hover:text-blue-600 rounded-xl no-underline transition-colors flex items-center gap-3">
+                   <Gift size={20} /> Khuyến mãi
+               </Link>
+               <Link to="/news" onClick={()=>setIsMobileMenuOpen(false)} className="px-4 py-3.5 text-slate-700 font-semibold text-[15px] hover:bg-blue-50 hover:text-blue-600 rounded-xl no-underline transition-colors flex items-center gap-3">
+                   <Newspaper size={20} /> Tin tức
+               </Link>
+               <Link to="/contact" onClick={()=>setIsMobileMenuOpen(false)} className="px-4 py-3.5 text-slate-700 font-semibold text-[15px] hover:bg-blue-50 hover:text-blue-600 rounded-xl no-underline transition-colors flex items-center gap-3">
+                   <Phone size={20} /> Liên hệ
+               </Link>
+           </div>
+        </div>
+      </div>
+
     </header>
   );
 }

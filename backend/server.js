@@ -12,6 +12,7 @@ const Order = require("./models/Order");
 const Message = require("./models/Message");
 const Product = require("./models/Product");
 const Promotion = require("./models/Promotion");
+const User = require("./models/User");
 const fs = require("fs");
 
 
@@ -173,6 +174,7 @@ app.use("/api/view-history", viewHistoryRoutes);
 app.use("/api/tags", tagRoutes);
 app.use("/api/notifications", notificationRoutes);
 
+
 app.use(errorHandler);
 
 // =============================
@@ -207,32 +209,49 @@ io.on("connection", (socket) => {
         content: content.trim(),
       });
 
-      // Emit tin nhắn đến người nhận
-      io.to(receiverId).emit("receive_message", {
+      const payload = {
         _id: newMessage._id,
         senderId: newMessage.senderId,
         receiverId: newMessage.receiverId,
         content: newMessage.content,
         isRead: newMessage.isRead,
         createdAt: newMessage.createdAt,
-      });
+      };
 
-      // Emit lại cho người gửi (để confirm tin nhắn đã gửi)
-      socket.emit("message_sent", {
-        _id: newMessage._id,
-        senderId: newMessage.senderId,
-        receiverId: newMessage.receiverId,
-        content: newMessage.content,
-        isRead: newMessage.isRead,
-        createdAt: newMessage.createdAt,
-      });
+      // TÌM TẤT CẢ ADMIN ĐỂ ĐỒNG BỘ REAL-TIME
+      const admins = await User.find({ role: "admin" }).select("_id");
+      const adminIds = admins.map((a) => a._id.toString());
+
+      const senderIdStr = senderId.toString();
+
+      // KIỂM TRA: Ai là người đang gửi tin nhắn?
+      if (!adminIds.includes(senderIdStr)) {
+        // TRƯỜNG HỢP 1: KHÁCH HÀNG NHẮN TIN
+        // Bắn tin nhắn đến TẤT CẢ Admin đang online
+        adminIds.forEach((adminId) => {
+          io.to(adminId).emit("receive_message", payload);
+        });
+      } else {
+        // TRƯỜNG HỢP 2: ADMIN NHẮN TIN (TRẢ LỜI KHÁCH)
+        // Bắn tin nhắn cho Khách
+        io.to(receiverId).emit("receive_message", payload); 
+        
+        // Bắn đồng bộ cho các Admin khác (để họ thấy đồng nghiệp vừa chat)
+        adminIds.forEach((adminId) => {
+          if (adminId !== senderIdStr) { // Không bắn ngược lại cho người vừa gửi
+            io.to(adminId).emit("receive_message", payload); 
+          }
+        });
+      }
+
+      // Emit lại cho chính người gửi (để giao diện UI tự động thêm dòng tin nhắn)
+      socket.emit("message_sent", payload);
 
     } catch (error) {
       console.error("[Socket.io] Lỗi gửi tin nhắn:", error);
       socket.emit("error_message", { message: "Lỗi gửi tin nhắn" });
     }
   });
-
   // Đánh dấu đã đọc real-time
   socket.on("mark_read", async ({ readerId, senderId }) => {
     try {
@@ -245,6 +264,11 @@ io.on("connection", (socket) => {
     } catch (error) {
       console.error("[Socket.io] Lỗi mark read:", error);
     }
+  });
+
+  // Chat kết thúc bởi Admin
+  socket.on("end_conversation", ({ adminId, userId }) => {
+    io.to(userId).emit("conversation_ended", { adminId });
   });
 
   // Typing indicator

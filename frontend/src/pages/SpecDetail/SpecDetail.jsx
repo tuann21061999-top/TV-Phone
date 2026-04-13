@@ -90,35 +90,39 @@ function SpecDetail() {
             <Header />
 
             {/* Sticky Top Header Bar */}
-            <div className="sticky top-0 bg-white border-b border-slate-200 z-50 py-3 shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
-                <div className="max-w-[1400px] mx-auto px-5 md:px-10 w-full flex justify-between items-center">
-                    <div className="flex items-center gap-4">
+            <div className="sticky top-0 bg-white border-b border-slate-200 z-40 shadow-[0_2px_10px_rgba(0,0,0,0.03)]">
+                <div className="max-w-[1400px] mx-auto px-4 md:px-10 w-full flex justify-between items-center h-12 md:h-[68px]">
+                    
+                    {/* THÔNG TIN SẢN PHẨM (CHỈ HIỆN TRÊN PC) */}
+                    <div className="hidden md:flex items-center gap-4 shrink-0">
                         <img src={mainImage} alt={product.name} className="w-[45px] h-[45px] object-contain bg-slate-100 rounded-lg p-1" />
                         <div>
-                            <h2 className="m-0 mb-0.5 text-base font-bold text-slate-800">{product.name}</h2>
+                            <h2 className="m-0 mb-0.5 text-base font-bold text-slate-800 truncate max-w-[250px]">{product.name}</h2>
                             <span className="text-sm font-semibold text-blue-600">{minPrice.toLocaleString()}đ</span>
                         </div>
                     </div>
-                    <div className="hidden md:flex items-center gap-[30px]">
-                        <Link to={`/product/${product.slug}`} className="text-sm font-semibold text-slate-500 no-underline relative pb-5 -mb-5 hover:text-blue-600 transition-colors">Tổng quan</Link>
-                        <span className="text-sm font-semibold text-blue-600 relative pb-5 -mb-5 after:absolute after:bottom-0 after:left-0 after:w-full after:h-[3px] after:bg-blue-600 after:rounded-t-sm cursor-default">Thông số kỹ thuật chi tiết</span>
-                        <Link to={`/product/${product.slug}/reviews`} className="text-sm font-semibold text-slate-500 no-underline relative pb-5 -mb-5 hover:text-blue-600 transition-colors">Đánh giá</Link>
+                    
+                    {/* MENU TABS (VUỐT NGANG TRÊN MOBILE) */}
+                    <div className="flex items-center gap-6 h-full w-full md:w-auto overflow-x-auto whitespace-nowrap scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                        <Link to={`/product/${product.slug}`} className="text-[13.5px] md:text-sm font-semibold text-slate-500 no-underline relative h-full flex items-center hover:text-blue-600 transition-colors shrink-0 px-1 md:px-0">Tổng quan</Link>
+                        <span className="text-[13.5px] md:text-sm font-semibold text-blue-600 relative h-full flex items-center after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2.5px] md:after:h-[3px] after:bg-blue-600 after:rounded-t-sm cursor-default shrink-0 px-1 md:px-0">Thông số kỹ thuật chi tiết</span>
+                        <Link to={`/product/${product.slug}/reviews`} className="text-[13.5px] md:text-sm font-semibold text-slate-500 no-underline relative h-full flex items-center hover:text-blue-600 transition-colors shrink-0 px-1 md:px-0">Đánh giá</Link>
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-[1400px] mx-auto px-5 md:px-10 w-full flex flex-col lg:flex-row gap-[30px] mt-[30px] mb-[60px]">
+            <div className="max-w-[1400px] mx-auto px-4 md:px-10 w-full flex flex-col lg:flex-row gap-6 lg:gap-[30px] mt-4 lg:mt-[30px] mb-12 lg:mb-[60px]">
                 {/* Left Sidebar */}
-                <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-5 order-2 lg:order-1">
-                    <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-                        <h3 className="m-0 mb-2.5 text-base font-bold text-slate-800">So sánh cấu hình</h3>
-                        <p className="text-[13.5px] text-slate-500 leading-relaxed mb-5">Chọn thiết bị khác để xem sự khác biệt về cấu hình.</p>
+                <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-4 md:gap-5 order-2 lg:order-1">
+                    <div className="bg-white rounded-xl p-5 md:p-6 border border-slate-200 shadow-sm">
+                        <h3 className="m-0 mb-2 md:mb-2.5 text-[15px] md:text-base font-bold text-slate-800">So sánh cấu hình</h3>
+                        <p className="text-[13px] md:text-[13.5px] text-slate-500 leading-relaxed mb-4 md:mb-5">Chọn thiết bị khác để xem sự khác biệt về cấu hình.</p>
                         <div className="relative">
-                            <div className="flex items-center border border-slate-300 rounded-lg p-2.5 px-4 bg-slate-50 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
+                            <div className="flex items-center border border-slate-300 rounded-lg p-2 md:p-2.5 px-3 md:px-4 bg-slate-50 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
                                 <input 
                                     type="text" 
                                     placeholder="Tìm sản phẩm..." 
-                                    className="border-none bg-transparent flex-1 outline-none text-sm text-slate-800"
+                                    className="border-none bg-transparent flex-1 outline-none text-[13px] md:text-sm text-slate-800 w-full"
                                     value={searchCompare}
                                     onChange={(e) => setSearchCompare(e.target.value)}
                                 />
@@ -128,7 +132,7 @@ function SpecDetail() {
                             </div>
                             
                             {compareResults.length > 0 && (
-                                <div className="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-lg z-10 mt-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.1)] max-h-[300px] overflow-y-auto">
+                                <div className="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-lg z-20 mt-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.1)] max-h-[300px] overflow-y-auto">
                                     {compareResults.map(p => (
                                         <div 
                                             key={p._id} 
@@ -144,10 +148,10 @@ function SpecDetail() {
                         </div>
                     </div>
 
-                    <div className="bg-green-50 rounded-xl p-6 border border-green-200 shadow-sm">
-                        <h3 className="m-0 mb-2.5 text-base font-bold text-blue-600">Bạn cần hỗ trợ?</h3>
-                        <p className="text-[13.5px] text-slate-600 leading-relaxed mb-5">Các chuyên gia công nghệ của chúng tôi luôn sẵn lòng giúp đỡ.</p>
-                        <Link to="/contact" className="block text-center bg-white border border-blue-600 text-blue-600 p-3 rounded-lg font-semibold no-underline transition-colors hover:bg-blue-50">
+                    <div className="bg-green-50 rounded-xl p-5 md:p-6 border border-green-200 shadow-sm">
+                        <h3 className="m-0 mb-2 md:mb-2.5 text-[15px] md:text-base font-bold text-blue-600">Bạn cần hỗ trợ?</h3>
+                        <p className="text-[13px] md:text-[13.5px] text-slate-600 leading-relaxed mb-4 md:mb-5">Các chuyên gia công nghệ của chúng tôi luôn sẵn lòng giúp đỡ.</p>
+                        <Link to="/contact" className="block text-center bg-white border border-blue-600 text-blue-600 p-2.5 md:p-3 rounded-lg font-semibold text-[14px] md:text-base no-underline transition-colors hover:bg-blue-50">
                             Chat với tư vấn viên
                         </Link>
                     </div>
@@ -155,7 +159,7 @@ function SpecDetail() {
 
                 {/* Right Main Content */}
                 <div className="flex-1 min-w-0 order-1 lg:order-2">
-                    <nav className="flex items-center gap-2 text-sm text-slate-500 mb-6 flex-wrap">
+                    <nav className="flex items-center gap-1.5 md:gap-2 text-[13px] md:text-sm text-slate-500 mb-5 md:mb-6 flex-wrap">
                         <Link to="/" className="text-slate-500 hover:text-blue-600 no-underline transition-colors">Trang chủ</Link> 
                         <ChevronRight size={14} />
                         <Link to={`/product/${product.slug}`} className="text-slate-500 hover:text-blue-600 no-underline transition-colors">{product.name}</Link> 
@@ -164,7 +168,7 @@ function SpecDetail() {
                     </nav>
 
                     {hasDetailedSpecs ? (
-                        <div className="flex flex-col gap-10">
+                        <div className="flex flex-col gap-6 md:gap-10">
                             {Object.entries(product.detailedSpecs).map(([groupName, specsArr], idx) => {
                                 // Bỏ qua nhóm nếu không có dữ liệu thực tế
                                 const validSpecs = Array.isArray(specsArr) ? specsArr.filter(s => s.value && String(s.value).trim() !== "") : [];
@@ -172,18 +176,18 @@ function SpecDetail() {
 
                                 return (
                                     <div key={idx} className="bg-transparent">
-                                        <div className="flex items-center gap-3 mb-5">
-                                            <div className="bg-blue-50 w-10 h-10 flex items-center justify-center rounded-lg text-blue-600 shrink-0">
+                                        <div className="flex items-center gap-2.5 md:gap-3 mb-4 md:mb-5">
+                                            <div className="bg-blue-50 w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg text-blue-600 shrink-0">
                                                 {ICONS[groupName] || <List size={20} className="text-blue-600" />}
                                             </div>
-                                            <h3 className="m-0 text-xl font-bold text-slate-800">{groupName}</h3>
+                                            <h3 className="m-0 text-lg md:text-xl font-bold text-slate-800">{groupName}</h3>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 bg-white p-5 md:p-8 rounded-xl md:rounded-2xl border border-slate-200 shadow-sm">
                                             {validSpecs.map((spec, sIdx) => (
                                                 <div key={sIdx} className="flex flex-col gap-1.5">
-                                                    <div className="text-[13px] font-bold uppercase tracking-[0.5px] text-slate-400">{spec.key}</div>
-                                                    <div className="text-[15px] text-slate-700 leading-relaxed font-medium" dangerouslySetInnerHTML={{ __html: String(spec.value).replace(/\n/g, '<br/>') }} />
+                                                    <div className="text-[12px] md:text-[13px] font-bold uppercase tracking-[0.5px] text-slate-400">{spec.key}</div>
+                                                    <div className="text-[14px] md:text-[15px] text-slate-700 leading-relaxed font-medium" dangerouslySetInnerHTML={{ __html: String(spec.value).replace(/\n/g, '<br/>') }} />
                                                 </div>
                                             ))}
                                         </div>
@@ -192,28 +196,28 @@ function SpecDetail() {
                             })}
                         </div>
                     ) : hasBasicSpecs ? (
-                        <div className="flex flex-col gap-10">
+                        <div className="flex flex-col gap-6 md:gap-10">
                             <div className="bg-transparent">
-                                <div className="flex items-center gap-3 mb-5">
-                                    <div className="bg-blue-50 w-10 h-10 flex items-center justify-center rounded-lg shrink-0">
+                                <div className="flex items-center gap-2.5 md:gap-3 mb-4 md:mb-5">
+                                    <div className="bg-blue-50 w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-lg shrink-0">
                                         <List size={20} className="text-blue-600" />
                                     </div>
-                                    <h3 className="m-0 text-xl font-bold text-slate-800">Cấu hình sản phẩm</h3>
+                                    <h3 className="m-0 text-lg md:text-xl font-bold text-slate-800">Cấu hình sản phẩm</h3>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 bg-white p-5 md:p-8 rounded-xl md:rounded-2xl border border-slate-200 shadow-sm">
                                     {Object.entries(product.specs).map(([key, value], idx) => (
                                         <div key={idx} className="flex flex-col gap-1.5">
-                                            <div className="text-[13px] font-bold uppercase tracking-[0.5px] text-slate-400">{key}</div>
-                                            <div className="text-[15px] text-slate-700 leading-relaxed font-medium">{value}</div>
+                                            <div className="text-[12px] md:text-[13px] font-bold uppercase tracking-[0.5px] text-slate-400">{key}</div>
+                                            <div className="text-[14px] md:text-[15px] text-slate-700 leading-relaxed font-medium">{value}</div>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="bg-white p-10 text-center rounded-xl border border-slate-200 shadow-sm">
-                            <p className="text-slate-500 mb-5 text-[15px]">chưa có thông tin phù hợp</p>
-                            <Link to={`/product/${product.slug}`} className="inline-block bg-blue-600 text-white py-2.5 px-6 rounded-lg no-underline font-semibold hover:bg-blue-700 transition-colors">
+                        <div className="bg-white p-8 md:p-10 text-center rounded-xl md:rounded-2xl border border-slate-200 shadow-sm">
+                            <p className="text-slate-500 mb-4 md:mb-5 text-[14px] md:text-[15px]">Chưa có thông tin cấu hình phù hợp</p>
+                            <Link to={`/product/${product.slug}`} className="inline-block bg-blue-600 text-white py-2 md:py-2.5 px-5 md:px-6 rounded-lg no-underline font-semibold hover:bg-blue-700 transition-colors text-[14px] md:text-base">
                                 Quay lại Tổng quan
                             </Link>
                         </div>

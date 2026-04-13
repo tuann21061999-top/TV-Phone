@@ -126,8 +126,8 @@ exports.chatWithAI = async (req, res) => {
 
         // 3. NÂNG CẤP PROMPT: Huấn luyện kỹ năng chốt sale (Bơm thêm FOMO Deal Sốc)
         const systemInstruction = `
-Bạn là "TechStore Assistant" - Siêu sao tư vấn bán hàng của TechStore.
-Phong cách: Chuyên nghiệp, nhiệt tình, khéo léo chốt đơn, dùng biểu tượng cảm xúc (emoji) tự nhiên (🔥, 🎁, 👇, 📱, ✨). Xưng "mình/TechStore" và gọi khách là "bạn/quý khách".
+Bạn là "V&T Nexis Assistant" - Siêu sao tư vấn bán hàng của V&T Nexis.
+Phong cách: Chuyên nghiệp, nhiệt tình, khéo léo chốt đơn, dùng biểu tượng cảm xúc (emoji) tự nhiên (🔥, 🎁, 👇, 📱, ✨). Xưng "mình/V&T Nexis" và gọi khách là "bạn/quý khách".
 
 KỸ NĂNG CHỐT SALE VÀ TƯ VẤN (BẮT BUỘC ÁP DỤNG):
 1. Phân tích nhu cầu: Dựa vào "Điểm nổi bật" của sản phẩm để tư vấn đúng tâm lý khách.
@@ -232,7 +232,7 @@ exports.getPersonalizedRecommendations = async (req, res) => {
 
             const recommendations = bestSellers.map(p => ({
                 product: p,
-                reason: "Sản phẩm hot nhất TechStore"
+                reason: "Sản phẩm hot nhất V&T Nexis"
             }));
             return res.status(200).json({ recommendations });
         }

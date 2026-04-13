@@ -17,8 +17,9 @@ function ChatWidget() {
     const [hasUnread, setHasUnread] = useState(false);
     const [loading, setLoading] = useState(false);
     const [chatMode, setChatMode] = useState("admin"); // 'admin' hoặc 'ai'
+    const [isChatArchived, setIsChatArchived] = useState(false);
     const [aiMessages, setAiMessages] = useState([
-        { _id: "1", content: "Chào bạn! Mình là Trợ lý ảo AI của TechStore, mình có thể gợi ý điện thoại gì cho bạn hôm nay?", senderId: "ai", createdAt: new Date().toISOString() }
+        { _id: "1", content: "Chào bạn! Mình là Trợ lý ảo AI của V&T Nexis, mình có thể gợi ý điện thoại gì cho bạn hôm nay?", senderId: "ai", createdAt: new Date().toISOString() }
     ]);
     const [aiLoading, setAiLoading] = useState(false);
 
@@ -67,11 +68,16 @@ function ChatWidget() {
         // Lắng nghe tin nhắn đến
         socket.on("receive_message", (msg) => {
             setMessages((prev) => [...prev, msg]);
+            setIsChatArchived(false);
             if (!isOpen) setHasUnread(true); // Hiện dot unread nếu chat đang đóng
         });
 
         socket.on("user_typing", () => setIsTyping(true));
         socket.on("user_stop_typing", () => setIsTyping(false));
+
+        socket.on("conversation_ended", () => {
+            setIsChatArchived(true);
+        });
 
         return () => {
             socket.disconnect();
@@ -99,7 +105,17 @@ function ChatWidget() {
                     `${import.meta.env.VITE_API_URL}/api/chat/conversation/${admin._id}`,
                     { headers }
                 );
-                setMessages(chatRes.data);
+                
+                if (chatRes.data.length > 0) {
+                    setIsChatArchived(chatRes.data[chatRes.data.length - 1].isArchived || false);
+                } else {
+                    setIsChatArchived(false);
+                }
+
+                // Lọc bỏ đi các tin nhắn đã bị admin archived, chỉ giữ lại lượt hội thoại (session) chưa kết thúc
+                const activeMessages = chatRes.data.filter(m => !m.isArchived);
+                setMessages(activeMessages);
+                
                 setHasUnread(false);
 
                 // 3. Đánh dấu đã đọc
@@ -273,7 +289,7 @@ function ChatWidget() {
                                 <Headphones size={18} />
                             </div>
                             <div>
-                                <h4 className="m-0 text-[14px] font-semibold">Hỗ trợ TechStore</h4>
+                                <h4 className="m-0 text-[14px] font-semibold">Hỗ trợ V&T Nexis</h4>
                                 <div className="flex gap-[5px] mt-1">
                                     <button
                                         onClick={() => setChatMode("admin")}
@@ -355,23 +371,38 @@ function ChatWidget() {
                     </div>
 
                     {/* Input */}
-                    <div className="flex items-center gap-2 px-[14px] py-[12px] border-t border-slate-200 bg-white">
-                        <input
-                            type="text"
-                            placeholder="Nhập tin nhắn..."
-                            value={inputMsg}
-                            onChange={handleInputChange}
-                            onKeyDown={handleKeyDown}
-                            className="flex-1 border border-slate-200 rounded-full px-4 py-2.5 text-[13px] outline-none transition-all duration-200 focus:border-blue-500 focus:ring-[3px] focus:ring-blue-500/10"
-                        />
-                        <button
-                            className="w-[38px] h-[38px] min-w-[38px] min-h-[38px] rounded-full bg-gradient-to-br from-blue-600 to-purple-600 text-white border-none cursor-pointer flex items-center justify-center transition-transform duration-200 hover:scale-105 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                            onClick={handleSend}
-                            disabled={!inputMsg.trim()}
-                        >
-                            <Send size={20} color="#ffffff" strokeWidth={2.5} />
-                        </button>
-                    </div>
+                    {isChatArchived && chatMode === "admin" ? (
+                        <div className="flex flex-col items-center justify-center p-4 border-t border-slate-200 bg-white text-center">
+                            <p className="text-[13px] text-slate-500 mb-2 mt-2 m-0">Admin đã kết thúc cuộc trò chuyện này.</p>
+                            <button 
+                                className="text-[13px] text-blue-600 font-semibold bg-transparent border-none cursor-pointer hover:underline p-0 mb-2"
+                                onClick={() => {
+                                    setIsChatArchived(false);
+                                    setMessages([]);
+                                }}
+                            >
+                                Nhấn vào đây để mở cuộc trò chuyện mới
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2 px-[14px] py-[12px] border-t border-slate-200 bg-white">
+                            <input
+                                type="text"
+                                placeholder="Nhập tin nhắn..."
+                                value={inputMsg}
+                                onChange={handleInputChange}
+                                onKeyDown={handleKeyDown}
+                                className="flex-1 border border-slate-200 rounded-full px-4 py-2.5 text-[13px] outline-none transition-all duration-200 focus:border-blue-500 focus:ring-[3px] focus:ring-blue-500/10"
+                            />
+                            <button
+                                className="w-[38px] h-[38px] min-w-[38px] min-h-[38px] rounded-full bg-gradient-to-br from-blue-600 to-purple-600 text-white border-none cursor-pointer flex items-center justify-center transition-transform duration-200 hover:scale-105 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={handleSend}
+                                disabled={!inputMsg.trim()}
+                            >
+                                <Send size={20} color="#ffffff" strokeWidth={2.5} />
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </>

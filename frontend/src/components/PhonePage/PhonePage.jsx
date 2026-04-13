@@ -1,4 +1,3 @@
-
 import Footer from "../../components/Footer/Footer";
 import Header from "../../components/Header/Header";
 import {
@@ -9,6 +8,7 @@ import {
   Filter,
   RotateCcw,
   Heart,
+  X 
 } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
@@ -21,6 +21,9 @@ function PhonePage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [favoriteIds, setFavoriteIds] = useState(new Set());
+  
+  // State đóng mở Drawer bộ lọc trên Mobile
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Filter states
   const [selectedBrands, setSelectedBrands] = useState([]);
@@ -42,7 +45,7 @@ function PhonePage() {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 9;
+  const productsPerPage = 12;
 
   /* ================= FETCH PRODUCTS ================= */
   useEffect(() => {
@@ -64,7 +67,6 @@ function PhonePage() {
 
     fetchProducts();
 
-    // Fetch favorites nếu đã đăng nhập
     const token = localStorage.getItem("token");
     if (token) {
       axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
@@ -254,44 +256,65 @@ function PhonePage() {
     <div className="bg-slate-50 min-h-screen font-sans">
       <Header />
 
-      {/* CSS Nhúng cho animation nảy tim */}
-      <style>
-        {`
-          @keyframes heartPop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-          }
-          .animate-heartPop {
-            animation: heartPop 0.35s ease;
-          }
-        `}
-      </style>
+      {/* Lớp mờ (Overlay) khi mở Filter trên Mobile */}
+      {isFilterOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-[90] lg:hidden backdrop-blur-sm"
+          onClick={() => setIsFilterOpen(false)}
+        />
+      )}
 
-      <div className="w-full max-w-[1400px] mx-auto py-5 px-5 sm:py-10 sm:px-10">
-        <nav className="flex items-center gap-2 text-sm text-slate-500 pb-4">
+      <div className="w-full max-w-[1400px] mx-auto py-4 px-4 sm:py-8 sm:px-10">
+        
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-[13px] md:text-sm text-slate-500 pb-3 md:pb-4">
           <Link to="/" className="hover:text-blue-600 transition-colors no-underline text-inherit">Trang chủ</Link>
           <ChevronRight size={14} />
           <span className="font-semibold text-slate-700">Điện thoại Di động</span>
         </nav>
 
-        <div className="mb-[30px]">
-          <h1 className="text-[28px] font-bold text-slate-800 m-0 mb-2">Điện thoại Di động</h1>
-          <p className="text-slate-500 m-0 text-[15px]">Tìm thấy {filteredProducts.length} sản phẩm</p>
+        {/* Tiêu đề & Nút bật Filter trên Mobile */}
+        <div className="mb-4 md:mb-[30px] flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-0">
+          <div>
+            <h1 className="text-2xl md:text-[28px] font-bold text-slate-800 m-0 mb-1 md:mb-2">Điện thoại Di động</h1>
+            <p className="text-slate-500 m-0 text-[13px] md:text-[15px] hidden md:block">Tìm thấy {filteredProducts.length} sản phẩm</p>
+          </div>
+          
+          {/* Nút bật Bộ lọc trên Mobile */}
+          <div className="flex justify-between items-center lg:hidden w-full border-t border-slate-200 pt-3 mt-1">
+            <span className="text-slate-500 text-[13px]">Tìm thấy {filteredProducts.length} sản phẩm</span>
+            <button 
+              className="flex items-center gap-1.5 border border-slate-300 px-4 py-2 rounded-lg text-[13px] font-bold bg-white text-slate-700 shadow-sm active:bg-slate-50"
+              onClick={() => setIsFilterOpen(true)}
+            >
+              <Filter size={16} /> Lọc
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-[30px] items-start">
+          
           {/* SIDEBAR BỘ LỌC */}
-          <aside className="w-full lg:w-[280px] shrink-0 p-6 bg-white rounded-xl border border-slate-200 shadow-sm lg:sticky lg:top-6 relative">
-            <div className="flex items-center gap-2.5 mb-6 pb-4 border-b border-slate-100 text-slate-800">
-              <Filter size={20} />
-              <h2 className="text-[18px] font-bold m-0">Bộ lọc sản phẩm</h2>
+          {/* ĐÃ SỬA: left-0 và -translate-x-full để trượt từ bên TRÁI sang */}
+          <aside className={`fixed top-0 left-0 h-full w-[280px] sm:w-[320px] bg-white z-[100] overflow-y-auto p-5 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 lg:w-[280px] lg:h-auto lg:z-auto lg:p-6 lg:rounded-xl lg:border lg:border-slate-200 lg:shadow-sm lg:sticky lg:top-6 shrink-0 ${isFilterOpen ? "translate-x-0" : "-translate-x-full"}`}>
+            
+            {/* Header Sidebar Mobile */}
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 text-slate-800">
+              <div className="flex items-center gap-2.5">
+                <Filter size={20} />
+                <h2 className="text-[18px] font-bold m-0">Bộ lọc sản phẩm</h2>
+              </div>
+              <button 
+                className="lg:hidden p-1.5 bg-slate-100 rounded-full text-slate-600 hover:bg-slate-200" 
+                onClick={() => setIsFilterOpen(false)}
+              >
+                <X size={18} />
+              </button>
             </div>
 
             {/* THƯƠNG HIỆU */}
             <div className="mb-6 pb-6 border-b border-slate-100">
               <h3 className="text-[14px] font-bold text-slate-800 mb-4 uppercase tracking-wide m-0">Thương hiệu</h3>
-              {/* Chỉ dùng grid-cols-2 cho mọi màn hình để chia 2 cột */}
               <div className="grid grid-cols-2 gap-3">
                 {availableBrands.map((brand) => (
                   <label key={brand} className="flex items-center gap-2.5 text-[14px] cursor-pointer text-slate-600 hover:text-blue-600 transition-colors">
@@ -314,7 +337,7 @@ function PhonePage() {
             {/* MỨC GIÁ */}
             <div className="mb-6 pb-6 border-b border-slate-100">
               <h3 className="text-[14px] font-bold text-slate-800 mb-4 uppercase tracking-wide m-0">Mức giá</h3>
-              <div className="flex flex-col gap-3 max-[1024px]:flex-row max-[1024px]:flex-wrap">
+              <div className="flex flex-col gap-3">
                 {[
                   { id: "all", label: "Tất cả" },
                   { id: "under2", label: "Dưới 2 triệu" },
@@ -340,7 +363,7 @@ function PhonePage() {
             {/* RAM */}
             <div className="mb-6 pb-6 border-b border-slate-100">
               <h3 className="text-[14px] font-bold text-slate-800 mb-4 uppercase tracking-wide m-0">RAM</h3>
-              <div className="grid grid-cols-2 gap-2 max-[1024px]:flex max-[1024px]:flex-row max-[1024px]:flex-wrap">
+              <div className="grid grid-cols-2 gap-3">
                 {availableRams.map((ram) => (
                   <label key={ram} className="flex items-center gap-2.5 text-[14px] cursor-pointer text-slate-600 hover:text-blue-600 transition-colors">
                     <input
@@ -362,7 +385,7 @@ function PhonePage() {
             {/* BỘ NHỚ TRONG */}
             <div className="mb-6 pb-6 border-b border-slate-100">
               <h3 className="text-[14px] font-bold text-slate-800 mb-4 uppercase tracking-wide m-0">Bộ nhớ trong</h3>
-              <div className="grid grid-cols-2 gap-2 max-[1024px]:flex max-[1024px]:flex-row max-[1024px]:flex-wrap">
+              <div className="grid grid-cols-2 gap-3">
                 {availableStorages.map((storage) => (
                   <label key={storage} className="flex items-center gap-2.5 text-[14px] cursor-pointer text-slate-600 hover:text-blue-600 transition-colors">
                     <input
@@ -384,7 +407,7 @@ function PhonePage() {
             {/* DUNG LƯỢNG PIN */}
             <div className="mb-6 pb-6 border-b border-slate-100 last:border-0 last:mb-4 last:pb-0">
               <h3 className="text-[14px] font-bold text-slate-800 mb-4 uppercase tracking-wide m-0">Dung lượng Pin</h3>
-              <div className="flex flex-col gap-3 max-[1024px]:flex-row max-[1024px]:flex-wrap">
+              <div className="flex flex-col gap-3">
                 {["all", "small", "medium", "large"].map((range) => (
                   <label key={range} className="flex items-center gap-2.5 text-[14px] cursor-pointer text-slate-600 hover:text-blue-600 transition-colors">
                     <input
@@ -403,8 +426,31 @@ function PhonePage() {
               </div>
             </div>
 
+            {/* Khối nút bấm chốt trên Mobile */}
+            <div className="lg:hidden sticky bottom-0 left-0 right-0 bg-white pt-4 pb-2 border-t border-slate-100 flex gap-3">
+               <button
+                className="w-1/2 flex items-center justify-center gap-2 p-3 border border-slate-300 text-slate-600 rounded-lg font-bold text-[14px] cursor-pointer active:bg-slate-100"
+                onClick={() => {
+                  setSelectedBrands([]);
+                  setSelectedStorages([]);
+                  setSelectedRams([]);
+                  setBatteryRange("all");
+                  setPriceRange("all");
+                }}
+              >
+                Xóa lọc
+              </button>
+              <button
+                className="w-1/2 flex items-center justify-center gap-2 p-3 border border-blue-600 bg-blue-600 text-white rounded-lg font-bold text-[14px] cursor-pointer shadow-md active:bg-blue-700"
+                onClick={() => setIsFilterOpen(false)}
+              >
+                Xem kết quả
+              </button>
+            </div>
+
+            {/* Nút Xóa bộ lọc trên PC */}
             <button
-              className="w-full flex items-center justify-center gap-2 p-3 border border-red-200 bg-red-50 text-red-500 rounded-lg font-semibold text-[14px] cursor-pointer transition-all hover:bg-red-500 hover:text-white hover:border-red-500"
+              className="hidden lg:flex w-full items-center justify-center gap-2 p-3 border border-red-200 bg-red-50 text-red-500 rounded-lg font-semibold text-[14px] cursor-pointer transition-all hover:bg-red-500 hover:text-white hover:border-red-500"
               onClick={() => {
                 setSelectedBrands([]);
                 setSelectedStorages([]);
@@ -421,9 +467,9 @@ function PhonePage() {
           {/* PRODUCT GRID */}
           <section className="flex-1 min-w-0">
             {loading ? (
-              <div className="text-center p-10 text-[16px] text-slate-500">Đang tải sản phẩm...</div>
+              <div className="text-center py-20 text-[15px] font-medium text-slate-500 animate-pulse">Đang tải sản phẩm...</div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4 lg:gap-5">
                 {currentProducts.map((product) => {
                   const { basePrice, finalPrice, discountPercent, totalLimit, totalSold } = getPricingInfo(product);
                   const isDiscount = finalPrice < basePrice;
@@ -432,97 +478,102 @@ function PhonePage() {
                   const progressPercent = totalLimit > 0 ? Math.min((totalSold / totalLimit) * 100, 100) : 0;
 
                   return (
-                    <div key={product._id} className="bg-white p-4 rounded-xl text-center transition-all duration-300 flex flex-col border border-slate-200 relative hover:-translate-y-1 hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.1)] hover:border-slate-300 group h-full">
+                    <div key={product._id} className="bg-white p-2.5 sm:p-4 rounded-xl text-center transition-all duration-300 flex flex-col border border-slate-200 relative hover:-translate-y-1 hover:shadow-[0_12px_24px_-8px_rgba(0,0,0,0.1)] hover:border-slate-300 group h-full">
 
                       {/* Tags */}
-                      <div className="absolute top-3 left-3 z-10 flex flex-col gap-1 items-start">
-                        {product.isFeatured && <span className="bg-red-500 text-white text-[11px] font-bold px-2 py-1 rounded tracking-[0.5px]">HOT</span>}
-                        {isDiscount && discountPercent > 0 && <span className="bg-red-500 text-white text-[11px] font-bold px-2 py-1 rounded tracking-[0.5px]">-{discountPercent}%</span>}
+                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 flex flex-col gap-1 items-start">
+                        {product.isFeatured && <span className="bg-red-500 text-white text-[9px] sm:text-[11px] font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 rounded tracking-[0.5px]">HOT</span>}
+                        {isDiscount && discountPercent > 0 && <span className="bg-red-500 text-white text-[9px] sm:text-[11px] font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 rounded tracking-[0.5px]">-{discountPercent}%</span>}
                       </div>
 
                       {/* Wishlist Button */}
                       <button
-                        className={`absolute top-2 right-2 z-20 bg-white/85 border-none rounded-full w-8 h-8 p-0 flex items-center justify-center cursor-pointer transition-all duration-250 ease-out shadow-[0_2px_6px_rgba(0,0,0,0.1)] hover:bg-white hover:scale-[1.15] hover:shadow-[0_3px_10px_rgba(0,0,0,0.15)] ${favoriteIds.has(product._id) ? "bg-red-50 animate-heartPop" : ""
+                        className={`absolute top-2 right-2 sm:top-2 sm:right-2 z-20 bg-white/90 border-none rounded-full w-7 h-7 sm:w-8 sm:h-8 p-0 flex items-center justify-center cursor-pointer transition-all duration-250 ease-out shadow-[0_2px_6px_rgba(0,0,0,0.1)] hover:bg-white md:hover:scale-[1.15] hover:shadow-[0_3px_10px_rgba(0,0,0,0.15)] ${favoriteIds.has(product._id) ? "bg-red-50 animate-heartPop" : ""
                           }`}
                         onClick={(e) => handleToggleFavorite(e, product._id)}
                         title={favoriteIds.has(product._id) ? "Bỏ yêu thích" : "Yêu thích"}
                       >
-                        <Heart size={18} color={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"} fill={favoriteIds.has(product._id) ? "#ef4444" : "none"} />
+                        <Heart size={16} className="sm:w-[18px] sm:h-[18px]" color={favoriteIds.has(product._id) ? "#ef4444" : "#6b7280"} fill={favoriteIds.has(product._id) ? "#ef4444" : "none"} />
                       </button>
 
-                      {/* --- FIX LỖI ẢNH BỊ PHÓNG TO NẰM Ở ĐÂY --- */}
+                      {/* KHUNG ẢNH */}
                       <div
-                        className="h-[150px] sm:h-[200px] w-full flex items-center justify-center mb-4 cursor-pointer overflow-hidden rounded-lg relative"
+                        className="h-[130px] sm:h-[160px] lg:h-[200px] w-full flex items-center justify-center mb-3 sm:mb-4 cursor-pointer overflow-hidden rounded-lg relative"
                         onClick={() => navigate(`/product/${product.slug || product._id}`)}
                       >
                         <img
                           src={displayImage}
                           alt={product.name}
-                          className="max-w-full max-h-full p-2 object-contain object-center transition-transform duration-300 group-hover:scale-105"
+                          className="max-w-full max-h-full p-2 object-contain object-center transition-transform duration-300 md:group-hover:scale-105"
                         />
                       </div>
 
+                      {/* TÊN SẢN PHẨM */}
                       <h3
                         onClick={() => navigate(`/product/${product.slug || product._id}`)}
-                        className="text-[15px] font-semibold text-slate-800 mb-3 m-0 cursor-pointer line-clamp-2 overflow-hidden min-h-[42px] transition-colors group-hover:text-blue-600"
+                        className="text-[13px] sm:text-[14px] lg:text-[15px] font-semibold text-slate-800 mb-2 sm:mb-3 m-0 cursor-pointer line-clamp-2 overflow-hidden min-h-[38px] sm:min-h-[42px] transition-colors group-hover:text-blue-600 leading-snug"
                       >
                         {product.name}
                       </h3>
 
-                      {/* Highlights */}
-                      <div className="flex justify-center gap-1.5 mb-3 flex-wrap min-h-[24px]">
-                        {product.highlights?.map((text, idx) => (
-                          <span key={idx} className="bg-slate-100 text-slate-600 text-[11px] font-semibold px-2 py-1 rounded-md whitespace-nowrap transition-all duration-200 group-hover:bg-blue-50 group-hover:text-blue-600">
+                      {/* HIGHLIGHTS (ĐÃ FIX LỖI TRÀN VIỀN) */}
+                      <div className="flex justify-center gap-1 sm:gap-1.5 mb-2 sm:mb-3 flex-wrap min-h-[20px] sm:min-h-[24px] w-full px-1">
+                        {product.highlights?.slice(0, 3).map((text, idx) => (
+                          <span 
+                            key={idx} 
+                            className="bg-slate-100 text-slate-600 text-[9px] sm:text-[11px] font-semibold px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-md transition-all duration-200 group-hover:bg-blue-50 group-hover:text-blue-600 inline-block max-w-full truncate"
+                            title={text} 
+                          >
                             {text}
                           </span>
                         ))}
                       </div>
 
                       {/* Rating */}
-                      <div className="flex items-center justify-center gap-[2px] mb-3">
+                      <div className="flex items-center justify-center gap-[2px] mb-2 sm:mb-3">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            size={14}
+                            className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5"
                             fill={i < Math.round(product.averageRating || 0) ? "#fbbf24" : "none"}
                             stroke={i < Math.round(product.averageRating || 0) ? "#fbbf24" : "#d1d5db"}
                           />
                         ))}
-                        <span className="text-[12px] text-slate-500 ml-1">({product.reviewsCount || 0} đánh giá)</span>
+                        <span className="text-[10px] sm:text-[12px] text-slate-500 ml-1">({product.reviewsCount || 0})</span>
                       </div>
 
                       {/* Price */}
-                      <div className="mt-auto mb-4 flex flex-col items-center min-h-[44px] justify-end">
+                      <div className="mt-auto mb-3 sm:mb-4 flex flex-col items-center min-h-[40px] sm:min-h-[44px] justify-end w-full">
                         {isDiscount ? (
                           <div className="flex flex-col items-center w-full">
-                            <span className="text-[13px] text-slate-400 line-through mb-0.5">{formatPrice(basePrice)}</span>
-                            <span className="text-red-500 font-bold text-[16px] sm:text-[18px]">{formatPrice(finalPrice)}</span>
+                            <span className="text-[11px] sm:text-[13px] text-slate-400 line-through mb-0.5">{formatPrice(basePrice)}</span>
+                            <span className="text-red-500 font-bold text-[15px] sm:text-[16px] lg:text-[18px]">{formatPrice(finalPrice)}</span>
                             {totalLimit > 0 && (
-                              <div className="w-full mt-2">
-                                <div className="w-full h-1.5 bg-red-100/50 rounded-full overflow-hidden">
+                              <div className="w-full mt-1.5 sm:mt-2">
+                                <div className="w-full h-1 sm:h-1.5 bg-red-100/50 rounded-full overflow-hidden">
                                   <div className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full" style={{ width: `${progressPercent}%` }} />
                                 </div>
-                                <div className="flex justify-center text-[10px] items-center gap-1.5 font-semibold text-red-500 mt-1">
+                                <div className="flex justify-center text-[9px] sm:text-[10px] items-center gap-1 sm:gap-1.5 font-semibold text-red-500 mt-1">
                                    <span className="relative flex h-1.5 w-1.5">
                                      {quantityLeft > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>}
                                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
                                    </span>
-                                   {quantityLeft > 0 ? `Còn ${quantityLeft} suất` : "Đã hết suất"}
+                                   {quantityLeft > 0 ? `Còn ${quantityLeft} suất` : "Đã hết"}
                                 </div>
                               </div>
                             )}
                           </div>
                         ) : (
-                          <span className="text-red-500 font-bold text-[16px] sm:text-[18px]">{formatPrice(basePrice)}</span>
+                          <span className="text-red-500 font-bold text-[15px] sm:text-[16px] lg:text-[18px]">{formatPrice(basePrice)}</span>
                         )}
                       </div>
 
                       <button
-                        className="p-2.5 w-full border border-slate-200 rounded-lg bg-white text-blue-600 cursor-pointer font-semibold text-[14px] flex items-center justify-center gap-2 transition-all duration-200 hover:bg-blue-600 hover:text-white hover:border-blue-600"
+                        className="p-2 sm:p-2.5 w-full border border-slate-200 rounded-lg bg-white text-blue-600 cursor-pointer font-semibold text-[12px] sm:text-[14px] flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 md:hover:bg-blue-600 md:hover:text-white md:hover:border-blue-600 active:bg-blue-50"
                         onClick={() => navigate(`/product/${product.slug || product._id}`)}
                       >
-                        <ShoppingCart size={16} />
-                        Xem chi tiết
+                        <ShoppingCart size={14} className="sm:w-4 sm:h-4" />
+                        Chi tiết
                       </button>
                     </div>
                   );
@@ -531,21 +582,21 @@ function PhonePage() {
             )}
 
             {!loading && filteredProducts.length === 0 && (
-              <div className="bg-white p-10 text-center text-slate-500 rounded-xl shadow-sm border border-dashed border-slate-200 mt-5">
+              <div className="bg-white p-10 text-center text-slate-500 rounded-xl shadow-sm border border-dashed border-slate-200 mt-2">
                 <span className="block text-4xl mb-3">🔍</span>
-                Không tìm thấy điện thoại nào phù hợp.
+                Không tìm thấy điện thoại nào phù hợp với bộ lọc hiện tại.
               </div>
             )}
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex justify-center gap-2 mt-10 flex-wrap">
+              <div className="flex justify-center gap-1.5 sm:gap-2 mt-8 sm:mt-10 flex-wrap">
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage(currentPage - 1)}
-                  className="w-10 h-10 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold flex items-center justify-center cursor-pointer transition-all hover:border-blue-600 hover:text-blue-600 disabled:bg-slate-50 disabled:text-slate-300 disabled:border-slate-200 disabled:cursor-not-allowed"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold flex items-center justify-center cursor-pointer transition-all hover:border-blue-600 hover:text-blue-600 disabled:bg-slate-50 disabled:text-slate-300 disabled:border-slate-200 disabled:cursor-not-allowed"
                 >
-                  <ChevronLeft size={18} />
+                  <ChevronLeft size={16} className="sm:w-[18px] sm:h-[18px]" />
                 </button>
 
                 {getPaginationNumbers().map((item, index) => (
@@ -553,7 +604,7 @@ function PhonePage() {
                     key={index}
                     onClick={() => typeof item === 'number' && setCurrentPage(item)}
                     disabled={item === '...'}
-                    className={`w-10 h-10 rounded-lg border flex items-center justify-center font-semibold transition-all duration-200 ${currentPage === item
+                    className={`w-8 h-8 sm:w-10 sm:h-10 text-[13px] sm:text-[15px] rounded-lg border flex items-center justify-center font-semibold transition-all duration-200 ${currentPage === item
                       ? "bg-blue-600 text-white border-blue-600 shadow-sm"
                       : item === "..."
                         ? "bg-transparent border-transparent text-slate-500 cursor-default"
@@ -567,9 +618,9 @@ function PhonePage() {
                 <button
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage(currentPage + 1)}
-                  className="w-10 h-10 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold flex items-center justify-center cursor-pointer transition-all hover:border-blue-600 hover:text-blue-600 disabled:bg-slate-50 disabled:text-slate-300 disabled:border-slate-200 disabled:cursor-not-allowed"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg border border-slate-200 bg-white text-slate-600 font-semibold flex items-center justify-center cursor-pointer transition-all hover:border-blue-600 hover:text-blue-600 disabled:bg-slate-50 disabled:text-slate-300 disabled:border-slate-200 disabled:cursor-not-allowed"
                 >
-                  <ChevronRight size={18} />
+                  <ChevronRight size={16} className="sm:w-[18px] sm:h-[18px]" />
                 </button>
               </div>
             )}

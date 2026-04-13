@@ -7,16 +7,16 @@ const sections = [
     icon: <ShoppingBag size={22} />,
     title: "1. Điều kiện mua hàng",
     content: [
-      "Để đặt hàng tại TechNova, bạn phải đủ 18 tuổi hoặc có sự đồng ý của người giám hộ hợp pháp.",
+      "Để đặt hàng tại V&T Nexis, bạn phải đủ 18 tuổi hoặc có sự đồng ý của người giám hộ hợp pháp.",
       "Bạn cam kết cung cấp thông tin chính xác (tên, địa chỉ, số điện thoại) khi đặt hàng. Mọi tổn thất phát sinh do thông tin sai lệch thuộc về trách nhiệm của người mua.",
-      "TechNova có quyền từ chối đơn hàng nếu phát hiện dấu hiệu gian lận hoặc vi phạm điều khoản.",
+      "V&T Nexis có quyền từ chối đơn hàng nếu phát hiện dấu hiệu gian lận hoặc vi phạm điều khoản.",
     ],
   },
   {
     icon: <CreditCard size={22} />,
     title: "2. Thanh toán và giá cả",
     content: [
-      "Giá sản phẩm hiển thị trên website bao gồm thuế VAT và cập nhật theo thời gian thực. TechNova bảo lưu quyền điều chỉnh giá mà không cần thông báo trước.",
+      "Giá sản phẩm hiển thị trên website bao gồm thuế VAT và cập nhật theo thời gian thực. V&T Nexis bảo lưu quyền điều chỉnh giá mà không cần thông báo trước.",
       "Chúng tôi hỗ trợ các phương thức: Thanh toán khi nhận hàng (COD), Thẻ tín dụng/ghi nợ, Ví điện tử VNPay/Momo và Chuyển khoản ngân hàng.",
       "Đơn hàng sẽ được xác nhận xử lý sau khi thanh toán được xác minh thành công.",
     ],
@@ -52,7 +52,7 @@ const sections = [
     icon: <Scale size={22} />,
     title: "6. Quyền sở hữu trí tuệ",
     content: [
-      "Toàn bộ nội dung trên website TechNova (hình ảnh, mô tả, logo, thiết kế) là tài sản của TechNova và được bảo hộ bởi Luật Sở hữu trí tuệ Việt Nam.",
+      "Toàn bộ nội dung trên website V&T Nexis (hình ảnh, mô tả, logo, thiết kế) là tài sản của V&T Nexis và được bảo hộ bởi Luật Sở hữu trí tuệ Việt Nam.",
       "Nghiêm cấm sao chép, phân phối hoặc sử dụng nội dung trên website vào mục đích thương mại khi chưa có sự cho phép bằng văn bản.",
     ],
   },
@@ -60,8 +60,8 @@ const sections = [
     icon: <Scale size={22} />,
     title: "7. Giới hạn trách nhiệm",
     content: [
-      "TechNova không chịu trách nhiệm về bất kỳ thiệt hại gián tiếp, vô tình hay đặc biệt nào phát sinh từ việc sử dụng sản phẩm hoặc dịch vụ.",
-      "Trách nhiệm pháp lý tối đa của TechNova không vượt quá giá trị đơn hàng gốc của giao dịch liên quan.",
+      "V&T Nexis không chịu trách nhiệm về bất kỳ thiệt hại gián tiếp, vô tình hay đặc biệt nào phát sinh từ việc sử dụng sản phẩm hoặc dịch vụ.",
+      "Trách nhiệm pháp lý tối đa của V&T Nexis không vượt quá giá trị đơn hàng gốc của giao dịch liên quan.",
     ],
   },
 ];
@@ -79,7 +79,7 @@ function TermsOfService() {
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold m-0 mb-4 text-slate-900">Điều khoản Dịch vụ</h1>
           <p className="text-base text-slate-600 leading-relaxed m-0 mb-5">
-            Vui lòng đọc kỹ các điều khoản và điều kiện này trước khi sử dụng dịch vụ của TechNova. Bằng cách truy cập hoặc sử dụng website, bạn đồng ý bị ràng buộc bởi các điều khoản này.
+            Vui lòng đọc kỹ các điều khoản và điều kiện này trước khi sử dụng dịch vụ của V&T Nexis. Bằng cách truy cập hoặc sử dụng website, bạn đồng ý bị ràng buộc bởi các điều khoản này.
           </p>
           <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-full py-1.5 px-4 text-[13px] text-emerald-600 font-medium">
             Cập nhật lần cuối: 25 tháng 3, 2025
@@ -93,7 +93,7 @@ function TermsOfService() {
         {/* INTRO CARD */}
         <div className="bg-emerald-50 border border-emerald-200 border-l-4 border-l-emerald-600 rounded-xl py-5 px-6 mb-8 text-emerald-900 text-[15px] leading-relaxed">
           <p className="m-0">
-            Các điều khoản này áp dụng cho tất cả người dùng của website <strong className="font-bold">technova.vn</strong>, bao gồm khách truy cập, người mua hàng và bất kỳ người nào tương tác với nội dung hoặc dịch vụ của chúng tôi.
+            Các điều khoản này áp dụng cho tất cả người dùng của website <strong className="font-bold">vtnexis.vn</strong>, bao gồm khách truy cập, người mua hàng và bất kỳ người nào tương tác với nội dung hoặc dịch vụ của chúng tôi.
           </p>
         </div>
 
@@ -126,7 +126,7 @@ function TermsOfService() {
           <div>
             <h3 className="text-lg m-0 mb-2 font-bold">Cần hỗ trợ thêm?</h3>
             <p className="m-0 text-[15px] leading-relaxed text-white/90">
-              Nếu bạn có thắc mắc về điều khoản dịch vụ, hãy liên hệ với chúng tôi qua email <a href="mailto:support@technova.vn" className="text-yellow-400 font-semibold underline hover:text-yellow-300 transition-colors">support@technova.vn</a> hoặc gọi <strong className="font-bold text-white">1900 1234</strong> (miễn phí, 8:00–21:00 hàng ngày).
+              Nếu bạn có thắc mắc về điều khoản dịch vụ, hãy liên hệ với chúng tôi qua email <a href="mailto:support@vtnexis.vn" className="text-yellow-400 font-semibold underline hover:text-yellow-300 transition-colors">support@vtnexis.vn</a> hoặc gọi <strong className="font-bold text-white">1900 1234</strong> (miễn phí, 8:00–21:00 hàng ngày).
             </p>
           </div>
         </div>

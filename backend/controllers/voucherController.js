@@ -96,7 +96,7 @@ const voucherController = {
                 try {
                     await Notification.create({
                         title: "🎁 Mã Giảm Giá Sốc",
-                        message: `TechStore vừa phát hành mã giảm giá ${code.toUpperCase()}. Nhanh tay kẻo lỡ số lượng có hạn!`,
+                        message: `V&T Nexis vừa phát hành mã giảm giá ${code.toUpperCase()}. Nhanh tay kẻo lỡ số lượng có hạn!`,
                         type: "promotion",
                         link: `/voucher/${code.toUpperCase()}`
                     });

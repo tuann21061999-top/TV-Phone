@@ -34,7 +34,7 @@ const PaymentResult = () => {
             <CheckCircle className="mx-auto text-green-500" size={80} />
             <h1 className="text-2xl font-bold mt-5 mb-4 text-slate-800">Thanh toán thành công!</h1>
             <p className="text-slate-600 text-base leading-relaxed mb-8">
-              Cảm ơn bạn đã mua sắm tại <span className="font-semibold text-blue-600">TechNova</span>. 
+              Cảm ơn bạn đã mua sắm tại <span className="font-semibold text-blue-600">V&T Nexis</span>. 
               Đơn hàng của bạn đang được xử lý và sẽ sớm được giao.
             </p>
           </>
