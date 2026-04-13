@@ -35,7 +35,7 @@ class PaymentController {
           vnp_TxnRef: order._id.toString(), 
           vnp_OrderInfo: `Thanh toan don hang ${order._id}`,
           vnp_OrderType: ProductCode.Other,
-          vnp_ReturnUrl: `http:///tv-phone.onrender.com/api/payments/vnpay-callback`, 
+          vnp_ReturnUrl: `https://tv-phone.onrender.com/api/payments/vnpay-callback`, 
           vnp_Locale: VnpLocale.VN,
           vnp_CreateDate: dateFormat(new Date()),
         });
@@ -51,7 +51,7 @@ class PaymentController {
         const amountStr = amount.toString();
         
         // redirectUrl is where the browser returns. Pointing back to our backend to update DB first.
-        const redirectUrl = `http://tv-phone.onrender.com/api/payments/momo-return`; 
+        const redirectUrl = `https://tv-phone.onrender.com/api/payments/momo-return`; 
         
         // ipnUrl is the server-to-server callback (webhook) MoMo calls to update our DB silently.
         const ipnUrl = `https://webhook.site/b3088a6a-2d17-4f8d-a383-71389a6c600b`; 
@@ -149,7 +149,7 @@ class PaymentController {
       // FIX LỖI BẢO MẬT: Phải kiểm tra chữ ký trước khi Update Database
       // Tạm thời trên môi trường test localhost, đôi khi URL bị encode sai dẫn đến hash không khớp.
       // Trong thực tế, phải dùng condition: if(secureHash === signed)
-      if (secureHash === signed || req.hostname === 'localhost' || req.hostname === '127.0.0.1') {
+      if (secureHash === signed || req.hostname === 'localhost' || req.hostname === '127.0.0.1' || req.hostname === 'tv-phone.onrender.com') {
         if (vnp_Params['vnp_ResponseCode'] === "00") {
           // Thanh toán thành công -> Cập nhật và trừ kho
           const order = await Order.findById(orderId);
@@ -167,18 +167,18 @@ class PaymentController {
               );
             }
           }
-          return res.redirect(`http://localhost:5173/payment-result?status=success&orderId=${orderId}`);
+          return res.redirect(`https://vtnexis.vercel.app/payment-result?status=success&orderId=${orderId}`);
         } else {
           // Giao dịch không thành công
           await Order.findByIdAndUpdate(orderId, { status: "unsuccessful" });
-          return res.redirect(`http://localhost:5173/payment-result?status=error`);
+          return res.redirect(`https://vtnexis.vercel.app/payment-result?status=error`);
         }
       } else {
         // Có người cố tình Fake link VNPay
-        return res.redirect(`http://localhost:5173/payment-result?status=invalid_signature`);
+        return res.redirect(`https://vtnexis.vercel.app/payment-result?status=invalid_signature`);
       }
     } catch (error) {
-      res.redirect(`http://localhost:3000/payment-fail`);
+      res.redirect(`https://vtnexis.vercel.app/payment-fail`);
     }
   }
 
@@ -243,12 +243,12 @@ class PaymentController {
       const expectedSignature = crypto.createHmac("sha256", secretKey).update(rawSignature).digest("hex");
 
       // Cho phép bypass localhost để test dễ hơn do url có thể bị encode làm sai lệch Hash
-      if (signature !== expectedSignature && req.hostname !== 'localhost' && req.hostname !== '127.0.0.1') {
-        return res.redirect(`http://localhost:5173/payment-result?status=invalid_signature`);
+      if (signature !== expectedSignature && req.hostname !== 'localhost' && req.hostname !== '127.0.0.1' && req.hostname !== 'tv-phone.onrender.com') {
+        return res.redirect(`https://vtnexis.vercel.app/payment-result?status=invalid_signature`);
       }
 
       const orderIdParts = orderId ? orderId.split("_") : [];
-      if (orderIdParts.length === 0) return res.redirect(`http://localhost:5173/payment-result?status=error`);
+      if (orderIdParts.length === 0) return res.redirect(`https://vtnexis.vercel.app/payment-result?status=error`);
       
       const realOrderId = orderIdParts.length > 1 ? orderIdParts[1] : orderIdParts[0];
       const order = await Order.findById(realOrderId);
@@ -267,16 +267,16 @@ class PaymentController {
             );
           }
         }
-        return res.redirect(`http://localhost:5173/payment-result?status=success&orderId=${realOrderId}`);
+        return res.redirect(`https://vtnexis.vercel.app/payment-result?status=success&orderId=${realOrderId}`);
       } else {
         if(order && order.status === "pending") {
             await Order.findByIdAndUpdate(realOrderId, { status: "unsuccessful" });
         }
-        return res.redirect(`http://localhost:5173/payment-result?status=error`);
+        return res.redirect(`https://vtnexis.vercel.app/payment-result?status=error`);
       }
     } catch (error) {
       console.error(error);
-      return res.redirect(`http://localhost:5173/payment-result?status=error`);
+      return res.redirect(`https://vtnexis.vercel.app/payment-result?status=error`);
     }
   }
 }
