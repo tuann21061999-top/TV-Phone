@@ -14,6 +14,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import GlobalArticle from "../../components/GlobalArticle/GlobalArticle";
 
 function PhonePage() {
   const navigate = useNavigate();
@@ -628,6 +629,7 @@ function PhonePage() {
         </div>
       </div>
 
+      <GlobalArticle pageCode="phones" />
       <Footer />
     </div>
   );

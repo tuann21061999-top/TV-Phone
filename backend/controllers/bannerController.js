@@ -6,7 +6,7 @@ const bannerController = {
   // 1. TẠO BANNER MỚI
   createBanner: async (req, res) => {
     try {
-      const { title, subtitle, link, buttonText, isActive, order } = req.body;
+      const { title, subtitle, link, newsLink, buttonText, isActive, order, theme, startDate, endDate, position } = req.body;
 
       // Kiểm tra xem multer có bắt được file ảnh gửi lên không
       if (!req.file) {
@@ -27,9 +27,14 @@ const bannerController = {
         subtitle,
         image: result.secure_url, // Lấy URL xịn từ Cloudinary trả về
         link,
+        newsLink,
         buttonText,
         isActive: isActive === 'true' || isActive === true,
-        order: parseInt(order) || 0
+        order: parseInt(order) || 0,
+        theme: theme || "blue",
+        position: position || "main",
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null
       });
 
       const savedBanner = await newBanner.save();
@@ -48,7 +53,7 @@ const bannerController = {
   updateBanner: async (req, res) => {
     try {
       const bannerId = req.params.id;
-      const { title, subtitle, link, buttonText, isActive, order } = req.body;
+      const { title, subtitle, link, newsLink, buttonText, isActive, order, theme, startDate, endDate, position } = req.body;
 
       let banner = await Banner.findById(bannerId);
       if (!banner) return res.status(404).json({ message: "Không tìm thấy Banner" });
@@ -65,9 +70,14 @@ const bannerController = {
       banner.title = title;
       banner.subtitle = subtitle;
       banner.link = link;
+      if (newsLink !== undefined) banner.newsLink = newsLink;
       banner.buttonText = buttonText;
       banner.isActive = isActive === 'true' || isActive === true;
       banner.order = parseInt(order) || 0;
+      banner.theme = theme || "blue";
+      banner.position = position || "main";
+      banner.startDate = startDate ? new Date(startDate) : null;
+      banner.endDate = endDate ? new Date(endDate) : null;
       banner.image = imageUrl;
 
       const updatedBanner = await banner.save();
@@ -94,7 +104,15 @@ const bannerController = {
   // 4. LẤY BANNER ĐANG ACTIVE CHO TRANG CHỦ
   getPublicBanners: async (req, res) => {
     try {
-      const banners = await Banner.find({ isActive: true }).sort({ order: 1, createdAt: -1 });
+      const now = new Date();
+      const query = {
+        isActive: true,
+        $and: [
+          { $or: [{ startDate: null }, { startDate: { $lte: now } }] },
+          { $or: [{ endDate: null }, { endDate: { $gte: now } }] }
+        ]
+      };
+      const banners = await Banner.find(query).sort({ order: 1, createdAt: -1 });
       res.status(200).json(banners);
     } catch (error) {
       res.status(500).json({ message: "Lỗi server", error: error.message });

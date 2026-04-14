@@ -7,7 +7,10 @@ const bannerSchema = new mongoose.Schema(
     subtitle: { type: String },              // Tiêu đề phụ (VD: "Mạnh mẽ vượt trội. Giảm 10%")
     image: { type: String, required: true }, // URL ảnh banner
     link: { type: String, required: true },  // Link khi click vào (VD: "/product/iphone-15")
+    newsLink: { type: String },              // Link bài viết khi click "Xem chi tiết" (VD: "/news/danh-gia")
     buttonText: { type: String, default: "Xem chi tiết" }, // Chữ trên nút
+    theme: { type: String, default: "blue" }, // Màu nền/gradient của banner (blue, purple, rose, emerald, dark)
+    position: { type: String, enum: ["main", "sub_left"], default: "main" }, // Vị trí hiển thị
     
     // Điều khiển hiển thị
     isActive: { type: Boolean, default: true },

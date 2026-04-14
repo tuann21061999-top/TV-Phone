@@ -60,7 +60,7 @@ function Header() {
           setIsSearching(false);
         }
       } else {
-        searchResults([]);
+        setSearchResults([]);
         setIsSearchOpen(false);
       }
     }, 500); // Debounce 500ms

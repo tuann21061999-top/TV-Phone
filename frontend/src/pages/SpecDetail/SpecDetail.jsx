@@ -86,7 +86,7 @@ function SpecDetail() {
     const hasBasicSpecs = product.specs && Object.keys(product.specs).length > 0;
 
     return (
-        <div className="bg-slate-50 min-h-screen font-sans">
+        <div className="bg-slate-50 min-h-screen font-['Inter',sans-serif]">
             <Header />
 
             {/* Sticky Top Header Bar */}

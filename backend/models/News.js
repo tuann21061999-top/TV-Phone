@@ -20,7 +20,7 @@ const contentBlockSchema = new mongoose.Schema(
     {
         type: {
             type: String,
-            enum: ["text", "image"],
+            enum: ["text", "image", "heading"],
             required: true,
         },
         value: {
@@ -79,6 +79,11 @@ const newsSchema = new mongoose.Schema(
         views: {
             type: Number,
             default: 0,
+        },
+        displayLocations: {
+            type: [String],
+            enum: ["home", "phones", "electronics", "accessories", "promotions", "contact"],
+            default: [],
         },
         isActive: {
             type: Boolean,

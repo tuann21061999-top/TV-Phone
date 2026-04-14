@@ -593,24 +593,24 @@ const Profile = () => {
               };
 
               return (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-4 md:gap-6">
 
                   {/* MEMBER LEVEL CARD */}
-                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm" style={{ borderLeft: `4px solid ${currentLevel.color}` }}>
-                    <div className="flex justify-between items-start mb-4.5">
-                      <div className="flex items-center gap-3.5">
-                        <span className="text-[36px] leading-none">{currentLevel.icon}</span>
+                  <div className="bg-white rounded-2xl border border-slate-200 p-4 md:p-6 shadow-sm" style={{ borderLeft: `4px solid ${currentLevel.color}` }}>
+                    <div className="flex justify-between items-start mb-3 md:mb-4.5">
+                      <div className="flex items-center gap-2.5 md:gap-3.5">
+                        <span className="text-[28px] md:text-[36px] leading-none">{currentLevel.icon}</span>
                         <div>
-                          <p className="text-xs text-slate-400 uppercase tracking-wide m-0 mb-0.5 font-semibold">Cấp thành viên</p>
-                          <h3 className="text-2xl font-extrabold m-0" style={{ color: currentLevel.color }}>{currentLevel.name}</h3>
+                          <p className="text-[10px] md:text-xs text-slate-400 uppercase tracking-wide m-0 mb-0.5 font-semibold">Cấp thành viên</p>
+                          <h3 className="text-xl md:text-2xl font-extrabold m-0" style={{ color: currentLevel.color }}>{currentLevel.name}</h3>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 md:gap-3">
                         <div className="text-right">
-                          <span className="block text-[28px] font-extrabold text-slate-800 leading-none">{totalPoints}</span>
-                          <span className="text-xs text-slate-500">điểm tích lũy</span>
+                          <span className="block text-[22px] md:text-[28px] font-extrabold text-slate-800 leading-none">{totalPoints}</span>
+                          <span className="text-[10px] md:text-xs text-slate-500">điểm tích lũy</span>
                         </div>
-                        <button className="w-7 h-7 rounded-full border-2 border-slate-300 bg-slate-50 text-slate-500 text-sm font-bold cursor-pointer transition-all shrink-0 flex items-center justify-center hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50" onClick={() => setShowLevelInfo(true)} title="Giải thích hệ thống">?</button>
+                        <button className="w-6 h-6 md:w-7 md:h-7 rounded-full border-2 border-slate-300 bg-slate-50 text-slate-500 text-xs md:text-sm font-bold cursor-pointer transition-all shrink-0 flex items-center justify-center hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50" onClick={() => setShowLevelInfo(true)} title="Giải thích hệ thống">?</button>
                       </div>
                     </div>
 
@@ -660,45 +660,45 @@ const Profile = () => {
                   )}
 
                   {/* THỐNG KÊ */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div className="bg-white rounded-xl p-5 flex items-center gap-4 shadow-sm border border-slate-100">
-                      <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-blue-100 text-blue-600"><Package size={24} /></div>
-                      <div>
-                        <h3 className="m-0 mb-1 text-[22px] text-slate-800 font-bold">{doneOrders.length}</h3>
-                        <p className="m-0 text-[13px] text-slate-500 font-medium">Đơn hàng đã giao</p>
+                  <div className="grid grid-cols-2 gap-3 md:gap-5">
+                    <div className="bg-white rounded-xl p-3.5 md:p-5 flex items-center gap-3 md:gap-4 shadow-sm border border-slate-100">
+                      <div className="w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-xl flex items-center justify-center shrink-0 bg-blue-100 text-blue-600"><Package size={20} className="md:hidden" /><Package size={24} className="hidden md:block" /></div>
+                      <div className="min-w-0">
+                        <h3 className="m-0 mb-0.5 md:mb-1 text-lg md:text-[22px] text-slate-800 font-bold">{doneOrders.length}</h3>
+                        <p className="m-0 text-[11px] md:text-[13px] text-slate-500 font-medium">Đơn đã giao</p>
                       </div>
                     </div>
-                    <div className="bg-white rounded-xl p-5 flex items-center gap-4 shadow-sm border border-slate-100">
-                      <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-emerald-100 text-emerald-600"><DollarSign size={24} /></div>
-                      <div>
-                        <h3 className="m-0 mb-1 text-[22px] text-slate-800 font-bold">{totalSpent.toLocaleString()}đ</h3>
-                        <p className="m-0 text-[13px] text-slate-500 font-medium">Tổng chi tiêu</p>
+                    <div className="bg-white rounded-xl p-3.5 md:p-5 flex items-center gap-3 md:gap-4 shadow-sm border border-slate-100">
+                      <div className="w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-xl flex items-center justify-center shrink-0 bg-emerald-100 text-emerald-600"><DollarSign size={20} className="md:hidden" /><DollarSign size={24} className="hidden md:block" /></div>
+                      <div className="min-w-0">
+                        <h3 className="m-0 mb-0.5 md:mb-1 text-base md:text-[22px] text-slate-800 font-bold truncate">{totalSpent.toLocaleString()}đ</h3>
+                        <p className="m-0 text-[11px] md:text-[13px] text-slate-500 font-medium">Tổng chi tiêu</p>
                       </div>
                     </div>
                   </div>
 
                   {/* ĐỔI ĐIỂM LẤY VOUCHER */}
-                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                    <h3 className="text-[17px] font-bold text-slate-800 m-0 mb-1.5 flex items-center gap-1.5"><Gift size={17} /> Đổi điểm lấy voucher</h3>
-                    <p className="text-[13px] text-slate-500 m-0 mb-4">
+                  <div className="bg-white rounded-2xl border border-slate-200 p-4 md:p-6 shadow-sm">
+                    <h3 className="text-[15px] md:text-[17px] font-bold text-slate-800 m-0 mb-1.5 flex items-center gap-1.5"><Gift size={17} /> Đổi điểm lấy voucher</h3>
+                    <p className="text-[12px] md:text-[13px] text-slate-500 m-0 mb-3 md:mb-4 leading-relaxed">
                       Tích lũy: <strong className="text-slate-700">{totalPoints} điểm</strong>
-                      {totalSpentPoints > 0 && <> &nbsp;·&nbsp; Đã dùng: <strong className="text-red-600">{totalSpentPoints}</strong> &nbsp;·&nbsp; Khả dụng: <strong className="text-emerald-600">{availablePoints} điểm</strong></>}
+                      {totalSpentPoints > 0 && <><br className="sm:hidden" /><span className="hidden sm:inline"> &nbsp;·&nbsp; </span>Đã dùng: <strong className="text-red-600">{totalSpentPoints}</strong> · Khả dụng: <strong className="text-emerald-600">{availablePoints} điểm</strong></>}
                     </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div className="grid grid-cols-3 gap-2 md:gap-3.5">
                       {VOUCHER_TIERS.map(v => {
                         const canAfford = availablePoints >= v.points;
                         return (
-                          <div key={v.tier} className={`border border-slate-200 rounded-xl p-4 flex flex-col items-center gap-2 text-center transition-shadow ${!canAfford ? 'opacity-55' : 'hover:shadow-md'}`}>
-                            <div className="text-white text-xs font-bold py-1 px-3 rounded-full tracking-wide" style={{ background: v.color }}>{v.tier}</div>
-                            <p className="text-[15px] font-bold text-slate-800 m-0">{v.label}</p>
-                            <p className="text-[13px] text-slate-500 m-0">{v.points} điểm</p>
+                          <div key={v.tier} className={`border border-slate-200 rounded-xl p-2.5 md:p-4 flex flex-col items-center gap-1.5 md:gap-2 text-center transition-shadow ${!canAfford ? 'opacity-55' : 'hover:shadow-md'}`}>
+                            <div className="text-white text-[10px] md:text-xs font-bold py-0.5 md:py-1 px-2 md:px-3 rounded-full tracking-wide" style={{ background: v.color }}>{v.tier}</div>
+                            <p className="text-[13px] md:text-[15px] font-bold text-slate-800 m-0">{v.label}</p>
+                            <p className="text-[11px] md:text-[13px] text-slate-500 m-0">{v.points} điểm</p>
                             <button
-                              className={`w-full border-none rounded-lg py-2.5 text-[13px] font-semibold text-white mt-1 transition-opacity ${canAfford ? 'cursor-pointer hover:opacity-90' : 'cursor-not-allowed bg-slate-400'}`}
+                              className={`w-full border-none rounded-lg py-2 md:py-2.5 text-[11px] md:text-[13px] font-semibold text-white mt-0.5 md:mt-1 transition-opacity ${canAfford ? 'cursor-pointer hover:opacity-90' : 'cursor-not-allowed bg-slate-400'}`}
                               disabled={!canAfford}
                               style={canAfford ? { background: v.color } : {}}
                               onClick={() => handleRedeem(v.tier)}
                             >
-                              {canAfford ? 'Đổi ngay' : 'Chưa đủ điểm'}
+                              {canAfford ? 'Đổi ngay' : 'Chưa đủ'}
                             </button>
                           </div>
                         );
@@ -721,7 +721,7 @@ const Profile = () => {
                   </div>
 
                   {/* THÔNG TIN CÁ NHÂN */}
-                  <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
+                  <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-slate-100">
                     <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
                       <h2 className="text-xl text-slate-800 m-0 font-bold">Thông tin liên hệ</h2>
                       {!isEditingInfo && (
@@ -799,11 +799,11 @@ const Profile = () => {
 
             {/* TAB ORDERS */}
             {activeTab === "orders" && (
-              <div className="bg-white rounded-xl p-6 md:p-7 shadow-sm border border-slate-100">
+              <div className="bg-white rounded-xl p-4 md:p-7 shadow-sm border border-slate-100">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 md:gap-0">
                   <div>
-                    <h2 className="m-0 text-[22px] text-slate-800 font-bold">Đơn hàng của tôi</h2>
-                    <p className="m-0 mt-1 text-sm text-slate-500">Quản lý và theo dõi tất cả đơn hàng của bạn</p>
+                    <h2 className="m-0 text-lg md:text-[22px] text-slate-800 font-bold">Đơn hàng của tôi</h2>
+                    <p className="m-0 mt-0.5 md:mt-1 text-[13px] md:text-sm text-slate-500">Quản lý và theo dõi tất cả đơn hàng của bạn</p>
                   </div>
                   <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg py-2 px-4 w-full md:w-[300px] transition-all focus-within:border-blue-500 focus-within:bg-white focus-within:ring-[3px] focus-within:ring-blue-500/10">
                     <Search size={18} className="text-slate-500" />
@@ -811,14 +811,14 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-3 mb-6 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300">
+                <div className="flex gap-2 md:gap-3 mb-4 md:mb-6 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-300 -mx-4 px-4 md:mx-0 md:px-0">
                   {filterOrderTabs.map(tab => (
                     <button
                       key={tab.id}
-                      className={`flex items-center gap-2 py-2 px-4 border rounded-full text-sm font-medium cursor-pointer whitespace-nowrap transition-all ${activeOrderFilter === tab.id ? "bg-blue-600 text-white border-blue-600" : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"}`}
+                      className={`flex items-center gap-1.5 md:gap-2 py-1.5 md:py-2 px-3 md:px-4 border rounded-full text-[12px] md:text-sm font-medium cursor-pointer whitespace-nowrap transition-all ${activeOrderFilter === tab.id ? "bg-blue-600 text-white border-blue-600" : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"}`}
                       onClick={() => setActiveOrderFilter(tab.id)}
                     >
-                      {tab.label} <span className={`py-0.5 px-1.5 rounded-full text-xs font-bold ${activeOrderFilter === tab.id ? "bg-white/20 text-white" : "bg-slate-200 text-slate-600"}`}>{getTabCount(tab.id)}</span>
+                      {tab.label} <span className={`py-0.5 px-1 md:px-1.5 rounded-full text-[10px] md:text-xs font-bold ${activeOrderFilter === tab.id ? "bg-white/20 text-white" : "bg-slate-200 text-slate-600"}`}>{getTabCount(tab.id)}</span>
                     </button>
                   ))}
                 </div>
@@ -835,13 +835,13 @@ const Profile = () => {
                   <div className="flex flex-col gap-5">
                     {filteredOrders.map(order => (
                       <div key={order._id} className="border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm hover:border-slate-300 transition-colors">
-                        <div className="flex justify-between items-center py-4 px-5 bg-slate-50 border-b border-slate-100">
-                          <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <div className="flex justify-between items-center py-3 md:py-4 px-4 md:px-5 bg-slate-50 border-b border-slate-100">
+                          <div className="flex items-center gap-1.5 md:gap-2 text-[12px] md:text-sm text-slate-500">
                             <span className="text-blue-600 font-bold uppercase">#{order._id.slice(-6)}</span>
                             <span className="text-slate-300">|</span>
                             <span>{new Date(order.createdAt).toLocaleDateString('vi-VN')}</span>
                           </div>
-                          <div className={`py-1 px-3 rounded-full text-xs font-semibold ${order.status === "waiting_approval" ? "bg-amber-100 text-amber-700" :
+                          <div className={`py-0.5 md:py-1 px-2 md:px-3 rounded-full text-[10px] md:text-xs font-semibold ${order.status === "waiting_approval" ? "bg-amber-100 text-amber-700" :
                             order.status === "pending" ? "bg-blue-100 text-blue-700" :
                               order.status === "paid" ? "bg-indigo-100 text-indigo-700" :
                                 order.status === "done" ? "bg-emerald-100 text-emerald-700" :
@@ -851,51 +851,54 @@ const Profile = () => {
                           </div>
                         </div>
 
-                        <div className="p-5">
+                        <div className="p-3.5 md:p-5">
                           {order.items.map((item, index) => (
-                            <div key={index} className="flex items-start gap-4 pb-4 mb-4 border-b border-dashed border-slate-100 last:border-0 last:pb-0 last:mb-0">
-                              <div className="w-20 h-20 bg-white border border-slate-200 rounded-lg flex items-center justify-center overflow-hidden shrink-0 p-1">
+                            <div key={index} className="flex items-start gap-3 md:gap-4 pb-3 md:pb-4 mb-3 md:mb-4 border-b border-dashed border-slate-100 last:border-0 last:pb-0 last:mb-0">
+                              <div className="w-16 h-16 md:w-20 md:h-20 bg-white border border-slate-200 rounded-lg flex items-center justify-center overflow-hidden shrink-0 p-1">
                                 <img src={item.image || "/no-image.png"} alt={item.name} className="max-w-full max-h-full object-contain" />
                               </div>
-                              <div className="flex-1">
-                                <h4 className="m-0 mb-1.5 text-[15px] text-slate-800 font-semibold">{item.name}</h4>
-                                <p className="m-0 mb-1 text-[13px] text-slate-500">{item.color} {item.storage ? `| ${item.storage}` : ''}</p>
-                                <p className="m-0 text-[13px] text-slate-500 font-medium">Số lượng: x{item.quantity}</p>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="m-0 mb-1 md:mb-1.5 text-[13px] md:text-[15px] text-slate-800 font-semibold line-clamp-2">{item.name}</h4>
+                                <p className="m-0 mb-0.5 md:mb-1 text-[12px] md:text-[13px] text-slate-500">{item.color} {item.storage ? `| ${item.storage}` : ''}</p>
+                                <div className="flex items-center justify-between md:justify-start">
+                                  <p className="m-0 text-[12px] md:text-[13px] text-slate-500 font-medium">SL: x{item.quantity}</p>
+                                  <span className="text-[13px] md:text-[15px] font-bold text-slate-800 md:hidden">{(item.price * item.quantity).toLocaleString()}đ</span>
+                                </div>
                               </div>
-                              <div className="text-[15px] font-bold text-slate-800 shrink-0">
+                              <div className="text-[15px] font-bold text-slate-800 shrink-0 hidden md:block">
                                 {(item.price * item.quantity).toLocaleString()}đ
                               </div>
                             </div>
                           ))}
                         </div>
 
-                        <div className="flex flex-col md:flex-row justify-between items-end md:items-center py-4 px-5 bg-slate-50 border-t border-slate-100 gap-4 md:gap-0">
+                        <div className="flex flex-col md:flex-row justify-between items-end md:items-center py-3 md:py-4 px-4 md:px-5 bg-slate-50 border-t border-slate-100 gap-3 md:gap-0">
                           <div className="w-full md:w-auto flex flex-col items-start">
-                            <div className="text-sm text-slate-600">
-                              Thành tiền: <strong className="text-[18px] text-red-500 ml-1.5 font-extrabold">{order.total.toLocaleString()}đ</strong>
+                            <div className="text-[13px] md:text-sm text-slate-600">
+                              Thành tiền: <strong className="text-base md:text-[18px] text-red-500 ml-1 md:ml-1.5 font-extrabold">{order.total.toLocaleString()}đ</strong>
                             </div>
                             {order.status === 'pending' && ['VNPAY', 'MOMO'].includes(order.paymentMethod) && (
-                              <p className="flex items-center gap-1 text-red-500 text-[13px] m-0 mt-1 font-medium">
-                                <AlertCircle size={14} /> Vui lòng thanh toán trong 15 phút.
+                              <p className="flex items-center gap-1 text-red-500 text-[12px] md:text-[13px] m-0 mt-1 font-medium">
+                                <AlertCircle size={13} /> Vui lòng thanh toán trong 15 phút.
                               </p>
                             )}
                           </div>
 
-                          <div className="flex gap-2.5 w-full md:w-auto justify-end">
-                            <button className="flex items-center gap-1.5 py-2 px-3.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800" onClick={() => navigate(`/order/${order._id}`)}>
-                              <Eye size={15} /> Xem chi tiết
+                          <div className="flex gap-2 md:gap-2.5 w-full md:w-auto justify-end flex-wrap">
+                            <button className="flex items-center gap-1 md:gap-1.5 py-1.5 md:py-2 px-2.5 md:px-3.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[12px] md:text-[13px] font-medium cursor-pointer transition-colors hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800" onClick={() => navigate(`/order/${order._id}`)}>
+                              <Eye size={14} /> Chi tiết
                             </button>
 
                             {order.status === 'pending' && ['VNPAY', 'MOMO'].includes(order.paymentMethod) && (
                               <>
                                 <button
-                                  className="flex items-center gap-1.5 py-2 px-3.5 bg-slate-100 border border-slate-200 text-slate-600 rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-slate-200"
+                                  className="flex items-center gap-1 md:gap-1.5 py-1.5 md:py-2 px-2.5 md:px-3.5 bg-slate-100 border border-slate-200 text-slate-600 rounded-lg text-[12px] md:text-[13px] font-medium cursor-pointer transition-colors hover:bg-slate-200"
                                   onClick={() => handleCancelOrder(order._id)}
                                 >
                                   Hủy đơn
                                 </button>
                                 <button
-                                  className="flex items-center gap-1.5 py-2 px-4 bg-blue-600 text-white border-none rounded-lg text-[13px] font-semibold cursor-pointer transition-colors hover:bg-blue-700 shadow-sm"
+                                  className="flex items-center gap-1 md:gap-1.5 py-1.5 md:py-2 px-3 md:px-4 bg-blue-600 text-white border-none rounded-lg text-[12px] md:text-[13px] font-semibold cursor-pointer transition-colors hover:bg-blue-700 shadow-sm"
                                   onClick={() => {
                                     navigate('/payment', {
                                       state: {
@@ -913,7 +916,7 @@ const Profile = () => {
 
                             {order.status === 'waiting_approval' && (
                               <button
-                                className="flex items-center gap-1.5 py-2 px-3.5 bg-red-50 border border-red-200 text-red-500 rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-red-100 hover:border-red-300"
+                                className="flex items-center gap-1 md:gap-1.5 py-1.5 md:py-2 px-2.5 md:px-3.5 bg-red-50 border border-red-200 text-red-500 rounded-lg text-[12px] md:text-[13px] font-medium cursor-pointer transition-colors hover:bg-red-100 hover:border-red-300"
                                 onClick={() => handleCancelOrder(order._id)}
                               >
                                 Hủy đơn
@@ -922,7 +925,7 @@ const Profile = () => {
 
                             {(order.status === "done" || order.status === "cancelled" || order.status === "returned") && (
                               <button
-                                className="flex items-center gap-1.5 py-2 px-3.5 bg-blue-600 text-white border-none rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-blue-700 shadow-sm"
+                                className="flex items-center gap-1 md:gap-1.5 py-1.5 md:py-2 px-2.5 md:px-3.5 bg-blue-600 text-white border-none rounded-lg text-[12px] md:text-[13px] font-medium cursor-pointer transition-colors hover:bg-blue-700 shadow-sm"
                                 onClick={() => {
                                   const firstItem = order.items[0];
                                   const slug = firstItem?.productId?.slug;
@@ -936,7 +939,7 @@ const Profile = () => {
 
                             {order.status === "done" && (
                               <button
-                                className="flex items-center gap-1.5 py-2 px-3.5 bg-amber-50 border border-amber-200 text-amber-600 rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-amber-100 hover:border-amber-300"
+                                className="flex items-center gap-1 md:gap-1.5 py-1.5 md:py-2 px-2.5 md:px-3.5 bg-amber-50 border border-amber-200 text-amber-600 rounded-lg text-[12px] md:text-[13px] font-medium cursor-pointer transition-colors hover:bg-amber-100 hover:border-amber-300"
                                 onClick={() => {
                                   const firstItem = order.items[0];
                                   const slug = firstItem?.productId?.slug;
@@ -962,7 +965,7 @@ const Profile = () => {
                               } else if (isWithin15Days) {
                                 return (
                                   <button
-                                    className="flex items-center gap-1.5 py-2 px-3.5 bg-white border border-red-500 text-red-500 rounded-lg text-[13px] font-medium cursor-pointer transition-colors hover:bg-red-50"
+                                    className="flex items-center gap-1 md:gap-1.5 py-1.5 md:py-2 px-2.5 md:px-3.5 bg-white border border-red-500 text-red-500 rounded-lg text-[12px] md:text-[13px] font-medium cursor-pointer transition-colors hover:bg-red-50"
                                     onClick={() => {
                                       const doneOrders = orders.filter(o => o.status === 'done');
                                       const totalSpent = doneOrders.reduce((sum, ord) => sum + ord.total, 0);
@@ -1001,7 +1004,7 @@ const Profile = () => {
 
             {/* TAB FAVORITES */}
             {activeTab === "favorites" && (
-              <div className="bg-white rounded-xl p-6 md:p-7 shadow-sm border border-slate-100">
+              <div className="bg-white rounded-xl p-4 md:p-7 shadow-sm border border-slate-100">
                 <div className="mb-6 pb-4 border-b border-slate-100"><h2 className="text-xl text-slate-800 m-0 font-bold">Sản phẩm yêu thích</h2></div>
                 {loadingFavorites ? (
                   <div className="text-center py-10 text-slate-500 animate-pulse">Đang tải danh sách yêu thích...</div>
@@ -1012,7 +1015,7 @@ const Profile = () => {
                     <button className="py-2.5 px-5 bg-white border border-slate-300 text-slate-700 rounded-lg text-sm font-medium cursor-pointer transition-colors hover:bg-slate-50 hover:border-slate-400" onClick={() => navigate("/")}>Khám phá sản phẩm</button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
                     {favorites.map((product) => (
                       <ProductCard
                         key={product._id}
@@ -1062,7 +1065,7 @@ const Profile = () => {
                     <p className="m-0 text-sm max-w-[400px] leading-relaxed text-slate-500">Các mã giảm giá sẽ xuất hiện tại đây khi có chương trình khuyến mãi mới.</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4">
                     {myVouchers.map((voucher, index) => {
                       const colorScheme = getVoucherColor(index);
                       const VoucherIcon = getVoucherIcon(voucher, index);
@@ -1075,25 +1078,28 @@ const Profile = () => {
                           className="flex bg-white rounded-xl border border-slate-200 overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.1)] hover:border-slate-300 border-l-4"
                           style={{ borderLeftColor: colorScheme.border }}
                         >
-                          <div className="flex flex-col items-center justify-center py-5 px-4 min-w-[100px] gap-2 border-r border-slate-100 border-dashed" style={{ backgroundColor: colorScheme.bg }}>
+                          <div className="hidden sm:flex flex-col items-center justify-center py-5 px-4 min-w-[100px] gap-2 border-r border-slate-100 border-dashed" style={{ backgroundColor: colorScheme.bg }}>
                             <VoucherIcon size={32} color={colorScheme.icon} />
                             <span className="text-[10px] font-extrabold tracking-wide uppercase" style={{ color: colorScheme.icon }}>
                               {getVoucherLabel(index)}
                             </span>
                           </div>
 
-                          <div className="flex-1 p-4 pl-5 flex flex-col justify-between">
+                          <div className="flex-1 p-3 md:p-4 md:pl-5 flex flex-col justify-between">
                             <div>
-                              <h3 className="m-0 text-[15px] font-bold text-slate-800 leading-tight">
-                                {voucher.discountType === "percentage"
-                                  ? `Giảm ${voucher.value}%`
-                                  : `Giảm ${voucher.value.toLocaleString()}đ`
-                                }
-                                {voucher.maxDiscountAmount && voucher.discountType === "percentage" &&
-                                  ` (tối đa ${voucher.maxDiscountAmount.toLocaleString()}đ)`
-                                }
+                              <h3 className="m-0 text-[14px] md:text-[15px] font-bold text-slate-800 leading-tight flex items-center gap-2">
+                                <span className="sm:hidden inline-flex w-6 h-6 rounded-md items-center justify-center shrink-0" style={{ backgroundColor: colorScheme.bg }}><VoucherIcon size={14} color={colorScheme.icon} /></span>
+                                <span>
+                                  {voucher.discountType === "percentage"
+                                    ? `Giảm ${voucher.value}%`
+                                    : `Giảm ${voucher.value.toLocaleString()}đ`
+                                  }
+                                  {voucher.maxDiscountAmount && voucher.discountType === "percentage" &&
+                                    <span className="hidden sm:inline"> (tối đa {voucher.maxDiscountAmount.toLocaleString()}đ)</span>
+                                  }
+                                </span>
                               </h3>
-                              <p className="m-0 mt-1.5 text-[13px] text-slate-500 leading-relaxed">{voucher.description || `Áp dụng cho đơn hàng từ ${voucher.minOrderValue.toLocaleString()}đ`}</p>
+                              <p className="m-0 mt-1 md:mt-1.5 text-[12px] md:text-[13px] text-slate-500 leading-relaxed line-clamp-2">{voucher.description || `Áp dụng cho đơn hàng từ ${voucher.minOrderValue.toLocaleString()}đ`}</p>
 
                               <div className="flex flex-wrap gap-1.5 mt-2.5">
                                 {voucher.minOrderValue > 0 && (
@@ -1102,7 +1108,7 @@ const Profile = () => {
                               </div>
                             </div>
 
-                            <div className="flex justify-between items-center mt-3 pt-3 border-t border-dashed border-slate-200">
+                            <div className="flex justify-between items-center mt-2 md:mt-3 pt-2 md:pt-3 border-t border-dashed border-slate-200">
                               <div className={`flex items-center gap-1.5 text-[12px] ${isExpiringSoon ? 'text-red-500 font-semibold' : 'text-slate-500'}`}>
                                 <Clock size={13} />
                                 <span>{daysLeft}</span>
@@ -1247,23 +1253,25 @@ const Profile = () => {
                         const method = methodMap[order.paymentMethod] || { label: order.paymentMethod, color: '#64748b', bg: '#f1f5f9', icon: '💰' };
                         const firstItem = order.items?.[0];
                         return (
-                          <div key={order._id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white border border-slate-200 rounded-xl py-4 px-5 transition-shadow hover:shadow-[0_4px_12px_rgba(0,0,0,0.07)] gap-4 sm:gap-0">
-                            <div className="flex items-center gap-3.5 w-full sm:w-auto">
-                              <div className="w-14 h-14 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center p-1">
+                          <div key={order._id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white border border-slate-200 rounded-xl py-3 md:py-4 px-4 md:px-5 transition-shadow hover:shadow-[0_4px_12px_rgba(0,0,0,0.07)] gap-3 sm:gap-0">
+                            <div className="flex items-center gap-3 md:gap-3.5 w-full sm:w-auto">
+                              <div className="w-12 h-12 md:w-14 md:h-14 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center p-1">
                                 <img src={firstItem?.image || '/no-image.png'} alt={firstItem?.name} className="max-w-full max-h-full object-contain" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-[11px] font-bold text-blue-600 uppercase tracking-wide m-0 mb-1">Đơn #{order._id.slice(-6)}</p>
-                                <p className="text-[14px] font-semibold text-slate-900 m-0 mb-1 truncate max-w-full sm:max-w-[250px]">{firstItem?.name}{order.items?.length > 1 ? ` +${order.items.length - 1} sản phẩm` : ''}</p>
-                                <p className="text-[12px] text-slate-400 m-0 font-medium">{new Date(order.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
+                                <p className="text-[10px] md:text-[11px] font-bold text-blue-600 uppercase tracking-wide m-0 mb-0.5 md:mb-1">Đơn #{order._id.slice(-6)}</p>
+                                <p className="text-[13px] md:text-[14px] font-semibold text-slate-900 m-0 mb-0.5 md:mb-1 truncate max-w-full sm:max-w-[250px]">{firstItem?.name}{order.items?.length > 1 ? ` +${order.items.length - 1} SP` : ''}</p>
+                                <p className="text-[11px] md:text-[12px] text-slate-400 m-0 font-medium">{new Date(order.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
                               </div>
                             </div>
-                            <div className="flex flex-col items-start sm:items-end gap-1.5 w-full sm:w-auto border-t sm:border-0 border-slate-100 pt-3 sm:pt-0">
-                              <span className="text-[12px] font-semibold py-1 px-3 rounded-full" style={{ color: method.color, background: method.bg }}>
-                                {method.icon} {method.label}
-                              </span>
-                              <p className="text-[18px] font-extrabold text-slate-900 m-0 mt-0.5">{order.total.toLocaleString()}đ</p>
-                              <span className="text-[12px] text-emerald-600 font-semibold">✓ Đã thanh toán</span>
+                            <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1.5 w-full sm:w-auto border-t sm:border-0 border-slate-100 pt-2.5 sm:pt-0">
+                              <div className="flex items-center gap-2 sm:flex-col sm:items-end">
+                                <span className="text-[11px] md:text-[12px] font-semibold py-0.5 md:py-1 px-2 md:px-3 rounded-full" style={{ color: method.color, background: method.bg }}>
+                                  {method.icon} {method.label}
+                                </span>
+                                <span className="text-[11px] md:text-[12px] text-emerald-600 font-semibold">✓ Đã thanh toán</span>
+                              </div>
+                              <p className="text-base md:text-[18px] font-extrabold text-slate-900 m-0">{order.total.toLocaleString()}đ</p>
                             </div>
                           </div>
                         );
@@ -1341,8 +1349,8 @@ const Profile = () => {
                   ) : (
                     <div className="grid grid-cols-1 gap-4">
                       {warrantyItems.map((item, idx) => (
-                        <div key={idx} className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col md:flex-row gap-5 items-start md:items-center shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md transition-shadow">
-                          <div className="w-20 h-20 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center p-2 shrink-0">
+                        <div key={idx} className="bg-white rounded-xl border border-slate-200 p-4 md:p-5 flex flex-col md:flex-row gap-4 md:gap-5 items-start md:items-center shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-md transition-shadow">
+                          <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center p-1.5 md:p-2 shrink-0">
                             <img src={item.image} alt={item.name} className="max-w-full max-h-full object-contain" />
                           </div>
 
@@ -1355,21 +1363,22 @@ const Profile = () => {
                             </div>
                           </div>
 
-                          <div className="flex flex-col items-start md:items-end gap-2 border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-5 w-full md:w-auto">
-                            <div className="text-[13px] text-slate-600">
-                              Ngày mua: <strong className="text-slate-800">{item.purchaseDate.toLocaleDateString('vi-VN')}</strong>
+                          <div className="flex flex-row md:flex-col items-center md:items-end gap-2 md:gap-2 border-t md:border-t-0 md:border-l border-slate-100 pt-3 md:pt-0 md:pl-5 w-full md:w-auto flex-wrap">
+                            <div className="text-[12px] md:text-[13px] text-slate-600">
+                              Mua: <strong className="text-slate-800">{item.purchaseDate.toLocaleDateString('vi-VN')}</strong>
                             </div>
-                            <div className="text-[13px] text-slate-600">
-                              Hết hạn: <strong className="text-slate-800">{item.endDate.toLocaleDateString('vi-VN')}</strong>
+                            <span className="text-slate-300 md:hidden">·</span>
+                            <div className="text-[12px] md:text-[13px] text-slate-600">
+                              HH: <strong className="text-slate-800">{item.endDate.toLocaleDateString('vi-VN')}</strong>
                             </div>
 
                             {item.remainingDays > 0 ? (
-                              <div className="mt-1 bg-emerald-50 text-emerald-700 border border-emerald-200 py-1.5 px-3 rounded-lg text-[13px] font-bold flex items-center gap-1.5">
-                                <CheckCircle size={14} /> Còn {item.remainingDays} ngày bảo hành
+                              <div className="mt-0 md:mt-1 bg-emerald-50 text-emerald-700 border border-emerald-200 py-1 md:py-1.5 px-2.5 md:px-3 rounded-lg text-[12px] md:text-[13px] font-bold flex items-center gap-1 md:gap-1.5 w-full md:w-auto justify-center md:justify-start">
+                                <CheckCircle size={13} /> Còn {item.remainingDays} ngày
                               </div>
                             ) : (
-                              <div className="mt-1 bg-red-50 text-red-600 border border-red-200 py-1.5 px-3 rounded-lg text-[13px] font-bold flex items-center gap-1.5">
-                                <XCircle size={14} /> Đã hết hạn bảo hành
+                              <div className="mt-0 md:mt-1 bg-red-50 text-red-600 border border-red-200 py-1 md:py-1.5 px-2.5 md:px-3 rounded-lg text-[12px] md:text-[13px] font-bold flex items-center gap-1 md:gap-1.5 w-full md:w-auto justify-center md:justify-start">
+                                <XCircle size={13} /> Đã hết hạn
                               </div>
                             )}
                           </div>

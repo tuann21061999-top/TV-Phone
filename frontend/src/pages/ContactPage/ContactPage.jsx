@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
+import GlobalArticle from "../../components/GlobalArticle/GlobalArticle";
 import { toast } from "sonner";
 import {
   MapPin, Phone, Mail, Send, Clock,
@@ -306,6 +307,7 @@ function ContactPage() {
       </div>
     </div>
 
+    <GlobalArticle pageCode="contact" />
     <Footer />
   </div>
 );

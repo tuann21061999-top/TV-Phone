@@ -175,6 +175,34 @@ const reviewController = {
 
   // 8. ADMIN: Đồng bộ lại averageRating & reviewsCount cho TOÀN BỘ sản phẩm
   //    Dùng khi dữ liệu bị lệch (có sao nhưng reviewsCount = 0)
+  // PUBLIC: Lấy top reviews cho trang chủ (không cần đăng nhập)
+  getTopReviews: async (req, res) => {
+    try {
+      const reviews = await Review.find({ status: "active", rating: { $gte: 4 } })
+        .sort({ rating: -1, createdAt: -1 })
+        .limit(8)
+        .populate("productId", "name slug colorImages images");
+
+      const result = reviews
+        .filter(r => r.comment && r.comment.length > 15 && r.productId)
+        .map(r => ({
+          _id: r._id,
+          username: r.username,
+          rating: r.rating,
+          comment: r.comment,
+          createdAt: r.createdAt,
+          productName: r.productId?.name || "Sản phẩm",
+          productSlug: r.productId?.slug || "",
+          productImage: r.productId?.colorImages?.[0]?.imageUrl || r.productId?.images?.[0] || "/no-image.png",
+        }));
+
+      res.status(200).json(result);
+    } catch (error) {
+      console.error("Lỗi lấy top reviews:", error);
+      res.status(500).json({ message: "Lỗi lấy đánh giá nổi bật", error: error.message });
+    }
+  },
+
   syncAllReviewStats: async (req, res) => {
     try {
       const allProducts = await Product.find({}).select("_id name averageRating reviewsCount");
