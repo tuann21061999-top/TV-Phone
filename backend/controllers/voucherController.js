@@ -352,7 +352,11 @@ const voucherController = {
             // Tính điểm tích lũy bằng Aggregate MongoDB để tránh nghẽn RAM khi có hàng ngàn orders
             const mongoose = require("mongoose");
             const orderStats = await Order.aggregate([
-                { $match: { userId: new mongoose.Types.ObjectId(userId), status: "done" } },
+                { $match: { 
+                    userId: new mongoose.Types.ObjectId(userId), 
+                    status: "done",
+                    "returnRequest.status": { $ne: "pending" }
+                } },
                 { $group: { _id: null, totalSpent: { $sum: "$total" } } }
             ]);
             const totalDoneAmount = orderStats.length > 0 ? orderStats[0].totalSpent : 0;

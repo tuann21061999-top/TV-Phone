@@ -4,6 +4,7 @@ import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
 import axios from "axios";
 import { toast } from "sonner";
+import GlobalArticle from "../GlobalArticle/GlobalArticle";
 import {
   Star,
   ShoppingCart,
@@ -661,6 +662,7 @@ function ElectronicPage() {
         </div>
       </div>
 
+      <GlobalArticle pageCode="electronics" />
       <Footer />
     </div>
   );

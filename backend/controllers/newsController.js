@@ -30,7 +30,19 @@ const uploadNewsImage = async (req, res) => {
 // @access  Public
 const getAllNews = async (req, res) => {
     try {
-        const news = await News.find({ isActive: true })
+        const filter = { isActive: true };
+        if (req.query.displayLocation) {
+            // Lấy bài viết được ghim vào trang cụ thể
+            filter.displayLocations = { $in: [req.query.displayLocation] };
+        } else {
+            // Trang tin tức chung: CHỈ lấy bài KHÔNG có displayLocations (hoặc mảng rỗng)
+            filter.$or = [
+                { displayLocations: { $exists: false } },
+                { displayLocations: { $size: 0 } }
+            ];
+        }
+
+        const news = await News.find(filter)
             .populate("relatedProduct", "name slug")
             .sort({ createdAt: -1 });
         res.json(news);

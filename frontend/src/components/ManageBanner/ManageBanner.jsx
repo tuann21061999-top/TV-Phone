@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Plus, Edit, Trash2, Eye, EyeOff, Image as ImageIcon, X, Upload, Search } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Image as ImageIcon, X, Upload, Search, ShoppingCart, Sparkles, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { getBannerStyles } from "../../utils/themeUtils";
 
 
 const ManageBanner = () => {
@@ -22,13 +23,23 @@ const ManageBanner = () => {
   const [productSearch, setProductSearch] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
 
+  // Thêm state cho News
+  const [news, setNews] = useState([]);
+  const [newsSearch, setNewsSearch] = useState("");
+  const [showNewsSuggestions, setShowNewsSuggestions] = useState(false);
+
   const [formData, setFormData] = useState({
     title: "",
     subtitle: "",
     link: "",
     buttonText: "Xem ngay",
     order: 0,
-    isActive: true
+    isActive: true,
+    theme: "blue",
+    position: "main",
+    newsLink: "",
+    startDate: "",
+    endDate: ""
   });
   const fetchProducts = async () => {
     try {
@@ -40,6 +51,18 @@ const ManageBanner = () => {
       console.error("Lỗi tải danh sách sản phẩm:", error);
     }
   };
+  
+  const fetchNews = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/news/admin/all`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
+      setNews(res.data);
+    } catch (error) {
+      console.error("Lỗi tải danh sách tin tức:", error);
+    }
+  };
+
   const fetchBanners = async () => {
     try {
       setLoading(true);
@@ -58,6 +81,7 @@ const ManageBanner = () => {
   useEffect(() => { 
     fetchBanners();
     fetchProducts(); 
+    fetchNews();
 }, []);
 
   const handleInputChange = (e) => {
@@ -76,7 +100,7 @@ const ManageBanner = () => {
 
   const openAddModal = () => {
     setIsEditing(false);
-    setFormData({ title: "", subtitle: "", link: "", buttonText: "Xem ngay", order: 0, isActive: true });
+    setFormData({ title: "", subtitle: "", link: "", newsLink: "", position: "main", buttonText: "Xem ngay", order: 0, isActive: true, theme: "blue", startDate: "", endDate: "" });
     setImageFile(null);
     setImagePreview("");
     setShowModal(true);
@@ -85,10 +109,22 @@ const ManageBanner = () => {
   const openEditModal = (banner) => {
     setIsEditing(true);
     setEditId(banner._id);
+    // Tự động covert thời gian dạng DB sang chuẩn input datetime-local
+    const formatDateForInput = (dateString) => {
+      if (!dateString) return "";
+      const date = new Date(dateString);
+      return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    };
+
     setFormData({
       title: banner.title, subtitle: banner.subtitle || "", 
-      link: banner.link || "", buttonText: banner.buttonText || "Xem ngay", 
-      order: banner.order || 0, isActive: banner.isActive
+      link: banner.link || "", 
+      newsLink: banner.newsLink || "",
+      position: banner.position || "main",
+      buttonText: banner.buttonText || "Xem ngay", 
+      order: banner.order || 0, isActive: banner.isActive, theme: banner.theme || "blue",
+      startDate: formatDateForInput(banner.startDate),
+      endDate: formatDateForInput(banner.endDate)
     });
     setImageFile(null);
     setImagePreview(banner.image); // Hiển thị ảnh cũ đang có trên DB
@@ -116,9 +152,14 @@ const ManageBanner = () => {
       submitData.append("title", formData.title);
       submitData.append("subtitle", formData.subtitle);
       submitData.append("link", formData.link);
+      submitData.append("newsLink", formData.newsLink || "");
+      submitData.append("position", formData.position || "main");
       submitData.append("buttonText", formData.buttonText);
       submitData.append("order", formData.order);
       submitData.append("isActive", formData.isActive);
+      submitData.append("theme", formData.theme);
+      if (formData.startDate) submitData.append("startDate", formData.startDate);
+      if (formData.endDate) submitData.append("endDate", formData.endDate);
       
       if (imageFile) {
         submitData.append("image", imageFile); // Phải khớp với upload.single('image') ở Backend
@@ -208,7 +249,12 @@ const ManageBanner = () => {
                 <div>
                   <h3 className="m-0 mb-2 text-[18px] font-bold text-slate-800">{banner.title}</h3>
                   <p className="m-0 mb-2 text-[14px] text-slate-500">{banner.subtitle}</p>
-                  <span className="text-[13px] text-blue-600 font-medium bg-blue-50 py-1 px-2.5 rounded">Link: {banner.link}</span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[13px] text-blue-600 font-medium bg-blue-50 py-1 px-2.5 rounded">Link: {banner.link}</span>
+                    {banner.newsLink && <span className="text-[13px] text-emerald-600 font-medium bg-emerald-50 py-1 px-2.5 rounded">Tin tức: {banner.newsLink}</span>}
+                    <span className="text-[13px] text-purple-600 font-medium bg-purple-50 py-1 px-2.5 rounded">Vị trí: {banner.position === "sub_left" ? "Góc trái dưới" : "Banner chính"}</span>
+                    <span className="text-[13px] text-orange-600 font-medium bg-orange-50 py-1 px-2.5 rounded">Theme: {banner.theme || "blue"}</span>
+                  </div>
                 </div>
                 
                 <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
@@ -232,14 +278,17 @@ const ManageBanner = () => {
       {/* MODAL THÊM/SỬA BANNER */}
       {showModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-[4px] flex items-center justify-center z-[9999]">
-          <div className="bg-white w-[90%] md:w-[500px] rounded-2xl shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-white w-[95%] md:w-[1100px] rounded-2xl shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col max-h-[90vh]">
             
             <div className="flex justify-between items-center py-5 px-6 bg-slate-50 border-b border-slate-200 shrink-0">
               <h3 className="m-0 text-[18px] text-slate-900 font-bold">{isEditing ? "Chỉnh sửa Banner" : "Thêm Banner mới"}</h3>
               <button className="bg-transparent border-none cursor-pointer text-slate-500 hover:text-slate-800" onClick={() => setShowModal(false)}><X size={20}/></button>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-6 overflow-y-auto [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-400">
+            <div className="flex flex-col md:flex-row flex-1 overflow-hidden min-h-[500px]">
+              {/* CỘT TRÁI: FORM */}
+              <div className="w-full md:w-[480px] border-r border-slate-200 flex flex-col">
+                <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1 [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-400">
               
               <div className="mb-4">
                 <label className="block text-[13px] font-semibold text-slate-800 mb-2">Tiêu đề chính (Title) *</label>
@@ -273,82 +322,170 @@ const ManageBanner = () => {
                 )}
               </div>
 
-              {/* KHU VỰC TÌM KIẾM SẢN PHẨM & NHẬP LINK */}
+              {/* KHU VỰC TÌM KIẾM SẢN PHẨM & BÀI VIẾT & NHẬP LINK */}
               <div className="mb-4">
                 <label className="block text-[13px] font-semibold text-slate-800 mb-2">Link trỏ tới khi click *</label>
                 <div className="flex flex-col gap-2 relative">
                   
-                  {/* Ô tìm kiếm thông minh */}
-                  <div className="relative">
-                    <Search size={16} color="#94A3B8" className="absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input 
-                      type="text" 
-                      placeholder="🔍 Gõ tên sản phẩm để tìm nhanh (VD: iPhone 15...)" 
-                      value={productSearch}
-                      onChange={(e) => {
-                        setProductSearch(e.target.value);
-                        setShowSuggestions(true);
-                      }}
-                      onFocus={() => setShowSuggestions(true)}
-                      onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} 
-                      className="w-full py-2.5 pr-3.5 pl-9 rounded-lg border border-slate-300 text-[13px] outline-none focus:border-blue-500 transition-colors"
-                    />
-                  </div>
-
-                  {/* Bảng kết quả xổ xuống */}
-                  {showSuggestions && productSearch && (
-                    <div className="absolute top-[44px] left-0 w-full bg-white border border-slate-200 rounded-lg shadow-[0_10px_25px_rgba(0,0,0,0.1)] z-50 max-h-[250px] overflow-y-auto">
-                      {products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())).length > 0 ? (
-                        products
-                          .filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase()))
-                          .slice(0, 5)
-                          .map(p => (
-                            <div 
-                              key={p._id} 
-                              className="flex items-center py-2 px-3 cursor-pointer border-b border-slate-100 transition-colors hover:bg-blue-50 group last:border-none"
-                              onClick={() => {
-                                setFormData({ ...formData, link: `/product/${p.slug}` });
-                                setProductSearch(p.name);
-                                setShowSuggestions(false);
-                              }}
-                            >
-                              <div className="w-[30px] h-[30px] rounded overflow-hidden mr-2.5 bg-slate-100 shrink-0 flex items-center justify-center">
-                                {p.colorImages && p.colorImages.length > 0 ? (
-                                  <img src={p.colorImages[0].imageUrl} alt={p.name} className="w-full h-full object-cover" />
-                                ) : (
-                                  <ImageIcon size={14} className="text-slate-400" />
-                                )}
-                              </div>
-                              <span className="text-[13px] text-slate-700 font-medium group-hover:text-blue-600 transition-colors">{p.name}</span>
-                            </div>
-                          ))
-                      ) : (
-                        <div className="p-4 text-center text-[13px] text-slate-400">Không tìm thấy sản phẩm nào</div>
+                  <div className="flex flex-col xl:flex-row gap-2">
+                    {/* Ô tìm kiếm Sản Phẩm */}
+                    <div className="relative flex-1">
+                      <Search size={16} color="#94A3B8" className="absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input 
+                        type="text" 
+                        placeholder="🔍 Tìm Sản phẩm (VD: iPhone 15...)" 
+                        value={productSearch}
+                        onChange={(e) => {
+                          setProductSearch(e.target.value);
+                          setShowSuggestions(true);
+                          setShowNewsSuggestions(false);
+                        }}
+                        onFocus={() => setShowSuggestions(true)}
+                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} 
+                        className="w-full py-2.5 pr-3.5 pl-9 rounded-lg border border-slate-300 text-[13px] outline-none focus:border-blue-500 transition-colors"
+                      />
+                      
+                      {/* Bảng kết quả Sản phầm */}
+                      {showSuggestions && productSearch && (
+                        <div className="absolute top-[44px] left-0 w-full bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-[250px] overflow-y-auto">
+                          {products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())).length > 0 ? (
+                            products
+                              .filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase()))
+                              .slice(0, 5)
+                              .map(p => (
+                                <div 
+                                  key={p._id} 
+                                  className="flex items-center py-2 px-3 cursor-pointer border-b border-slate-100 hover:bg-blue-50 group"
+                                  onClick={() => {
+                                    setFormData({ ...formData, link: `/product/${p.slug}` });
+                                    setProductSearch(p.name);
+                                    setShowSuggestions(false);
+                                  }}
+                                >
+                                  <div className="w-8 h-8 rounded shrink-0 mr-2 bg-slate-100 flex items-center justify-center overflow-hidden">
+                                     {p.colorImages?.[0]?.imageUrl ? <img src={p.colorImages[0].imageUrl} className="w-full h-full object-cover"/> : <ImageIcon size={14}/>}
+                                  </div>
+                                  <span className="text-[13px] font-medium text-slate-700">{p.name}</span>
+                                </div>
+                              ))
+                          ) : (
+                            <div className="p-3 text-[13px] text-center text-slate-400">Không tìm thấy sản phẩm</div>
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
+                    
+                    {/* Ô tìm kiếm Bài Viết / Tin Tức */}
+                    <div className="relative flex-1">
+                      <Search size={16} color="#94A3B8" className="absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input 
+                        type="text" 
+                        placeholder="📝 Tìm Bài viết/Tin tức (VD: Đánh giá...)" 
+                        value={newsSearch}
+                        onChange={(e) => {
+                          setNewsSearch(e.target.value);
+                          setShowNewsSuggestions(true);
+                          setShowSuggestions(false);
+                        }}
+                        onFocus={() => setShowNewsSuggestions(true)}
+                        onBlur={() => setTimeout(() => setShowNewsSuggestions(false), 200)} 
+                        className="w-full py-2.5 pr-3.5 pl-9 rounded-lg border border-slate-300 text-[13px] outline-none focus:border-emerald-500 transition-colors"
+                      />
+
+                      {/* Bảng kết quả Tin Tức */}
+                      {showNewsSuggestions && newsSearch && (
+                        <div className="absolute top-[44px] left-0 w-full bg-white border border-slate-200 rounded-lg shadow-xl z-50 max-h-[250px] overflow-y-auto">
+                          {news.filter(n => n.title.toLowerCase().includes(newsSearch.toLowerCase())).length > 0 ? (
+                            news
+                              .filter(n => n.title.toLowerCase().includes(newsSearch.toLowerCase()))
+                              .slice(0, 5)
+                              .map(n => (
+                                <div 
+                                  key={n._id} 
+                                  className="flex items-center py-2 px-3 cursor-pointer border-b border-slate-100 hover:bg-emerald-50 group"
+                                  onClick={() => {
+                                    setFormData({ ...formData, newsLink: `/news/${n.slug}` });
+                                    setNewsSearch(n.title);
+                                    setShowNewsSuggestions(false);
+                                  }}
+                                >
+                                  <div className="w-[45px] h-8 rounded shrink-0 mr-2 bg-slate-100 flex overflow-hidden">
+                                     {n.thumbnail ? <img src={n.thumbnail} className="w-full h-full object-cover"/> : <ImageIcon size={14}/>}
+                                  </div>
+                                  <span className="text-[13px] font-medium text-slate-700 line-clamp-1">{n.title}</span>
+                                </div>
+                              ))
+                          ) : (
+                            <div className="p-3 text-[13px] text-center text-slate-400">Không tìm thấy bài viết</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
 
                   {/* Ô chứa Link chính thức */}
-                  <input 
-                    type="text" 
-                    name="link" 
-                    value={formData.link} 
-                    onChange={handleInputChange} 
-                    placeholder="Kết quả link: /product/slug-san-pham" 
-                    required 
-                    className="w-full py-2.5 px-3.5 bg-slate-50 rounded-lg border border-slate-300 text-[14px] outline-none focus:border-blue-500 transition-colors"
-                  />
+                  <div className="flex flex-col gap-2">
+                      <input 
+                        type="text" 
+                        name="link" 
+                        value={formData.link} 
+                        onChange={handleInputChange} 
+                        placeholder="Link nút Mua ngay: VD /product/iphone hoặc /electronics" 
+                        required 
+                        className="w-full py-2.5 px-3.5 bg-slate-50 rounded-lg border border-slate-300 text-[14px] outline-none focus:border-blue-500 transition-colors"
+                      />
+                      {/* Hiển thị newsLink nếu đã chọn bài viết (chỉ đọc, xóa bằng nút X) */}
+                      {formData.newsLink && (
+                        <div className="flex items-center gap-2 bg-emerald-50 rounded-lg border border-emerald-300 py-2 px-3.5">
+                          <span className="text-[13px] text-emerald-700 font-medium flex-1 truncate">📝 Bài viết gán: {formData.newsLink}</span>
+                          <button 
+                            type="button"
+                            onClick={() => { setFormData({...formData, newsLink: ""}); setNewsSearch(""); }}
+                            className="text-red-400 hover:text-red-600 cursor-pointer bg-transparent border-none text-[16px] font-bold shrink-0"
+                          >✕</button>
+                        </div>
+                      )}
+                  </div>
                 </div>
               </div>
 
               <div className="flex gap-4">
                 <div className="mb-4 flex-1">
+                  <label className="block text-[13px] font-semibold text-slate-800 mb-2">Vị trí hiển thị</label>
+                  <select name="position" value={formData.position} onChange={handleInputChange} className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors">
+                    <option value="main">Banner Chính (Trượt ngang)</option>
+                    <option value="sub_left">Góc trái dưới (Khắc phục kích thước nhỏ)</option>
+                  </select>
+                </div>
+                <div className="mb-4 flex-1">
                   <label className="block text-[13px] font-semibold text-slate-800 mb-2">Chữ trên nút</label>
                   <input type="text" name="buttonText" value={formData.buttonText} onChange={handleInputChange} placeholder="VD: Mua ngay" className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
                 </div>
-                <div className="mb-4 w-[120px]">
+                <div className="mb-4 flex-1">
+                  <label className="block text-[13px] font-semibold text-slate-800 mb-2">Màu Gradient nền</label>
+                  <select name="theme" value={formData.theme} onChange={handleInputChange} className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors bg-white">
+                    <option value="blue">Xanh dương (Mặc định)</option>
+                    <option value="purple">Tím mộng mơ</option>
+                    <option value="rose">Hồng cam đỏ</option>
+                    <option value="emerald">Xanh lục ngọc</option>
+                    <option value="dark">Tối tinh tế</option>
+                  </select>
+                </div>
+                <div className="mb-4 w-[100px]">
                   <label className="block text-[13px] font-semibold text-slate-800 mb-2">Thứ tự</label>
                   <input type="number" name="order" value={formData.order} onChange={handleInputChange} min="0" className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
+                </div>
+              </div>
+
+              <div className="flex gap-4 mb-4">
+                <div className="flex-1">
+                  <label className="block text-[13px] font-semibold text-slate-800 mb-2">Ngày bắt đầu hiển thị (Tùy chọn)</label>
+                  <input type="datetime-local" name="startDate" value={formData.startDate} onChange={handleInputChange} className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-[13px] font-semibold text-slate-800 mb-2">Ngày tự động ẩn (Tùy chọn)</label>
+                  <input type="datetime-local" name="endDate" value={formData.endDate} onChange={handleInputChange} className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
                 </div>
               </div>
 
@@ -364,6 +501,53 @@ const ManageBanner = () => {
                 </button>
               </div>
             </form>
+              </div>
+
+              {/* {CỘT PHẢI: LIVE PREVIEW} */}
+              <div className="hidden md:flex flex-1 bg-slate-100/50 p-6 flex-col items-center overflow-y-auto relative">
+                <h4 className="text-[13px] font-bold text-slate-500 uppercase tracking-widest mb-6 border-b border-slate-200 pb-2 w-full text-center">Bản xem trước (Live Preview)</h4>
+                
+                <div className="w-full xl:w-[120%] transform scale-[0.4] xl:scale-[0.55] origin-top my-4">
+                  <div className={`relative w-full rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.08)] border flex flex-col-reverse md:flex-row items-center min-h-[500px] group transition-all duration-1000 ease-in-out ${getBannerStyles(formData.theme).bg}`}>
+                    
+                    <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 translate-x-1/4 -translate-y-1/4 pointer-events-none transition-colors duration-1000 ${getBannerStyles(formData.theme).blob1}`}></div>
+                    <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 -translate-x-1/4 translate-y-1/4 pointer-events-none transition-colors duration-1000 ${getBannerStyles(formData.theme).blob2}`}></div>
+
+                    <div className="flex-1 w-full md:w-1/2 flex flex-col gap-6 z-10 px-8 pb-12 pt-4 md:p-14 lg:p-16 text-center md:text-left items-center md:items-start">
+                      <div className={`inline-flex items-center gap-1.5 text-[15px] font-bold tracking-wider px-5 py-2 rounded-full uppercase shadow-sm ${getBannerStyles(formData.theme).badge}`}>
+                        <Sparkles size={18} className="mb-[1.5px]" />
+                        Sản phẩm nổi bật
+                      </div>
+                      <h1 className={`text-[46px] lg:text-[62px] font-extrabold leading-[1.12] m-0 tracking-tight transition-colors duration-1000 drop-shadow-sm ${getBannerStyles(formData.theme).title}`}>
+                        {formData.title || "Tiêu đề Banner Mẫu"}
+                      </h1>
+                      <p className={`text-[20px] leading-relaxed m-0 md:max-w-[85%] font-medium transition-colors duration-1000 ${getBannerStyles(formData.theme).subtitle}`}>
+                        {formData.subtitle || "Mô tả phụ sẽ nằm ở phần này"}
+                      </p>
+                      
+                      <div className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto mt-8">
+                        <div className={`flex-1 sm:flex-none h-[64px] flex items-center justify-center gap-2 text-white px-12 rounded-2xl text-[18px] font-bold transition-all ${getBannerStyles(formData.theme).btn}`}>
+                          <ShoppingCart size={22} />
+                          {formData.buttonText || "Xem ngay"}
+                        </div>
+                        <div className={`flex-1 sm:flex-none h-[64px] flex items-center justify-center gap-2 bg-white/20 backdrop-blur-md px-12 rounded-2xl text-[18px] font-bold border border-white/40 shadow-[0_8px_20px_rgba(0,0,0,0.04)] ${formData.theme === "dark" ? "text-white border-slate-600" : "text-slate-700"}`}>
+                          Xem chi tiết <ArrowRight size={22} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="w-full md:w-1/2 relative flex justify-center items-center py-16 z-10">
+                      <img 
+                        src={imagePreview || "https://via.placeholder.com/600x500?text=ẢNH+MẪU"} 
+                        alt="Preview" 
+                        className="w-[420px] lg:w-[500px] max-h-[500px] object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,0.25)] scale-110" 
+                      />
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
           </div>
         </div>
       )}

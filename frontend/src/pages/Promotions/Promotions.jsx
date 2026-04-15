@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import ProductCard from "../../components/Product/ProductCard";
+import GlobalArticle from "../../components/GlobalArticle/GlobalArticle";
 
 // Component Đếm ngược
 const CountdownTimer = ({ targetDate }) => {
@@ -299,6 +300,7 @@ const Promotions = () => {
                 </div>
             </div>
 
+            <GlobalArticle pageCode="promotions" />
             <Footer />
         </div>
     );

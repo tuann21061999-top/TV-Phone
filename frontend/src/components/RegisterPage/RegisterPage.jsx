@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom"; // 1. Thêm navigate để chuy�
 import { registerUser, sendRegisterOTP } from "../../api/authService"; // 2. Import hàm gọi API đã tạo ở bước trước
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
-import Hero from "../Hero/Hero"; // Nhúng banner home
+import Banner from "../Banner/Banner"; // Nhúng banner home
 import { toast, Toaster } from "sonner";
 
 const RegisterPage = () => {
@@ -91,7 +91,7 @@ const RegisterPage = () => {
       {/* LEFT BANNER */}
       <div className="hidden lg:block flex-[1.2] animate-[fadeInHalf_0.8s_ease-out_forwards]">
         <div className="p-10">
-          <Hero />
+          <Banner />
         </div>
       </div>
 

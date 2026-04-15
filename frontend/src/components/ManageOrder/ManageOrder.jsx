@@ -18,6 +18,7 @@ const ManageOrder = () => {
   const adminTabs = [
     { id: "all", label: "Tất cả" },
     { id: "needs_action", label: "Cần xử lý" },
+    { id: "return_requests", label: "Y/c Trả hàng" },
     { id: "pending", label: "Chờ thanh toán" },
     { id: "preparing", label: "Đang đóng gói" },
     { id: "shipping", label: "Đang vận chuyển" },
@@ -95,7 +96,8 @@ const ManageOrder = () => {
     // 1. Lọc theo tab trạng thái
     let matchesTab = true;
     switch (activeTab) {
-      case "needs_action": matchesTab = (order.status === "waiting_approval" || order.status === "paid" || (order.returnRequest && order.returnRequest.status === "pending")); break;
+      case "needs_action": matchesTab = (order.status === "waiting_approval" || order.status === "paid"); break;
+      case "return_requests": matchesTab = (order.returnRequest && order.returnRequest.status === "pending"); break;
       case "pending": matchesTab = (order.status === "pending"); break;
       case "preparing": matchesTab = (order.status === "preparing"); break;
       case "shipping": matchesTab = (order.status === "shipping"); break;
@@ -181,7 +183,8 @@ const ManageOrder = () => {
         {adminTabs.map(tab => {
           let count = 0;
           if (tab.id === "all") count = orders.length;
-          else if (tab.id === "needs_action") count = orders.filter(o => o.status === "waiting_approval" || o.status === "paid" || (o.returnRequest && o.returnRequest.status === "pending")).length;
+          else if (tab.id === "needs_action") count = orders.filter(o => o.status === "waiting_approval" || o.status === "paid").length;
+          else if (tab.id === "return_requests") count = orders.filter(o => o.returnRequest && o.returnRequest.status === "pending").length;
           else if (tab.id === "cancelled_returned") count = orders.filter(o => o.status === "cancelled" || o.status === "returned").length;
           else count = orders.filter(o => o.status === tab.id).length;
 

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { 
-  ShoppingCart, User, Search, Smartphone, Bell, Menu, X, 
+  ShoppingCart, User, Search, Smartphone, Bell, Menu, X,
+  CheckCheck,
   Home, Laptop, Headphones, Gift, Newspaper, Phone 
 } from "lucide-react";
 import axios from "axios";
@@ -60,7 +61,7 @@ function Header() {
           setIsSearching(false);
         }
       } else {
-        searchResults([]);
+        setSearchResults([]);
         setIsSearchOpen(false);
       }
     }, 500); // Debounce 500ms
@@ -150,6 +151,65 @@ function Header() {
     } catch (e) {
       console.error("Lỗi click thông báo:", e);
     }
+  };
+
+  const handleMarkAllNotificationsAsRead = async () => {
+    if (!token || unreadNotifyCount <= 0) return;
+
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/notifications/read-all`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setUnreadNotifyCount(0);
+      setNotifications((prev) => prev.map((notif) => ({ ...notif, isRead: true })));
+    } catch (error) {
+      console.error("Lỗi đánh dấu tất cả đã đọc:", error);
+    }
+  };
+
+  const getNotificationMeta = (type) => {
+    switch (type) {
+      case "order":
+        return {
+          Icon: ShoppingCart,
+          label: "Đơn hàng",
+          badgeClass: "bg-blue-100 text-blue-700",
+          iconWrapClass: "bg-blue-100 text-blue-700",
+        };
+      case "promotion":
+        return {
+          Icon: Gift,
+          label: "Ưu đãi",
+          badgeClass: "bg-sky-100 text-sky-700",
+          iconWrapClass: "bg-sky-100 text-sky-700",
+        };
+      default:
+        return {
+          Icon: Bell,
+          label: "Hệ thống",
+          badgeClass: "bg-indigo-100 text-indigo-700",
+          iconWrapClass: "bg-indigo-100 text-indigo-700",
+        };
+    }
+  };
+
+  const formatNotificationTime = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMinutes = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMinutes / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMinutes < 1) return "Vừa xong";
+    if (diffMinutes < 60) return `${diffMinutes} phút trước`;
+    if (diffHours < 24) return `${diffHours} giờ trước`;
+    if (diffDays < 7) return `${diffDays} ngày trước`;
+
+    return date.toLocaleDateString("vi-VN");
   };
 
   return (
@@ -264,25 +324,74 @@ function Header() {
 
                 {/* BOX THÔNG BÁO DROPDOWN */}
                 {isNotifyOpen && (
-                  <div className="absolute top-[120%] -right-[10px] w-[320px] bg-white rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.15)] z-[99999] p-[15px] max-h-[400px] overflow-y-auto cursor-default">
-                    <h4 className="m-0 mb-2.5 text-[16px] font-semibold text-slate-800 border-b border-slate-100 pb-2.5 text-left">Thông báo</h4>
-                    {notifications.length > 0 ? (
-                      notifications.map(notif => (
-                        <div
-                          key={notif._id}
-                          onClick={() => handleNotificationClick(notif)}
-                          className={`p-2.5 rounded-md mb-2 cursor-pointer transition-colors duration-200 text-left ${notif.isRead ? "bg-white hover:bg-slate-50" : "bg-indigo-50 hover:bg-indigo-100"}`}
-                        >
-                          <h5 className="m-0 mb-1 text-[14px] text-slate-900">{notif.title}</h5>
-                          <p className="m-0 text-[12px] text-slate-600 leading-[1.4]">{notif.message}</p>
-                          <span className="text-[10px] text-slate-400 block mt-1">
-                            {new Date(notif.createdAt).toLocaleDateString('vi-VN')}
-                          </span>
+                  <div className="absolute top-[130%] right-0 z-[99999] w-[360px] max-w-[92vw] cursor-default overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-[0_22px_45px_-28px_rgba(15,23,42,0.45)]">
+                    <div className="flex items-center justify-between border-b border-blue-100 bg-blue-50/60 px-4 py-3">
+                      <div className="text-left">
+                        <h4 className="m-0 text-[16px] font-bold text-slate-800">Thông báo</h4>
+                        <p className="m-0 mt-0.5 text-[11px] font-medium text-slate-500">
+                          {unreadNotifyCount} chưa đọc / {notifications.length} tổng
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleMarkAllNotificationsAsRead}
+                        disabled={unreadNotifyCount <= 0}
+                        className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-blue-700 transition-colors hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <CheckCheck size={12} /> Đọc hết
+                      </button>
+                    </div>
+
+                    <div className="max-h-[430px] overflow-y-auto p-3">
+                      {notifications.length > 0 ? (
+                        notifications.map((notif) => {
+                          const meta = getNotificationMeta(notif.type);
+                          const MetaIcon = meta.Icon;
+
+                          return (
+                            <button
+                              key={notif._id}
+                              type="button"
+                              onClick={() => handleNotificationClick(notif)}
+                              className={`mb-2 w-full rounded-2xl border p-3 text-left transition-all last:mb-0 ${
+                                notif.isRead
+                                  ? "border-slate-100 bg-white hover:border-blue-100 hover:bg-blue-50/40"
+                                  : "border-blue-200 bg-blue-50/70 hover:bg-blue-100/70"
+                              }`}
+                            >
+                              <div className="mb-2 flex items-start gap-3">
+                                <div className={`mt-0.5 rounded-xl p-2 ${meta.iconWrapClass}`}>
+                                  <MetaIcon size={14} />
+                                </div>
+
+                                <div className="min-w-0 flex-1">
+                                  <div className="mb-1 flex items-start justify-between gap-2">
+                                    <h5 className="m-0 line-clamp-1 text-[13px] font-bold text-slate-900">{notif.title}</h5>
+                                    {!notif.isRead && <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-blue-500" />}
+                                  </div>
+                                  <p className="m-0 line-clamp-2 text-[12px] leading-[1.5] text-slate-600">{notif.message}</p>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center justify-between gap-2">
+                                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${meta.badgeClass}`}>
+                                  {meta.label}
+                                </span>
+                                <span className="text-[10px] font-medium text-slate-400">
+                                  {formatNotificationTime(notif.createdAt)}
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })
+                      ) : (
+                        <div className="rounded-2xl border border-dashed border-blue-200 bg-blue-50/40 px-4 py-8 text-center">
+                          <Bell size={26} className="mx-auto text-blue-300" />
+                          <p className="mb-0 mt-2 text-[13px] font-medium text-slate-500">Chưa có thông báo nào.</p>
                         </div>
-                      ))
-                    ) : (
-                      <div className="text-center text-slate-500 py-5 text-[14px]">Chưa có thông báo nào.</div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

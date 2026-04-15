@@ -6,7 +6,7 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
 import Header from "../Header/Header";
 import Footer from "../Footer/Footer";
-import Hero from "../Hero/Hero"; // Nhúng banner home
+import Banner from "../Banner/Banner"; // Nhúng banner home
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -101,10 +101,10 @@ const LoginPage = () => {
 
         <div className="flex max-w-[1400px] mx-auto items-center justify-center py-10 px-5 gap-[60px] min-h-[calc(100vh-80px)] w-full">
           
-          {/* Khung chứa Hero Banner (Ẩn trên điện thoại, hiện trên màn hình lớn) */}
-          {/* Đã sửa thành [&>section] và dùng !important để đè layout của component Hero */}
+          {/* Khung chứa Banner (Ẩn trên điện thoại, hiện trên màn hình lớn) */}
+          {/* Đã sửa thành [&>section] và dùng !important để đè layout của component Banner */}
           <div className="hidden lg:block flex-[1.2] animate-fadeInHalf [&>section]:!m-0 [&>section]:!p-10 [&>section]:!min-h-fit [&>section]:!shadow-none [&>section]:!bg-none [&>section]:!bg-transparent">
-            <Hero />
+            <Banner />
           </div>
           
           {/* Khung Form Đăng nhập */}

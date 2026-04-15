@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import {
     Plus, Edit, Trash2, Search, X, Image as ImageIcon,
-    Type, ArrowUp, ArrowDown, Link2
+    Type, ArrowUp, ArrowDown, Link2, Heading
 } from "lucide-react";
 
 const API = `${import.meta.env.VITE_API_URL}/api`;
@@ -28,6 +28,7 @@ function ManageNews() {
         category: "Khác",
         contentBlocks: [],
         relatedProduct: "",
+        displayLocations: [],
         isActive: true,
     };
     const [form, setForm] = useState(emptyForm);
@@ -138,6 +139,7 @@ function ManageNews() {
             category: a.category,
             contentBlocks: a.contentBlocks || [],
             relatedProduct: a.relatedProduct?._id || a.relatedProduct || "",
+            displayLocations: a.displayLocations || [],
             isActive: a.isActive,
         });
         setThumbPreview(a.thumbnail);
@@ -370,7 +372,7 @@ function ManageNews() {
                                     {form.contentBlocks.map((block, idx) => (
                                         <div key={idx} className="bg-white border border-slate-200 rounded-lg mb-3 overflow-hidden">
                                             <div className="flex justify-between items-center p-2 px-3 bg-slate-50 border-b border-slate-100">
-                                                <span className="text-xs font-semibold text-slate-500">{block.type === "text" ? "📝 Văn bản" : "🖼️ Ảnh"} #{idx + 1}</span>
+                                                <span className="text-xs font-semibold text-slate-500">{block.type === "heading" ? "📌 Mục chính" : block.type === "text" ? "📝 Văn bản" : "🖼️ Ảnh"} #{idx + 1}</span>
                                                 <div className="flex gap-1.5">
                                                     <button type="button" className="bg-slate-100 w-[26px] h-[26px] rounded flex items-center justify-center text-slate-600 hover:bg-slate-200 disabled:opacity-35 disabled:cursor-not-allowed" onClick={() => moveBlock(idx, -1)} disabled={idx === 0}><ArrowUp size={14} /></button>
                                                     <button type="button" className="bg-slate-100 w-[26px] h-[26px] rounded flex items-center justify-center text-slate-600 hover:bg-slate-200 disabled:opacity-35 disabled:cursor-not-allowed" onClick={() => moveBlock(idx, 1)} disabled={idx === form.contentBlocks.length - 1}><ArrowDown size={14} /></button>
@@ -378,7 +380,15 @@ function ManageNews() {
                                                 </div>
                                             </div>
 
-                                            {block.type === "text" ? (
+                                            {block.type === "heading" ? (
+                                                <input
+                                                    type="text"
+                                                    value={block.value}
+                                                    onChange={(e) => updateBlock(idx, e.target.value)}
+                                                    placeholder="Nhập tiêu đề mục chính (sẽ tạo mục lục tự động)…"
+                                                    className="w-full p-3 text-base font-bold outline-none border-l-4 border-blue-500 bg-blue-50/30"
+                                                />
+                                            ) : block.type === "text" ? (
                                                 <textarea
                                                     rows="4"
                                                     value={block.value}
@@ -402,11 +412,46 @@ function ManageNews() {
                                         </div>
                                     ))}
 
-                                    <div className="flex gap-3 justify-center pt-2">
+                                    <div className="flex gap-3 justify-center pt-2 flex-wrap">
+                                        <button type="button" className="flex items-center gap-1.5 py-2.5 px-5 rounded-lg font-semibold text-sm cursor-pointer border border-dashed bg-indigo-50 text-indigo-600 border-indigo-300 hover:bg-indigo-100 transition-colors" onClick={() => addBlock("heading")}><Heading size={16} /> + Mục chính</button>
                                         <button type="button" className="flex items-center gap-1.5 py-2.5 px-5 rounded-lg font-semibold text-sm cursor-pointer border border-dashed bg-blue-50 text-blue-500 border-blue-300 hover:bg-blue-100 transition-colors" onClick={() => addBlock("text")}><Type size={16} /> + Văn bản</button>
                                         <button type="button" className="flex items-center gap-1.5 py-2.5 px-5 rounded-lg font-semibold text-sm cursor-pointer border border-dashed bg-green-50 text-green-600 border-green-300 hover:bg-green-100 transition-colors" onClick={() => addBlock("image")}><ImageIcon size={16} /> + Ảnh</button>
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* Display Location Selector */}
+                            <div className="mb-4">
+                                <label className="block font-medium text-slate-800 mb-2 text-sm">Ghim bài viết này lên giao diện mua sắm 📌</label>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                    {[
+                                      { id: "home", label: "Trang chủ" },
+                                      { id: "phones", label: "Điện thoại" },
+                                      { id: "electronics", label: "Đồ điện tử" },
+                                      { id: "accessories", label: "Phụ kiện" },
+                                      { id: "promotions", label: "Khuyến mãi" },
+                                      { id: "contact", label: "Liên hệ" },
+                                    ].map(loc => (
+                                      <label key={loc.id} className="flex items-center gap-2 text-[13px] bg-slate-50 p-2 rounded border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors">
+                                        <input 
+                                          type="checkbox" 
+                                          checked={form.displayLocations.includes(loc.id)}
+                                          onChange={(e) => {
+                                            const isChecked = e.target.checked;
+                                            setForm(prev => {
+                                              let updated = [...prev.displayLocations];
+                                              if (isChecked) updated.push(loc.id);
+                                              else updated = updated.filter(i => i !== loc.id);
+                                              return { ...prev, displayLocations: updated };
+                                            });
+                                          }}
+                                          className="cursor-pointer"
+                                        />
+                                        {loc.label}
+                                      </label>
+                                    ))}
+                                </div>
+                                <p className="text-[12px] text-slate-400 mt-1.5 italic">* Bỏ trống nếu bài viết chỉ nằm trong kho Tin Tức chung.</p>
                             </div>
 
                             {/* Footer */}

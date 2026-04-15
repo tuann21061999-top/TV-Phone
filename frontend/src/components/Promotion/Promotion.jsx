@@ -4,7 +4,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 
-function Promotion() {
+function Promotion({ isCompact = false }) {
   const [bestProduct, setBestProduct] = useState(null);
   const [bestPricing, setBestPricing] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,8 +36,8 @@ function Promotion() {
 
   if (loading) {
     return (
-      <section className="promotion promotion-loading">
-        <Loader2 className="animate-spin text-blue-500 mx-auto my-10" size={32} />
+      <section className={`${isCompact ? "w-full h-full" : ""} flex items-center justify-center`}>
+        <Loader2 className="animate-spin text-blue-500 mx-auto my-8" size={28} />
       </section>
     );
   }
@@ -51,56 +51,59 @@ function Promotion() {
   const progressPercent = hasLimit ? Math.min((soldQty / bestProduct.quantityLimit) * 100, 100) : 0;
 
   return (
-    <section className="relative w-[92%] md:w-[90%] max-w-[1200px] mx-auto my-8 md:my-[60px] bg-gradient-to-br from-slate-900 to-blue-900 text-white rounded-2xl flex flex-col md:flex-row justify-between items-center overflow-hidden shadow-[0_10px_30px_rgba(30,58,138,0.3)] px-5 py-8 md:px-12 md:py-10 gap-6 md:gap-10">
+    <section className={`relative bg-gradient-to-br from-slate-900 to-blue-900 text-white flex overflow-hidden shadow-[0_8px_24px_rgba(30,58,138,0.25)]
+      ${isCompact 
+        ? "w-full h-full rounded-xl flex-row items-center justify-between px-4 py-3 md:px-5 gap-2" 
+        : "w-[92%] md:w-[90%] max-w-[1200px] mx-auto my-6 md:my-[50px] rounded-xl flex-col md:flex-row items-center justify-between px-4 py-5 md:px-10 md:py-8 gap-4 md:gap-8"}
+    `}>
 
       {/* Glow effect */}
-      <div className="absolute -top-1/2 -left-[10%] w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-[radial-gradient(circle,rgba(59,130,246,0.4)_0%,rgba(15,23,42,0)_70%)] pointer-events-none z-[1]" />
+      <div className="absolute -top-1/2 -left-[10%] w-[200px] h-[200px] md:w-[400px] md:h-[400px] bg-[radial-gradient(circle,rgba(59,130,246,0.35)_0%,rgba(15,23,42,0)_70%)] pointer-events-none z-[1]" />
 
       {/* CONTENT LEFT */}
-      <div className="relative z-[2] flex-1 flex flex-col gap-3 md:gap-4 items-center md:items-start text-center md:text-left w-full">
+      <div className="relative z-[2] flex-1 flex flex-col gap-1 md:gap-1.5 items-start text-left w-full min-w-0 overflow-hidden">
 
         {/* Badge */}
-        <div className="bg-white/10 border border-white/20 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[11px] md:text-[13px] font-bold tracking-wide text-yellow-400 backdrop-blur w-fit">
-          HOT DEAL MỖI NGÀY
+        <div className="bg-white/10 border border-white/20 px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-bold tracking-wide text-yellow-400 backdrop-blur w-fit shrink-0">
+          ⚡ FLASH SALE
         </div>
 
         {/* Tiêu đề */}
-        <h2 className="text-xl sm:text-2xl md:text-[32px] font-extrabold leading-tight m-0">
+        <h2 className={`${isCompact ? "text-[12px] md:text-[15px]" : "text-sm md:text-[22px]"} font-extrabold leading-tight m-0 line-clamp-1`}>
           {bestProduct.isShockDeal
-            ? "FLASH SALE CHỚP NHOÁNG"
+            ? "FLASH SALE"
             : bestPricing.discountPercent > 0
             ? "Giảm Giá Khủng"
             : "Sản Phẩm Đỉnh Cao"}
         </h2>
 
         {/* THÔNG TIN SẢN PHẨM */}
-        <div className="mt-1 md:mt-2 bg-white/5 p-3 md:p-4 rounded-xl border-l-4 border-yellow-400 w-full max-w-[320px] md:max-w-md flex flex-col items-center md:items-start">
-          <h3 className="text-base md:text-lg font-semibold text-slate-200 mb-1 md:mb-1.5 line-clamp-2 md:line-clamp-1">
+        <div className="bg-white/5 p-1.5 md:p-2 rounded-md border-l-2 border-yellow-400 w-full flex flex-col items-start">
+          <h3 className="text-[10px] md:text-[12px] font-semibold text-slate-200 mb-0 line-clamp-1">
             {bestProduct.productName}
           </h3>
-
-          <div className="flex items-baseline gap-2 md:gap-3 justify-center md:justify-start">
-            <span className="text-[22px] sm:text-2xl md:text-[28px] font-extrabold text-yellow-400 leading-none">
+          <div className="flex items-baseline gap-1.5">
+            <span className={`${isCompact ? "text-[14px] md:text-[17px]" : "text-[16px] md:text-[20px]"} font-extrabold text-yellow-400 leading-none`}>
               {bestPricing.finalPrice.toLocaleString()}đ
             </span>
             {bestPricing.discountPercent > 0 && (
-              <span className="text-[11px] md:text-sm line-through text-slate-400 font-medium">
+              <span className="text-[8px] md:text-[10px] line-through text-slate-400 font-medium">
                 {bestPricing.basePrice.toLocaleString()}đ
               </span>
             )}
           </div>
         </div>
 
-        {/* THANH TIẾN ĐỘ (Giới hạn số lượng) */}
+        {/* THANH TIẾN ĐỘ */}
         {hasLimit && (
-          <div className="w-full max-w-[320px] md:max-w-md mt-1 md:mt-2">
-            <div className="w-full h-1.5 md:h-2 bg-slate-200/30 rounded-full overflow-hidden">
+          <div className="w-full mt-0.5">
+            <div className="w-full h-[3px] md:h-1 bg-slate-200/30 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-pink-500 to-red-500 rounded-full"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <div className="flex justify-between text-[10px] md:text-[12px] text-slate-300 mt-1.5 font-medium px-0.5">
+            <div className="flex justify-between text-[7px] md:text-[9px] text-slate-300 mt-0.5 font-medium">
               <span>Đã bán: {soldQty}</span>
               <span>Giới hạn: {bestProduct.quantityLimit}</span>
             </div>
@@ -109,36 +112,39 @@ function Promotion() {
 
         {/* ĐỒNG HỒ ĐẾM NGƯỢC */}
         {bestPricing.discountPercent > 0 && (
-          <div className="mt-1 md:mt-2 transform scale-[0.85] md:scale-100 origin-center md:origin-left w-full flex justify-center md:justify-start">
+          <div className="transform scale-[0.55] md:scale-[0.7] origin-left w-full">
             <Countdown targetDate={bestPricing.targetEnd} />
           </div>
         )}
 
-        {/* NÚT BẤM MUA NGAY */}
+        {/* NÚT BẤM */}
         <Link
           to={`/product/${bestProduct.slug || bestProduct.productId}`}
-          className="mt-1 md:mt-3 inline-flex items-center justify-center bg-yellow-400 text-slate-900 font-bold px-5 py-2.5 md:px-6 md:py-3 rounded-xl hover:bg-yellow-500 hover:-translate-y-[2px] transition-all shadow-lg text-[13px] md:text-base w-full sm:w-auto max-w-[320px]"
+          className={`inline-flex items-center justify-center bg-yellow-400 text-slate-900 font-bold rounded-lg hover:bg-yellow-500 hover:-translate-y-[1px] transition-all shadow-md shrink-0 no-underline
+            ${isCompact ? "px-3 py-1.5 text-[9px] md:text-[11px] md:px-4 md:py-2" : "px-4 py-2 text-[11px] md:text-[13px] mt-1"}`}
         >
           Xem ngay kẻo lỡ
         </Link>
       </div>
 
       {/* IMAGE RIGHT */}
-      <div className="relative z-[2] flex-1 flex justify-center items-center mt-2 md:mt-0 w-full">
-        {/* Bóp nhỏ kích thước khung ảnh trên mobile */}
-        <div className="relative w-[220px] h-[220px] sm:w-[260px] sm:h-[260px] md:w-[380px] md:h-[380px] animate-[float_6s_ease-in-out_infinite]">
+      <div className={`relative z-[2] flex justify-center items-center shrink-0`}>
+        <div className={`relative animate-[float_6s_ease-in-out_infinite] 
+          ${isCompact ? "w-[90px] h-[90px] md:w-[140px] md:h-[140px]" : "w-[140px] h-[140px] md:w-[260px] md:h-[260px]"}
+        `}>
           
-          <div className="absolute inset-0 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.2)] md:shadow-[0_20px_50px_rgba(0,0,0,0.25)]">
+          <div className="absolute inset-0 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_6px_16px_rgba(0,0,0,0.18)]">
             <img
               src={displayImage}
               alt={bestProduct.productName}
-              className="w-[85%] h-[85%] object-contain mix-blend-multiply"
+              className="w-[82%] h-[82%] object-contain mix-blend-multiply"
             />
           </div>
 
-          {/* DISCOUNT BADGE (Thu nhỏ badge trên mobile) */}
+          {/* DISCOUNT BADGE */}
           {bestPricing.discountPercent > 0 && (
-            <div className="absolute -top-1 -right-1 md:-top-4 md:-right-4 w-[56px] h-[56px] md:w-[80px] md:h-[80px] bg-red-500 text-white flex items-center justify-center rounded-full text-[14px] md:text-xl font-black rotate-12 shadow-lg z-10 border-2 md:border-[3px] border-white">
+            <div className={`absolute -top-0.5 -right-0.5 md:-top-1 md:-right-1 bg-red-500 text-white flex items-center justify-center rounded-full font-black rotate-12 shadow-md z-10 border-[1.5px] border-white
+              ${isCompact ? "w-[30px] h-[30px] text-[8px] md:w-[44px] md:h-[44px] md:text-[11px]" : "w-[36px] h-[36px] text-[9px] md:w-[56px] md:h-[56px] md:text-[13px]"}`}>
               -{bestPricing.discountPercent}%
             </div>
           )}
