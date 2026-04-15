@@ -498,6 +498,34 @@ const orderController = {
         return res.status(400).json({ message: "Yêu cầu trả hàng đã được gửi trước đó" });
       }
 
+      // KIỂM TRA ĐIỂM: Nếu khách không đủ điểm tương ứng đơn hàng thì không cho trả
+      const orderPoints = Math.floor(order.total / 50000);
+      if (orderPoints > 0) {
+        const User = require("../models/User");
+        const mongoose = require("mongoose");
+        const user = await User.findById(req.user.id);
+        
+        // Tính tổng điểm đang có (loại trừ các đơn đang pending trả hàng)
+        const orderStats = await Order.aggregate([
+          { $match: { 
+              userId: new mongoose.Types.ObjectId(req.user.id), 
+              status: "done",
+              "returnRequest.status": { $ne: "pending" }
+            } 
+          },
+          { $group: { _id: null, totalSpent: { $sum: "$total" } } }
+        ]);
+        const totalDoneAmount = orderStats.length > 0 ? orderStats[0].totalSpent : 0;
+        const totalAccumulated = Math.floor(totalDoneAmount / 50000);
+        
+        const totalSpentPoints = (user.redemptionHistory || []).reduce((s, r) => s + r.pointsSpent, 0);
+        const availablePoints = totalAccumulated - totalSpentPoints;
+        
+        if (availablePoints < orderPoints) {
+          return res.status(400).json({ message: "Bạn không đủ điểm khả dụng để hoàn trả đơn hàng này, vì điểm tương ứng đã được dùng để đổi voucher." });
+        }
+      }
+
       let uploadedImages = [];
       if (req.files && req.files.length > 0) {
         for (const file of req.files) {

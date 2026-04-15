@@ -45,7 +45,12 @@ function AdminPage() {
 
         // Lấy orders
         const ordersRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/orders/admin/all`, { headers });
-        const newOrders = ordersRes.data.filter(o => o.status === "waiting_approval" || o.status === "paid" || o.status === "pending").length;
+        const newOrders = ordersRes.data.filter(o => 
+          o.status === "waiting_approval" || 
+          o.status === "paid" || 
+          o.status === "pending" ||
+          (o.returnRequest && o.returnRequest.status === "pending")
+        ).length;
         if (activeTab !== "orders") {
           setOrderBadge(newOrders);
         } else {

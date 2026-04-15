@@ -553,7 +553,8 @@ const Profile = () => {
             {/* TAB INFO */}
             {activeTab === "info" && (() => {
               const doneOrders = orders.filter(o => o.status === 'done');
-              const totalSpent = doneOrders.reduce((sum, o) => sum + o.total, 0);
+              const ordersForPoints = doneOrders.filter(o => !o.returnRequest || o.returnRequest.status !== 'pending');
+              const totalSpent = ordersForPoints.reduce((sum, o) => sum + o.total, 0);
               const totalPoints = Math.floor(totalSpent / 50000);
               const totalSpentPoints = redemptionHistory.reduce((s, r) => s + r.pointsSpent, 0);
               const availablePoints = totalPoints - totalSpentPoints;
