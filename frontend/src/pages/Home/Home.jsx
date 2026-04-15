@@ -11,7 +11,6 @@ import AIRecommend from "../../components/AIRecommend/AIRecommend";
 import AIAccessoryRecommend from "../../components/AIAccessoryRecommend/AIAccessoryRecommend";
 import NewArrivals from "../../components/NewArrivals/NewArrivals";
 import BrandShowcase from "../../components/BrandShowcase/BrandShowcase";
-import CustomerReviews from "../../components/CustomerReviews/CustomerReviews";
 import LatestNews from "../../components/LatestNews/LatestNews";
 import GlobalArticle from "../../components/GlobalArticle/GlobalArticle";
 
@@ -43,7 +42,6 @@ function Home() {
       <AIAccessoryRecommend />
       <NewArrivals />
       <ProductGrid />
-      <CustomerReviews />
       <BrandShowcase />
       <LatestNews />
       <Features />
