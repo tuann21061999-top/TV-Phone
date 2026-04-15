@@ -42,30 +42,41 @@ const BRAND_LOGOS = {
   Flydigi: "https://cdn.brandfetch.io/idZlGwotLY/w/52/h/47/theme/dark/logo.png?c=1bxid64Mup7aczewSAYMX&t=1769290949469"
 };
 
-function Navbar() {
+function Navbar({ preloadedProducts, isProductsReady = false }) {
   const [deviceBrands, setDeviceBrands] = useState([]);
   const [electronicBrands, setElectronicBrands] = useState([]);
   const [accessoryBrands, setAccessoryBrands] = useState([]);
 
   useEffect(() => {
+    const applyBrandsFromProducts = (data) => {
+      if (!Array.isArray(data)) return;
+
+      const devices = data.filter((p) => p.productType === "device").map((p) => p.brand);
+      const electronics = data.filter((p) => p.productType === "electronic").map((p) => p.brand);
+      const accessories = data.filter((p) => p.productType === "accessory").map((p) => p.brand);
+
+      setDeviceBrands([...new Set(devices.filter(Boolean))].sort());
+      setElectronicBrands([...new Set(electronics.filter(Boolean))].sort());
+      setAccessoryBrands([...new Set(accessories.filter(Boolean))].sort());
+    };
+
+    if (Array.isArray(preloadedProducts)) {
+      if (!isProductsReady) return;
+      applyBrandsFromProducts(preloadedProducts);
+      return;
+    }
+
     const fetchBrands = async () => {
       try {
         const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
-        if (data && Array.isArray(data)) {
-          const devices = data.filter(p => p.productType === "device").map(p => p.brand);
-          const electronics = data.filter(p => p.productType === "electronic").map(p => p.brand);
-          const accessories = data.filter(p => p.productType === "accessory").map(p => p.brand);
-
-          setDeviceBrands([...new Set(devices.filter(Boolean))].sort());
-          setElectronicBrands([...new Set(electronics.filter(Boolean))].sort());
-          setAccessoryBrands([...new Set(accessories.filter(Boolean))].sort());
-        }
+        applyBrandsFromProducts(data);
       } catch (error) {
         console.error("Lỗi lấy danh sách sản phẩm ở Navbar:", error);
       }
     };
+
     fetchBrands();
-  }, []);
+  }, [preloadedProducts, isProductsReady]);
 
   const renderBrandLink = (brand, basePath) => {
     const logoSrc = BRAND_LOGOS[brand];

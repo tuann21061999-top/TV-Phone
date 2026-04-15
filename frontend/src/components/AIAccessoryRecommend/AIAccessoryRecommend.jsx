@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '../Product/ProductCard';
 
-const AIAccessoryRecommend = () => {
+const AIAccessoryRecommend = ({ initialFavoriteIds }) => {
     const [recommendations, setRecommendations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [favoriteIds, setFavoriteIds] = useState(new Set()); 
@@ -23,6 +23,13 @@ const AIAccessoryRecommend = () => {
         };
 
         fetchRecommendations();
+    }, [token]);
+
+    useEffect(() => {
+        if (initialFavoriteIds instanceof Set) {
+            setFavoriteIds(new Set(initialFavoriteIds));
+            return;
+        }
 
         if (token) {
             axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
@@ -32,7 +39,7 @@ const AIAccessoryRecommend = () => {
                 setFavoriteIds(ids);
             }).catch(() => { });
         }
-    }, [token]);
+    }, [initialFavoriteIds, token]);
 
     const handleFavoriteToggle = (productId, isLiked) => {
         setFavoriteIds(prev => {

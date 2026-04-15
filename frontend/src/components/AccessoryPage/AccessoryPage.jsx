@@ -75,12 +75,10 @@ function AccessoriesPage() {
       try {
         setLoading(true);
         const { data } = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/products?productType=accessory`
+          `${import.meta.env.VITE_API_URL}/api/products?type=accessory`
         );
 
-        const accessories = data.filter(
-          (p) => p.productType === "accessory"
-        );
+        const accessories = Array.isArray(data) ? data : [];
 
         setProducts(accessories);
       } catch (err) {

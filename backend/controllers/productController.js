@@ -33,7 +33,8 @@ exports.createProduct = async (req, res) => {
 ===================================== */
 exports.getAllProducts = async (req, res) => {
   try {
-    const { type, brand, search, condition, admin } = req.query;
+    const { type, productType, brand, search, condition, admin } = req.query;
+    const resolvedType = type || productType;
 
     let filter = {};
 
@@ -42,10 +43,10 @@ exports.getAllProducts = async (req, res) => {
       filter.isActive = true;
     }
 
-    if (type === 'hot') {
+    if (resolvedType === 'hot') {
       filter.isFeatured = true;
-    } else if (type) {
-      filter.productType = type;
+    } else if (resolvedType) {
+      filter.productType = resolvedType;
       // Đã xóa dòng filter.isFeatured = { $ne: true } để trả về ĐẦY ĐỦ sản phẩm
     }
     if (brand) filter.brand = brand;

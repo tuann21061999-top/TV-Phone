@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import axios from "axios";
 
-function ProductGrid() {
+function ProductGrid({ preloadedProducts, initialFavoriteIds, isProductsReady = false }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [favoriteIds, setFavoriteIds] = useState(new Set()); // Thêm state lưu tim
@@ -12,6 +12,13 @@ function ProductGrid() {
   const [visibleCount, setVisibleCount] = useState(6); // Mặc định hiển thị 6 sản phẩm (3 hàng trên mobile)
 
   useEffect(() => {
+    if (Array.isArray(preloadedProducts)) {
+      const hotProducts = preloadedProducts.filter((p) => p.isFeatured === true);
+      setProducts(hotProducts);
+      setLoading(!isProductsReady);
+      return;
+    }
+
     const fetchProducts = async () => {
       try {
         setLoading(true);
@@ -28,9 +35,18 @@ function ProductGrid() {
         setLoading(false);
       }
     };
+
     fetchProducts();
 
-    // Lấy danh sách yêu thích nếu đã đăng nhập
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preloadedProducts, isProductsReady]);
+
+  useEffect(() => {
+    if (initialFavoriteIds instanceof Set) {
+      setFavoriteIds(new Set(initialFavoriteIds));
+      return;
+    }
+
     const token = localStorage.getItem("token");
     if (token) {
       axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
@@ -40,7 +56,7 @@ function ProductGrid() {
         setFavoriteIds(ids);
       }).catch(() => {});
     }
-  }, []);
+  }, [initialFavoriteIds]);
 
   // Lọc sản phẩm theo Tab (Tất cả, Điện thoại, Điện tử, Phụ kiện)
   const filteredProducts = products.filter(p => {
