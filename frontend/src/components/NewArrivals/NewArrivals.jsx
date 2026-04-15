@@ -4,13 +4,23 @@ import ProductCard from "../Product/ProductCard";
 import { Flame, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-function NewArrivals() {
+function NewArrivals({ preloadedProducts, initialFavoriteIds, isProductsReady = false }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [favoriteIds, setFavoriteIds] = useState(new Set());
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (Array.isArray(preloadedProducts)) {
+      const latest = [...preloadedProducts]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 6);
+
+      setProducts(latest);
+      setLoading(!isProductsReady);
+      return;
+    }
+
     const fetchLatest = async () => {
       try {
         const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
@@ -31,7 +41,15 @@ function NewArrivals() {
 
     fetchLatest();
 
-    // Lấy danh sách yêu thích
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preloadedProducts, isProductsReady]);
+
+  useEffect(() => {
+    if (initialFavoriteIds instanceof Set) {
+      setFavoriteIds(new Set(initialFavoriteIds));
+      return;
+    }
+
     const token = localStorage.getItem("token");
     if (token) {
       axios
@@ -44,7 +62,7 @@ function NewArrivals() {
         })
         .catch(() => {});
     }
-  }, []);
+  }, [initialFavoriteIds]);
 
   const handleFavoriteToggle = (productId, isLiked) => {
     setFavoriteIds((prev) => {

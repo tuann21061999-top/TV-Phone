@@ -73,9 +73,9 @@ function ElectronicPage() {
       try {
         setLoading(true);
         const { data } = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/products?productType=electronic`
+          `${import.meta.env.VITE_API_URL}/api/products?type=electronic`
         );
-        const electronics = data.filter(p => p.productType === "electronic");
+        const electronics = Array.isArray(data) ? data : [];
         setProducts(electronics);
         // eslint-disable-next-line no-unused-vars
       } catch (err) {

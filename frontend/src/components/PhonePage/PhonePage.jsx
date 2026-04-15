@@ -54,10 +54,10 @@ function PhonePage() {
       try {
         setLoading(true);
         const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/products?productType=device`
+          `${import.meta.env.VITE_API_URL}/api/products?type=device`
         );
 
-        const devices = res.data.filter(p => p.productType === "device");
+        const devices = Array.isArray(res.data) ? res.data : [];
         setProducts(devices);
       } catch (error) {
         console.error("Error fetching products:", error);
