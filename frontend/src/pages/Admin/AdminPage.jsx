@@ -35,6 +35,7 @@ function AdminPage() {
   const [orderBadge, setOrderBadge] = useState(0);
   const [chatBadge, setChatBadge] = useState(0);
   const [reviewBadge, setReviewBadge] = useState(0);
+  const [feedbackBadge, setFeedbackBadge] = useState(0);
 
   useEffect(() => {
     const fetchBadges = async () => {
@@ -75,6 +76,15 @@ function AdminPage() {
           setReviewBadge(0);
         }
 
+        // Lấy feedbacks
+        const feedbacksRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/feedbacks/admin`, { headers });
+        const unreadFeedbacks = feedbacksRes.data.filter(f => f.status === "new").length;
+        if (activeTab !== "feedbacks") {
+          setFeedbackBadge(unreadFeedbacks);
+        } else {
+          setFeedbackBadge(0);
+        }
+
       } catch (error) {
         console.error("Lỗi lấy thông báo badge:", error);
       }
@@ -90,6 +100,7 @@ function AdminPage() {
     if (tab === "orders") setOrderBadge(0);
     if (tab === "chat") setChatBadge(0);
     if (tab === "reviews") setReviewBadge(0);
+    if (tab === "feedbacks") setFeedbackBadge(0);
     setIsSidebarOpen(false);
   };
   const getTabTitle = () => {
@@ -210,6 +221,7 @@ function AdminPage() {
             {[
               { tab: "orders", icon: <FileText size={18} />, label: "Đơn hàng", badge: orderBadge },
               { tab: "reviews", icon: <BarChart3 size={18} />, label: "Đánh giá", badge: reviewBadge },
+              { tab: "feedbacks", icon: <MessageSquare size={18} />, label: "Phản hồi", badge: feedbackBadge },
               { tab: "chat", icon: <MessageSquare size={18} />, label: "Chat", badge: chatBadge },
             ].map(({ tab, icon, label, badge }) => (
               <button
@@ -233,7 +245,6 @@ function AdminPage() {
             {/* Normal buttons */}
             {[
               { tab: "users", icon: <Users size={18} />, label: "Người dùng" },
-              { tab: "feedbacks", icon: <Package size={18} />, label: "Phản hồi" },
               { tab: "vouchers", icon: <Ticket size={18} />, label: "Voucher" },
               { tab: "promotions", icon: <Flame size={18} />, label: "Giảm giá" },
             ].map(({ tab, icon, label }) => (

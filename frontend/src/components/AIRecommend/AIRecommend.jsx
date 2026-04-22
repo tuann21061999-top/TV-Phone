@@ -95,7 +95,7 @@ const AIRecommend = ({ initialFavoriteIds }) => {
     if (loading || recommendations.length === 0) return null;
 
     return (
-        <section className="my-6 md:my-[50px] container mx-auto px-0 md:px-4 relative group">
+        <section className="my-6 md:my-[50px] w-full max-w-[100vw] mx-auto px-0 md:px-4 relative group overflow-hidden">
 
             {/* HEADER */}
             <div className="mb-4 md:mb-[25px] text-left md:text-center px-4 md:px-0">
@@ -108,13 +108,13 @@ const AIRecommend = ({ initialFavoriteIds }) => {
                         AI Powered
                     </span>
                 </div>
-                <p className="mt-1 md:mt-2.5 text-slate-500 text-[12px] md:text-[15px]">
+                <p className="mt-1 md:mt-2.5 text-slate-500 text-[12px] md:text-[15px] truncate px-1">
                     Gợi ý thông minh dựa trên sở thích và hành vi mua sắm của bạn.
                 </p>
             </div>
 
             {/* CAROUSEL CONTAINER */}
-            <div className="relative flex items-center w-full">
+            <div className="relative flex items-center w-full min-w-0 max-w-full">
 
                 {/* NÚT TRÁI (Hiển thị cả Mobile & PC) */}
                 <button

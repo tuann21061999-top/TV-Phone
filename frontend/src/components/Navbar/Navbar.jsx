@@ -47,35 +47,61 @@ function Navbar({ preloadedProducts, isProductsReady = false }) {
   const [electronicBrands, setElectronicBrands] = useState([]);
   const [accessoryBrands, setAccessoryBrands] = useState([]);
 
+  const [deviceTags, setDeviceTags] = useState([]);
+  const [electronicTags, setElectronicTags] = useState([]);
+  const [accessoryTags, setAccessoryTags] = useState([]);
+
   useEffect(() => {
-    const applyBrandsFromProducts = (data) => {
-      if (!Array.isArray(data)) return;
-
-      const devices = data.filter((p) => p.productType === "device").map((p) => p.brand);
-      const electronics = data.filter((p) => p.productType === "electronic").map((p) => p.brand);
-      const accessories = data.filter((p) => p.productType === "accessory").map((p) => p.brand);
-
-      setDeviceBrands([...new Set(devices.filter(Boolean))].sort());
-      setElectronicBrands([...new Set(electronics.filter(Boolean))].sort());
-      setAccessoryBrands([...new Set(accessories.filter(Boolean))].sort());
+    const fetchTags = async () => {
+      try {
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/tags`);
+        return data || [];
+      } catch (error) {
+        console.error("Lỗi lấy danh sách tags:", error);
+        return [];
+      }
     };
 
-    if (Array.isArray(preloadedProducts)) {
-      if (!isProductsReady) return;
-      applyBrandsFromProducts(preloadedProducts);
+    const applyData = async (data) => {
+      if (!Array.isArray(data)) return;
+
+      const devices = data.filter((p) => p.productType === "device");
+      const electronics = data.filter((p) => p.productType === "electronic");
+      const accessories = data.filter((p) => p.productType === "accessory");
+
+      setDeviceBrands([...new Set(devices.map(p => p.brand).filter(Boolean))].sort());
+      setElectronicBrands([...new Set(electronics.map(p => p.brand).filter(Boolean))].sort());
+      setAccessoryBrands([...new Set(accessories.map(p => p.brand).filter(Boolean))].sort());
+
+      const dTagIds = new Set(devices.flatMap(p => p.tags || []).map(id => id.toString()));
+      const eTagIds = new Set(electronics.flatMap(p => p.tags || []).map(id => id.toString()));
+      const aTagIds = new Set(accessories.flatMap(p => p.tags || []).map(id => id.toString()));
+
+      const allTags = await fetchTags();
+      const nonGlobalTags = allTags.filter(t => t.type !== "Price Segment");
+
+      setDeviceTags(nonGlobalTags.filter(t => dTagIds.has(t._id.toString())).slice(0, 6));
+      setElectronicTags(nonGlobalTags.filter(t => eTagIds.has(t._id.toString())).slice(0, 6));
+      setAccessoryTags(nonGlobalTags.filter(t => aTagIds.has(t._id.toString())).slice(0, 6));
+    };
+
+    if (Array.isArray(preloadedProducts) && isProductsReady) {
+      applyData(preloadedProducts);
       return;
+    } else if (!isProductsReady && Array.isArray(preloadedProducts)) {
+      return; // wait until ready
     }
 
-    const fetchBrands = async () => {
+    const fetchItems = async () => {
       try {
         const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
-        applyBrandsFromProducts(data);
+        applyData(data);
       } catch (error) {
         console.error("Lỗi lấy danh sách sản phẩm ở Navbar:", error);
       }
     };
 
-    fetchBrands();
+    fetchItems();
   }, [preloadedProducts, isProductsReady]);
 
   const renderBrandLink = (brand, basePath) => {
@@ -118,10 +144,22 @@ function Navbar({ preloadedProducts, isProductsReady = false }) {
                   Điện thoại, Máy tính bảng <ChevronRight size={16} className="text-slate-400 group-hover/item:text-blue-600 transition-colors" />
                 </NavLink>
                 {/* SUBMENU PANEL */}
-                <div className="absolute top-0 left-full ml-1 w-[480px] bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-slate-100 p-6 opacity-0 invisible -translate-x-3 group-hover/item:opacity-100 group-hover/item:visible group-hover/item:translate-x-0 transition-all duration-300 z-50">
-                  <h4 className="text-base font-extrabold text-slate-800 m-0 mb-5 pb-3 border-b border-slate-100">Thương hiệu Điện thoại</h4>
-                  <div className="grid grid-cols-4 gap-y-6 gap-x-4">
-                    {deviceBrands.length > 0 ? deviceBrands.map(b => renderBrandLink(b, "/phones")) : <span className="text-sm text-slate-400 italic col-span-4">Đang tải...</span>}
+                <div className="absolute top-0 left-full ml-1 w-[700px] bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-slate-100 p-6 opacity-0 invisible -translate-x-3 group-hover/item:opacity-100 group-hover/item:visible group-hover/item:translate-x-0 transition-all duration-300 z-50 flex gap-6">
+                  <div className="flex-1">
+                    <h4 className="text-base font-extrabold text-slate-800 m-0 mb-5 pb-3 border-b border-slate-100">Thương hiệu Điện thoại</h4>
+                    <div className="grid grid-cols-4 gap-y-6 gap-x-4">
+                      {deviceBrands.length > 0 ? deviceBrands.map(b => renderBrandLink(b, "/phones")) : <span className="text-sm text-slate-400 italic col-span-4">Đang tải...</span>}
+                    </div>
+                  </div>
+                  <div className="w-[200px] shrink-0 border-l border-slate-100 pl-6">
+                    <h4 className="text-base font-extrabold text-slate-800 m-0 mb-5 pb-3 border-b border-slate-100">Gợi ý nhanh</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {deviceTags.length > 0 ? deviceTags.map(tag => (
+                        <Link key={tag._id} to={`/search?tag=${tag._id}&tagName=${encodeURIComponent(tag.name)}`} className="px-3 py-1.5 bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-600 text-[13px] rounded-lg font-medium transition-colors no-underline">
+                          {tag.name}
+                        </Link>
+                      )) : <span className="text-sm text-slate-400 italic">...</span>}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -131,10 +169,22 @@ function Navbar({ preloadedProducts, isProductsReady = false }) {
                 <NavLink to="/electronics" className="flex items-center justify-between px-5 py-3.5 text-[14.5px] font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 no-underline transition-colors">
                   Đồ điện tử <ChevronRight size={16} className="text-slate-400 group-hover/item:text-blue-600 transition-colors" />
                 </NavLink>
-                <div className="absolute top-0 left-full ml-1 w-[480px] bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-slate-100 p-6 opacity-0 invisible -translate-x-3 group-hover/item:opacity-100 group-hover/item:visible group-hover/item:translate-x-0 transition-all duration-300 z-50">
-                  <h4 className="text-base font-extrabold text-slate-800 m-0 mb-5 pb-3 border-b border-slate-100">Thương hiệu Điện tử</h4>
-                  <div className="grid grid-cols-4 gap-y-6 gap-x-4">
-                    {electronicBrands.length > 0 ? electronicBrands.map(b => renderBrandLink(b, "/electronics")) : <span className="text-sm text-slate-400 italic col-span-4">Đang tải...</span>}
+                <div className="absolute top-0 left-full ml-1 w-[700px] bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-slate-100 p-6 opacity-0 invisible -translate-x-3 group-hover/item:opacity-100 group-hover/item:visible group-hover/item:translate-x-0 transition-all duration-300 z-50 flex gap-6">
+                  <div className="flex-1">
+                    <h4 className="text-base font-extrabold text-slate-800 m-0 mb-5 pb-3 border-b border-slate-100">Thương hiệu Điện tử</h4>
+                    <div className="grid grid-cols-4 gap-y-6 gap-x-4">
+                      {electronicBrands.length > 0 ? electronicBrands.map(b => renderBrandLink(b, "/electronics")) : <span className="text-sm text-slate-400 italic col-span-4">Đang tải...</span>}
+                    </div>
+                  </div>
+                  <div className="w-[200px] shrink-0 border-l border-slate-100 pl-6">
+                    <h4 className="text-base font-extrabold text-slate-800 m-0 mb-5 pb-3 border-b border-slate-100">Gợi ý nhanh</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {electronicTags.length > 0 ? electronicTags.map(tag => (
+                        <Link key={tag._id} to={`/search?tag=${tag._id}&tagName=${encodeURIComponent(tag.name)}`} className="px-3 py-1.5 bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-600 text-[13px] rounded-lg font-medium transition-colors no-underline">
+                          {tag.name}
+                        </Link>
+                      )) : <span className="text-sm text-slate-400 italic">...</span>}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -144,10 +194,22 @@ function Navbar({ preloadedProducts, isProductsReady = false }) {
                 <NavLink to="/accessories" className="flex items-center justify-between px-5 py-3.5 text-[14.5px] font-bold text-slate-700 hover:bg-blue-50 hover:text-blue-600 no-underline transition-colors">
                   Phụ kiện <ChevronRight size={16} className="text-slate-400 group-hover/item:text-blue-600 transition-colors" />
                 </NavLink>
-                <div className="absolute top-0 left-full ml-1 w-[480px] bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-slate-100 p-6 opacity-0 invisible -translate-x-3 group-hover/item:opacity-100 group-hover/item:visible group-hover/item:translate-x-0 transition-all duration-300 z-50">
-                  <h4 className="text-base font-extrabold text-slate-800 m-0 mb-5 pb-3 border-b border-slate-100">Thương hiệu Phụ kiện</h4>
-                  <div className="grid grid-cols-4 gap-y-6 gap-x-4">
-                    {accessoryBrands.length > 0 ? accessoryBrands.map(b => renderBrandLink(b, "/accessories")) : <span className="text-sm text-slate-400 italic col-span-4">Đang tải...</span>}
+                <div className="absolute top-0 left-full ml-1 w-[700px] bg-white rounded-xl shadow-[0_15px_40px_rgba(0,0,0,0.15)] border border-slate-100 p-6 opacity-0 invisible -translate-x-3 group-hover/item:opacity-100 group-hover/item:visible group-hover/item:translate-x-0 transition-all duration-300 z-50 flex gap-6">
+                  <div className="flex-1">
+                    <h4 className="text-base font-extrabold text-slate-800 m-0 mb-5 pb-3 border-b border-slate-100">Thương hiệu Phụ kiện</h4>
+                    <div className="grid grid-cols-4 gap-y-6 gap-x-4">
+                      {accessoryBrands.length > 0 ? accessoryBrands.map(b => renderBrandLink(b, "/accessories")) : <span className="text-sm text-slate-400 italic col-span-4">Đang tải...</span>}
+                    </div>
+                  </div>
+                  <div className="w-[200px] shrink-0 border-l border-slate-100 pl-6">
+                    <h4 className="text-base font-extrabold text-slate-800 m-0 mb-5 pb-3 border-b border-slate-100">Gợi ý nhanh</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {accessoryTags.length > 0 ? accessoryTags.map(tag => (
+                        <Link key={tag._id} to={`/search?tag=${tag._id}&tagName=${encodeURIComponent(tag.name)}`} className="px-3 py-1.5 bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-600 text-[13px] rounded-lg font-medium transition-colors no-underline">
+                          {tag.name}
+                        </Link>
+                      )) : <span className="text-sm text-slate-400 italic">...</span>}
+                    </div>
                   </div>
                 </div>
               </div>

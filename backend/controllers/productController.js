@@ -33,7 +33,7 @@ exports.createProduct = async (req, res) => {
 ===================================== */
 exports.getAllProducts = async (req, res) => {
   try {
-    const { type, productType, brand, search, condition, admin } = req.query;
+    const { type, productType, brand, search, condition, admin, tag } = req.query;
     const resolvedType = type || productType;
 
     let filter = {};
@@ -51,13 +51,15 @@ exports.getAllProducts = async (req, res) => {
     }
     if (brand) filter.brand = brand;
     if (condition) filter.condition = condition;
+    if (tag) {
+       // Support multiple tags via comma separated string or single tag
+       filter.tags = tag; 
+    }
 
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
         { brand: { $regex: search, $options: "i" } },
-        { highlights: { $elemMatch: { $regex: search, $options: "i" } } },
-        { description: { $regex: search, $options: "i" } },
       ];
     }
 
