@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const feedbackController = require("../controllers/feedbackController");
-const { protect, admin } = require("../middleware/authMiddleware"); 
+const { protect, admin, optionalAuth } = require("../middleware/authMiddleware"); 
 
 // ==========================================
 // PUBLIC ROUTES
 // ==========================================
 
 // POST /api/feedbacks -> Khách hàng gửi form (Có thể cho phép khách vãng lai, không cần protect)
-router.post("/", feedbackController.submitFeedback);
+router.post("/", optionalAuth, feedbackController.submitFeedback);
 // Thêm route này vào phần PUBLIC ROUTES (hoặc USER ROUTES)
 router.get("/mine", protect, feedbackController.getMyFeedbacks);
 

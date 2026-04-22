@@ -9,11 +9,13 @@ import { ChevronRight } from "lucide-react";
 function SearchPage() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
+  const tagId = searchParams.get("tag") || "";
+  const tagName = searchParams.get("tagName") || "";
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [favoriteIds, setFavoriteIds] = useState(new Set()); // Thêm state lưu tim
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
 
   useEffect(() => {
     // Lấy danh sách yêu thích khi load trang Search
@@ -30,7 +32,7 @@ function SearchPage() {
 
   useEffect(() => {
     const fetchSearchResults = async () => {
-      if (!query) {
+      if (!query && !tagId) {
         setProducts([]);
         setLoading(false);
         return;
@@ -39,7 +41,11 @@ function SearchPage() {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/products?search=${encodeURIComponent(query)}`);
+        let apiUrl = `${import.meta.env.VITE_API_URL}/api/products`;
+        if (query) apiUrl += `?search=${encodeURIComponent(query)}`;
+        else if (tagId) apiUrl += `?tag=${encodeURIComponent(tagId)}`;
+        
+        const response = await axios.get(apiUrl);
         setProducts(response.data);
       } catch (err) {
         console.error("Lỗi khi tìm kiếm:", err);
@@ -50,7 +56,7 @@ function SearchPage() {
     };
 
     fetchSearchResults();
-  }, [query]);
+  }, [query, tagId]);
 
   const handleFavoriteToggle = (productId, isLiked) => {
     setFavoriteIds(prev => {
@@ -75,7 +81,9 @@ function SearchPage() {
         
         {/* HEADER TÌM KIẾM */}
         <div className="mb-8">
-          <h1 className="text-2xl md:text-[28px] font-bold text-slate-900 m-0 mb-1">Kết quả tìm kiếm cho: "{query}"</h1>
+          <h1 className="text-2xl md:text-[28px] font-bold text-slate-900 m-0 mb-1">
+            {tagName ? `Kết quả lọc theo tag: "${tagName}"` : `Kết quả tìm kiếm cho: "${query}"`}
+          </h1>
           <p className="text-[15px] text-slate-500 m-0">Tìm thấy {products.length} sản phẩm phù hợp</p>
         </div>
 

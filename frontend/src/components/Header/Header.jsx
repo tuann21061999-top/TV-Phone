@@ -4,14 +4,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { 
   ShoppingCart, User, Search, Smartphone, Bell, Menu, X,
   CheckCheck,
-  Home, Laptop, Headphones, Gift, Newspaper, Phone 
+  Home, Laptop, Headphones, Gift, Newspaper, Phone, TrendingUp, Flame
 } from "lucide-react";
 import axios from "axios";
 import logoImg from "../../assets/Logo3.png";
 
 function Header({ preloadedProducts, isProductsReady = false }) {
   const [cartCount, setCartCount] = useState(0);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem("user");
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (e) {
+      return null;
+    }
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -21,6 +28,42 @@ function Header({ preloadedProducts, isProductsReady = false }) {
   const [isNotifyOpen, setIsNotifyOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+  const [globalProducts, setGlobalProducts] = useState([]);
+
+  useEffect(() => {
+    let isCancelled = false;
+    if (preloadedProducts && preloadedProducts.length > 0) {
+      setGlobalProducts(preloadedProducts);
+    } else {
+      axios.get(`${import.meta.env.VITE_API_URL}/api/products`)
+        .then(res => {
+          if (!isCancelled) {
+            setGlobalProducts(Array.isArray(res.data) ? res.data : (res.data.data || []));
+          }
+        })
+        .catch(err => console.error("Lỗi lấy danh sách sản phẩm ở Header:", err));
+    }
+    return () => { isCancelled = true; };
+  }, [preloadedProducts]);
+
+  const favoriteProducts = React.useMemo(() => {
+    if (globalProducts.length > 0) {
+      return [...globalProducts]
+        .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
+        .slice(0, 2);
+    }
+    return [];
+  }, [globalProducts]);
+
+  const trendingProducts = React.useMemo(() => {
+    if (globalProducts.length > 0) {
+      return [...globalProducts]
+        .sort((a, b) => (b.totalSold || 0) - (a.totalSold || 0))
+        .slice(0, 3);
+    }
+    return [];
+  }, [globalProducts]);
 
   const token = localStorage.getItem("token");
 
@@ -106,6 +149,7 @@ function Header({ preloadedProducts, isProductsReady = false }) {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(data);
+        localStorage.setItem("user", JSON.stringify(data));
       } catch (error) {
         console.error("Lỗi lấy profile user:", error);
       }
@@ -261,14 +305,50 @@ function Header({ preloadedProducts, isProductsReady = false }) {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={handleKeyDown}
-                onFocus={() => { if (searchTerm.trim()) setIsSearchOpen(true); }}
+                onFocus={() => setIsSearchOpen(true)}
               />
               <Search size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/80 cursor-pointer transition-colors duration-200 hover:text-white" onClick={handleSearch} />
 
               {/* SEARCH DROPDOWN - FIX Z-INDEX: z-[99999] */}
-              {isSearchOpen && (searchTerm.trim().length > 0) && (
-                <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white rounded-lg shadow-[0_10px_25px_rgba(0,0,0,0.15)] z-[99999] overflow-hidden flex flex-col">
-                  {isSearching ? (
+              {isSearchOpen && (
+                <div className="absolute top-[calc(100%+8px)] left-0 w-[120%] lg:w-[400px] bg-white rounded-lg shadow-[0_10px_25px_rgba(0,0,0,0.15)] z-[99999] overflow-hidden flex flex-col">
+                  {searchTerm.trim().length === 0 ? (
+                    <div className="flex flex-col p-4 w-full">
+                      {favoriteProducts.length > 0 && (
+                        <>
+                          <h4 className="flex items-center gap-2 text-[14px] font-bold text-slate-800 m-0 mb-3"><TrendingUp size={16} className="text-blue-500" /> Xu hướng yêu thích</h4>
+                          <div className="flex flex-col mb-4">
+                            {favoriteProducts.map((product) => (
+                              <div key={product._id} className="flex items-center gap-3 py-2.5 px-2 cursor-pointer transition-colors duration-200 rounded-lg hover:bg-slate-50" onClick={() => { setIsSearchOpen(false); setSearchTerm(""); navigate(`/product/${product.slug || product._id}`); }}>
+                                <img src={product.colorImages?.[0]?.imageUrl || product.images?.[0] || "/no-image.png"} alt={product.name} className="w-10 h-10 object-contain rounded bg-white shrink-0 border border-slate-100 p-0.5" />
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-[13px] text-slate-800 m-0 mb-0.5 font-medium line-clamp-1">{product.name}</h4>
+                                  <span className="text-[12.5px] text-red-500 font-bold">{product.variants?.[0]?.price ? product.variants[0].price.toLocaleString("vi-VN") + "₫" : "Đang cập nhật"}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      )}
+
+                      {trendingProducts.length > 0 && (
+                        <>
+                          <h4 className="flex items-center gap-2 text-[14px] font-bold text-slate-800 m-0 mb-3"><Flame size={16} className="text-red-500" /> Sản phẩm trending</h4>
+                          <div className="flex flex-col">
+                            {trendingProducts.map((product) => (
+                              <div key={product._id} className="flex items-center gap-3 py-2.5 px-2 cursor-pointer transition-colors duration-200 rounded-lg hover:bg-slate-50" onClick={() => { setIsSearchOpen(false); setSearchTerm(""); navigate(`/product/${product.slug || product._id}`); }}>
+                                <img src={product.colorImages?.[0]?.imageUrl || product.images?.[0] || "/no-image.png"} alt={product.name} className="w-10 h-10 object-contain rounded bg-white shrink-0 border border-slate-100 p-0.5" />
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-[13px] text-slate-800 m-0 mb-0.5 font-medium line-clamp-1">{product.name}</h4>
+                                  <span className="text-[12.5px] text-red-500 font-bold">{product.variants?.[0]?.price ? product.variants[0].price.toLocaleString("vi-VN") + "₫" : "Đang cập nhật"}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ) : isSearching ? (
                     <div className="p-[15px] text-center text-slate-500 text-[14px]">Đang tìm kiếm...</div>
                   ) : searchResults.length > 0 ? (
                     <>
@@ -324,7 +404,7 @@ function Header({ preloadedProducts, isProductsReady = false }) {
 
                 {/* BOX THÔNG BÁO DROPDOWN */}
                 {isNotifyOpen && (
-                  <div className="absolute top-[130%] right-0 z-[99999] w-[360px] max-w-[92vw] cursor-default overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-[0_22px_45px_-28px_rgba(15,23,42,0.45)]">
+                  <div className="absolute top-[130%] -right-[50px] sm:-right-[10px] md:right-0 z-[99999] w-[320px] sm:w-[360px] max-w-[95vw] cursor-default overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-[0_22px_45px_-28px_rgba(15,23,42,0.45)]">
                     <div className="flex items-center justify-between border-b border-blue-100 bg-blue-50/60 px-4 py-3">
                       <div className="text-left">
                         <h4 className="m-0 text-[16px] font-bold text-slate-800">Thông báo</h4>
@@ -446,6 +526,7 @@ function Header({ preloadedProducts, isProductsReady = false }) {
                     className="w-full py-2.5 pr-10 pl-4 rounded-xl border border-slate-200 bg-white text-slate-700 outline-none text-[14px] focus:border-blue-500 shadow-sm"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    onFocus={() => setIsSearchOpen(true)}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                             handleSearch();
@@ -463,9 +544,45 @@ function Header({ preloadedProducts, isProductsReady = false }) {
                   />
 
                   {/* Dropdown for Mobile Search */}
-                  {isSearchOpen && (searchTerm.trim().length > 0) && (
+                  {isSearchOpen && (
                     <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white rounded-lg shadow-xl border border-slate-100 z-[99999] overflow-hidden flex flex-col">
-                      {isSearching ? (
+                      {searchTerm.trim().length === 0 ? (
+                        <div className="flex flex-col p-3 w-full max-h-[350px] overflow-y-auto">
+                          {favoriteProducts.length > 0 && (
+                            <>
+                              <h4 className="flex items-center gap-2 text-[13px] font-bold text-slate-800 m-0 mb-2.5"><TrendingUp size={14} className="text-blue-500" /> Xu hướng yêu thích</h4>
+                              <div className="flex flex-col mb-4">
+                                {favoriteProducts.map((product) => (
+                                  <div key={product._id} className="flex items-center gap-3 py-2 px-2 cursor-pointer border-b border-slate-50 last:border-none hover:bg-slate-50" onClick={() => { setIsSearchOpen(false); setSearchTerm(""); setIsMobileMenuOpen(false); navigate(`/product/${product.slug || product._id}`); }}>
+                                    <img src={product.colorImages?.[0]?.imageUrl || product.images?.[0] || "/no-image.png"} alt={product.name} className="w-8 h-8 object-contain rounded bg-white shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="text-[12px] text-slate-800 m-0 mb-0.5 font-medium line-clamp-1">{product.name}</h4>
+                                      <span className="text-[12px] text-red-500 font-bold">{product.variants?.[0]?.price ? product.variants[0].price.toLocaleString("vi-VN") + "₫" : ""}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </>
+                          )}
+
+                          {trendingProducts.length > 0 && (
+                            <>
+                              <h4 className="flex items-center gap-2 text-[13px] font-bold text-slate-800 m-0 mb-2.5"><Flame size={14} className="text-red-500" /> Sản phẩm trending</h4>
+                              <div className="flex flex-col">
+                                {trendingProducts.map((product) => (
+                                  <div key={product._id} className="flex items-center gap-3 py-2 px-2 cursor-pointer border-b border-slate-50 last:border-none hover:bg-slate-50" onClick={() => { setIsSearchOpen(false); setSearchTerm(""); setIsMobileMenuOpen(false); navigate(`/product/${product.slug || product._id}`); }}>
+                                    <img src={product.colorImages?.[0]?.imageUrl || product.images?.[0] || "/no-image.png"} alt={product.name} className="w-8 h-8 object-contain rounded bg-white shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                      <h4 className="text-[12px] text-slate-800 m-0 mb-0.5 font-medium line-clamp-1">{product.name}</h4>
+                                      <span className="text-[12px] text-red-500 font-bold">{product.variants?.[0]?.price ? product.variants[0].price.toLocaleString("vi-VN") + "₫" : ""}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ) : isSearching ? (
                         <div className="p-3 text-center text-slate-500 text-[13px]">Đang tìm...</div>
                       ) : searchResults.length > 0 ? (
                         <>

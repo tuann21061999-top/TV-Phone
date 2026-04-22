@@ -124,15 +124,25 @@ const Cart = () => {
 
   if (!cart || !cart.items || cart.items.length === 0) {
     return (
-      <div className="bg-[#f4f7fa] min-h-screen flex flex-col">
+      <div className="bg-[#f4f7fa] min-h-screen w-full relative overflow-x-hidden">
         <Header />
-        <main className="max-w-[1200px] mx-auto py-12 px-5 flex-1 flex flex-col items-center text-center">
-          <ShoppingCart size={70} className="text-slate-300 mb-5" />
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Giỏ hàng trống</h2>
-          <p className="text-slate-500 mb-8 max-w-sm">Hãy khám phá các ưu đãi hấp dẫn và thêm sản phẩm vào giỏ nhé!</p>
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-full font-bold shadow-lg" onClick={() => navigate("/")}>Bắt đầu mua sắm</button>
-          <div className="w-full mt-10"><AIRecommend /></div>
-        </main>
+        <div className="w-full h-full flex flex-col justify-start">
+          <main className="w-full max-w-[1200px] mx-auto py-10 px-4 text-center mt-6">
+            <div className="flex justify-center mb-5">
+              <ShoppingCart size={70} className="text-slate-300" />
+            </div>
+            <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-3">Giỏ hàng trống</h2>
+            <p className="text-sm md:text-base text-slate-500 mb-8 max-w-[280px] md:max-w-sm mx-auto leading-relaxed">
+              Hãy khám phá các ưu đãi hấp dẫn và thêm sản phẩm vào giỏ nhé!
+            </p>
+            <button className="bg-blue-600 text-white px-8 py-3.5 rounded-full font-bold shadow-lg md:text-base hover:bg-blue-700 transition" onClick={() => navigate("/")}>
+              Bắt đầu mua sắm
+            </button>
+            <div className="w-full mt-12 mb-6 block overflow-hidden">
+              <AIRecommend />
+            </div>
+          </main>
+        </div>
         <Footer />
       </div>
     );
@@ -141,9 +151,9 @@ const Cart = () => {
   const finalTotal = Math.max(0, cart.total - (appliedVoucher ? appliedVoucher.discountAmount : 0));
 
   return (
-    <div className="bg-[#f4f7fa] min-h-screen font-sans flex flex-col pb-24 lg:pb-0">
+    <div className="bg-[#f4f7fa] min-h-screen font-sans flex flex-col pb-24 lg:pb-0 max-w-[100vw] overflow-x-hidden w-full">
       <Header />
-      <main className="max-w-[1200px] mx-auto py-6 md:py-10 px-4 md:px-5 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 md:gap-[30px] flex-1 w-full">
+      <main className="max-w-[1200px] mx-auto py-6 md:py-10 px-4 md:px-5 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 md:gap-[30px] flex-1 w-full min-w-0">
 
         {/* --- DANH SÁCH SẢN PHẨM --- */}
         <div>
@@ -163,18 +173,18 @@ const Cart = () => {
                 {/* Thông tin */}
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm md:text-base font-bold text-slate-900 mb-0.5 md:mb-1 truncate">{item.name}</h3>
-                  <p className="text-xs md:text-[13px] text-slate-500 mb-1 md:mb-2">{item.color} | {item.storage}</p>
+                  <p className="text-xs md:text-[13px] text-slate-500 mb-1 md:mb-2 truncate">{item.color} | {item.storage}</p>
                   
-                  <div className="flex items-center justify-between mt-auto">
-                    <div className="text-blue-600 font-bold text-[14px] md:text-lg">
+                  <div className="flex flex-wrap sm:flex-nowrap items-center justify-between mt-auto gap-2 md:gap-0">
+                    <div className="text-blue-600 font-bold text-[14px] md:text-lg min-w-0 truncate">
                       {item.price.toLocaleString()}đ
                     </div>
                     
                     {/* Bộ tăng giảm số lượng (Mobile gọn hơn) */}
-                    <div className="flex items-center bg-slate-100 rounded-lg p-1 h-8 md:h-9">
-                      <button className="w-7 h-full flex items-center justify-center text-slate-500" onClick={() => handleUpdateQuantity(item._id, item.quantity - 1)}><Minus size={14}/></button>
-                      <span className="w-7 text-center font-bold text-sm text-slate-900">{item.quantity}</span>
-                      <button className="w-7 h-full flex items-center justify-center text-slate-500" onClick={() => handleUpdateQuantity(item._id, item.quantity + 1)}><Plus size={14}/></button>
+                    <div className="flex items-center shadow-sm bg-slate-100 rounded-lg p-[2px] md:p-1 h-8 md:h-9 shrink-0">
+                      <button className="w-6 md:w-7 h-full flex items-center justify-center text-slate-500 hover:text-blue-600 transition-colors bg-white rounded-md md:rounded-none md:bg-transparent shadow-sm md:shadow-none" onClick={() => handleUpdateQuantity(item._id, item.quantity - 1)}><Minus size={14}/></button>
+                      <span className="w-6 md:w-7 text-center font-bold text-[13px] md:text-sm text-slate-900">{item.quantity}</span>
+                      <button className="w-6 md:w-7 h-full flex items-center justify-center text-slate-500 hover:text-blue-600 transition-colors bg-white rounded-md md:rounded-none md:bg-transparent shadow-sm md:shadow-none" onClick={() => handleUpdateQuantity(item._id, item.quantity + 1)}><Plus size={14}/></button>
                     </div>
                   </div>
                 </div>
@@ -206,10 +216,10 @@ const Cart = () => {
                   value={voucherCode}
                   onChange={(e) => setVoucherCode(e.target.value)}
                   disabled={!!appliedVoucher}
-                  className="flex-1 h-11 px-4 border border-slate-200 rounded-xl bg-slate-50 outline-none focus:border-blue-500 disabled:opacity-50 text-sm"
+                  className="flex-1 min-w-0 h-11 px-3 md:px-4 border border-slate-200 rounded-xl bg-slate-50 outline-none focus:border-blue-500 disabled:opacity-50 text-[13px] md:text-sm"
                 />
                 {!appliedVoucher ? (
-                  <button className="bg-slate-900 text-white px-5 rounded-xl text-sm font-bold disabled:opacity-50" onClick={() => handleApplyVoucher()} disabled={applying || !voucherCode.trim()}>
+                  <button className="bg-slate-900 text-white px-4 md:px-5 shrink-0 rounded-xl text-[13px] md:text-sm font-bold disabled:opacity-50" onClick={() => handleApplyVoucher()} disabled={applying || !voucherCode.trim()}>
                     {applying ? "..." : "Dùng"}
                   </button>
                 ) : (
@@ -271,16 +281,16 @@ const Cart = () => {
       </main>
 
       {/* --- STICKY MOBILE CHECKOUT BAR --- */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white p-4 border-t border-slate-200 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-[100] flex items-center justify-between gap-4">
-        <div className="flex flex-col">
-          <span className="text-[11px] text-slate-500 font-medium">Tổng tiền</span>
-          <span className="text-lg font-black text-blue-600 leading-tight">{finalTotal.toLocaleString()}đ</span>
+      <div className="lg:hidden fixed bottom-0 left-0 w-full bg-white p-3 md:p-4 border-t border-slate-200 shadow-[0_-4px_15px_rgba(0,0,0,0.06)] z-[100] flex items-center justify-between gap-3 overflow-hidden">
+        <div className="flex flex-col min-w-0 shrink-0 max-w-[45%]">
+          <span className="text-[11px] text-slate-500 font-medium whitespace-nowrap">Tổng cộng</span>
+          <span className="text-base sm:text-lg font-black text-blue-600 leading-tight truncate">{finalTotal.toLocaleString()}đ</span>
         </div>
         <button 
-          className="flex-1 bg-blue-600 text-white py-3.5 rounded-xl font-bold text-sm shadow-md active:bg-blue-700"
+          className="flex-1 min-w-0 bg-blue-600 text-white py-3 sm:py-3.5 px-2 rounded-xl font-bold text-[13px] sm:text-sm shadow-lg shadow-blue-200 active:bg-blue-700 truncate"
           onClick={() => navigate('/checkout', { state: { items: cart.items, isBuyNow: false, appliedVoucher } })}
         >
-          ĐẶT HÀNG ({cart.items.length})
+          MUA HÀNG ({cart.items.length})
         </button>
       </div>
 

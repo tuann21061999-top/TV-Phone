@@ -57,10 +57,10 @@ function ContactPage() {
   }, [token]);
 
   useEffect(() => {
-    if (activeTab === "history" && token) {
+    if (token) {
       fetchMyFeedbacks();
     }
-  }, [activeTab, token, fetchMyFeedbacks]);
+  }, [token, fetchMyFeedbacks]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
