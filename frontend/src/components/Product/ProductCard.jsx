@@ -3,6 +3,7 @@ import { Star, ShoppingCart, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import axios from "axios";
+import { cloudinaryPresets } from "../../utils/cloudinary";
 
 function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
   const navigate = useNavigate();
@@ -125,8 +126,12 @@ function ProductCard({ product, isFavorited = false, onFavoriteToggle }) {
         </button>
 
         <img
-          src={product.images?.[0] || product.colorImages?.[0]?.imageUrl || "/no-image.png"}
+          src={cloudinaryPresets.thumbnail(product.images?.[0] || product.colorImages?.[0]?.imageUrl || "/no-image.png")}
           alt={product.name}
+          loading="lazy"
+          decoding="async"
+          width={300}
+          height={300}
           className="max-w-full max-h-full object-contain transition-transform duration-300 md:group-hover:scale-105"
         />
       </div>

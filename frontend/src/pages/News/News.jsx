@@ -3,8 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Calendar, Clock3, Eye, Flame, Search, User } from "lucide-react";
 import { toast } from "sonner";
-import Header from "../../components/Header/Header";
-import Footer from "../../components/Footer/Footer";
+import Header from "../../components/Layout/Header";
+import Footer from "../../components/Layout/Footer";
 
 const CATEGORIES = [
   "Tất cả",

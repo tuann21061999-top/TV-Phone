@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Countdown from "../Countdown/Countdown";
+import Countdown from "./Countdown";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { Loader2 } from "lucide-react";
