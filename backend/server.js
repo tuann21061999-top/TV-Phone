@@ -59,6 +59,14 @@ app.use(cors());
 app.use(express.json());
 
 // =============================
+// ✅ HEALTH CHECK ENDPOINT (PRE-WARMING)
+// =============================
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok", message: "Server is awake" });
+});
+
+
+// =============================
 // ✅ ROUTE TEST UPLOAD IMAGE
 // =============================
 app.post("/api/upload", upload.single("image"), async (req, res) => {

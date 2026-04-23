@@ -1,19 +1,19 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Header from "../../components/Header/Header";
-import Banner from "../../components/Banner/Banner";
+import Header from "../../components/Layout/Header";
+import Banner from "../../components/Home/Banner";
 import ProductGrid from "../../components/Product/ProductGrid";
-import Footer from "../../components/Footer/Footer";
-import Category from "../../components/Category/Category";
-import Features from "../../components/Features/Features";
+import Footer from "../../components/Layout/Footer";
+import Category from "../../components/Home/Category";
+import Features from "../../components/Home/Features";
 import Promotion from "../../components/Promotion/Promotion";
-import AIRecommend from "../../components/AIRecommend/AIRecommend";
-import AIAccessoryRecommend from "../../components/AIAccessoryRecommend/AIAccessoryRecommend";
-import NewArrivals from "../../components/NewArrivals/NewArrivals";
-import BrandShowcase from "../../components/BrandShowcase/BrandShowcase";
-import LatestNews from "../../components/LatestNews/LatestNews";
-import GlobalArticle from "../../components/GlobalArticle/GlobalArticle";
+import AIRecommend from "../../components/AI/AIRecommend";
+import AIAccessoryRecommend from "../../components/AI/AIAccessoryRecommend";
+import NewArrivals from "../../components/Home/NewArrivals";
+import BrandShowcase from "../../components/Home/BrandShowcase";
+import LatestNews from "../../components/Home/LatestNews";
+import GlobalArticle from "../../components/Home/GlobalArticle";
 
 function Home() {
   const [homeProducts, setHomeProducts] = useState([]);

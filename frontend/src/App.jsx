@@ -1,50 +1,56 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { Toaster } from "sonner";
 
 import Home from "./pages/Home/Home";
-import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
-import AdminRoute from "./components/AdminRoute/AdminRoute";
-import PageTransition from "./components/PageTransition/PageTransition";
+import ScrollToTop from "./components/Common/ScrollToTop";
+import AdminRoute from "./components/Common/AdminRoute";
+import PageTransition from "./components/Common/PageTransition";
 import "./App.css";
 
 // Lazy-load route components to keep the initial bundle small.
-const PhonePage = lazy(() => import("./components/PhonePage/PhonePage"));
-const ElectronicPage = lazy(() => import("./components/ElectronicPage/ElectronicPage"));
-const AccessoryPage = lazy(() => import("./components/AccessoryPage/AccessoryPage"));
-const Promotions = lazy(() => import("./pages/Promotions/Promotions"));
-const ContactPage = lazy(() => import("./pages/ContactPage/ContactPage"));
+const PhonePage = lazy(() => import("./pages/Products/PhonePage"));
+const ElectronicPage = lazy(() => import("./pages/Products/ElectronicPage"));
+const AccessoryPage = lazy(() => import("./pages/Products/AccessoryPage"));
+const Promotions = lazy(() => import("./pages/Static/Promotions"));
+const ContactPage = lazy(() => import("./pages/Static/ContactPage"));
 const News = lazy(() => import("./pages/News/News"));
-const NewsDetail = lazy(() => import("./pages/NewsDetail/NewsDetail"));
-const ProductDetail = lazy(() => import("./pages/ProductDetail/ProductDetail"));
-const SearchPage = lazy(() => import("./pages/SearchPage/SearchPage"));
-const SpecDetail = lazy(() => import("./pages/SpecDetail/SpecDetail"));
-const ProductCompare = lazy(() => import("./pages/ProductCompare/ProductCompare"));
-const ReviewPage = lazy(() => import("./pages/ReviewPage/ReviewPage"));
-const Cart = lazy(() => import("./components/Cart/Cart"));
-const LoginPage = lazy(() => import("./components/LoginPages/LoginPage"));
-const RegisterPage = lazy(() => import("./components/RegisterPage/RegisterPage"));
-const ForgotPassword = lazy(() => import("./components/LoginPages/ForgotPassword"));
-const Profile = lazy(() => import("./components/Profile/Profile"));
+const NewsDetail = lazy(() => import("./pages/News/NewsDetail"));
+const ProductDetail = lazy(() => import("./pages/Products/ProductDetail"));
+const SearchPage = lazy(() => import("./pages/Products/SearchPage"));
+const SpecDetail = lazy(() => import("./pages/Products/SpecDetail"));
+const ProductCompare = lazy(() => import("./pages/Products/ProductCompare"));
+const ReviewPage = lazy(() => import("./pages/Products/ReviewPage"));
+const Cart = lazy(() => import("./components/Common/Cart"));
+const LoginPage = lazy(() => import("./pages/Auth/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/Auth/RegisterPage"));
+const ForgotPassword = lazy(() => import("./pages/Auth/ForgotPassword"));
+const Profile = lazy(() => import("./pages/User/Profile"));
 const AdminPage = lazy(() => import("./pages/Admin/AdminPage"));
-const ManageProduct = lazy(() => import("./components/ManageProduct/ManagePhone"));
-const ManageElectronic = lazy(() => import("./components/ManageProduct/ManageElectronic"));
-const ManageAccessory = lazy(() => import("./components/ManageProduct/ManageAccessory"));
-const AddressModal = lazy(() => import("./components/Profile/AddressModal"));
-const CheckoutPage = lazy(() => import("./pages/CheckoutPage/CheckoutPage"));
-const Payment = lazy(() => import("./pages/Payment/Payment"));
-const PaymentResult = lazy(() => import("./pages/PaymentResult/PaymentResult"));
-const ManageOrder = lazy(() => import("./components/ManageOrder/ManageOrder"));
-const OrderDetail = lazy(() => import("./pages/OrderDetail/OrderDetail"));
-const ReviewOrder = lazy(() => import("./pages/ReviewOrder/ReviewOrder"));
-const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy/PrivacyPolicy"));
-const TermsOfService = lazy(() => import("./pages/TermsOfService/TermsOfService"));
-const GlobalDeliveryConfirm = lazy(() => import("./components/GlobalDeliveryConfirm/GlobalDeliveryConfirm"));
-const ChatWidget = lazy(() => import("./components/ChatWidget/ChatWidget"));
+const ManageProduct = lazy(() => import("./pages/Manage/ManagePhone"));
+const ManageElectronic = lazy(() => import("./pages/Manage/ManageElectronic"));
+const ManageAccessory = lazy(() => import("./pages/Manage/ManageAccessory"));
+const AddressModal = lazy(() => import("./pages/User/AddressModal"));
+const CheckoutPage = lazy(() => import("./pages/Order/CheckoutPage"));
+const Payment = lazy(() => import("./pages/Order/Payment"));
+const PaymentResult = lazy(() => import("./pages/Order/PaymentResult"));
+const ManageOrder = lazy(() => import("./pages/Manage/ManageOrder"));
+const OrderDetail = lazy(() => import("./pages/Order/OrderDetail"));
+const ReviewOrder = lazy(() => import("./pages/Order/ReviewOrder"));
+const PrivacyPolicy = lazy(() => import("./pages/Static/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/Static/TermsOfService"));
+const GlobalDeliveryConfirm = lazy(() => import("./components/Common/GlobalDeliveryConfirm"));
+const ChatWidget = lazy(() => import("./components/Common/ChatWidget"));
 
 function App() {
   const location = useLocation();
+
+  useEffect(() => {
+    // Đánh thức server ngầm (Pre-warming) cho Render Free Tier
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    fetch(`${apiUrl}/api/health`).catch(() => {});
+  }, []);
 
   return (
     <>
