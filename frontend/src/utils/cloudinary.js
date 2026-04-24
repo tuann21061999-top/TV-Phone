@@ -53,7 +53,7 @@ export const cloudinaryPresets = {
   medium: (url) => optimizeCloudinaryUrl(url, { width: 600, quality: 'auto' }),
 
   /** Ảnh lớn (banner, hero) */
-  banner: (url) => optimizeCloudinaryUrl(url, { width: 1000, quality: 'auto:good' }),
+  banner: (url) => optimizeCloudinaryUrl(url, { width: 1920, quality: 'auto:best' }),
 
   /** Ảnh avatar nhỏ */
   avatar: (url) => optimizeCloudinaryUrl(url, { width: 100, quality: 'auto', crop: 'fill' }),

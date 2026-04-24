@@ -48,7 +48,7 @@ function Banner() {
   const currentTheme = getBannerStyles(activeBanner.theme);
 
   // Chiều cao cố định cho grid dưới (sub-banner & promotion phải bằng nhau)
-  const GRID_H = "h-[160px] md:h-[220px]";
+  const GRID_H = "h-[180px] sm:h-[200px] md:h-[240px]";
 
   return (
     <section className="w-full max-w-[1200px] mx-auto px-3 md:px-0">
@@ -78,7 +78,7 @@ function Banner() {
       </style>
 
       {/* ===== MAIN BANNER - Chiều cao cố định, text tự co ===== */}
-      <div className={`relative w-full rounded-2xl overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.07)] border flex flex-col-reverse md:flex-row items-stretch h-[240px] md:h-[340px] lg:h-[380px] group transition-all duration-1000 ease-in-out ${currentTheme.bg}`}>
+      <div className={`relative w-full rounded-2xl overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.07)] border flex flex-col-reverse md:flex-row items-stretch aspect-[3/1] md:aspect-auto md:h-[340px] lg:h-[380px] group transition-all duration-1000 ease-in-out ${currentTheme.bg}`}>
         
         {/* Background Blobs */}
         <div className={`absolute top-0 right-0 w-[250px] h-[250px] md:w-[500px] md:h-[500px] rounded-full mix-blend-multiply filter blur-[50px] md:blur-[90px] opacity-70 translate-x-1/4 -translate-y-1/4 pointer-events-none transition-colors duration-1000 animate-[spin_30s_linear_infinite] ${currentTheme.blob1}`}></div>
@@ -87,11 +87,17 @@ function Banner() {
         {/* Nút điều hướng (PC) */}
         {mainBanners.length > 1 && (
           <>
-            <button className="absolute top-1/2 -translate-y-1/2 left-3 w-9 h-9 rounded-full bg-white/70 border border-white backdrop-blur-md hidden md:flex items-center justify-center cursor-pointer z-20 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:bg-white hover:scale-110 hover:text-blue-600 text-slate-700" onClick={prevSlide}>
-              <ChevronLeft size={20} />
+            <button 
+              className="absolute top-1/2 -translate-y-1/2 left-2 md:left-3 w-7 h-7 md:w-9 md:h-9 rounded-full bg-white/70 border border-white backdrop-blur-md flex items-center justify-center cursor-pointer z-20 shadow-md transition-all opacity-100 md:opacity-0 group-hover:opacity-100 hover:bg-white hover:scale-110 hover:text-blue-600 text-slate-700" 
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); prevSlide(); }}
+            >
+              <ChevronLeft size={16} className="md:w-5 md:h-5" />
             </button>
-            <button className="absolute top-1/2 -translate-y-1/2 right-3 w-9 h-9 rounded-full bg-white/70 border border-white backdrop-blur-md hidden md:flex items-center justify-center cursor-pointer z-20 shadow-md transition-all opacity-0 group-hover:opacity-100 hover:bg-white hover:scale-110 hover:text-blue-600 text-slate-700" onClick={nextSlide}>
-              <ChevronRight size={20} />
+            <button 
+              className="absolute top-1/2 -translate-y-1/2 right-2 md:right-3 w-7 h-7 md:w-9 md:h-9 rounded-full bg-white/70 border border-white backdrop-blur-md flex items-center justify-center cursor-pointer z-20 shadow-md transition-all opacity-100 md:opacity-0 group-hover:opacity-100 hover:bg-white hover:scale-110 hover:text-blue-600 text-slate-700" 
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); nextSlide(); }}
+            >
+              <ChevronRight size={16} className="md:w-5 md:h-5" />
             </button>
           </>
         )}
