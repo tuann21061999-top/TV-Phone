@@ -53,7 +53,7 @@ function Promotion({ isCompact = false }) {
   return (
     <section className={`relative bg-gradient-to-br from-slate-900 to-blue-900 text-white flex overflow-hidden shadow-[0_8px_24px_rgba(30,58,138,0.25)]
       ${isCompact 
-        ? "w-full h-full rounded-xl flex-row items-center justify-between px-4 py-3 md:px-5 gap-2" 
+        ? "w-full h-full rounded-xl flex-row items-center justify-between px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 gap-1 md:gap-4" 
         : "w-[92%] md:w-[90%] max-w-[1200px] mx-auto my-6 md:my-[50px] rounded-xl flex-col md:flex-row items-center justify-between px-4 py-5 md:px-10 md:py-8 gap-4 md:gap-8"}
     `}>
 
@@ -61,33 +61,33 @@ function Promotion({ isCompact = false }) {
       <div className="absolute -top-1/2 -left-[10%] w-[200px] h-[200px] md:w-[400px] md:h-[400px] bg-[radial-gradient(circle,rgba(59,130,246,0.35)_0%,rgba(15,23,42,0)_70%)] pointer-events-none z-[1]" />
 
       {/* CONTENT LEFT */}
-      <div className="relative z-[2] flex-1 flex flex-col gap-1 md:gap-1.5 items-start text-left w-full min-w-0 overflow-hidden">
+      <div className="relative z-[2] flex-1 flex flex-col gap-0.5 md:gap-1.5 items-start text-left w-full min-w-0 overflow-hidden">
 
-        {/* Badge */}
-        <div className="bg-white/10 border border-white/20 px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-bold tracking-wide text-yellow-400 backdrop-blur w-fit shrink-0">
+        {/* Badge (Chỉ hiện trên desktop nếu isCompact để tiết kiệm diện tích mobile) */}
+        <div className={`${isCompact ? "hidden md:flex" : "flex"} bg-white/10 border border-white/20 px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-bold tracking-wide text-yellow-400 backdrop-blur w-fit shrink-0`}>
           ⚡ FLASH SALE
         </div>
 
         {/* Tiêu đề */}
-        <h2 className={`${isCompact ? "text-[12px] md:text-[15px]" : "text-sm md:text-[22px]"} font-extrabold leading-tight m-0 line-clamp-1`}>
+        <h2 className={`${isCompact ? "text-[12px] md:text-[18px]" : "text-sm md:text-[22px]"} font-extrabold leading-tight m-0 line-clamp-1 text-yellow-400 md:text-white`}>
           {bestProduct.isShockDeal
-            ? "FLASH SALE"
+            ? "⚡ FLASH SALE"
             : bestPricing.discountPercent > 0
             ? "Giảm Giá Khủng"
             : "Sản Phẩm Đỉnh Cao"}
         </h2>
 
         {/* THÔNG TIN SẢN PHẨM */}
-        <div className="bg-white/5 p-1.5 md:p-2 rounded-md border-l-2 border-yellow-400 w-full flex flex-col items-start">
-          <h3 className="text-[10px] md:text-[12px] font-semibold text-slate-200 mb-0 line-clamp-1">
+        <div className="bg-white/5 p-1 md:p-2 rounded-md border-l-2 border-yellow-400 w-full flex flex-col items-start">
+          <h3 className="text-[10px] md:text-[13px] font-semibold text-slate-200 mb-0 line-clamp-1">
             {bestProduct.productName}
           </h3>
-          <div className="flex items-baseline gap-1.5">
-            <span className={`${isCompact ? "text-[14px] md:text-[17px]" : "text-[16px] md:text-[20px]"} font-extrabold text-yellow-400 leading-none`}>
+          <div className="flex items-baseline gap-1.5 mt-0.5 md:mt-1">
+            <span className={`${isCompact ? "text-[13px] md:text-[18px]" : "text-[16px] md:text-[20px]"} font-extrabold text-yellow-400 leading-none`}>
               {bestPricing.finalPrice.toLocaleString()}đ
             </span>
             {bestPricing.discountPercent > 0 && (
-              <span className="text-[8px] md:text-[10px] line-through text-slate-400 font-medium">
+              <span className="text-[8px] md:text-[11px] line-through text-slate-400 font-medium">
                 {bestPricing.basePrice.toLocaleString()}đ
               </span>
             )}
@@ -112,7 +112,7 @@ function Promotion({ isCompact = false }) {
 
         {/* ĐỒNG HỒ ĐẾM NGƯỢC */}
         {bestPricing.discountPercent > 0 && (
-          <div className="transform scale-[0.55] md:scale-[0.7] origin-left w-full">
+          <div className="transform scale-[0.45] sm:scale-[0.55] md:scale-[0.7] origin-left w-full -mt-2 -mb-2.5 md:-mt-1 md:-mb-2">
             <Countdown targetDate={bestPricing.targetEnd} />
           </div>
         )}
@@ -121,7 +121,7 @@ function Promotion({ isCompact = false }) {
         <Link
           to={`/product/${bestProduct.slug || bestProduct.productId}`}
           className={`inline-flex items-center justify-center bg-yellow-400 text-slate-900 font-bold rounded-lg hover:bg-yellow-500 hover:-translate-y-[1px] transition-all shadow-md shrink-0 no-underline
-            ${isCompact ? "px-3 py-1.5 text-[9px] md:text-[11px] md:px-4 md:py-2" : "px-4 py-2 text-[11px] md:text-[13px] mt-1"}`}
+            ${isCompact ? "px-2.5 py-1 text-[9px] md:text-[13px] md:px-5 md:py-1.5" : "px-4 py-2 text-[11px] md:text-[13px] mt-1"}`}
         >
           Xem ngay kẻo lỡ
         </Link>
@@ -130,7 +130,7 @@ function Promotion({ isCompact = false }) {
       {/* IMAGE RIGHT */}
       <div className={`relative z-[2] flex justify-center items-center shrink-0`}>
         <div className={`relative animate-[float_6s_ease-in-out_infinite] 
-          ${isCompact ? "w-[90px] h-[90px] md:w-[140px] md:h-[140px]" : "w-[140px] h-[140px] md:w-[260px] md:h-[260px]"}
+          ${isCompact ? "w-[75px] h-[75px] sm:w-[90px] sm:h-[90px] md:w-[140px] md:h-[140px]" : "w-[140px] h-[140px] md:w-[260px] md:h-[260px]"}
         `}>
           
           <div className="absolute inset-0 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_6px_16px_rgba(0,0,0,0.18)]">
