@@ -3,6 +3,7 @@ import { Download, Wallet, ShoppingBag, Users, LineChart as ChartIcon, TrendingU
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const AdminDashboard = () => {
   const [data, setData] = useState({
@@ -65,6 +66,48 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleExportReport = () => {
+    try {
+      // Thêm BOM để Excel đọc được tiếng Việt (UTF-8)
+      let csvContent = "\uFEFF"; 
+      
+      // 1. Overview
+      csvContent += "TỔNG QUAN HỆ THỐNG\n";
+      csvContent += "Tổng Doanh Thu,Tổng Lợi Nhuận Gộp,Đơn Hàng Mới,Tổng Khách Hàng\n";
+      csvContent += `"${data.overview.totalRevenue}","${data.overview.totalProfit}","${data.overview.totalOrders}","${data.overview.totalUsers}"\n\n`;
+
+      // 2. Chart Data
+      csvContent += "CHI TIẾT DOANH THU\n";
+      csvContent += "Thời gian,Doanh thu\n";
+      data.chartData.forEach(row => {
+        csvContent += `"${row.name}","${row.revenue}"\n`;
+      });
+      csvContent += "\n";
+
+      // 3. Top Products
+      csvContent += "TOP SẢN PHẨM BÁN CHẠY\n";
+      csvContent += "Tên sản phẩm,Lượt bán,Doanh thu\n";
+      data.topProducts.forEach(prod => {
+        csvContent += `"${prod.name}","${prod.sales}","${prod.revenue}"\n`;
+      });
+
+      // Tạo Blob và tự động tải xuống
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Bao_Cao_Doanh_Thu_${new Date().toLocaleDateString('vi-VN').replace(/\//g, '-')}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success("Xuất báo cáo thành công!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Lỗi khi xuất báo cáo!");
+    }
+  };
+
   if (loading) return <div className="dashboard-loading">Đang tổng hợp dữ liệu từ hệ thống...</div>;
 
   return (
@@ -76,7 +119,7 @@ const AdminDashboard = () => {
           <h1 className="text-2xl font-bold text-slate-900 mb-1">Tổng quan hệ thống</h1>
           <p className="text-sm text-slate-500 m-0">Dữ liệu được cập nhật theo thời gian thực (Real-time) từ các đơn hàng thành công.</p>
         </div>
-        <button className="flex items-center gap-2 bg-white border border-slate-200 text-blue-600 font-semibold py-2 px-4 rounded-lg hover:bg-blue-50 transition-colors shadow-sm shrink-0">
+        <button onClick={handleExportReport} className="flex items-center gap-2 bg-white border border-slate-200 text-blue-600 font-semibold py-2 px-4 rounded-lg hover:bg-blue-50 transition-colors shadow-sm shrink-0 cursor-pointer">
           <Download size={18} /> Xuất báo cáo
         </button>
       </div>

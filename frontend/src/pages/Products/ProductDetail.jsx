@@ -370,7 +370,7 @@ function ProductDetail() {
 
       if (res.status === 200) {
         toast.success("Đã thêm vào giỏ hàng thành công!");
-        setTimeout(() => navigate("/cart"), 1000);
+        window.dispatchEvent(new Event("cartUpdated"));
       }
     } catch (error) {
       console.error("Lỗi thêm vào giỏ:", error);

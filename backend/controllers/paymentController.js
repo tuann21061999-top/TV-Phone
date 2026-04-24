@@ -29,10 +29,12 @@ class PaymentController {
 
       // --- XỬ LÝ VNPAY ---
       if (paymentMethod === "VNPAY") {
+        // Thêm timestamp để tránh trùng TxnRef khi user thanh toán lại
+        const txnRef = `${order._id}_${Date.now()}`;
         const vnpUrl = vnpay.buildPaymentUrl({
           vnp_Amount: amount,
           vnp_IpAddr: req.headers["x-forwarded-for"] || req.connection.remoteAddress || "127.0.0.1",
-          vnp_TxnRef: order._id.toString(), 
+          vnp_TxnRef: txnRef, 
           vnp_OrderInfo: `Thanh toan don hang ${order._id}`,
           vnp_OrderType: ProductCode.Other,
           // SỬ DỤNG BIẾN MÔI TRƯỜNG BACKEND
@@ -122,50 +124,41 @@ class PaymentController {
   // ==========================================
   async vnpayCallback(req, res) {
     try {
-      let vnp_Params = req.query;
-      const secureHash = vnp_Params['vnp_SecureHash'];
+      // Sử dụng verifyReturnUrl của thư viện vnpay thay vì verify thủ công
+      const verify = vnpay.verifyReturnUrl(req.query);
 
-      delete vnp_Params['vnp_SecureHash'];
-      delete vnp_Params['vnp_SecureHashType'];
+      // Trích xuất orderId thực từ TxnRef (format: orderId_timestamp)
+      const txnRef = verify.vnp_TxnRef || req.query['vnp_TxnRef'] || '';
+      const orderId = txnRef.includes('_') ? txnRef.split('_')[0] : txnRef;
 
-      vnp_Params = Object.keys(vnp_Params).sort().reduce((result, key) => {
-        result[key] = vnp_Params[key];
-        return result;
-      }, {});
-
-      const secretKey = "O6J4Z89F24EL7WDPFXJEJBX47AGBLQVO";
-      const signData = qs.stringify(vnp_Params, { encode: false });
-      const hmac = crypto.createHmac("sha512", secretKey);
-      const signed = hmac.update(Buffer.from(signData, 'utf-8')).digest("hex");
-
-      const orderId = vnp_Params['vnp_TxnRef'];
-
-      if (secureHash === signed || req.hostname === 'localhost' || req.hostname === '127.0.0.1') {
-        if (vnp_Params['vnp_ResponseCode'] === "00") {
-          const order = await Order.findById(orderId);
-          if (order && order.status === "pending") {
-            order.status = "paid";
-            order.isPaid = true;
-            order.paidAt = new Date();
-            await order.save();
-
-            for (const item of order.items) {
-              await Product.updateOne(
-                { _id: item.productId, "variants._id": item.variantId },
-                { $inc: { "variants.$.quantity": -item.quantity, totalSold: item.quantity } }
-              );
-            }
-          }
-          // SỬ DỤNG BIẾN MÔI TRƯỜNG FRONTEND
-          return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=success&orderId=${orderId}`);
-        } else {
-          await Order.findByIdAndUpdate(orderId, { status: "unsuccessful" });
-          return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=error`);
-        }
-      } else {
+      if (!verify.isVerified) {
+        console.error('VNPay signature verification failed');
         return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=invalid_signature`);
       }
+
+      if (verify.isSuccess) {
+        const order = await Order.findById(orderId);
+        if (order && order.status === "pending") {
+          order.status = "paid";
+          order.isPaid = true;
+          order.paidAt = new Date();
+          await order.save();
+
+          for (const item of order.items) {
+            await Product.updateOne(
+              { _id: item.productId, "variants._id": item.variantId },
+              { $inc: { "variants.$.quantity": -item.quantity, totalSold: item.quantity } }
+            );
+          }
+        }
+        // SỬ DỤNG BIẾN MÔI TRƯỜNG FRONTEND
+        return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=success&orderId=${orderId}`);
+      } else {
+        await Order.findByIdAndUpdate(orderId, { status: "unsuccessful" });
+        return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=error`);
+      }
     } catch (error) {
+      console.error('VNPay callback error:', error);
       return res.redirect(`${process.env.FRONTEND_URL}/payment-result?status=error`);
     }
   }

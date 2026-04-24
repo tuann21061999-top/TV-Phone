@@ -13,6 +13,7 @@ import ManageVoucher from "../Manage/ManageVoucher";
 import ManagePromotions from "../Manage/ManagePromotions";
 import ManageNews from "../Manage/ManageNews";
 import ManageTags from "../Manage/ManageTags";
+import ManageCategory from "../Manage/ManageCategory";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import axios from "axios";
@@ -22,7 +23,7 @@ import {
   ShoppingBag, FileText, Users, BarChart3,
   Package, Smartphone, MousePointer2, Settings,
   LogOut, LayoutDashboard, MessageSquare, Ticket, Flame,
-  Newspaper, Tag, Menu, X
+  Newspaper, Tag, FolderTree, Menu, X
 } from "lucide-react";
 
 function AdminPage() {
@@ -119,6 +120,7 @@ function AdminPage() {
       case "promotions": return "Khuyến mãi (Variant Cấu hình)";
       case "news": return "Quản lý Tin tức";
       case "tags": return "Quản lý Tags";
+      case "categories": return "Quản lý Danh mục";
       default: return "Bảng điều khiển";
     }
   };
@@ -197,6 +199,7 @@ function AdminPage() {
               { tab: "products", icon: <Smartphone size={18} />, label: "Điện thoại" },
               { tab: "electronics", icon: <ShoppingBag size={18} />, label: "Đồ điện tử" },
               { tab: "accessories", icon: <MousePointer2 size={18} />, label: "Phụ kiện" },
+              { tab: "categories", icon: <FolderTree size={18} />, label: "Quản lý Danh mục" },
               { tab: "tags", icon: <Tag size={18} />, label: "Quản lý Tags" },
             ].map(({ tab, icon, label }) => (
               <button
@@ -309,6 +312,7 @@ function AdminPage() {
             {activeTab === "promotions" && <ManagePromotions />}
             {activeTab === "news" && <ManageNews />}
             {activeTab === "tags" && <ManageTags />}
+            {activeTab === "categories" && <ManageCategory />}
 
             {activeTab === "users" && (
               <div className="flex flex-col items-center justify-center px-5 py-20 text-center text-slate-500 h-full bg-white rounded-2xl border border-dashed border-slate-300">

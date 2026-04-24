@@ -97,7 +97,10 @@ const Cart = () => {
         body: JSON.stringify({ itemId, quantity: newQty }),
       });
       const data = await res.json();
-      if(res.ok) setCart(data);
+      if(res.ok) {
+        setCart(data);
+        window.dispatchEvent(new Event("cartUpdated"));
+      }
     } catch (err) {
       toast.error("Lỗi cập nhật");
     }
@@ -114,7 +117,10 @@ const Cart = () => {
         method: "DELETE",
       });
       const data = await res.json();
-      if(res.ok) setCart(data);
+      if(res.ok) {
+        setCart(data);
+        window.dispatchEvent(new Event("cartUpdated"));
+      }
     } catch (err) {
       toast.error("Lỗi khi xóa");
     }
@@ -171,28 +177,31 @@ const Cart = () => {
                 </div>
 
                 {/* Thông tin */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm md:text-base font-bold text-slate-900 mb-0.5 md:mb-1 truncate">{item.name}</h3>
-                  <p className="text-xs md:text-[13px] text-slate-500 mb-1 md:mb-2 truncate">{item.color} | {item.storage}</p>
+                <div className="flex-1 min-w-0 flex flex-col justify-between h-full">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0">
+                      <h3 className="text-sm md:text-base font-bold text-slate-900 mb-0.5 md:mb-1 line-clamp-2">{item.name}</h3>
+                      <p className="text-xs md:text-[13px] text-slate-500 mb-0 truncate">{item.color} | {item.storage}</p>
+                    </div>
+                    {/* Nút xóa */}
+                    <button className="text-slate-400 hover:text-red-500 transition-colors p-1 shrink-0 -mt-1 -mr-1" onClick={() => handleRemoveItem(item._id)} title="Xóa">
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                   
-                  <div className="flex flex-wrap sm:flex-nowrap items-center justify-between mt-auto gap-2 md:gap-0">
-                    <div className="text-blue-600 font-bold text-[14px] md:text-lg min-w-0 truncate">
+                  <div className="flex items-end justify-between mt-3">
+                    <div className="text-blue-600 font-bold text-[15px] md:text-lg min-w-0 truncate">
                       {item.price.toLocaleString()}đ
                     </div>
                     
-                    {/* Bộ tăng giảm số lượng (Mobile gọn hơn) */}
-                    <div className="flex items-center shadow-sm bg-slate-100 rounded-lg p-[2px] md:p-1 h-8 md:h-9 shrink-0">
-                      <button className="w-6 md:w-7 h-full flex items-center justify-center text-slate-500 hover:text-blue-600 transition-colors bg-white rounded-md md:rounded-none md:bg-transparent shadow-sm md:shadow-none" onClick={() => handleUpdateQuantity(item._id, item.quantity - 1)}><Minus size={14}/></button>
-                      <span className="w-6 md:w-7 text-center font-bold text-[13px] md:text-sm text-slate-900">{item.quantity}</span>
-                      <button className="w-6 md:w-7 h-full flex items-center justify-center text-slate-500 hover:text-blue-600 transition-colors bg-white rounded-md md:rounded-none md:bg-transparent shadow-sm md:shadow-none" onClick={() => handleUpdateQuantity(item._id, item.quantity + 1)}><Plus size={14}/></button>
+                    {/* Bộ tăng giảm số lượng */}
+                    <div className="flex items-center shadow-sm border border-slate-200 bg-white rounded-lg h-8 md:h-9 shrink-0 overflow-hidden">
+                      <button className="w-7 md:w-8 h-full flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors" onClick={() => handleUpdateQuantity(item._id, item.quantity - 1)}><Minus size={14}/></button>
+                      <span className="w-7 md:w-8 text-center font-semibold text-[13px] md:text-sm text-slate-900 bg-slate-50 border-x border-slate-200 h-full flex items-center justify-center">{item.quantity}</span>
+                      <button className="w-7 md:w-8 h-full flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors" onClick={() => handleUpdateQuantity(item._id, item.quantity + 1)}><Plus size={14}/></button>
                     </div>
                   </div>
                 </div>
-
-                {/* Nút xóa */}
-                <button className="p-2 text-slate-300 hover:text-red-500 transition-colors" onClick={() => handleRemoveItem(item._id)}>
-                  <Trash2 size={18} />
-                </button>
               </div>
             ))}
           </div>

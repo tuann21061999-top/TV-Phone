@@ -85,12 +85,6 @@ function NewArrivals({ preloadedProducts, initialFavoriteIds, isProductsReady = 
           <h2 className="text-xl md:text-2xl font-bold text-slate-900 m-0">Sản phẩm mới về</h2>
           <p className="text-[13px] md:text-sm text-slate-500 m-0 mt-1">Cập nhật những sản phẩm mới nhất vừa về kho</p>
         </div>
-        <button
-          className="hidden sm:flex items-center gap-1.5 text-[13px] md:text-sm font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-4 py-2 cursor-pointer transition-all hover:bg-emerald-100 hover:-translate-y-0.5"
-          onClick={() => navigate("/search?q=")}
-        >
-          Xem tất cả <ArrowRight size={15} />
-        </button>
       </div>
 
       {/* PRODUCT GRID */}
