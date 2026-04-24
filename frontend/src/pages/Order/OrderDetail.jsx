@@ -265,18 +265,7 @@ const OrderDetail = () => {
               </div>
             </div>
 
-            {/* Banner Khuyến mãi */}
-            <div className="bg-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
-              <p className="text-[10px] font-extrabold text-blue-400 bg-blue-400/10 inline-block px-2 py-1 rounded mb-3 tracking-widest uppercase">Ưu đãi dành cho bạn</p>
-              <h4 className="m-0 mb-4 text-base font-bold">Giảm 10% cho đơn hàng tiếp theo</h4>
-              <div className="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-dashed border-white/20">
-                <span className="font-mono font-bold text-lg tracking-wider">VTNEXIS10</span>
-                <button className="bg-transparent border-none text-blue-400 flex items-center gap-1.5 cursor-pointer text-xs font-bold hover:text-blue-300">
-                  <Copy size={14}/> SAO CHÉP
-                </button>
-              </div>
-            </div>
+
 
           </div>
         </div>
