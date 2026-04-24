@@ -133,10 +133,17 @@ const ManageBanner = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.title || !formData.link) {
-      toast.error("Vui lòng nhập đủ Tiêu đề và Link!");
+    if (formData.position === 'sub_left' && !formData.title) {
+      toast.error("Vui lòng nhập Tiêu đề cho banner phụ!");
       return;
     }
+    if (!formData.link) {
+      toast.error("Vui lòng nhập Link!");
+      return;
+    }
+
+    // Nếu là banner chính, tự set title mặc định để không bị lỗi DB
+    const finalTitle = formData.position === 'main' ? (formData.title || "Banner Chính") : formData.title;
 
     // Nếu là thêm mới thì bắt buộc phải có ảnh
     if (!isEditing && !imageFile) {
@@ -149,7 +156,7 @@ const ManageBanner = () => {
       const token = localStorage.getItem("token");
       
       const submitData = new FormData();
-      submitData.append("title", formData.title);
+      submitData.append("title", finalTitle);
       submitData.append("subtitle", formData.subtitle);
       submitData.append("link", formData.link);
       submitData.append("newsLink", formData.newsLink || "");
@@ -290,15 +297,19 @@ const ManageBanner = () => {
               <div className="w-full md:w-[480px] border-r border-slate-200 flex flex-col">
                 <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1 [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-400">
               
-              <div className="mb-4">
-                <label className="block text-[13px] font-semibold text-slate-800 mb-2">Tiêu đề chính (Title) *</label>
-                <input type="text" name="title" value={formData.title} onChange={handleInputChange} placeholder="VD: iPhone 15 Pro Max mới nhất..." required className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
-              </div>
+              {formData.position === "sub_left" && (
+                <>
+                  <div className="mb-4">
+                    <label className="block text-[13px] font-semibold text-slate-800 mb-2">Tiêu đề chính (Title) *</label>
+                    <input type="text" name="title" value={formData.title} onChange={handleInputChange} placeholder="VD: iPhone 15 Pro Max mới nhất..." required className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
+                  </div>
 
-              <div className="mb-4">
-                <label className="block text-[13px] font-semibold text-slate-800 mb-2">Mô tả phụ (Subtitle)</label>
-                <input type="text" name="subtitle" value={formData.subtitle} onChange={handleInputChange} placeholder="VD: Giảm sốc 2 triệu đồng..." className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
-              </div>
+                  <div className="mb-4">
+                    <label className="block text-[13px] font-semibold text-slate-800 mb-2">Mô tả phụ (Subtitle)</label>
+                    <input type="text" name="subtitle" value={formData.subtitle} onChange={handleInputChange} placeholder="VD: Giảm sốc 2 triệu đồng..." className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
+                  </div>
+                </>
+              )}
 
               {/* KHU VỰC UPLOAD FILE ẢNH */}
               <div className="mb-4">
@@ -376,6 +387,7 @@ const ManageBanner = () => {
                     </div>
                     
                     {/* Ô tìm kiếm Bài Viết / Tin Tức */}
+                    {formData.position === "sub_left" && (
                     <div className="relative flex-1">
                       <Search size={16} color="#94A3B8" className="absolute left-3 top-1/2 -translate-y-1/2" />
                       <input 
@@ -421,6 +433,7 @@ const ManageBanner = () => {
                         </div>
                       )}
                     </div>
+                    )}
                   </div>
 
 
@@ -458,20 +471,24 @@ const ManageBanner = () => {
                     <option value="sub_left">Góc trái dưới (Khắc phục kích thước nhỏ)</option>
                   </select>
                 </div>
-                <div className="mb-4 flex-1">
-                  <label className="block text-[13px] font-semibold text-slate-800 mb-2">Chữ trên nút</label>
-                  <input type="text" name="buttonText" value={formData.buttonText} onChange={handleInputChange} placeholder="VD: Mua ngay" className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
-                </div>
-                <div className="mb-4 flex-1">
-                  <label className="block text-[13px] font-semibold text-slate-800 mb-2">Màu Gradient nền</label>
-                  <select name="theme" value={formData.theme} onChange={handleInputChange} className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors bg-white">
-                    <option value="blue">Xanh dương (Mặc định)</option>
-                    <option value="purple">Tím mộng mơ</option>
-                    <option value="rose">Hồng cam đỏ</option>
-                    <option value="emerald">Xanh lục ngọc</option>
-                    <option value="dark">Tối tinh tế</option>
-                  </select>
-                </div>
+                {formData.position === "sub_left" && (
+                  <>
+                    <div className="mb-4 flex-1">
+                      <label className="block text-[13px] font-semibold text-slate-800 mb-2">Chữ trên nút</label>
+                      <input type="text" name="buttonText" value={formData.buttonText} onChange={handleInputChange} placeholder="VD: Mua ngay" className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
+                    </div>
+                    <div className="mb-4 flex-1">
+                      <label className="block text-[13px] font-semibold text-slate-800 mb-2">Màu Gradient nền</label>
+                      <select name="theme" value={formData.theme} onChange={handleInputChange} className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors bg-white">
+                        <option value="blue">Xanh dương (Mặc định)</option>
+                        <option value="purple">Tím mộng mơ</option>
+                        <option value="rose">Hồng cam đỏ</option>
+                        <option value="emerald">Xanh lục ngọc</option>
+                        <option value="dark">Tối tinh tế</option>
+                      </select>
+                    </div>
+                  </>
+                )}
                 <div className="mb-4 w-[100px]">
                   <label className="block text-[13px] font-semibold text-slate-800 mb-2">Thứ tự</label>
                   <input type="number" name="order" value={formData.order} onChange={handleInputChange} min="0" className="w-full py-2.5 px-3.5 border border-slate-300 rounded-lg text-[14px] outline-none focus:border-blue-500 transition-colors" />
@@ -508,42 +525,54 @@ const ManageBanner = () => {
                 <h4 className="text-[13px] font-bold text-slate-500 uppercase tracking-widest mb-6 border-b border-slate-200 pb-2 w-full text-center">Bản xem trước (Live Preview)</h4>
                 
                 <div className="w-full xl:w-[120%] transform scale-[0.4] xl:scale-[0.55] origin-top my-4">
-                  <div className={`relative w-full rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.08)] border flex flex-col-reverse md:flex-row items-center min-h-[500px] group transition-all duration-1000 ease-in-out ${getBannerStyles(formData.theme).bg}`}>
-                    
-                    <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 translate-x-1/4 -translate-y-1/4 pointer-events-none transition-colors duration-1000 ${getBannerStyles(formData.theme).blob1}`}></div>
-                    <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 -translate-x-1/4 translate-y-1/4 pointer-events-none transition-colors duration-1000 ${getBannerStyles(formData.theme).blob2}`}></div>
-
-                    <div className="flex-1 w-full md:w-1/2 flex flex-col gap-6 z-10 px-8 pb-12 pt-4 md:p-14 lg:p-16 text-center md:text-left items-center md:items-start">
-                      <div className={`inline-flex items-center gap-1.5 text-[15px] font-bold tracking-wider px-5 py-2 rounded-full uppercase shadow-sm ${getBannerStyles(formData.theme).badge}`}>
-                        <Sparkles size={18} className="mb-[1.5px]" />
-                        Sản phẩm nổi bật
-                      </div>
-                      <h1 className={`text-[46px] lg:text-[62px] font-extrabold leading-[1.12] m-0 tracking-tight transition-colors duration-1000 drop-shadow-sm ${getBannerStyles(formData.theme).title}`}>
-                        {formData.title || "Tiêu đề Banner Mẫu"}
-                      </h1>
-                      <p className={`text-[20px] leading-relaxed m-0 md:max-w-[85%] font-medium transition-colors duration-1000 ${getBannerStyles(formData.theme).subtitle}`}>
-                        {formData.subtitle || "Mô tả phụ sẽ nằm ở phần này"}
-                      </p>
-                      
-                      <div className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto mt-8">
-                        <div className={`flex-1 sm:flex-none h-[64px] flex items-center justify-center gap-2 text-white px-12 rounded-2xl text-[18px] font-bold transition-all ${getBannerStyles(formData.theme).btn}`}>
-                          <ShoppingCart size={22} />
-                          {formData.buttonText || "Xem ngay"}
-                        </div>
-                        <div className={`flex-1 sm:flex-none h-[64px] flex items-center justify-center gap-2 bg-white/20 backdrop-blur-md px-12 rounded-2xl text-[18px] font-bold border border-white/40 shadow-[0_8px_20px_rgba(0,0,0,0.04)] ${formData.theme === "dark" ? "text-white border-slate-600" : "text-slate-700"}`}>
-                          Xem chi tiết <ArrowRight size={22} />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="w-full md:w-1/2 relative flex justify-center items-center py-16 z-10">
+                  {formData.position === "main" ? (
+                    <div className="relative w-full rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.08)] min-h-[500px] flex items-center justify-center bg-slate-900 border">
                       <img 
-                        src={imagePreview || "https://via.placeholder.com/600x500?text=ẢNH+MẪU"} 
+                        src={imagePreview || "https://via.placeholder.com/1200x500?text=ẢNH+BANNER+FULL"} 
                         alt="Preview" 
-                        className="w-[420px] lg:w-[500px] max-h-[500px] object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,0.25)] scale-110" 
+                        className="w-full h-full object-cover absolute inset-0" 
                       />
                     </div>
-                  </div>
+                  ) : (
+                    <div className={`relative w-full rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.08)] border flex flex-col-reverse md:flex-row items-center min-h-[500px] group transition-all duration-1000 ease-in-out ${getBannerStyles(formData.theme).bg}`}>
+                      
+                      <div className={`absolute top-0 right-0 w-[600px] h-[600px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 translate-x-1/4 -translate-y-1/4 pointer-events-none transition-colors duration-1000 ${getBannerStyles(formData.theme).blob1}`}></div>
+                      <div className={`absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full mix-blend-multiply filter blur-[100px] opacity-80 -translate-x-1/4 translate-y-1/4 pointer-events-none transition-colors duration-1000 ${getBannerStyles(formData.theme).blob2}`}></div>
+
+                      <div className="flex-1 w-full md:w-1/2 flex flex-col gap-6 z-10 px-8 pb-12 pt-4 md:p-14 lg:p-16 text-center md:text-left items-center md:items-start">
+                        <div className={`inline-flex items-center gap-1.5 text-[15px] font-bold tracking-wider px-5 py-2 rounded-full uppercase shadow-sm ${getBannerStyles(formData.theme).badge}`}>
+                          <Sparkles size={18} className="mb-[1.5px]" />
+                          Sản phẩm phụ
+                        </div>
+                        <h1 className={`text-[46px] lg:text-[62px] font-extrabold leading-[1.12] m-0 tracking-tight transition-colors duration-1000 drop-shadow-sm ${getBannerStyles(formData.theme).title}`}>
+                          {formData.title || "Tiêu đề Banner Mẫu"}
+                        </h1>
+                        <p className={`text-[20px] leading-relaxed m-0 md:max-w-[85%] font-medium transition-colors duration-1000 ${getBannerStyles(formData.theme).subtitle}`}>
+                          {formData.subtitle || "Mô tả phụ sẽ nằm ở phần này"}
+                        </p>
+                        
+                        <div className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto mt-8">
+                          <div className={`flex-1 sm:flex-none h-[64px] flex items-center justify-center gap-2 text-white px-12 rounded-2xl text-[18px] font-bold transition-all ${getBannerStyles(formData.theme).btn}`}>
+                            <ShoppingCart size={22} />
+                            {formData.buttonText || "Khám phá ngay"}
+                          </div>
+                          {formData.newsLink && (
+                            <div className={`flex-1 sm:flex-none h-[64px] flex items-center justify-center gap-2 bg-white/20 backdrop-blur-md px-12 rounded-2xl text-[18px] font-bold border border-white/40 shadow-[0_8px_20px_rgba(0,0,0,0.04)] ${formData.theme === "dark" ? "text-white border-slate-600" : "text-slate-700"}`}>
+                              Xem chi tiết <ArrowRight size={22} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="w-full md:w-1/2 relative flex justify-center items-center py-16 z-10">
+                        <img 
+                          src={imagePreview || "https://via.placeholder.com/600x500?text=ẢNH+MẪU"} 
+                          alt="Preview" 
+                          className="w-[420px] lg:w-[500px] max-h-[500px] object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,0.25)] scale-110" 
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
               </div>

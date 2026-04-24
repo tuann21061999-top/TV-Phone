@@ -96,65 +96,20 @@ function Banner() {
           </>
         )}
 
-        {/* TEXT (Trái) - flex-1 + overflow-hidden giữ chiều cao cố định */}
-        <div key={`text-${activeBanner._id}`} className="flex-1 w-full md:w-1/2 flex flex-col gap-1.5 md:gap-2.5 z-10 px-4 pb-6 pt-2 md:p-8 lg:p-10 text-center md:text-left items-center md:items-start justify-center overflow-hidden">
-          
-          {/* Badge */}
-          <div className={`inline-flex items-center gap-1 text-[9px] md:text-[11px] font-bold tracking-wider px-2.5 py-0.5 md:px-3 md:py-1 rounded-full uppercase animate-slideUpFade opacity-0 shrink-0 ${currentTheme.badge}`}>
-            <Sparkles size={10} className="md:w-[13px] md:h-[13px]" />
-            Sản phẩm nổi bật
-          </div>
-          
-          {/* Title - Dùng clamp() để tự co font theo chiều cao */}
-          <h1 
-            className={`font-extrabold leading-[1.15] m-0 tracking-tight animate-slideUpFade opacity-0 delay-100 transition-colors duration-1000 drop-shadow-sm line-clamp-2 ${currentTheme.title}`}
-            style={{ fontSize: "clamp(18px, 4vw, 42px)" }}
-          >
-            {activeBanner.title}
-          </h1>
-          
-          {/* Subtitle */}
-          <p 
-            className={`leading-relaxed m-0 md:max-w-[90%] animate-slideUpFade opacity-0 delay-200 transition-colors duration-1000 font-medium line-clamp-2 ${currentTheme.subtitle}`}
-            style={{ fontSize: "clamp(11px, 1.5vw, 15px)" }}
-          >
-            {activeBanner.subtitle}
-          </p>
-
-          {/* Buttons */}
-          <div className="flex flex-row gap-2 md:gap-3 w-full sm:w-auto mt-1 md:mt-3 animate-slideUpFade opacity-0 delay-200 shrink-0">
-            <Link 
-              to={activeBanner.link || "/"} 
-              className={`flex-1 sm:flex-none h-[34px] md:h-[42px] flex items-center justify-center gap-1 text-white no-underline px-4 md:px-7 rounded-lg md:rounded-xl text-[11px] md:text-[13px] font-bold cursor-pointer transition-all duration-300 hover:-translate-y-0.5 active:scale-95 ${currentTheme.btn}`}
-            >
-              <ShoppingCart size={14} className="md:w-4 md:h-4" />
-              {activeBanner.buttonText || "Mua ngay"}
-            </Link>
-            
-            {activeBanner.newsLink && (
-              <Link 
-                to={activeBanner.newsLink}
-                className={`flex-1 sm:flex-none h-[34px] md:h-[42px] flex items-center justify-center gap-1 bg-white/20 backdrop-blur-md no-underline px-4 md:px-7 rounded-lg md:rounded-xl text-[11px] md:text-[13px] font-bold border border-white/40 cursor-pointer transition-all duration-300 hover:-translate-y-0.5 active:scale-95 ${activeBanner.theme === "dark" ? "text-white border-slate-600 hover:bg-white/30" : "text-slate-700 hover:bg-white/40"}`}
-              >
-                Xem chi tiết
-                <ArrowRight size={14} className={`md:w-4 md:h-4 ${activeBanner.theme === "dark" ? "text-slate-300" : "text-slate-500"}`} />
-              </Link>
-            )}
-          </div>
-        </div>
-
-        {/* HÌNH ẢNH (Phải) */}
-        <div key={`img-${activeBanner._id}`} className="w-full md:w-[45%] relative flex justify-center items-center py-4 md:py-0 z-10 animate-scaleIn opacity-0 group-hover:scale-[1.03] transition-transform duration-700">
+        {/* TOÀN BỘ BANNER LÀ HÌNH ẢNH CÓ THỂ CLICK */}
+        <Link 
+          key={`img-${activeBanner._id}`} 
+          to={activeBanner.link || "/"}
+          className="w-full h-full relative z-10 block group-hover:scale-[1.01] transition-transform duration-700 overflow-hidden animate-scaleIn opacity-0"
+        >
           <img 
             src={cloudinaryPresets.banner(activeBanner.image)} 
             alt={activeBanner.title} 
             fetchpriority="high"
             decoding="sync"
-            width={340}
-            height={300}
-            className="w-[140px] sm:w-[180px] md:w-[280px] lg:w-[340px] max-h-[140px] sm:max-h-[200px] md:max-h-[300px] object-contain drop-shadow-[0_16px_30px_rgba(0,0,0,0.2)] animate-float" 
+            className="w-full h-full object-cover" 
           />
-        </div>
+        </Link>
 
         {/* PAGINATION DOTS */}
         {mainBanners.length > 1 && (
