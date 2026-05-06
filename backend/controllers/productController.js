@@ -63,17 +63,25 @@ exports.getAllProducts = async (req, res) => {
       ];
     }
 
-    const products = await Product.find(filter)
+    // Kích hoạt Vercel Edge Caching (Cache 60 giây ở máy chủ CDN Vercel)
+    res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+
+    let query = Product.find(filter)
       .populate("categoryId", "name")
       .sort({ createdAt: -1 });
 
-    // Không cần aggregate nữa, vì averageRating và reviewsCount đã được cache sẵn trong Product Model
+    // Tối ưu Payload: Tránh sập Vercel bằng cách chỉ lấy các trường thực sự cần thiết trên giao diện Khách
+    if (admin !== 'true') {
+      query = query.select('name slug brand productType condition isFeatured tags images colorImages variants averageRating reviewsCount totalSold highlights promotion isActive categoryId');
+    }
+
+    const products = await query.lean(); // .lean() giúp tốc độ truy vấn Mongoose nhanh gấp 5 lần
+
+    // Đảm bảo các thuộc tính số không bị undefined
     const enriched = products.map(p => {
-      const obj = p.toObject();
-      // Đảm bảo không undefined
-      obj.averageRating = obj.averageRating || 0;
-      obj.reviewsCount = obj.reviewsCount || 0;
-      return obj;
+      p.averageRating = p.averageRating || 0;
+      p.reviewsCount = p.reviewsCount || 0;
+      return p;
     });
 
     res.json(enriched);
