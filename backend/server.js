@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cron = require("node-cron");
 const http = require("http");
+const compression = require("compression");
 const { Server } = require("socket.io");
 dotenv.config();
 const cloudinary = require("./config/cloudinary");
@@ -57,6 +58,7 @@ const io = new Server(server, {
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(compression());
 
 // =============================
 // ✅ HEALTH CHECK ENDPOINT (PRE-WARMING)
