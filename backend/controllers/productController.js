@@ -31,8 +31,22 @@ exports.createProduct = async (req, res) => {
 /* =====================================
    GET ALL PRODUCTS (FILTER + SEARCH)
 ===================================== */
+// Khởi tạo bộ nhớ Cache trên RAM (In-Memory Cache)
+const productListCache = {};
+const CACHE_TTL = 30000; // Lưu Cache trong 30 giây
+
 exports.getAllProducts = async (req, res) => {
   try {
+    // 1. Dùng nguyên đường link URL (chứa các filter) làm chìa khóa lưu Cache
+    const cacheKey = req.originalUrl;
+    
+    // 2. Nếu có dữ liệu trong RAM và chưa quá 30 giây -> Trả về NGAY LẬP TỨC
+    if (productListCache[cacheKey] && (Date.now() - productListCache[cacheKey].timestamp < CACHE_TTL)) {
+      res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
+      res.set('X-Served-From', 'In-Memory-Cache'); // Đánh dấu để biết lấy từ RAM
+      return res.json(productListCache[cacheKey].data);
+    }
+
     const { type, productType, brand, search, condition, admin, tag } = req.query;
     const resolvedType = type || productType;
 
@@ -84,6 +98,13 @@ exports.getAllProducts = async (req, res) => {
       return p;
     });
 
+    // 3. LƯU KẾT QUẢ VÀO RAM TRƯỚC KHI TRẢ VỀ CHO KHÁCH (để những khách sau dùng)
+    productListCache[cacheKey] = {
+      data: enriched,
+      timestamp: Date.now()
+    };
+
+    res.set('X-Served-From', 'MongoDB');
     res.json(enriched);
   } catch (error) {
     res.status(500).json({ message: error.message });
