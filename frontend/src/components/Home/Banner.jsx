@@ -14,7 +14,8 @@ function Banner() {
     const fetchBanners = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/banners`); 
-        setBanners(res.data);
+        const data = res.data;
+        setBanners(Array.isArray(data) ? data : (data?.data || []));
       } catch (error) {
         console.error("Lỗi khi lấy banner:", error);
       }
