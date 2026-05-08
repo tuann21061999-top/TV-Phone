@@ -20,4 +20,9 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ✅ DATABASE INDEXES
+reviewSchema.index({ productId: 1, status: 1, createdAt: -1 });     // getProductReviews
+reviewSchema.index({ userId: 1, productId: 1 });                     // checkEligibility
+reviewSchema.index({ status: 1, rating: -1 });                       // getTopReviews
+
 module.exports = mongoose.model("Review", reviewSchema);

@@ -339,7 +339,7 @@ const orderController = {
       }
 
       // 1. TỔNG QUAN
-      const allDoneOrdersFiltered = await Order.find(matchStageForTotals);
+      const allDoneOrdersFiltered = await Order.find(matchStageForTotals).lean();
       let totalRevenue = 0;
       let totalImportCost = 0;
 
@@ -359,7 +359,7 @@ const orderController = {
 
       // 2. DỮ LIỆU BIỂU ĐỒ
       const chartData = [];
-      const ordersForChart = period === "year" ? await Order.find({ status: "done" }) : allDoneOrdersFiltered;
+      const ordersForChart = period === "year" ? await Order.find({ status: "done" }).lean() : allDoneOrdersFiltered;
 
       if (period === "day") {
         const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
@@ -379,7 +379,7 @@ const orderController = {
           chartData.push({ name: `THG ${m}`, revenue: monthRev });
         }
       } else {
-        const minOrder = await Order.findOne({ status: "done" }).sort({ createdAt: 1 });
+        const minOrder = await Order.findOne({ status: "done" }).sort({ createdAt: 1 }).lean();
         const startYear = minOrder ? minOrder.createdAt.getFullYear() : currentYear - 4;
         for (let y = startYear; y <= currentYear; y++) {
           const startOfYear = new Date(y, 0, 1);
@@ -425,7 +425,8 @@ const orderController = {
       const recentOrders = await Order.find()
         .sort({ createdAt: -1 })
         .limit(5)
-        .select("_id shippingInfo items createdAt total status paymentMethod");
+        .select("_id shippingInfo items createdAt total status paymentMethod")
+        .lean();
 
       res.status(200).json({
         overview: { totalRevenue, totalProfit, totalOrders: newOrdersCount, totalUsers },
@@ -444,7 +445,7 @@ const orderController = {
   getMyOrders: async (req, res) => {
     try {
       const userId = req.user.id;
-      const orders = await Order.find({ userId }).sort({ createdAt: -1 }).populate("items.productId", "slug");
+      const orders = await Order.find({ userId }).sort({ createdAt: -1 }).populate("items.productId", "slug").lean();
       res.status(200).json(orders);
     } catch (error) {
       res.status(500).json({ message: "Lỗi khi lấy lịch sử đơn hàng", error: error.message });
@@ -468,7 +469,7 @@ const orderController = {
 
   getAllOrdersAdmin: async (req, res) => {
     try {
-      const orders = await Order.find().sort({ createdAt: -1 });
+      const orders = await Order.find().sort({ createdAt: -1 }).lean();
       res.status(200).json(orders);
     } catch (error) {
       res.status(500).json({ message: "Lỗi server", error: error.message });

@@ -49,4 +49,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ✅ DATABASE INDEXES
+userSchema.index({ role: 1 });                                       // Admin lookups (chat)
+
 module.exports = mongoose.model("User", userSchema);

@@ -1,4 +1,5 @@
 const Category = require("../models/Category");
+const mongoose = require("mongoose");
 
 exports.createCategory = async (req, res, next) => {
   try {
@@ -18,7 +19,7 @@ exports.createCategory = async (req, res, next) => {
 
 exports.getCategories = async (req, res, next) => {
   try {
-    const categories = await Category.find().sort({ createdAt: -1 });
+    const categories = await Category.find().sort({ createdAt: -1 }).lean();
     res.json(categories);
   } catch (error) {
     next(error);

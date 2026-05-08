@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const cron = require("node-cron");
 const http = require("http");
 const compression = require("compression");
+const rateLimit = require("express-rate-limit");
 const { Server } = require("socket.io");
 dotenv.config();
 const cloudinary = require("./config/cloudinary");
@@ -50,15 +51,50 @@ const port = process.env.PORT || 5000;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Trong production nên giới hạn origin
+    origin: process.env.FRONTEND_URL || "*",
     methods: ["GET", "POST"],
   },
+  // ✅ TỐI ƯU SOCKET.IO CHO 512MB RAM
+  maxHttpBufferSize: 1e6,        // Giới hạn 1MB per message (tránh spam lớn)
+  pingTimeout: 30000,            // Timeout ping 30s
+  pingInterval: 25000,           // Ping mỗi 25s
+  transports: ['websocket', 'polling'], // Ưu tiên WebSocket, fallback polling
+  allowUpgrades: true,
+  perMessageDeflate: false,      // Tắt nén per-message để tiết kiệm CPU
+  httpCompression: false,        // compression middleware đã xử lý HTTP rồi
 });
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '5mb' })); // Giới hạn body size
 app.use(compression());
+
+// =============================
+// ✅ RATE LIMITING - CHỐNG QUÁ TẢI
+// =============================
+const apiLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,  // 1 phút
+  max: 100,                  // Tối đa 100 request/IP/phút
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Quá nhiều request, vui lòng thử lại sau 1 phút.' },
+});
+
+// Rate limit riêng cho AI endpoint (tốn tài nguyên hơn)
+const aiLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 20,                   // Chỉ 20 request AI/phút/IP
+  message: { message: 'Quá nhiều yêu cầu AI, vui lòng thử lại sau.' },
+});
+
+// Rate limit cho auth endpoints (chống brute force)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,  // 15 phút
+  max: 30,                   // 30 lần đăng nhập/15 phút
+  message: { message: 'Quá nhiều lần thử đăng nhập, vui lòng thử lại sau 15 phút.' },
+});
+
+app.use('/api/', apiLimiter);
 
 // =============================
 // ✅ HEALTH CHECK ENDPOINT (PRE-WARMING)
@@ -162,7 +198,7 @@ cron.schedule("*/5 * * * *", async () => {
 });
 
 // Routes chính
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/admin", adminRoutes);
@@ -176,7 +212,7 @@ app.use("/api/feedbacks", feedbackRoutes);
 app.use("/api/admin/inventory", inventoryRoutes);
 app.use("/api/vouchers", voucherRoutes);
 app.use("/api/chat", chatRoutes);
-app.use("/api/ai", aiRoutes);
+app.use("/api/ai", aiLimiter, aiRoutes);
 app.use("/api/promotions", promotionRoutes);
 app.use("/api/favorites", favoriteRoutes);
 app.use("/api/news", newsRoutes);
@@ -303,51 +339,54 @@ io.on("connection", (socket) => {
   });
 });
 
-// CRON JOB 2: Tự động chạy mỗi 5 phút để check và xóa khuyến mãi nào hêt hạn
-cron.schedule("*/5 * * * *", async () => {
-  try {
-    const Product = require("./models/Product"); // require here to avoid circular dep issues just in case, or we can use the top level one
-    const now = new Date();
-    // Tìm các sản phẩm có ít nhất 1 variant hết hạn khuyến mãi
-    const products = await Product.find({
-      "variants": {
-        $elemMatch: {
-          promotionEnd: { $lt: now, $ne: null }
-        }
-      }
-    });
+// ✅ ĐÃ XÓA CRON JOB 2 (trùng lặp với Cron Job 1 ở trên - tiết kiệm tải DB)
 
-    for (const product of products) {
-      let changed = false;
-      for (const variant of product.variants) {
-        if (variant.promotionEnd && variant.promotionEnd < now) {
-          variant.discountType = "none";
-          variant.discountValue = 0;
-          variant.promotionEnd = null;
-          variant.isShockDeal = false;
-          variant.discountPrice = null;
-          changed = true;
-        }
-      }
-      if (changed) await product.save();
-    }
-    // console.log("[Cron] Đã dọn dẹp khuyến mãi hết hạn");
-  } catch (error) {
-    console.error("[Cron] Lỗi khi quản lý khuyến mãi:", error);
-  }
-});
-
-// Connect MongoDB
+// =============================
+// ✅ CONNECT MONGODB VỚI CONNECTION POOL TỐI ƯU
+// =============================
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    maxPoolSize: 20,              // Tối đa 20 connections (phù hợp 512MB RAM)
+    minPoolSize: 3,               // Giữ tối thiểu 3 connections sẵn sàng
+    socketTimeoutMS: 45000,       // Timeout query sau 45s
+    serverSelectionTimeoutMS: 5000, // Timeout chọn server 5s
+    maxIdleTimeMS: 30000,         // Đóng connection idle sau 30s (tiết kiệm RAM)
+    heartbeatFrequencyMS: 10000,  // Kiểm tra kết nối mỗi 10s
+  })
   .then(() => {
-    console.log("Connected to MongoDB");
+    console.log("✅ Connected to MongoDB (Pool: 3-20 connections)");
   })
   .catch((err) => {
-    console.error("Error connecting to MongoDB:", err);
+    console.error("❌ Error connecting to MongoDB:", err);
   });
 
 // Start server (dùng HTTP server thay vì app.listen để hỗ trợ Socket.io)
 server.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`🚀 Server running on port ${port}`);
 });
+
+// =============================
+// ✅ GRACEFUL SHUTDOWN - Đóng connections đúng cách khi server tắt
+// =============================
+const gracefulShutdown = async (signal) => {
+  console.log(`\n🛑 ${signal} received. Shutting down gracefully...`);
+  
+  // Đóng Socket.IO connections
+  io.close(() => {
+    console.log('Socket.IO connections closed');
+  });
+  
+  // Đóng HTTP server
+  server.close(() => {
+    console.log('HTTP server closed');
+  });
+  
+  // Đóng MongoDB connections
+  await mongoose.connection.close();
+  console.log('MongoDB connection closed');
+  
+  process.exit(0);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));

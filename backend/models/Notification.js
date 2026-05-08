@@ -21,4 +21,8 @@ const notificationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ✅ DATABASE INDEXES
+notificationSchema.index({ userId: 1, createdAt: -1 });             // User notifications
+notificationSchema.index({ userId: 1, isRead: 1 });                  // Unread count
+
 module.exports = mongoose.model("Notification", notificationSchema);
