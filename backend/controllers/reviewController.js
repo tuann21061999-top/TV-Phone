@@ -111,7 +111,8 @@ const reviewController = {
   getProductReviews: async (req, res) => {
     try {
       const reviews = await Review.find({ productId: req.params.productId, status: "active" })
-                                  .sort({ createdAt: -1 });
+                                  .sort({ createdAt: -1 })
+                                  .lean();
       res.status(200).json(reviews);
     } catch (error) {
       res.status(500).json({ message: "Lỗi lấy đánh giá", error });
@@ -121,7 +122,7 @@ const reviewController = {
   // 4. Lấy danh sách đánh giá cho Admin
   getAllReviewsAdmin: async (req, res) => {
     try {
-      const reviews = await Review.find().populate("productId", "name image").sort({ createdAt: -1 });
+      const reviews = await Review.find().populate("productId", "name image").sort({ createdAt: -1 }).lean();
       res.status(200).json(reviews);
     } catch (error) {
       res.status(500).json({ message: "Lỗi lấy danh sách đánh giá", error });

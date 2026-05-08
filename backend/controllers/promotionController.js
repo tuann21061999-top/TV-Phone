@@ -240,10 +240,10 @@ const promotionController = {
                 query["variants"].$elemMatch.isShockDeal = true;
             }
 
-            const products = await Product.find(query).select("name slug brand colorImages variants condition productType averageRating reviewsCount");
+            const products = await Product.find(query).select("name slug brand colorImages variants condition productType averageRating reviewsCount").lean();
 
             const filteredProducts = products.map(p => {
-                const doc = p.toObject();
+                const doc = { ...p }; // .lean() đã trả về plain object, dùng spread copy
                 doc.variants = doc.variants.filter(v =>
                     v.promotionEnd &&
                     new Date(v.promotionEnd) > now &&

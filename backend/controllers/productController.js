@@ -31,9 +31,23 @@ exports.createProduct = async (req, res) => {
 /* =====================================
    GET ALL PRODUCTS (FILTER + SEARCH)
 ===================================== */
-// Khởi tạo bộ nhớ Cache trên RAM (In-Memory Cache)
+// ✅ Khởi tạo bộ nhớ Cache trên RAM (có giới hạn để tránh tràn RAM trên 512MB)
 const productListCache = {};
 const CACHE_TTL = 30000; // Lưu Cache trong 30 giây
+const MAX_CACHE_ENTRIES = 50; // Tối đa 50 cache entries (tránh OOM trên 512MB)
+
+// Hàm dọn dẹp cache cũ (gọi trước khi thêm mới)
+const cleanupCache = () => {
+  const keys = Object.keys(productListCache);
+  if (keys.length >= MAX_CACHE_ENTRIES) {
+    // Xóa 25% entries cũ nhất
+    const sortedKeys = keys.sort((a, b) => productListCache[a].timestamp - productListCache[b].timestamp);
+    const toRemove = Math.ceil(keys.length * 0.25);
+    for (let i = 0; i < toRemove; i++) {
+      delete productListCache[sortedKeys[i]];
+    }
+  }
+};
 
 exports.getAllProducts = async (req, res) => {
   try {
@@ -99,6 +113,7 @@ exports.getAllProducts = async (req, res) => {
     });
 
     // 3. LƯU KẾT QUẢ VÀO RAM TRƯỚC KHI TRẢ VỀ CHO KHÁCH (để những khách sau dùng)
+    cleanupCache(); // Dọn dẹp cache cũ nếu đầy
     productListCache[cacheKey] = {
       data: enriched,
       timestamp: Date.now()
@@ -156,7 +171,7 @@ exports.getProductById = async (req, res) => {
         productGroup: product.productGroup,
         _id: { $ne: product._id },
         isActive: true,
-      }).select("name slug colorImages productGroup productType variants");
+      }).select("name slug colorImages productGroup productType variants").lean();
     }
 
     // MỤC 1: SẢN PHẨM LIÊN QUAN (Cùng Brand)
@@ -168,7 +183,8 @@ exports.getProductById = async (req, res) => {
     })
       .sort({ totalSold: -1 })
       .limit(5)
-      .select("-description -specs -detailImages -createdAt -updatedAt");
+      .select("-description -specs -detailImages -createdAt -updatedAt")
+      .lean();
 
     if (relatedProducts.length < 5) {
       const genericProducts = await Product.find({
@@ -178,7 +194,8 @@ exports.getProductById = async (req, res) => {
       })
         .sort({ totalSold: -1 })
         .limit(5 - relatedProducts.length)
-        .select("-description -specs -detailImages -createdAt -updatedAt");
+        .select("-description -specs -detailImages -createdAt -updatedAt")
+        .lean();
       relatedProducts = [...relatedProducts, ...genericProducts];
     }
 
@@ -191,7 +208,7 @@ exports.getProductById = async (req, res) => {
         isActive: true,
         _id: { $ne: product._id },
         tags: { $in: product.tags }
-      }).select("-description -specs -detailImages -createdAt -updatedAt");
+      }).select("-description -specs -detailImages -createdAt -updatedAt").lean();
 
       // Tính điểm trùng khớp Tag
       const scoredProducts = candidateProducts.map(p => {

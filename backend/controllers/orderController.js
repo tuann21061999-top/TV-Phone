@@ -8,26 +8,56 @@ const { validateVoucher, calculateDiscount } = require("./voucherController");
 const cloudinary = require("../config/cloudinary");
 const fs = require("fs");
 
-// Hàm bổ trợ cập nhật kho báu
-const updateInventory = async (items, type) => {
-  // type: "decrease" (giảm kho khi bán) hoặc "increase" (tăng kho khi trả hàng/hủy)
-  const multiplier = type === "decrease" ? -1 : 1;
-  const soldMultiplier = type === "decrease" ? 1 : -1;
+// Hàm giữ kho an toàn (chống Race Condition)
+const reserveInventory = async (items) => {
+  const deductedItems = [];
+  try {
+    for (const item of items) {
+      const result = await Product.findOneAndUpdate(
+        { 
+          _id: item.productId, 
+          variants: { $elemMatch: { _id: item.variantId, quantity: { $gte: item.quantity } } } 
+        },
+        {
+          $inc: { "variants.$.quantity": -item.quantity, totalSold: item.quantity }
+        },
+        { new: true }
+      );
+      if (!result) throw new Error("Sản phẩm đã hết hàng");
 
+      await PromotionModel.updateOne(
+        { productId: item.productId, isActive: true },
+        { $inc: { soldQuantity: item.quantity } }
+      );
+      deductedItems.push(item);
+    }
+    return { success: true };
+  } catch (error) {
+    // Rollback
+    for (const dItem of deductedItems) {
+      await Product.updateOne(
+        { _id: dItem.productId, "variants._id": dItem.variantId },
+        { $inc: { "variants.$.quantity": dItem.quantity, totalSold: -dItem.quantity } }
+      );
+      await PromotionModel.updateOne(
+        { productId: dItem.productId, isActive: true },
+        { $inc: { soldQuantity: -dItem.quantity } }
+      );
+    }
+    return { success: false, message: error.message };
+  }
+};
+
+// Hàm hoàn kho (sử dụng khi hủy đơn, trả hàng hoặc rollback)
+const restoreInventory = async (items) => {
   for (const item of items) {
     await Product.updateOne(
       { _id: item.productId, "variants._id": item.variantId },
-      {
-        $inc: {
-          "variants.$.quantity": multiplier * item.quantity,
-          totalSold: soldMultiplier * item.quantity
-        }
-      }
+      { $inc: { "variants.$.quantity": item.quantity, totalSold: -item.quantity } }
     );
-
     await PromotionModel.updateOne(
       { productId: item.productId, isActive: true },
-      { $inc: { soldQuantity: soldMultiplier * item.quantity } }
+      { $inc: { soldQuantity: -item.quantity } }
     );
   }
 };
@@ -121,6 +151,15 @@ const orderController = {
         initialStatus = "pending";
       }
 
+      // ── Khóa Lạc Quan: Trừ kho ngay lập tức cho COD và SimulatedPayment ──
+      const requireInventoryCheck = (paymentMethod === "COD" || isSimulatedPaymentSuccess);
+      if (requireInventoryCheck) {
+        const reserveResult = await reserveInventory(orderItems);
+        if (!reserveResult.success) {
+          return res.status(400).json({ message: "Rất tiếc, có sản phẩm trong giỏ đã vừa hết hàng do người khác đã đặt mua. Vui lòng kiểm tra lại giỏ hàng." });
+        }
+      }
+
       const newOrder = new Order({
         userId, email: req.user.email, items: orderItems,
         total: finalTotal, shippingInfo, shippingFee,
@@ -130,7 +169,13 @@ const orderController = {
         voucherCode: appliedVoucherCode
       });
 
-      const savedOrder = await newOrder.save();
+      let savedOrder;
+      try {
+        savedOrder = await newOrder.save();
+      } catch (saveError) {
+        if (requireInventoryCheck) await restoreInventory(orderItems);
+        throw saveError;
+      }
 
       // ── Cập nhật voucher usage sau khi đơn hàng được tạo thành công ──
       if (appliedVoucherCode) {
@@ -138,11 +183,6 @@ const orderController = {
           { code: appliedVoucherCode },
           { $inc: { usedCount: 1 }, $addToSet: { usedBy: userId } }
         );
-      }
-
-      // Giảm kho ngay khi đặt COD hoặc thanh toán online thành công (giữ hàng)
-      if (paymentMethod === "COD" || isSimulatedPaymentSuccess) {
-        await updateInventory(orderItems, "decrease");
       }
 
       if (!isBuyNow) await Cart.findOneAndUpdate({ userId }, { items: [], total: 0 });
@@ -163,7 +203,7 @@ const orderController = {
 
       // Logic hoàn kho nếu Hủy đơn
       if (status === "cancelled" && oldStatus !== "cancelled" && oldStatus !== "returned") {
-        await updateInventory(order.items, "increase");
+        await restoreInventory(order.items);
       }
       // Hoàn lại lượt sử dụng voucher cho khách nếu có áp dụng
       if (order.voucherCode) {
@@ -228,7 +268,7 @@ const orderController = {
       // Nhưng theo logic createOrder của bạn, khi "waiting_approval" (COD) hoặc "paid" thì kho đã bị trừ.
       // Dù trạng thái cũ là gì, miễn là nó chưa phải "cancelled" hoặc "returned" thì ta cứ hoàn kho:
       if (oldStatus !== "cancelled" && oldStatus !== "returned" && oldStatus !== "pending") {
-        await updateInventory(order.items, "increase");
+        await restoreInventory(order.items);
       }
       // Hoàn lại lượt sử dụng voucher cho khách nếu có áp dụng
       if (order.voucherCode) {
@@ -260,7 +300,7 @@ const orderController = {
       } else {
         // Khách không nhận hàng -> chuyển sang returned và hoàn kho
         order.status = "returned";
-        await updateInventory(order.items, "increase");
+        await restoreInventory(order.items);
       }
 
       await order.save();
@@ -299,7 +339,7 @@ const orderController = {
       }
 
       // 1. TỔNG QUAN
-      const allDoneOrdersFiltered = await Order.find(matchStageForTotals);
+      const allDoneOrdersFiltered = await Order.find(matchStageForTotals).lean();
       let totalRevenue = 0;
       let totalImportCost = 0;
 
@@ -319,7 +359,7 @@ const orderController = {
 
       // 2. DỮ LIỆU BIỂU ĐỒ
       const chartData = [];
-      const ordersForChart = period === "year" ? await Order.find({ status: "done" }) : allDoneOrdersFiltered;
+      const ordersForChart = period === "year" ? await Order.find({ status: "done" }).lean() : allDoneOrdersFiltered;
 
       if (period === "day") {
         const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
@@ -339,7 +379,7 @@ const orderController = {
           chartData.push({ name: `THG ${m}`, revenue: monthRev });
         }
       } else {
-        const minOrder = await Order.findOne({ status: "done" }).sort({ createdAt: 1 });
+        const minOrder = await Order.findOne({ status: "done" }).sort({ createdAt: 1 }).lean();
         const startYear = minOrder ? minOrder.createdAt.getFullYear() : currentYear - 4;
         for (let y = startYear; y <= currentYear; y++) {
           const startOfYear = new Date(y, 0, 1);
@@ -385,7 +425,8 @@ const orderController = {
       const recentOrders = await Order.find()
         .sort({ createdAt: -1 })
         .limit(5)
-        .select("_id shippingInfo items createdAt total status paymentMethod");
+        .select("_id shippingInfo items createdAt total status paymentMethod")
+        .lean();
 
       res.status(200).json({
         overview: { totalRevenue, totalProfit, totalOrders: newOrdersCount, totalUsers },
@@ -404,7 +445,7 @@ const orderController = {
   getMyOrders: async (req, res) => {
     try {
       const userId = req.user.id;
-      const orders = await Order.find({ userId }).sort({ createdAt: -1 }).populate("items.productId", "slug");
+      const orders = await Order.find({ userId }).sort({ createdAt: -1 }).populate("items.productId", "slug").lean();
       res.status(200).json(orders);
     } catch (error) {
       res.status(500).json({ message: "Lỗi khi lấy lịch sử đơn hàng", error: error.message });
@@ -428,7 +469,7 @@ const orderController = {
 
   getAllOrdersAdmin: async (req, res) => {
     try {
-      const orders = await Order.find().sort({ createdAt: -1 });
+      const orders = await Order.find().sort({ createdAt: -1 }).lean();
       res.status(200).json(orders);
     } catch (error) {
       res.status(500).json({ message: "Lỗi server", error: error.message });
@@ -466,13 +507,16 @@ const orderController = {
       const order = await Order.findById(req.params.id);
       if (!order) return res.status(404).json({ message: "Không tìm thấy" });
 
+      // Cố gắng trừ kho khi thanh toán thành công
+      const reserveResult = await reserveInventory(order.items);
+      if (!reserveResult.success) {
+        return res.status(400).json({ message: "Thanh toán thành công nhưng sản phẩm đã hết hàng. Vui lòng liên hệ CSKH để hoàn tiền." });
+      }
+
       order.status = "paid";
       order.isPaid = true;
       order.paidAt = new Date();
       await order.save();
-
-      // Sau khi thanh toán online thật thành công -> Trừ kho
-      await updateInventory(order.items, "decrease");
 
       res.status(200).json({ message: "Thành công", order });
     } catch (error) {
@@ -580,7 +624,7 @@ const orderController = {
         order.status = "returned";
 
         // Hoàn kho
-        await updateInventory(order.items, "increase");
+        await restoreInventory(order.items);
 
         // Gui thong bao
         await Notification.create({

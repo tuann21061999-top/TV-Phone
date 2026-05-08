@@ -157,10 +157,11 @@ function ChatWidget() {
                     text: m.content
                 }));
 
+                const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
                 const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/ai/chat`, {
                     message: userMsg,
                     history: history
-                });
+                }, config);
 
                 setAiMessages(prev => [
                     ...prev,

@@ -258,4 +258,13 @@ productSchema.pre("save", function () {
   }
 });
 
+// ✅ DATABASE INDEXES - Tăng tốc truy vấn (rất quan trọng cho chịu tải)
+productSchema.index({ productType: 1, isActive: 1, createdAt: -1 }); // getAllProducts filter
+productSchema.index({ categoryId: 1, brand: 1, isActive: 1 });       // Related products
+productSchema.index({ isFeatured: 1, isActive: 1 });                  // Hot products
+productSchema.index({ isActive: 1, totalSold: -1 });                  // Best sellers
+productSchema.index({ 'variants.promotionEnd': 1 });                  // Cron job scan
+productSchema.index({ tags: 1, isActive: 1 });                        // Tag-based queries
+productSchema.index({ slug: 1 });                                     // Slug lookup
+
 module.exports = mongoose.model("Product", productSchema);

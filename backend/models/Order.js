@@ -85,4 +85,10 @@ const orderSchema = new mongoose.Schema(
 
 );
 
+// ✅ DATABASE INDEXES
+orderSchema.index({ userId: 1, createdAt: -1 });                     // getMyOrders
+orderSchema.index({ status: 1, createdAt: 1 });                      // Cron job + admin filter
+orderSchema.index({ status: 1, 'returnRequest.status': 1 });         // Return requests
+orderSchema.index({ voucherCode: 1 });                                // Voucher lookup
+
 module.exports = mongoose.model("Order", orderSchema);
