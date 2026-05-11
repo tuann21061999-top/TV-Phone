@@ -268,7 +268,7 @@ function Header() {
             <Link to="/" className="inline-block leading-none no-underline transition-transform duration-300 hover:text-[#FACC15] hover:scale-105 group shrink-0">
               <img src={logoImg} alt="V&T Nexis Logo" width={160} height={45} className="h-[30px] md:h-[45px] w-auto object-contain transition-transform duration-300" />
             </Link>
-            <Navbar preloadedProducts={preloadedProducts} isProductsReady={isProductsReady} />
+            <Navbar />
           </div>
 
           {/* HEADER RIGHT: SEARCH & ICONS */}

@@ -42,7 +42,7 @@ const BRAND_LOGOS = {
   Flydigi: "https://cdn.brandfetch.io/idZlGwotLY/w/52/h/47/theme/dark/logo.png?c=1bxid64Mup7aczewSAYMX&t=1769290949469"
 };
 
-function Navbar({ preloadedProducts, isProductsReady = false }) {
+function Navbar() {
   const [deviceBrands, setDeviceBrands] = useState([]);
   const [electronicBrands, setElectronicBrands] = useState([]);
   const [accessoryBrands, setAccessoryBrands] = useState([]);
@@ -52,57 +52,39 @@ function Navbar({ preloadedProducts, isProductsReady = false }) {
   const [accessoryTags, setAccessoryTags] = useState([]);
 
   useEffect(() => {
-    const fetchTags = async () => {
+    const fetchData = async () => {
       try {
-        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/tags`);
-        return data || [];
+        // Tải danh sách Tags
+        const tagsRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/tags`);
+        const allTags = tagsRes.data || [];
+        const nonGlobalTags = allTags.filter(t => t.type !== "Price Segment");
+
+        // Tải danh sách sản phẩm tinh gọn (chỉ lấy field brand và type)
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products?limit=2000`);
+        const allProducts = Array.isArray(data) ? data : data.data || [];
+
+        const devices = allProducts.filter((p) => p.productType === "device");
+        const electronics = allProducts.filter((p) => p.productType === "electronic");
+        const accessories = allProducts.filter((p) => p.productType === "accessory");
+
+        setDeviceBrands([...new Set(devices.map(p => p.brand).filter(Boolean))].sort());
+        setElectronicBrands([...new Set(electronics.map(p => p.brand).filter(Boolean))].sort());
+        setAccessoryBrands([...new Set(accessories.map(p => p.brand).filter(Boolean))].sort());
+
+        const dTagIds = new Set(devices.flatMap(p => p.tags || []).map(id => id.toString()));
+        const eTagIds = new Set(electronics.flatMap(p => p.tags || []).map(id => id.toString()));
+        const aTagIds = new Set(accessories.flatMap(p => p.tags || []).map(id => id.toString()));
+
+        setDeviceTags(nonGlobalTags.filter(t => dTagIds.has(t._id.toString())).slice(0, 6));
+        setElectronicTags(nonGlobalTags.filter(t => eTagIds.has(t._id.toString())).slice(0, 6));
+        setAccessoryTags(nonGlobalTags.filter(t => aTagIds.has(t._id.toString())).slice(0, 6));
       } catch (error) {
-        console.error("Lỗi lấy danh sách tags:", error);
-        return [];
+        console.error("Lỗi lấy dữ liệu Navbar:", error);
       }
     };
 
-    const applyData = async (data) => {
-      if (!Array.isArray(data)) return;
-
-      const devices = data.filter((p) => p.productType === "device");
-      const electronics = data.filter((p) => p.productType === "electronic");
-      const accessories = data.filter((p) => p.productType === "accessory");
-
-      setDeviceBrands([...new Set(devices.map(p => p.brand).filter(Boolean))].sort());
-      setElectronicBrands([...new Set(electronics.map(p => p.brand).filter(Boolean))].sort());
-      setAccessoryBrands([...new Set(accessories.map(p => p.brand).filter(Boolean))].sort());
-
-      const dTagIds = new Set(devices.flatMap(p => p.tags || []).map(id => id.toString()));
-      const eTagIds = new Set(electronics.flatMap(p => p.tags || []).map(id => id.toString()));
-      const aTagIds = new Set(accessories.flatMap(p => p.tags || []).map(id => id.toString()));
-
-      const allTags = await fetchTags();
-      const nonGlobalTags = allTags.filter(t => t.type !== "Price Segment");
-
-      setDeviceTags(nonGlobalTags.filter(t => dTagIds.has(t._id.toString())).slice(0, 6));
-      setElectronicTags(nonGlobalTags.filter(t => eTagIds.has(t._id.toString())).slice(0, 6));
-      setAccessoryTags(nonGlobalTags.filter(t => aTagIds.has(t._id.toString())).slice(0, 6));
-    };
-
-    if (Array.isArray(preloadedProducts) && isProductsReady) {
-      applyData(preloadedProducts);
-      return;
-    } else if (!isProductsReady && Array.isArray(preloadedProducts)) {
-      return; // wait until ready
-    }
-
-    const fetchItems = async () => {
-      try {
-        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
-        applyData(data);
-      } catch (error) {
-        console.error("Lỗi lấy danh sách sản phẩm ở Navbar:", error);
-      }
-    };
-
-    fetchItems();
-  }, [preloadedProducts, isProductsReady]);
+    fetchData();
+  }, []);
 
   const renderBrandLink = (brand, basePath) => {
     const logoSrc = BRAND_LOGOS[brand];
