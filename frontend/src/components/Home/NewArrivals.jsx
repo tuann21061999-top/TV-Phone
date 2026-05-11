@@ -23,14 +23,9 @@ function NewArrivals({ preloadedProducts, initialFavoriteIds, isProductsReady = 
 
     const fetchLatest = async () => {
       try {
-        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
-        const allProducts = Array.isArray(data) ? data : data.data || [];
-
-        // Sắp xếp theo ngày tạo mới nhất và lấy 6 sản phẩm
-        const latest = [...allProducts]
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          .slice(0, 6);
-
+        // Chỉ lấy 6 sản phẩm mới nhất từ Server
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products?limit=6`);
+        const latest = Array.isArray(data) ? data : data.data || [];
         setProducts(latest);
       } catch (error) {
         console.error("Lỗi lấy sản phẩm mới:", error);

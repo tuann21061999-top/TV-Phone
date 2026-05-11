@@ -17,15 +17,12 @@ const Features = lazy(() => import("../../components/Home/Features"));
 const GlobalArticle = lazy(() => import("../../components/Home/GlobalArticle"));
 
 function Home() {
-  const [homeProducts, setHomeProducts] = useState([]);
   const [favoriteIds, setFavoriteIds] = useState(new Set());
-  const [isProductsReady, setIsProductsReady] = useState(false);
 
   // SEO: Đặt document title
   useEffect(() => {
     document.title = "V&T Nexis – Điện thoại, Phụ kiện & Đồ điện tử chính hãng";
     
-    // Meta description
     let metaDesc = document.querySelector('meta[name="description"]');
     if (!metaDesc) {
       metaDesc = document.createElement("meta");
@@ -40,55 +37,26 @@ function Home() {
   }, []);
 
   useEffect(() => {
-    let isCancelled = false;
-
-    const fetchHomeSharedData = async () => {
+    const fetchFavorites = async () => {
       try {
         const token = localStorage.getItem("token");
-        const headers = token ? { Authorization: `Bearer ${token}` } : null;
-
-        const productsPromise = axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
-        const favoritesPromise = headers
-          ? axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, { headers })
-          : Promise.resolve(null);
-
-        const productsRes = await productsPromise;
-
-        if (isCancelled) return;
-
-        const allProducts = Array.isArray(productsRes.data)
-          ? productsRes.data
-          : productsRes.data?.data || [];
-
-        setHomeProducts(allProducts);
-        setIsProductsReady(true);
-
-        const favoritesRes = await favoritesPromise;
-
-        if (isCancelled) return;
-
-        if (favoritesRes?.data) {
-          setFavoriteIds(new Set(favoritesRes.data.map((item) => item._id)));
+        if (token) {
+          const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/favorites`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setFavoriteIds(new Set(data.map((item) => item._id)));
         }
       } catch (error) {
-        console.error("Lỗi tải dữ liệu trang chủ:", error);
-      } finally {
-        if (!isCancelled) {
-          setIsProductsReady(true);
-        }
+        console.error("Lỗi tải yêu thích:", error);
       }
     };
 
-    fetchHomeSharedData();
-
-    return () => {
-      isCancelled = true;
-    };
+    fetchFavorites();
   }, []);
 
   return (
     <div className="bg-[#f5f7fb] font-sans w-full">
-      <Header preloadedProducts={homeProducts} isProductsReady={isProductsReady} />
+      <Header />
       <Banner />
       <Category />
       
@@ -101,23 +69,15 @@ function Home() {
       </Suspense>
       
       <Suspense fallback={<div className="h-40" />}>
-        <NewArrivals
-          preloadedProducts={homeProducts}
-          initialFavoriteIds={favoriteIds}
-          isProductsReady={isProductsReady}
-        />
+        <NewArrivals initialFavoriteIds={favoriteIds} />
       </Suspense>
 
       <Suspense fallback={<div className="h-40" />}>
-        <ProductGrid
-          preloadedProducts={homeProducts}
-          initialFavoriteIds={favoriteIds}
-          isProductsReady={isProductsReady}
-        />
+        <ProductGrid initialFavoriteIds={favoriteIds} />
       </Suspense>
 
       <Suspense fallback={<div className="h-20" />}>
-        <BrandShowcase preloadedProducts={homeProducts} isProductsReady={isProductsReady} />
+        <BrandShowcase />
       </Suspense>
 
       <Suspense fallback={<div className="h-20" />}>
