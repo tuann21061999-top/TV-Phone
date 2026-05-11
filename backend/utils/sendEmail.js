@@ -1,29 +1,32 @@
 const nodemailer = require('nodemailer');
 
 const sendEmail = async (options) => {
-    // 1. Kiểm tra an toàn biến môi trường trước khi trim()
+    // Kiểm tra biến môi trường
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        throw new Error("Thiếu cấu hình EMAIL_USER hoặc EMAIL_PASS trong hệ thống!");
+        throw new Error('Thiếu EMAIL_USER hoặc EMAIL_PASS');
     }
 
     try {
-        // 2. Cấu hình rõ ràng host và port thay vì chỉ ghi service: 'gmail'
+        // Cấu hình transporter cho Gmail SMTP
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // Dùng SSL cho port 465
+            port: 587,
+            secure: false, // dùng STARTTLS
             auth: {
                 user: process.env.EMAIL_USER.trim(),
                 pass: process.env.EMAIL_PASS.trim()
             },
-            // Ép dùng IPv4 — Render không hỗ trợ IPv6 outbound
+
+            // QUAN TRỌNG:
+            // Ép dùng IPv4 để tránh lỗi ENETUNREACH trên Render
             family: 4,
+
             tls: {
-                servername: 'smtp.gmail.com'
+                rejectUnauthorized: false
             }
         });
 
-        // Tùy chọn gửi email
+        // Nội dung email
         const mailOptions = {
             from: `"V&T Nexis" <${process.env.EMAIL_USER.trim()}>`,
             to: options.to,
@@ -33,12 +36,14 @@ const sendEmail = async (options) => {
 
         // Gửi email
         const info = await transporter.sendMail(mailOptions);
-        return info; 
-        
+
+        console.log('Email gửi thành công:', info.response);
+
+        return info;
+
     } catch (error) {
-        // 3. THROW ERROR: Ném lỗi ra ngoài để authController biết đường báo lỗi 500
         console.error('LỖI GỬI MAIL NODEMAILER:', error);
-        throw error; 
+        throw error;
     }
 };
 
