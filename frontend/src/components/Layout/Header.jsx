@@ -9,7 +9,7 @@ import {
 import axios from "axios";
 import logoImg from "../../assets/Logo3.png";
 
-function Header({ preloadedProducts, isProductsReady = false }) {
+function Header() {
   const [cartCount, setCartCount] = useState(0);
   const [user, setUser] = useState(() => {
     try {
@@ -29,41 +29,26 @@ function Header({ preloadedProducts, isProductsReady = false }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const [globalProducts, setGlobalProducts] = useState([]);
+  const [trendingProducts, setTrendingProducts] = useState([]);
+  const [favoriteProducts, setFavoriteProducts] = useState([]);
 
   useEffect(() => {
-    let isCancelled = false;
-    if (preloadedProducts && preloadedProducts.length > 0) {
-      setGlobalProducts(preloadedProducts);
-    } else {
-      axios.get(`${import.meta.env.VITE_API_URL}/api/products`)
-        .then(res => {
-          if (!isCancelled) {
-            setGlobalProducts(Array.isArray(res.data) ? res.data : (res.data.data || []));
-          }
-        })
-        .catch(err => console.error("Lỗi lấy danh sách sản phẩm ở Header:", err));
-    }
-    return () => { isCancelled = true; };
-  }, [preloadedProducts]);
-
-  const favoriteProducts = React.useMemo(() => {
-    if (globalProducts.length > 0) {
-      return [...globalProducts]
-        .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
-        .slice(0, 2);
-    }
-    return [];
-  }, [globalProducts]);
-
-  const trendingProducts = React.useMemo(() => {
-    if (globalProducts.length > 0) {
-      return [...globalProducts]
-        .sort((a, b) => (b.totalSold || 0) - (a.totalSold || 0))
-        .slice(0, 3);
-    }
-    return [];
-  }, [globalProducts]);
+    const fetchHeaderData = async () => {
+      try {
+        // Chỉ lấy những gì cần thiết cho dropdown
+        const [trendingRes, favoriteRes] = await Promise.all([
+          axios.get(`${import.meta.env.VITE_API_URL}/api/products?limit=3`),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/products?limit=2`)
+        ]);
+        
+        setTrendingProducts(Array.isArray(trendingRes.data) ? trendingRes.data : trendingRes.data.data || []);
+        setFavoriteProducts(Array.isArray(favoriteRes.data) ? favoriteRes.data : favoriteRes.data.data || []);
+      } catch (err) {
+        console.error("Lỗi lấy dữ liệu Header:", err);
+      }
+    };
+    fetchHeaderData();
+  }, []);
 
   const token = localStorage.getItem("token");
 
@@ -86,20 +71,13 @@ function Header({ preloadedProducts, isProductsReady = false }) {
       if (searchTerm.trim()) {
         setIsSearching(true);
         try {
-          const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products?search=${encodeURIComponent(searchTerm.trim())}`);
-
-          // THUẬT TOÁN ƯU TIÊN ĐIỆN THOẠI TRƯỚC
-          const sortedData = data.sort((a, b) => {
-            const isPhoneA = a.productType === "device" || a.categoryName === "Điện thoại" ? 1 : 0;
-            const isPhoneB = b.productType === "device" || b.categoryName === "Điện thoại" ? 1 : 0;
-            return isPhoneB - isPhoneA; // Xếp giảm dần (Điện thoại lên đầu)
-          });
-
-          // Lấy 5 kết quả đầu tiên sau khi đã sắp xếp ưu tiên
-          setSearchResults(sortedData.slice(0, 5));
+          // Chỉ lấy 5 kết quả đầu tiên cho dropdown tìm kiếm nhanh
+          const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products?search=${encodeURIComponent(searchTerm.trim())}&limit=5`);
+          const results = Array.isArray(data) ? data : data.data || [];
+          setSearchResults(results);
           setIsSearchOpen(true);
         } catch (error) {
-          console.error("Lỗi khi fetch live search", error);
+          console.error("Lỗi tìm kiếm:", error);
         } finally {
           setIsSearching(false);
         }
@@ -107,7 +85,7 @@ function Header({ preloadedProducts, isProductsReady = false }) {
         setSearchResults([]);
         setIsSearchOpen(false);
       }
-    }, 500); // Debounce 500ms
+    }, 400);
 
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);

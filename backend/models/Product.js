@@ -277,6 +277,11 @@ productSchema.index({ isFeatured: 1, isActive: 1 });                  // Hot pro
 productSchema.index({ isActive: 1, totalSold: -1 });                  // Best sellers
 productSchema.index({ 'variants.promotionEnd': 1 });                  // Cron job scan
 productSchema.index({ tags: 1, isActive: 1 });                        // Tag-based queries
-productSchema.index({ slug: 1 });                                     // Slug lookup
+productSchema.index({ slug: 1 });
+productSchema.index({ productType: 1, isActive: 1 });
+productSchema.index({ isFeatured: 1, isActive: 1 });
+productSchema.index({ brand: 1 });
+productSchema.index({ createdAt: -1 });
+productSchema.index({ name: 'text', brand: 'text' }); // Search optimization
 
 module.exports = mongoose.model("Product", productSchema);

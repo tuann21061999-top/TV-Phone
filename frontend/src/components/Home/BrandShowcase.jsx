@@ -28,31 +28,22 @@ function BrandShowcase({ preloadedProducts, isProductsReady = false }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const applyBrands = (data) => {
-      if (!Array.isArray(data)) return;
-
-      const allBrands = [...new Set(data.map((p) => p.brand).filter(Boolean))].sort();
-      const brandsWithLogos = allBrands.filter((b) => BRAND_LOGOS[b]);
-      setBrands(brandsWithLogos.length > 0 ? brandsWithLogos : allBrands.slice(0, 12));
-    };
-
-    if (Array.isArray(preloadedProducts)) {
-      if (!isProductsReady) return;
-      applyBrands(preloadedProducts);
-      return;
-    }
-
     const fetchBrands = async () => {
       try {
-        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products`);
-        applyBrands(data);
+        // Chỉ lấy field brand từ các sản phẩm để hiển thị logo
+        const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/products?limit=1000`);
+        const allProducts = Array.isArray(data) ? data : data.data || [];
+        
+        const allBrands = [...new Set(allProducts.map((p) => p.brand).filter(Boolean))].sort();
+        const brandsWithLogos = allBrands.filter((b) => BRAND_LOGOS[b]);
+        setBrands(brandsWithLogos.length > 0 ? brandsWithLogos : allBrands.slice(0, 12));
       } catch (error) {
         console.error("Lỗi lấy thương hiệu:", error);
       }
     };
 
     fetchBrands();
-  }, [preloadedProducts, isProductsReady]);
+  }, []);
 
   if (brands.length === 0) return null;
 

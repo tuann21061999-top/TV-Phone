@@ -51,22 +51,18 @@ const cleanupCache = () => {
 
 exports.getAllProducts = async (req, res) => {
   try {
-    // 1. Dùng nguyên đường link URL (chứa các filter) làm chìa khóa lưu Cache
     const cacheKey = req.originalUrl;
     
-    // 2. Nếu có dữ liệu trong RAM và chưa quá 30 giây -> Trả về NGAY LẬP TỨC
     if (productListCache[cacheKey] && (Date.now() - productListCache[cacheKey].timestamp < CACHE_TTL)) {
       res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
-      res.set('X-Served-From', 'In-Memory-Cache'); // Đánh dấu để biết lấy từ RAM
+      res.set('X-Served-From', 'In-Memory-Cache');
       return res.json(productListCache[cacheKey].data);
     }
 
-    const { type, productType, brand, search, condition, admin, tag } = req.query;
+    const { type, productType, brand, search, condition, admin, tag, page, limit } = req.query;
     const resolvedType = type || productType;
 
     let filter = {};
-
-    // ✅ FIX LỖI 1: Phải so sánh chuỗi chính xác. Chỉ khi admin đích thị là 'true' thì mới lấy cả hàng ẩn.
     if (admin !== 'true') {
       filter.isActive = true;
     }
@@ -75,14 +71,10 @@ exports.getAllProducts = async (req, res) => {
       filter.isFeatured = true;
     } else if (resolvedType) {
       filter.productType = resolvedType;
-      // Đã xóa dòng filter.isFeatured = { $ne: true } để trả về ĐẦY ĐỦ sản phẩm
     }
     if (brand) filter.brand = brand;
     if (condition) filter.condition = condition;
-    if (tag) {
-       // Support multiple tags via comma separated string or single tag
-       filter.tags = tag; 
-    }
+    if (tag) filter.tags = tag;
 
     if (search) {
       filter.$or = [
@@ -91,36 +83,53 @@ exports.getAllProducts = async (req, res) => {
       ];
     }
 
-    // Kích hoạt Vercel Edge Caching (Cache 60 giây ở máy chủ CDN Vercel)
+    // Xử lý Phân trang
+    const p = parseInt(page) || 1;
+    const l = parseInt(limit) || 0; // Nếu limit = 0 thì lấy tất cả (giữ tương thích cũ)
+    const skip = (p - 1) * l;
+
     res.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
 
-    let query = Product.find(filter)
-      .populate("categoryId", "name")
-      .sort({ createdAt: -1 });
+    let query = Product.find(filter).sort({ createdAt: -1 });
 
-    // Tối ưu Payload: Tránh sập Vercel bằng cách chỉ lấy các trường thực sự cần thiết trên giao diện Khách
     if (admin !== 'true') {
-      query = query.select('name slug brand productType condition isFeatured tags images colorImages variants averageRating reviewsCount totalSold highlights promotion isActive categoryId specs');
+      // Chỉ lấy các trường cần thiết cho Card để giảm payload
+      query = query.select('name slug brand productType condition isFeatured tags images colorImages variants averageRating reviewsCount totalSold isActive categoryId');
     }
 
-    const products = await query.lean(); // .lean() giúp tốc độ truy vấn Mongoose nhanh gấp 5 lần
+    if (l > 0) {
+      query = query.skip(skip).limit(l);
+    }
 
-    // Đảm bảo các thuộc tính số không bị undefined
-    const enriched = products.map(p => {
-      p.averageRating = p.averageRating || 0;
-      p.reviewsCount = p.reviewsCount || 0;
-      return p;
-    });
+    const [products, total] = await Promise.all([
+      query.lean(),
+      Product.countDocuments(filter)
+    ]);
 
-    // 3. LƯU KẾT QUẢ VÀO RAM TRƯỚC KHI TRẢ VỀ CHO KHÁCH (để những khách sau dùng)
-    cleanupCache(); // Dọn dẹp cache cũ nếu đầy
-    productListCache[cacheKey] = {
+    const enriched = products.map(p => ({
+      ...p,
+      averageRating: p.averageRating || 0,
+      reviewsCount: p.reviewsCount || 0
+    }));
+
+    const responseData = l > 0 ? {
       data: enriched,
+      pagination: {
+        total,
+        page: p,
+        limit: l,
+        pages: Math.ceil(total / l)
+      }
+    } : enriched;
+
+    cleanupCache();
+    productListCache[cacheKey] = {
+      data: responseData,
       timestamp: Date.now()
     };
 
     res.set('X-Served-From', 'MongoDB');
-    res.json(enriched);
+    res.json(responseData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
