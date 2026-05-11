@@ -14,6 +14,7 @@ import ManagePromotions from "../Manage/ManagePromotions";
 import ManageNews from "../Manage/ManageNews";
 import ManageTags from "../Manage/ManageTags";
 import ManageCategory from "../Manage/ManageCategory";
+import ManageCompareSpec from "../Manage/ManageCompareSpec";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import axios from "axios";
@@ -23,7 +24,7 @@ import {
   ShoppingBag, FileText, Users, BarChart3,
   Package, Smartphone, MousePointer2, Settings,
   LogOut, LayoutDashboard, MessageSquare, Ticket, Flame,
-  Newspaper, Tag, FolderTree, Menu, X
+  Newspaper, Tag, FolderTree, Menu, X, Layers
 } from "lucide-react";
 
 function AdminPage() {
@@ -121,6 +122,7 @@ function AdminPage() {
       case "news": return "Quản lý Tin tức";
       case "tags": return "Quản lý Tags";
       case "categories": return "Quản lý Danh mục";
+      case "compareSpecs": return "Nhóm So Sánh";
       default: return "Bảng điều khiển";
     }
   };
@@ -201,6 +203,7 @@ function AdminPage() {
               { tab: "accessories", icon: <MousePointer2 size={18} />, label: "Phụ kiện" },
               { tab: "categories", icon: <FolderTree size={18} />, label: "Quản lý Danh mục" },
               { tab: "tags", icon: <Tag size={18} />, label: "Quản lý Tags" },
+              { tab: "compareSpecs", icon: <Layers size={18} />, label: "Nhóm So Sánh" },
             ].map(({ tab, icon, label }) => (
               <button
                 key={tab}
@@ -313,6 +316,7 @@ function AdminPage() {
             {activeTab === "news" && <ManageNews />}
             {activeTab === "tags" && <ManageTags />}
             {activeTab === "categories" && <ManageCategory />}
+            {activeTab === "compareSpecs" && <ManageCompareSpec />}
 
             {activeTab === "users" && (
               <div className="flex flex-col items-center justify-center px-5 py-20 text-center text-slate-500 h-full bg-white rounded-2xl border border-dashed border-slate-300">

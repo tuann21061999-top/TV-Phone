@@ -100,7 +100,7 @@ exports.getAllProducts = async (req, res) => {
 
     // Tối ưu Payload: Tránh sập Vercel bằng cách chỉ lấy các trường thực sự cần thiết trên giao diện Khách
     if (admin !== 'true') {
-      query = query.select('name slug brand productType condition isFeatured tags images colorImages variants averageRating reviewsCount totalSold highlights promotion isActive categoryId');
+      query = query.select('name slug brand productType condition isFeatured tags images colorImages variants averageRating reviewsCount totalSold highlights promotion isActive categoryId specs');
     }
 
     const products = await query.lean(); // .lean() giúp tốc độ truy vấn Mongoose nhanh gấp 5 lần

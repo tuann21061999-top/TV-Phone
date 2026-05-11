@@ -11,6 +11,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
   const [searchTerm, setSearchTerm] = useState("");
   const [form, setForm] = useState(emptyFormTemplate);
   const [tagsList, setTagsList] = useState([]);
+  const [compareSpecsList, setCompareSpecsList] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [imagesToDelete, setImagesToDelete] = useState([]);
 
@@ -38,9 +39,19 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
     }
   };
 
+  const fetchCompareSpecs = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/compare-specs`);
+      setCompareSpecsList(res.data);
+    } catch (err) {
+      console.error("Lỗi tải compare specs", err);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
     fetchTags();
+    fetchCompareSpecs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -145,6 +156,10 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
 
     const processedTags = (p.tags || []).map(t => t._id || t);
     const processedCompatibleWith = (p.compatibleWith || []).map(cp => cp._id || cp);
+    const processedCompareRatings = (p.compareRatings || []).map(cr => ({
+      groupId: cr.groupId?._id || cr.groupId,
+      tierId: cr.tierId?._id || cr.tierId,
+    }));
 
     setForm({
       ...p,
@@ -155,7 +170,8 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
       conditionLevel: (p.conditionLevel && p.conditionLevel.length > 0) ? p.conditionLevel : ["99%"],
       detailImages: processedDetailImages,
       tags: processedTags,
-      compatibleWith: processedCompatibleWith
+      compatibleWith: processedCompatibleWith,
+      compareRatings: processedCompareRatings,
     });
     setShowModal(true);
     document.body.style.overflow = "hidden";
@@ -323,6 +339,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
         conditionLevel: form.condition === "new" ? [] : form.conditionLevel,
         tags: form.tags || [],
         compatibleWith: form.compatibleWith || [],
+        compareRatings: form.compareRatings || [],
         imagesToDelete
       };
 
@@ -343,7 +360,7 @@ export const useProductManager = (productType, emptyFormTemplate, specsConfig = 
   };
 
   return {
-    products, allProducts, form, setForm, showModal, isEditing, searchTerm, setSearchTerm, tagsList,
+    products, allProducts, form, setForm, showModal, isEditing, searchTerm, setSearchTerm, tagsList, compareSpecsList,
     selectedIds, setSelectedIds, handleSelectAll, handleSelectOne, clearSelection, refreshData: fetchProducts,
     addField, removeField, handleImageFileChange, handleDetailImageChange, openModalForAdd, openModalForEdit, closeModal,
     handleDelete, toggleActive, handleSubmit

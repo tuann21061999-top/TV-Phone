@@ -42,6 +42,7 @@ const PrivacyPolicy = lazy(() => import("./pages/Static/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/Static/TermsOfService"));
 const GlobalDeliveryConfirm = lazy(() => import("./components/Common/GlobalDeliveryConfirm"));
 const ChatWidget = lazy(() => import("./components/Common/ChatWidget"));
+const SmartFinderWidget = lazy(() => import("./components/SmartFinder/SmartFinderWidget"));
 
 function App() {
   const location = useLocation();
@@ -57,6 +58,7 @@ function App() {
       <Toaster position="top-right" richColors />
       <Suspense fallback={null}>
         <GlobalDeliveryConfirm />
+        <SmartFinderWidget />
         <ChatWidget />
       </Suspense>
       <ScrollToTop />

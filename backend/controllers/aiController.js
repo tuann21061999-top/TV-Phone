@@ -16,6 +16,9 @@ exports.chatWithAI = async (req, res) => {
         }
 
         const now = new Date();
+        const Tag = require("../models/Tag");
+        const allTags = await Tag.find().select("name").lean();
+        const tagNames = allTags.map(t => t.name).join(", ");
 
         // NÂNG CẤP PROMPT: Tập trung vào sự CỰC KỲ NGẮN GỌN, đi thẳng vào trọng tâm
         const systemInstruction = `
@@ -24,12 +27,13 @@ Phong cách: Trả lời CỰC KỲ NGẮN GỌN, đi thẳng vào trọng tâm,
 
 KỸ NÁNG CHỐT SALE VÀ TƯ VẤN:
 1. Nếu khách hàng có nhu cầu mua máy hoặc hỏi thông tin, HÃY SỬ DỤNG CÔNG CỤ search_products để tìm kiếm sản phẩm.
-2. LƯU Ý TỐI QUAN TRỌNG: TUYỆT ĐỐI KHÔNG dùng kiến thức cá nhân để phán xét một sản phẩm có tồn tại hay chưa. Bạn BẮT BUỘC phải dùng công cụ search_products để tìm trong Database trước khi kết luận!
-3. NẾU KHÁCH YÊU CẦU THÊM VÀO GIỎ HÀNG:
+2. LƯU Ý TỐI QUAN TRỌNG: TUYỆT ĐỐI KHÔNG dùng kiến thức cá nhân để phán xét một sản phẩm có tồn tại hay chưa. Bạn BẮT BUỘC phải dùng công cụ search_products để tìm trong Database trước kết luận!
+3. Các Thẻ tính năng (Tags) đang có trong shop: [${tagNames}]. Nếu khách hỏi (ví dụ: chơi game, chụp ảnh), HÃY ưu tiên trích xuất đúng tên Tag (vd: "Gaming", "Camera") để điền vào trường keyword.
+4. NẾU KHÁCH YÊU CẦU THÊM VÀO GIỎ HÀNG:
    - Bạn BẮT BUỘC phải hỏi khách muốn lấy phiên bản nào (màu gì, bộ nhớ bao nhiêu) nếu chưa rõ.
    - Khi đã có đủ thông tin, sử dụng công cụ add_to_cart để thêm vào giỏ.
-4. TUYỆT ĐỐI KHÔNG BAO GIỜ sử dụng dấu sao (*) hay (**) trong câu trả lời.
-5. Luôn hỏi lại khách một câu hỏi NGẮN GỌN ở cuối (vd: "Bạn ưng phiên bản nào?").
+5. TUYỆT ĐỐI KHÔNG BAO GIỜ sử dụng dấu sao (*) hay (**) trong câu trả lời.
+6. Luôn hỏi lại khách một câu hỏi NGẮN GỌN ở cuối (vd: "Bạn ưng phiên bản nào?").
 
 QUY TẮC TRÌNH BÀY KHI GIỚI THIỆU SẢN PHẨM (BẮT BUỘC TUÂN THỦ FORMAT NÀY):
 - Nêu Tên sản phẩm và mức giảm giá.
@@ -156,12 +160,22 @@ THÔNG TIN THANH TOÁN & BẢO HÀNH (Chỉ nhắc khi khách hỏi):
                 const conditions = [{ isActive: true }];
 
                 if (args.keyword && args.keyword.trim() !== "") {
+                    // Loại bỏ các từ vô nghĩa chung chung
+                    let cleanKeyword = args.keyword.toLowerCase().replace(/điện thoại|điện tử|phụ kiện|sản phẩm|máy|tốt/g, '').trim();
+                    if (!cleanKeyword) cleanKeyword = args.keyword.trim(); // fallback
+
+                    // Tìm các Tag khớp với keyword
+                    const Tag = require("../models/Tag");
+                    const matchingTags = await Tag.find({ name: new RegExp(cleanKeyword, "i") }).select("_id");
+                    const tagIds = matchingTags.map(t => t._id);
+
                     // Tách từ khóa để bắt buộc phải có đủ các từ
-                    const terms = args.keyword.trim().split(/\s+/);
+                    const terms = cleanKeyword.split(/\s+/);
                     const keywordConditions = terms.map(term => ({
                         $or: [
                             { name: new RegExp(term, "i") },
-                            { highlights: new RegExp(term, "i") }
+                            { highlights: new RegExp(term, "i") },
+                            { tags: { $in: tagIds } }
                         ]
                     }));
                     conditions.push({ $and: keywordConditions });
@@ -224,7 +238,9 @@ THÔNG TIN THANH TOÁN & BẢO HÀNH (Chỉ nhắc khi khách hỏi):
                 const products = await Product.find(finalQuery)
                 .sort(sortOptions)
                 .limit(5)
-                .select("name slug condition variants promotion highlights totalSold");
+                .select("name slug condition variants promotion highlights totalSold tags compareRatings")
+                .populate("tags", "name")
+                .populate("compareRatings.groupId", "name tiers");
 
                 let productContextStr = "";
 
@@ -251,6 +267,23 @@ THÔNG TIN THANH TOÁN & BẢO HÀNH (Chỉ nhắc khi khách hỏi):
                                 ? `Điểm nổi bật: ${p.highlights.join(" | ")}.`
                                 : "";
 
+                            const tagsStr = p.tags && p.tags.length > 0
+                                ? `Thẻ: ${p.tags.map(t => t.name).join(", ")}.`
+                                : "";
+
+                            let specsStr = "";
+                            if (p.compareRatings && p.compareRatings.length > 0) {
+                                const specItems = p.compareRatings.map(cr => {
+                                    if (!cr.groupId) return null;
+                                    const tier = cr.groupId.tiers?.find(t => t._id.toString() === cr.tierId?.toString());
+                                    if (tier) return `${cr.groupId.name} (${tier.name})`;
+                                    return null;
+                                }).filter(Boolean);
+                                if (specItems.length > 0) {
+                                    specsStr = `Phân cấp: ${specItems.join(", ")}.`;
+                                }
+                            }
+
                             const promoData = promoMap[p._id.toString()];
                             let flashSaleText = "";
 
@@ -265,7 +298,7 @@ THÔNG TIN THANH TOÁN & BẢO HÀNH (Chỉ nhắc khi khách hỏi):
                                 }
                             }
 
-                            productContextStr += `\n📱 Tên máy: ${p.name} (productId: ${p._id.toString()})\n🔗 Link đặt hàng: ${productLink}\n✨ ${highlightsStr}${flashSaleText}\n`;
+                            productContextStr += `\n📱 Tên máy: ${p.name} (productId: ${p._id.toString()})\n🔗 Link đặt hàng: ${productLink}\n✨ ${[highlightsStr, tagsStr, specsStr].filter(Boolean).join(" ")}${flashSaleText}\n`;
 
                             let globalDiscountPercent = 0;
                             if (p.promotion?.discountPercent &&

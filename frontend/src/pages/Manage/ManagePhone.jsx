@@ -17,6 +17,7 @@ const emptyForm = {
   conditionLevel: ["99%"],
   detailImages: [],
   tags: [],
+  compareRatings: [],
   compatibleWith: [],
   highlights: [""], isFeatured: false, isActive: true,
   specs: [
@@ -103,7 +104,7 @@ const emptyForm = {
 
 export default function ManagePhone() {
   const {
-    products, allProducts, form, setForm, showModal, isEditing, searchTerm, setSearchTerm, tagsList,
+    products, allProducts, form, setForm, showModal, isEditing, searchTerm, setSearchTerm, tagsList, compareSpecsList,
     selectedIds, handleSelectAll, handleSelectOne, clearSelection, refreshData,
     addField, removeField, handleImageFileChange, handleDetailImageChange, openModalForAdd, openModalForEdit, closeModal, handleDelete, toggleActive, handleSubmit
   } = useProductManager("device", emptyForm);
@@ -367,6 +368,42 @@ export default function ManagePhone() {
                         selectedTags={form.tags}
                         onChange={(newTags) => setForm({ ...form, tags: newTags })}
                       />
+                    </div>
+
+                    {/* NHÓM SO SÁNH — GÁN BẬC */}
+                    <div className="flex flex-col gap-2 md:col-span-2">
+                      <label className="text-sm font-semibold text-slate-600">Xếp hạng so sánh (Hiển thị trên trang so sánh):</label>
+                      <div className="flex flex-col gap-3 p-4 border border-slate-200 rounded-xl bg-slate-50">
+                        {compareSpecsList.filter(cs => cs.isActive).sort((a, b) => a.order - b.order).map(cs => {
+                          const currentRating = (form.compareRatings || []).find(r => r.groupId === cs._id);
+                          return (
+                            <div key={cs._id} className="flex items-center gap-3 bg-white p-3 rounded-lg border border-slate-100">
+                              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 text-blue-600 font-bold text-sm shrink-0">{cs.order}</div>
+                              <span className="text-sm font-semibold text-slate-700 min-w-[120px]">{cs.name}</span>
+                              <select
+                                value={currentRating?.tierId || ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  let updated = [...(form.compareRatings || [])].filter(r => r.groupId !== cs._id);
+                                  if (val) {
+                                    updated.push({ groupId: cs._id, tierId: val });
+                                  }
+                                  setForm({ ...form, compareRatings: updated });
+                                }}
+                                className="flex-1 p-2.5 px-3 border border-slate-200 rounded-lg text-sm text-slate-700 bg-white transition-all focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 appearance-none"
+                              >
+                                <option value="">-- Không gán --</option>
+                                {cs.tiers.sort((a, b) => a.rank - b.rank).map(tier => (
+                                  <option key={tier._id} value={tier._id}>{tier.name} (Bậc {tier.rank})</option>
+                                ))}
+                              </select>
+                            </div>
+                          );
+                        })}
+                        {compareSpecsList.filter(cs => cs.isActive).length === 0 && (
+                          <p className="text-sm text-slate-400 m-0">Chưa có nhóm so sánh nào. Hãy tạo trong mục "Nhóm So Sánh".</p>
+                        )}
+                      </div>
                     </div>
 
                     {/* SẢN PHẨM TƯƠNG THÍCH */}
