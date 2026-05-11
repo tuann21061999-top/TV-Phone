@@ -42,7 +42,7 @@ const PrivacyPolicy = lazy(() => import("./pages/Static/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/Static/TermsOfService"));
 const GlobalDeliveryConfirm = lazy(() => import("./components/Common/GlobalDeliveryConfirm"));
 const ChatWidget = lazy(() => import("./components/Common/ChatWidget"));
-const SmartFinderWidget = lazy(() => import("./components/SmartFinder/SmartFinderWidget"));
+const SmartFinderWidget = lazy(() => import("./components/Common/SmartFinderWidget"));
 
 function App() {
   const location = useLocation();
