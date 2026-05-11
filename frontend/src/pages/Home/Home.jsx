@@ -1,19 +1,20 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import axios from "axios";
 import Header from "../../components/Layout/Header";
 import Banner from "../../components/Home/Banner";
-import ProductGrid from "../../components/Product/ProductGrid";
-import Footer from "../../components/Layout/Footer";
 import Category from "../../components/Home/Category";
-import Features from "../../components/Home/Features";
-import Promotion from "../../components/Promotion/Promotion";
-import AIRecommend from "../../components/AI/AIRecommend";
-import AIAccessoryRecommend from "../../components/AI/AIAccessoryRecommend";
-import NewArrivals from "../../components/Home/NewArrivals";
-import BrandShowcase from "../../components/Home/BrandShowcase";
-import LatestNews from "../../components/Home/LatestNews";
-import GlobalArticle from "../../components/Home/GlobalArticle";
+import Footer from "../../components/Layout/Footer";
+
+// Lazy load các section dưới nếp gấp
+const AIRecommend = lazy(() => import("../../components/AI/AIRecommend"));
+const AIAccessoryRecommend = lazy(() => import("../../components/AI/AIAccessoryRecommend"));
+const NewArrivals = lazy(() => import("../../components/Home/NewArrivals"));
+const ProductGrid = lazy(() => import("../../components/Product/ProductGrid"));
+const BrandShowcase = lazy(() => import("../../components/Home/BrandShowcase"));
+const LatestNews = lazy(() => import("../../components/Home/LatestNews"));
+const Features = lazy(() => import("../../components/Home/Features"));
+const GlobalArticle = lazy(() => import("../../components/Home/GlobalArticle"));
 
 function Home() {
   const [homeProducts, setHomeProducts] = useState([]);
@@ -90,22 +91,47 @@ function Home() {
       <Header preloadedProducts={homeProducts} isProductsReady={isProductsReady} />
       <Banner />
       <Category />
-      <AIRecommend initialFavoriteIds={favoriteIds} />
-      <AIAccessoryRecommend initialFavoriteIds={favoriteIds} />
-      <NewArrivals
-        preloadedProducts={homeProducts}
-        initialFavoriteIds={favoriteIds}
-        isProductsReady={isProductsReady}
-      />
-      <ProductGrid
-        preloadedProducts={homeProducts}
-        initialFavoriteIds={favoriteIds}
-        isProductsReady={isProductsReady}
-      />
-      <BrandShowcase preloadedProducts={homeProducts} isProductsReady={isProductsReady} />
-      <LatestNews />
-      <Features />
-      <GlobalArticle pageCode="home" />
+      
+      <Suspense fallback={<div className="h-20" />}>
+        <AIRecommend initialFavoriteIds={favoriteIds} />
+      </Suspense>
+      
+      <Suspense fallback={<div className="h-20" />}>
+        <AIAccessoryRecommend initialFavoriteIds={favoriteIds} />
+      </Suspense>
+      
+      <Suspense fallback={<div className="h-40" />}>
+        <NewArrivals
+          preloadedProducts={homeProducts}
+          initialFavoriteIds={favoriteIds}
+          isProductsReady={isProductsReady}
+        />
+      </Suspense>
+
+      <Suspense fallback={<div className="h-40" />}>
+        <ProductGrid
+          preloadedProducts={homeProducts}
+          initialFavoriteIds={favoriteIds}
+          isProductsReady={isProductsReady}
+        />
+      </Suspense>
+
+      <Suspense fallback={<div className="h-20" />}>
+        <BrandShowcase preloadedProducts={homeProducts} isProductsReady={isProductsReady} />
+      </Suspense>
+
+      <Suspense fallback={<div className="h-20" />}>
+        <LatestNews />
+      </Suspense>
+
+      <Suspense fallback={<div className="h-20" />}>
+        <Features />
+      </Suspense>
+
+      <Suspense fallback={<div className="h-40" />}>
+        <GlobalArticle pageCode="home" />
+      </Suspense>
+
       <Footer />
     </div>
   );

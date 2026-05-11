@@ -83,6 +83,10 @@ function BrandShowcase({ preloadedProducts, isProductsReady = false }) {
                   <img
                     src={logoSrc}
                     alt={brand}
+                    width={56}
+                    height={56}
+                    loading="lazy"
+                    decoding="async"
                     className="max-w-full max-h-full object-contain grayscale opacity-60 transition-all duration-300 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
                   />
                 ) : (

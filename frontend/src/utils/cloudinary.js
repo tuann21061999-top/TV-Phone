@@ -52,9 +52,15 @@ export const cloudinaryPresets = {
   /** Ảnh trung bình (chi tiết sản phẩm) */
   medium: (url) => optimizeCloudinaryUrl(url, { width: 600, quality: 'auto' }),
 
-  /** Ảnh lớn (banner, hero) */
-  banner: (url) => optimizeCloudinaryUrl(url, { width: 1920, quality: 'auto:best' }),
+  /** Ảnh banner cho PC (Full HD) */
+  banner: (url) => optimizeCloudinaryUrl(url, { width: 1920, quality: 'auto' }),
+
+  /** Ảnh banner cho Mobile (Tối ưu payload) */
+  bannerMobile: (url) => optimizeCloudinaryUrl(url, { width: 800, quality: 'auto' }),
 
   /** Ảnh avatar nhỏ */
   avatar: (url) => optimizeCloudinaryUrl(url, { width: 100, quality: 'auto', crop: 'fill' }),
+
+  /** Ảnh logo đối tác */
+  logo: (url) => optimizeCloudinaryUrl(url, { width: 200, quality: 'auto' }),
 };

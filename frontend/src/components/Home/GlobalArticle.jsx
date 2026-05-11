@@ -85,12 +85,15 @@ function GlobalArticle({ pageCode }) {
                         />
                     );
                 }
-                // Image block
-                return (
                     <div key={idx} className="text-center my-4">
-                        <img src={block.value} alt={`Hình minh họa ${idx + 1}`} className="max-w-full rounded-xl shadow-sm mx-auto" />
+                        <img 
+                            src={block.value} 
+                            alt={`Hình minh họa ${idx + 1}`} 
+                            loading="lazy"
+                            decoding="async"
+                            className="max-w-full rounded-xl shadow-sm mx-auto" 
+                        />
                     </div>
-                );
             })}
         </article>
 

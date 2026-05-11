@@ -57,6 +57,10 @@ function LatestNews() {
           <img
             src={cloudinaryPresets.medium(heroNews.thumbnail)}
             alt={heroNews.title}
+            width={600}
+            height={400}
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -89,6 +93,10 @@ function LatestNews() {
                 <img
                   src={cloudinaryPresets.thumbnail(news.thumbnail)}
                   alt={news.title}
+                  width={140}
+                  height={100}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover min-h-[90px] md:min-h-[100px] transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
