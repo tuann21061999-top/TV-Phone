@@ -5,6 +5,7 @@ import Header from "../../components/Layout/Header";
 import Footer from "../../components/Layout/Footer";
 import { Calendar, User, Eye, ChevronRight, Clock, List, ArrowUp } from "lucide-react";
 import { toast } from "sonner";
+import { ListSkeleton } from "../../components/Common/Skeletons";
 
 function NewsDetail() {
     const { slug } = useParams();
@@ -72,7 +73,24 @@ function NewsDetail() {
     };
 
     if (loading) return (
-        <div className="text-center mt-24 text-slate-500 font-['Inter',sans-serif]">Đang tải bài viết...</div>
+        <div className="bg-slate-50 min-h-screen font-['Inter',sans-serif]">
+            <Header />
+            <div className="max-w-[1200px] mx-auto px-4 md:px-8 py-6 md:py-10">
+                <div className="bg-white rounded-2xl p-5 md:p-10 border border-slate-100 animate-pulse">
+                    <div className="h-6 bg-slate-200 rounded w-24 mb-4"></div>
+                    <div className="h-10 bg-slate-200 rounded w-3/4 mb-4"></div>
+                    <div className="h-4 bg-slate-200 rounded w-1/2 mb-8"></div>
+                    <div className="h-[300px] bg-slate-200 rounded-xl mb-8"></div>
+                    <div className="space-y-3">
+                        <div className="h-4 bg-slate-200 rounded w-full"></div>
+                        <div className="h-4 bg-slate-200 rounded w-5/6"></div>
+                        <div className="h-4 bg-slate-200 rounded w-4/6"></div>
+                        <div className="h-4 bg-slate-200 rounded w-full"></div>
+                        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
     if (!article) return (
         <div className="text-center mt-24 text-slate-500 font-['Inter',sans-serif]">Không tìm thấy bài viết</div>

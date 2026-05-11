@@ -75,7 +75,7 @@ app.use(compression());
 // =============================
 const apiLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,  // 1 phút
-  max: 100,                  // Tối đa 100 request/IP/phút
+  max: 500,                  // Đã tăng từ 100 lên 500 request/IP/phút để tránh lỗi 429
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'Quá nhiều request, vui lòng thử lại sau 1 phút.' },
@@ -84,7 +84,7 @@ const apiLimiter = rateLimit({
 // Rate limit riêng cho AI endpoint (tốn tài nguyên hơn)
 const aiLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
-  max: 20,                   // Chỉ 20 request AI/phút/IP
+  max: 50,                   // Đã tăng từ 20 lên 50
   message: { message: 'Quá nhiều yêu cầu AI, vui lòng thử lại sau.' },
 });
 

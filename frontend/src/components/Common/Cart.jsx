@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import Header from "../Layout/Header";
 import Footer from "../Layout/Footer";
 import AIRecommend from "../AI/AIRecommend";
+import { CartSkeleton } from "../Common/Skeletons";
 
 const Cart = () => {
   const [cart, setCart] = useState(null);
@@ -126,7 +127,12 @@ const Cart = () => {
     }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-slate-500">Đang tải giỏ hàng...</div>;
+  if (loading) return (
+    <div className="bg-[#f4f7fa] min-h-screen w-full">
+      <Header />
+      <CartSkeleton />
+    </div>
+  );
 
   if (!cart || !cart.items || cart.items.length === 0) {
     return (

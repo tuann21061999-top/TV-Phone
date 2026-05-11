@@ -5,6 +5,8 @@ import Header from "../../components/Layout/Header";
 import Footer from "../../components/Layout/Footer";
 import ProductReview from "../../components/Product/ProductReview";
 import ProductCard from "../../components/Product/ProductCard";
+import { cloudinaryPresets } from "../../utils/cloudinary";
+import { ProductDetailSkeleton } from "../../components/Common/Skeletons";
 
 import { toast } from "sonner";
 import {
@@ -292,7 +294,12 @@ function ProductDetail() {
     };
   }, [product, selectedColor, selectedMem, selectedCondition, needsOptionSelection]);
 
-  if (loading) return <div className="flex justify-center items-center py-20 text-slate-500 font-medium animate-pulse">Đang tải...</div>;
+  if (loading) return (
+    <div className="bg-slate-50 min-h-screen font-sans">
+      <Header />
+      <ProductDetailSkeleton />
+    </div>
+  );
   if (!product)
     return <div className="flex justify-center items-center py-20 text-red-500 font-medium">Không tìm thấy sản phẩm</div>;
 
@@ -389,7 +396,7 @@ function ProductDetail() {
             
             {/* THÔNG TIN SẢN PHẨM (CHỈ HIỆN TRÊN PC) */}
             <div className="hidden md:flex items-center gap-4 shrink-0">
-              <img src={mainImage} alt={product.name} className="h-10 w-10 object-contain" />
+              <img src={cloudinaryPresets.thumbnail(mainImage)} alt={product.name} className="h-10 w-10 object-contain" />
               <div className="flex flex-col">
                 <h2 className="m-0 text-sm font-bold text-slate-800 truncate max-w-[200px]">{product.name}</h2>
                 <span className="text-xs font-bold text-blue-600">{priceData?.base?.toLocaleString() || 0}đ</span>
@@ -433,7 +440,7 @@ function ProductDetail() {
           <div className="w-full min-w-0">
             <div className="w-full aspect-square max-h-[350px] md:max-h-[500px] bg-white rounded-xl md:rounded-2xl border border-slate-200 flex items-center justify-center overflow-hidden relative">
               <img
-                src={mainImage}
+                src={cloudinaryPresets.medium(mainImage)}
                 alt={product.name}
                 className="w-full h-full object-contain p-4 md:p-8 transition-transform duration-300 md:hover:scale-105"
               />
@@ -462,7 +469,7 @@ function ProductDetail() {
                       onClick={() => setActiveImage(imgUrl)}
                     >
                       <img
-                        src={imgUrl}
+                        src={cloudinaryPresets.thumbnail(imgUrl)}
                         alt={`${product.name} chi tiết ${idx + 1}`}
                         className="w-full h-full object-contain"
                       />

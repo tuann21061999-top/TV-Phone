@@ -15,6 +15,11 @@ const sendEmail = async (options) => {
             auth: {
                 user: process.env.EMAIL_USER.trim(),
                 pass: process.env.EMAIL_PASS.trim()
+            },
+            // Ép dùng IPv4 — Render không hỗ trợ IPv6 outbound
+            family: 4,
+            tls: {
+                servername: 'smtp.gmail.com'
             }
         });
 

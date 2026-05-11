@@ -4,7 +4,8 @@ import axios from 'axios';
 import Header from '../../components/Layout/Header';
 import Footer from '../../components/Layout/Footer';
 import { ChevronRight, Cpu, HardDrive, Maximize, Camera, Battery, Smartphone, Wifi, Gamepad2, Layers, ShoppingCart, List } from 'lucide-react';
-
+import { cloudinaryPresets } from '../../utils/cloudinary';
+import { ListSkeleton } from '../../components/Common/Skeletons';
 const ICONS = {
     "Thông tin chung": <Layers size={20} color="#2563eb" />,
     "Màn hình": <Maximize size={20} color="#2563eb" />,
@@ -77,7 +78,15 @@ function SpecDetail() {
         return Math.min(...product.variants.map(v => v.price));
     }, [product]);
 
-    if (loading) return <div className="flex justify-center items-center py-20 text-slate-500 font-medium animate-pulse">Đang tải cấu hình chi tiết...</div>;
+    if (loading) return (
+        <div className="bg-slate-50 min-h-screen font-['Inter',sans-serif]">
+            <Header />
+            <div className="max-w-[1400px] mx-auto px-4 md:px-10 w-full mt-8">
+                <div className="h-5 bg-slate-200 rounded w-1/3 mb-6 animate-pulse"></div>
+                <ListSkeleton rows={6} />
+            </div>
+        </div>
+    );
     if (!product) return <div className="flex justify-center items-center py-20 text-red-500 font-medium">Không tìm thấy sản phẩm</div>;
 
     const hasDetailedSpecs = product.detailedSpecs &&
@@ -95,7 +104,7 @@ function SpecDetail() {
                     
                     {/* THÔNG TIN SẢN PHẨM (CHỈ HIỆN TRÊN PC) */}
                     <div className="hidden md:flex items-center gap-4 shrink-0">
-                        <img src={mainImage} alt={product.name} className="w-[45px] h-[45px] object-contain bg-slate-100 rounded-lg p-1" />
+                        <img src={cloudinaryPresets.thumbnail(mainImage)} alt={product.name} className="w-[45px] h-[45px] object-contain bg-slate-100 rounded-lg p-1" />
                         <div>
                             <h2 className="m-0 mb-0.5 text-base font-bold text-slate-800 truncate max-w-[250px]">{product.name}</h2>
                             <span className="text-sm font-semibold text-blue-600">{minPrice.toLocaleString()}đ</span>
@@ -139,7 +148,7 @@ function SpecDetail() {
                                             className="p-2.5 flex items-center gap-2.5 cursor-pointer border-b border-slate-50 last:border-none hover:bg-slate-50 transition-colors"
                                             onClick={() => navigate(`/compare?p1=${product.slug}&p2=${p.slug}`)}
                                         >
-                                            <img src={p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl} alt={p.name} className="w-10 h-10 object-contain" />
+                                            <img src={cloudinaryPresets.thumbnail(p.colorImages?.find(c => c.isDefault)?.imageUrl || p.colorImages?.[0]?.imageUrl)} alt={p.name} className="w-10 h-10 object-contain" />
                                             <div className="flex-1 text-[13px] font-semibold text-slate-800">{p.name}</div>
                                         </div>
                                     ))}

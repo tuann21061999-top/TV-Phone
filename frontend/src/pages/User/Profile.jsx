@@ -15,6 +15,7 @@ import axios from "axios";
 import AddressModal from "./AddressModal";
 import PaymentModal from "./PaymentModal";
 import ProductCard from "../../components/Product/ProductCard";
+import { ProfileSkeleton, ListSkeleton, ProductGridSkeleton } from "../../components/Common/Skeletons";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -465,7 +466,12 @@ const Profile = () => {
     } catch { alert("Lỗi xóa phương thức"); }
   };
 
-  if (!user) return null;
+  if (!user) return (
+    <div className="bg-slate-50 min-h-screen font-sans">
+      <Header />
+      <ProfileSkeleton />
+    </div>
+  );
 
   return (
     <div className="bg-slate-50 min-h-screen font-sans">
@@ -825,7 +831,9 @@ const Profile = () => {
                 </div>
 
                 {loadingOrders ? (
-                  <div className="text-center py-10 text-slate-500 animate-pulse">Đang tải danh sách đơn hàng...</div>
+                  <div className="py-4">
+                    <ListSkeleton rows={3} />
+                  </div>
                 ) : filteredOrders.length === 0 ? (
                   <div className="flex flex-col items-center justify-center p-10 text-center text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-200">
                     <Package size={48} className="text-slate-300 mb-4" />
@@ -1008,7 +1016,7 @@ const Profile = () => {
               <div className="bg-white rounded-xl p-4 md:p-7 shadow-sm border border-slate-100">
                 <div className="mb-6 pb-4 border-b border-slate-100"><h2 className="text-xl text-slate-800 m-0 font-bold">Sản phẩm yêu thích</h2></div>
                 {loadingFavorites ? (
-                  <div className="text-center py-10 text-slate-500 animate-pulse">Đang tải danh sách yêu thích...</div>
+                  <ProductGridSkeleton count={6} />
                 ) : favorites.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 px-5 text-center text-slate-500 bg-slate-50 rounded-xl border border-dashed border-slate-200">
                     <Heart size={48} className="text-slate-300 mb-4" />
@@ -1055,9 +1063,8 @@ const Profile = () => {
                 </div>
 
                 {loadingVouchers ? (
-                  <div className="text-center py-16 text-slate-500 bg-white rounded-xl shadow-sm border border-slate-200">
-                    <Loader2 className="animate-spin mx-auto mb-3 text-slate-400" size={32} />
-                    <p className="m-0">Đang tải kho voucher...</p>
+                  <div className="py-4">
+                    <ListSkeleton rows={3} />
                   </div>
                 ) : myVouchers.length === 0 ? (
                   <div className="flex flex-col items-center justify-center p-16 px-5 text-slate-400 text-center bg-white rounded-xl shadow-sm border border-slate-200">

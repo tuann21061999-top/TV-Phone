@@ -5,6 +5,7 @@ import Header from "../../components/Layout/Header";
 import Footer from "../../components/Layout/Footer";
 import ProductCard from "../../components/Product/ProductCard";
 import { ChevronRight } from "lucide-react";
+import { ProductGridSkeleton } from "../../components/Common/Skeletons";
 
 function SearchPage() {
   const [searchParams] = useSearchParams();
@@ -89,9 +90,7 @@ function SearchPage() {
 
         {/* NỘI DUNG */}
         {loading ? (
-          <div className="text-center py-16 bg-white rounded-xl border border-slate-200 text-slate-600 text-lg animate-pulse shadow-sm">
-            Đang tải kết quả...
-          </div>
+          <ProductGridSkeleton count={8} />
         ) : error ? (
           <div className="text-center py-16 bg-red-50 rounded-xl border border-red-200 text-red-500 text-lg shadow-sm">
             {error}

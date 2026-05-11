@@ -4,8 +4,10 @@ import Header from "../../components/Layout/Header";
 import Footer from "../../components/Layout/Footer";
 import axios from "axios";
 import { toast } from "sonner";
+import ProductCard from "../../components/Product/ProductCard";
 import GlobalArticle from "../../components/Home/GlobalArticle";
 import { cloudinaryPresets } from "../../utils/cloudinary";
+import { ProductGridSkeleton } from "../../components/Common/Skeletons";
 import {
   Star,
   ShoppingCart,
@@ -497,10 +499,11 @@ function AccessoriesPage() {
 
           {/* PRODUCTS */}
           <section className="flex-1 min-w-0">
-            {loading && <div className="text-center py-20 text-[15px] font-medium text-slate-500 animate-pulse">Đang tải sản phẩm...</div>}
-            {error && <div className="text-red-500 font-medium">{error}</div>}
-
-            {!loading && !error && (
+            {loading ? (
+              <ProductGridSkeleton count={8} />
+            ) : error ? (
+              <div className="text-red-500 font-medium">{error}</div>
+            ) : (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4 lg:gap-5">
                 {currentProducts.map((product) => {
                   const { basePrice, finalPrice, discountPercent, totalLimit, totalSold } = getPricingInfo(product);
