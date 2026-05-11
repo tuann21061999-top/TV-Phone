@@ -1,8 +1,8 @@
 const nodemailer = require('nodemailer');
 
 const sendEmail = async (options) => {
-    if (!process.env.BREVO_EMAIL || !process.env.BREVO_KEY) {
-        throw new Error('Thiếu BREVO_EMAIL hoặc BREVO_KEY');
+    if (!process.env.BREVO_EMAIL || !process.env.BREVO_SMTP_KEY) {
+        throw new Error('Thiếu BREVO_EMAIL hoặc BREVO_SMTP_KEY');
     }
 
     try {
@@ -13,7 +13,7 @@ const sendEmail = async (options) => {
 
             auth: {
                 user: process.env.BREVO_EMAIL.trim(),
-                pass: process.env.BREVO_KEY.trim()
+                pass: process.env.BREVO_SMTP_KEY.trim()
             },
 
             name: 'V&T Nexis',
