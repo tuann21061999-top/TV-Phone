@@ -5,6 +5,8 @@ import Header from '../../components/Layout/Header';
 import Footer from '../../components/Layout/Footer';
 import ProductReview from '../../components/Product/ProductReview';
 import { ShoppingCart } from 'lucide-react';
+import { cloudinaryPresets } from '../../utils/cloudinary';
+import { ListSkeleton } from '../../components/Common/Skeletons';
 
 function ReviewPage() {
     const { slug } = useParams();
@@ -37,7 +39,14 @@ function ReviewPage() {
         return Math.min(...product.variants.map(v => v.price));
     }, [product]);
 
-    if (loading) return <div className="flex justify-center items-center min-h-[60vh] text-slate-500 font-medium animate-pulse">Đang tải...</div>;
+    if (loading) return (
+        <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
+            <Header />
+            <div className="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-5 mt-4 md:mt-8 mb-12">
+                <ListSkeleton rows={4} />
+            </div>
+        </div>
+    );
     if (!product) return <div className="flex justify-center items-center min-h-[60vh] text-red-500 font-medium">Không tìm thấy sản phẩm</div>;
 
     return (
@@ -50,7 +59,7 @@ function ReviewPage() {
                     
                     {/* THÔNG TIN SẢN PHẨM (CHỈ HIỆN TRÊN PC) */}
                     <div className="hidden md:flex items-center gap-4 shrink-0">
-                        <img src={mainImage} alt={product.name} className="w-[45px] h-[45px] object-contain bg-slate-100 rounded-lg p-1" />
+                        <img src={cloudinaryPresets.thumbnail(mainImage)} alt={product.name} className="w-[45px] h-[45px] object-contain bg-slate-100 rounded-lg p-1" />
                         <div>
                             <h2 className="m-0 mb-0.5 text-base font-bold text-slate-800 truncate max-w-[250px] lg:max-w-[300px]">{product.name}</h2>
                             <span className="text-sm font-semibold text-blue-600">{minPrice.toLocaleString()}đ</span>

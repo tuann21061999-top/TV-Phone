@@ -1,6 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
 import { Toaster } from "sonner";
 
 import Home from "./pages/Home/Home";
@@ -62,49 +61,47 @@ function App() {
         <ChatWidget />
       </Suspense>
       <ScrollToTop />
-      <AnimatePresence mode="wait">
-        <Suspense
-          fallback={
-            <div className="min-h-[40vh] flex items-center justify-center text-sm text-slate-500">
-              Đang tải trang...
-            </div>
-          }
-        >
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-            <Route path="/phones" element={<PageTransition><PhonePage /></PageTransition>} />
-            <Route path="/electronics" element={<PageTransition><ElectronicPage /></PageTransition>} />
-            <Route path="/accessories" element={<PageTransition><AccessoryPage /></PageTransition>} />
-            <Route path="/promotions" element={<PageTransition><Promotions /></PageTransition>} />
-            <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
-            <Route path="/news" element={<PageTransition><News /></PageTransition>} />
-            <Route path="/news/:slug" element={<PageTransition><NewsDetail /></PageTransition>} />
-            <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
-            <Route path="/cart" element={<PageTransition><Cart /></PageTransition>} />
-            <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
-            <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
-            <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
-            <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
-            <Route path="/product/:slug" element={<PageTransition><ProductDetail /></PageTransition>} />
-            <Route path="/product/:slug/specs" element={<PageTransition><SpecDetail /></PageTransition>} />
-            <Route path="/compare" element={<PageTransition><ProductCompare /></PageTransition>} />
-            <Route path="/product/:slug/reviews" element={<PageTransition><ReviewPage /></PageTransition>} />
-            <Route path="/admin" element={<AdminRoute><PageTransition><AdminPage /></PageTransition></AdminRoute>} />
-            <Route path="/admin/products" element={<AdminRoute><PageTransition><ManageProduct /></PageTransition></AdminRoute>} />
-            <Route path="/admin/electronics" element={<AdminRoute><PageTransition><ManageElectronic /></PageTransition></AdminRoute>} />
-            <Route path="/admin/accessories" element={<AdminRoute><PageTransition><ManageAccessory /></PageTransition></AdminRoute>} />
-            <Route path="/profile/address" element={<PageTransition><AddressModal /></PageTransition>} />
-            <Route path="/checkout" element={<PageTransition><CheckoutPage /></PageTransition>} />
-            <Route path="/payment" element={<PageTransition><Payment /></PageTransition>} />
-            <Route path="/payment-result" element={<PageTransition><PaymentResult /></PageTransition>} />
-            <Route path="/admin/orders" element={<AdminRoute><PageTransition><ManageOrder /></PageTransition></AdminRoute>} />
-            <Route path="/order/:id" element={<PageTransition><OrderDetail /></PageTransition>} />
-            <Route path="/review-order/:id" element={<PageTransition><ReviewOrder /></PageTransition>} />
-            <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
-            <Route path="/terms-of-service" element={<PageTransition><TermsOfService /></PageTransition>} />
-          </Routes>
-        </Suspense>
-      </AnimatePresence>
+      <Suspense
+        fallback={
+          <div className="min-h-[40vh] flex items-center justify-center text-sm text-slate-500">
+            Đang tải trang...
+          </div>
+        }
+      >
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+          <Route path="/phones" element={<PageTransition><PhonePage /></PageTransition>} />
+          <Route path="/electronics" element={<PageTransition><ElectronicPage /></PageTransition>} />
+          <Route path="/accessories" element={<PageTransition><AccessoryPage /></PageTransition>} />
+          <Route path="/promotions" element={<PageTransition><Promotions /></PageTransition>} />
+          <Route path="/contact" element={<PageTransition><ContactPage /></PageTransition>} />
+          <Route path="/news" element={<PageTransition><News /></PageTransition>} />
+          <Route path="/news/:slug" element={<PageTransition><NewsDetail /></PageTransition>} />
+          <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
+          <Route path="/cart" element={<PageTransition><Cart /></PageTransition>} />
+          <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
+          <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
+          <Route path="/forgot-password" element={<PageTransition><ForgotPassword /></PageTransition>} />
+          <Route path="/profile" element={<PageTransition><Profile /></PageTransition>} />
+          <Route path="/product/:slug" element={<PageTransition><ProductDetail /></PageTransition>} />
+          <Route path="/product/:slug/specs" element={<PageTransition><SpecDetail /></PageTransition>} />
+          <Route path="/compare" element={<PageTransition><ProductCompare /></PageTransition>} />
+          <Route path="/product/:slug/reviews" element={<PageTransition><ReviewPage /></PageTransition>} />
+          <Route path="/admin" element={<AdminRoute><PageTransition><AdminPage /></PageTransition></AdminRoute>} />
+          <Route path="/admin/products" element={<AdminRoute><PageTransition><ManageProduct /></PageTransition></AdminRoute>} />
+          <Route path="/admin/electronics" element={<AdminRoute><PageTransition><ManageElectronic /></PageTransition></AdminRoute>} />
+          <Route path="/admin/accessories" element={<AdminRoute><PageTransition><ManageAccessory /></PageTransition></AdminRoute>} />
+          <Route path="/profile/address" element={<PageTransition><AddressModal /></PageTransition>} />
+          <Route path="/checkout" element={<PageTransition><CheckoutPage /></PageTransition>} />
+          <Route path="/payment" element={<PageTransition><Payment /></PageTransition>} />
+          <Route path="/payment-result" element={<PageTransition><PaymentResult /></PageTransition>} />
+          <Route path="/admin/orders" element={<AdminRoute><PageTransition><ManageOrder /></PageTransition></AdminRoute>} />
+          <Route path="/order/:id" element={<PageTransition><OrderDetail /></PageTransition>} />
+          <Route path="/review-order/:id" element={<PageTransition><ReviewOrder /></PageTransition>} />
+          <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+          <Route path="/terms-of-service" element={<PageTransition><TermsOfService /></PageTransition>} />
+        </Routes>
+      </Suspense>
     </>
   );
 }

@@ -16,6 +16,8 @@ import axios from "axios";
 import { toast } from "sonner";
 import GlobalArticle from "../../components/Home/GlobalArticle";
 import { cloudinaryPresets } from "../../utils/cloudinary";
+import { ProductGridSkeleton } from "../../components/Common/Skeletons";
+
 
 function PhonePage() {
   const navigate = useNavigate();
@@ -469,7 +471,7 @@ function PhonePage() {
           {/* PRODUCT GRID */}
           <section className="flex-1 min-w-0">
             {loading ? (
-              <div className="text-center py-20 text-[15px] font-medium text-slate-500 animate-pulse">Đang tải sản phẩm...</div>
+              <ProductGridSkeleton count={8} />
             ) : (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4 lg:gap-5">
                 {currentProducts.map((product) => {

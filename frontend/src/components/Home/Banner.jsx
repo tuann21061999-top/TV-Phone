@@ -114,6 +114,9 @@ function Banner() {
             alt={activeBanner.title} 
             fetchpriority="high"
             decoding="sync"
+            loading="eager"
+            width={1200}
+            height={380}
             className="w-full h-full object-cover" 
           />
         </Link>

@@ -6,6 +6,7 @@ import Header from "../../components/Layout/Header";
 import Footer from "../../components/Layout/Footer";
 import ProductCard from "../../components/Product/ProductCard";
 import GlobalArticle from "../../components/Home/GlobalArticle";
+import { ProductGridSkeleton } from "../../components/Common/Skeletons";
 
 // Component Đếm ngược
 const CountdownTimer = ({ targetDate }) => {
@@ -173,8 +174,8 @@ const Promotions = () => {
                         </div>
 
                         {loading ? (
-                            <div className="flex justify-center items-center py-20 text-slate-500 font-medium text-lg animate-pulse">
-                                Đang tải dữ liệu khuyến mãi...
+                            <div className="py-10">
+                                <ProductGridSkeleton count={4} />
                             </div>
                         ) : topDeals.length > 0 ? (
                             <div className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] bg-gradient-to-br from-slate-900 to-blue-900 p-0">
@@ -281,9 +282,7 @@ const Promotions = () => {
                     </div>
 
                     {loading ? (
-                        <div className="flex justify-center items-center py-20 text-slate-500 font-medium text-lg animate-pulse">
-                            Đang tải dữ liệu...
-                        </div>
+                        <ProductGridSkeleton count={6} />
                     ) : allPromotions.length > 0 ? (
                         <div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-3 sm:gap-5 md:gap-[30px]">
                             {allPromotions.map(product => (

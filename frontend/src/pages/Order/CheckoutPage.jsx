@@ -8,6 +8,8 @@ import axios from "axios";
 import Header from "../../components/Layout/Header";
 import Footer from "../../components/Layout/Footer";
 import AddressModal from "../User/AddressModal";
+import { cloudinaryPresets } from "../../utils/cloudinary";
+import { CheckoutSkeleton } from "../../components/Common/Skeletons";
 import { toast } from "sonner";
 
 // --- CÁC GÓI BẢO HÀNH ---
@@ -321,8 +323,9 @@ const CheckoutPage = () => {
   };
 
   if (loading) return (
-  <div className="flex justify-center items-center h-screen text-lg text-blue-600">
-    Đang tải thông tin...
+  <div className="bg-slate-50 min-h-screen font-sans text-slate-800">
+    <Header />
+    <CheckoutSkeleton />
   </div>
 );
 
@@ -506,7 +509,7 @@ return (
             {checkoutItems.map((item, idx) => (
               <div key={idx} className="flex items-center gap-3">
                 <div className="w-[60px] h-[60px] bg-slate-50 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
-                  <img src={item.image} alt={item.name} className="max-w-full max-h-full object-contain" />
+                  <img src={cloudinaryPresets.thumbnail(item.image)} alt={item.name} className="max-w-full max-h-full object-contain" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="text-[13px] font-semibold m-0 mb-1 line-clamp-2">{item.name}</h4>
