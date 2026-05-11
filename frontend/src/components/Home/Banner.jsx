@@ -110,13 +110,17 @@ function Banner() {
           className="w-full h-full relative z-10 block group-hover:scale-[1.01] transition-transform duration-700 overflow-hidden animate-scaleIn opacity-0"
         >
           <img 
-            src={cloudinaryPresets.banner(activeBanner.image)} 
+            src={
+              window.innerWidth < 768 
+                ? cloudinaryPresets.bannerMobile(activeBanner.image) 
+                : cloudinaryPresets.banner(activeBanner.image)
+            } 
             alt={activeBanner.title} 
             fetchpriority="high"
             decoding="sync"
             loading="eager"
-            width={1200}
-            height={380}
+            width={window.innerWidth < 768 ? 800 : 1200}
+            height={window.innerWidth < 768 ? 266 : 380}
             className="w-full h-full object-cover" 
           />
         </Link>

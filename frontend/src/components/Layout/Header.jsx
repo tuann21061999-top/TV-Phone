@@ -288,7 +288,7 @@ function Header({ preloadedProducts, isProductsReady = false }) {
             </button>
 
             <Link to="/" className="inline-block leading-none no-underline transition-transform duration-300 hover:text-[#FACC15] hover:scale-105 group shrink-0">
-              <img src={logoImg} alt="V&T Nexis Logo" className="h-[30px] md:h-[45px] w-auto object-contain transition-transform duration-300" />
+              <img src={logoImg} alt="V&T Nexis Logo" width={160} height={45} className="h-[30px] md:h-[45px] w-auto object-contain transition-transform duration-300" />
             </Link>
             <Navbar preloadedProducts={preloadedProducts} isProductsReady={isProductsReady} />
           </div>
@@ -320,7 +320,7 @@ function Header({ preloadedProducts, isProductsReady = false }) {
                           <div className="flex flex-col mb-4">
                             {favoriteProducts.map((product) => (
                               <div key={product._id} className="flex items-center gap-3 py-2.5 px-2 cursor-pointer transition-colors duration-200 rounded-lg hover:bg-slate-50" onClick={() => { setIsSearchOpen(false); setSearchTerm(""); navigate(`/product/${product.slug || product._id}`); }}>
-                                <img src={product.colorImages?.[0]?.imageUrl || product.images?.[0] || "/no-image.png"} alt={product.name} className="w-10 h-10 object-contain rounded bg-white shrink-0 border border-slate-100 p-0.5" />
+                                <img src={product.colorImages?.[0]?.imageUrl || product.images?.[0] || "/no-image.png"} alt={product.name} width={40} height={40} loading="lazy" decoding="async" className="w-10 h-10 object-contain rounded bg-white shrink-0 border border-slate-100 p-0.5" />
                                 <div className="flex-1 min-w-0">
                                   <h4 className="text-[13px] text-slate-800 m-0 mb-0.5 font-medium line-clamp-1">{product.name}</h4>
                                   <span className="text-[12.5px] text-red-500 font-bold">{product.variants?.[0]?.price ? product.variants[0].price.toLocaleString("vi-VN") + "₫" : "Đang cập nhật"}</span>
@@ -337,7 +337,7 @@ function Header({ preloadedProducts, isProductsReady = false }) {
                           <div className="flex flex-col">
                             {trendingProducts.map((product) => (
                               <div key={product._id} className="flex items-center gap-3 py-2.5 px-2 cursor-pointer transition-colors duration-200 rounded-lg hover:bg-slate-50" onClick={() => { setIsSearchOpen(false); setSearchTerm(""); navigate(`/product/${product.slug || product._id}`); }}>
-                                <img src={product.colorImages?.[0]?.imageUrl || product.images?.[0] || "/no-image.png"} alt={product.name} className="w-10 h-10 object-contain rounded bg-white shrink-0 border border-slate-100 p-0.5" />
+                                <img src={product.colorImages?.[0]?.imageUrl || product.images?.[0] || "/no-image.png"} alt={product.name} width={40} height={40} loading="lazy" decoding="async" className="w-10 h-10 object-contain rounded bg-white shrink-0 border border-slate-100 p-0.5" />
                                 <div className="flex-1 min-w-0">
                                   <h4 className="text-[13px] text-slate-800 m-0 mb-0.5 font-medium line-clamp-1">{product.name}</h4>
                                   <span className="text-[12.5px] text-red-500 font-bold">{product.variants?.[0]?.price ? product.variants[0].price.toLocaleString("vi-VN") + "₫" : "Đang cập nhật"}</span>
@@ -365,6 +365,10 @@ function Header({ preloadedProducts, isProductsReady = false }) {
                           <img
                             src={product.colorImages?.[0]?.imageUrl || product.images?.[0] || "/no-image.png"}
                             alt={product.name}
+                            width={40}
+                            height={40}
+                            loading="lazy"
+                            decoding="async"
                             className="w-10 h-10 object-contain rounded bg-white shrink-0"
                           />
                           <div>

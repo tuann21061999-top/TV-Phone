@@ -137,6 +137,10 @@ function Promotion({ isCompact = false }) {
             <img
               src={displayImage}
               alt={bestProduct.productName}
+              width={260}
+              height={260}
+              loading="lazy"
+              decoding="async"
               className="w-[82%] h-[82%] object-contain mix-blend-multiply"
             />
           </div>
