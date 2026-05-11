@@ -15,6 +15,7 @@ import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import GlobalArticle from "../../components/Home/GlobalArticle";
+import { cloudinaryPresets } from "../../utils/cloudinary";
 
 function PhonePage() {
   const navigate = useNavigate();
@@ -503,7 +504,7 @@ function PhonePage() {
                         onClick={() => navigate(`/product/${product.slug || product._id}`)}
                       >
                         <img
-                          src={displayImage}
+                          src={cloudinaryPresets.thumbnail(displayImage)}
                           alt={product.name}
                           className="max-w-full max-h-full p-2 object-contain object-center transition-transform duration-300 md:group-hover:scale-105"
                         />

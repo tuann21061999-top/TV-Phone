@@ -5,6 +5,7 @@ import Footer from "../../components/Layout/Footer";
 import axios from "axios";
 import { toast } from "sonner";
 import GlobalArticle from "../../components/Home/GlobalArticle";
+import { cloudinaryPresets } from "../../utils/cloudinary";
 import {
   Star,
   ShoppingCart,
@@ -549,7 +550,7 @@ function AccessoriesPage() {
                         onClick={() => navigate(`/product/${product.slug || product._id}`)}
                       >
                         <img
-                          src={displayImage}
+                          src={cloudinaryPresets.thumbnail(displayImage)}
                           alt={product.name}
                           className="max-h-full max-w-full p-2 object-contain object-center transition-transform duration-300 md:group-hover:scale-105"
                         />

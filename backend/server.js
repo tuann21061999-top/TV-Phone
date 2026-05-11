@@ -40,6 +40,7 @@ const favoriteRoutes = require("./routes/favoriteRoutes");
 const newsRoutes = require("./routes/newsRoutes");
 const viewHistoryRoutes = require("./routes/viewHistoryRoutes");
 const tagRoutes = require("./routes/tagRoutes");
+const compareSpecRoutes = require("./routes/compareSpecRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
@@ -218,6 +219,7 @@ app.use("/api/favorites", favoriteRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/view-history", viewHistoryRoutes);
 app.use("/api/tags", tagRoutes);
+app.use("/api/compare-specs", compareSpecRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 

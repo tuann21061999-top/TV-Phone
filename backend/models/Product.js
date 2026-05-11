@@ -191,6 +191,18 @@ const productSchema = new mongoose.Schema(
       },
     ],
 
+    compareRatings: [
+      {
+        groupId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "CompareSpec",
+        },
+        tierId: {
+          type: mongoose.Schema.Types.ObjectId,
+        },
+      },
+    ],
+
     isFeatured: {
       type: Boolean,
       default: false,

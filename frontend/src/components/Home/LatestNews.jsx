@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Newspaper, ArrowRight, Calendar, ChevronRight } from "lucide-react";
+import { cloudinaryPresets } from "../../utils/cloudinary";
 
 function LatestNews() {
   const [newsList, setNewsList] = useState([]);
@@ -54,7 +55,7 @@ function LatestNews() {
           className="relative rounded-2xl overflow-hidden cursor-pointer group h-[220px] sm:h-[280px] md:h-full md:min-h-[380px]"
         >
           <img
-            src={heroNews.thumbnail}
+            src={cloudinaryPresets.medium(heroNews.thumbnail)}
             alt={heroNews.title}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
@@ -86,7 +87,7 @@ function LatestNews() {
             >
               <div className="w-[110px] sm:w-[130px] md:w-[140px] shrink-0 overflow-hidden">
                 <img
-                  src={news.thumbnail}
+                  src={cloudinaryPresets.thumbnail(news.thumbnail)}
                   alt={news.title}
                   className="w-full h-full object-cover min-h-[90px] md:min-h-[100px] transition-transform duration-500 group-hover:scale-105"
                 />
