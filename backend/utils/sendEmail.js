@@ -1,47 +1,51 @@
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 
 const sendEmail = async (options) => {
-    if (!process.env.BREVO_EMAIL || !process.env.BREVO_SMTP_KEY) {
-        throw new Error('Thiếu BREVO_EMAIL hoặc BREVO_SMTP_KEY');
+    // Kiểm tra biến môi trường
+    if (!process.env.BREVO_EMAIL || !process.env.BREVO_API_KEY) {
+        throw new Error('Thiếu BREVO_EMAIL hoặc BREVO_API_KEY');
     }
 
     try {
-        const transporter = nodemailer.createTransport({
-            host: 'smtp-relay.brevo.com',
-            port: 587,
-            secure: false,
+        // Gửi email qua Brevo REST API
+        const response = await axios.post(
+            'https://api.brevo.com/v3/smtp/email',
+            {
+                sender: {
+                    name: 'V&T Nexis',
+                    email: process.env.BREVO_EMAIL.trim()
+                },
 
-            auth: {
-                user: process.env.BREVO_EMAIL.trim(),
-                pass: process.env.BREVO_SMTP_KEY.trim()
+                to: [
+                    {
+                        email: options.to
+                    }
+                ],
+
+                subject: options.subject,
+
+                htmlContent: options.html
             },
+            {
+                headers: {
+                    'api-key': process.env.BREVO_API_KEY.trim(),
+                    'Content-Type': 'application/json'
+                },
 
-            name: 'V&T Nexis',
-
-            connectionTimeout: 10000,
-            greetingTimeout: 10000,
-            socketTimeout: 10000,
-
-            tls: {
-                rejectUnauthorized: false
+                timeout: 10000
             }
-        });
+        );
 
-        const mailOptions = {
-            from: `"V&T Nexis" <${process.env.BREVO_EMAIL.trim()}>`,
-            to: options.to,
-            subject: options.subject,
-            html: options.html
-        };
+        console.log('Email gửi thành công:', response.data);
 
-        const info = await transporter.sendMail(mailOptions);
-
-        console.log('Email gửi thành công:', info.response);
-
-        return info;
+        return response.data;
 
     } catch (error) {
-        console.error('LỖI GỬI MAIL:', error);
+        console.error(
+            'LỖI GỬI MAIL:',
+            error.response?.data || error.message
+        );
+
         throw error;
     }
 };
