@@ -4,12 +4,12 @@ const router = express.Router();
 const productController = require("../controllers/productController");
 const { validateProduct } = require("../middleware/productMiddleware");
 const { protect, admin } = require("../middleware/authMiddleware");
-const smartSearchController = require("../controllers/smartSearchController");
+const quickSearchController = require("../controllers/quickSearchController");
 
 /* ===============================
-   SMART SEARCH
+   QUICK SEARCH
 =============================== */
-router.post("/smart-search", smartSearchController.smartSearch);
+router.post("/quick-search", quickSearchController.quickSearch);
 
 /* ===============================
    CREATE

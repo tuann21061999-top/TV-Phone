@@ -48,6 +48,8 @@ exports.smartSearch = async (req, res) => {
         });
       }
 
+      let diffSum = 0; // Dương = Tốt hơn tổng thể, Âm = Kém hơn tổng thể
+
       requestedGroups.forEach(groupId => {
         const reqTierId = ratings[groupId];
         const reqRank = ranksMap[groupId] ? ranksMap[groupId][reqTierId] : null;
@@ -57,46 +59,81 @@ exports.smartSearch = async (req, res) => {
         const prodTierId = prodRatings[groupId];
         if (!prodTierId) {
           // Product doesn't have rating for this group => severe penalty
-          penalty += 20; 
+          penalty += 1000; 
           return;
         }
 
         const prodRank = ranksMap[groupId][prodTierId];
         if (prodRank == null) {
-          penalty += 20;
+          penalty += 1000;
           return;
         }
 
-        if (prodRank === reqRank) {
+        const diff = Math.abs(prodRank - reqRank);
+        if (diff > 1) {
+          penalty += 1000; // Only allow +/- 1 rank difference
+        } else if (prodRank === reqRank) {
           // Exact match! No penalty
           penalty += 0;
           matchCount++;
         } else if (prodRank < reqRank) {
           // Better than requested (lower rank number is better)
           penalty += (reqRank - prodRank) * 2; // Slight penalty but prioritizes it over worse products
+          diffSum += (reqRank - prodRank);
         } else {
           // Worse than requested
           penalty += (prodRank - reqRank) * 10; // High penalty
+          diffSum -= (prodRank - reqRank);
         }
       });
+
+      let minPrice = 0;
+      if (product.variants && product.variants.length > 0) {
+        minPrice = Math.min(...product.variants.map(v => v.price));
+      }
 
       return {
         product,
         penalty,
-        matchCount
+        matchCount,
+        diffSum,
+        minPrice
       };
     });
 
+    // Filter out products with penalty >= 1000
+    const validProducts = scoredProducts.filter(item => item.penalty < 1000);
+
     // Sort products by lowest penalty. If penalty is same, prioritize highest matchCount.
-    scoredProducts.sort((a, b) => {
+    validProducts.sort((a, b) => {
       if (a.penalty !== b.penalty) return a.penalty - b.penalty;
       return b.matchCount - a.matchCount; // tie-breaker: more exact matches
     });
 
-    // Top 6 products: 1 best match, 5 related
-    const topMatches = scoredProducts.slice(0, 6).map(item => item.product);
+    const exactMatches = validProducts
+      .filter(item => item.penalty === 0)
+      .map(item => ({ ...item.product.toObject(), _isExact: true }));
 
-    res.json(topMatches);
+    const suggestionCandidates = validProducts.filter(item => item.penalty > 0);
+    
+    // Sort suggestions by price ASCENDING so we recommend the cheapest options first
+    suggestionCandidates.sort((a, b) => a.minPrice - b.minPrice);
+
+    // Lấy 3 sản phẩm tốt hơn và 3 sản phẩm kém hơn dựa trên giá rẻ nhất
+    const betterSuggestions = suggestionCandidates.filter(item => item.diffSum > 0).slice(0, 3);
+    const worseSuggestions = suggestionCandidates.filter(item => item.diffSum <= 0).slice(0, 3);
+
+    const suggestions = [...betterSuggestions, ...worseSuggestions]
+      .map(item => ({ 
+        ...item.product.toObject(), 
+        _isExact: false,
+        _isBetter: item.diffSum > 0
+      }));
+
+    res.json({
+      exactMatches,
+      suggestions
+    });
   } catch (error) {
     console.error("Smart Search Error:", error);
     res.status(500).json({ message: "Lỗi tìm kiếm thông minh" });
