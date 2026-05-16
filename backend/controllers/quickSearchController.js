@@ -135,7 +135,7 @@ exports.quickSearch = async (req, res) => {
       suggestions
     });
   } catch (error) {
-    console.error("Smart Search Error:", error);
+    console.error("Quick Search Error:", error);
     res.status(500).json({ message: "Lỗi tìm kiếm thông minh" });
   }
 };

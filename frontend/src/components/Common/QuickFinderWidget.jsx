@@ -3,7 +3,7 @@ import axios from "axios";
 import { Sparkles, X, Search, ChevronRight, Wand2 } from "lucide-react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 
-const SmartFinderWidget = () => {
+const QuickFinderWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [specs, setSpecs] = useState([]);
   const [ratings, setRatings] = useState({});
@@ -375,4 +375,4 @@ const SmartFinderWidget = () => {
   );
 };
 
-export default SmartFinderWidget;
+export default QuickFinderWidget;
