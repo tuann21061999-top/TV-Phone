@@ -44,6 +44,9 @@ const compareSpecRoutes = require("./routes/compareSpecRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
+// Kích hoạt trust proxy để express-rate-limit hoạt động đúng khi deploy trên Render/Vercel (chạy sau reverse proxy)
+app.set("trust proxy", 1);
+
 const port = process.env.PORT || 5000;
 
 // =============================
@@ -356,7 +359,7 @@ mongoose
     heartbeatFrequencyMS: 10000,  // Kiểm tra kết nối mỗi 10s
   })
   .then(() => {
-    console.log("✅ Connected to MongoDB (Pool: 3-20 connections)");
+    console.log("Connected to MongoDB (Pool: 3-20 connections)");
   })
   .catch((err) => {
     console.error("❌ Error connecting to MongoDB:", err);
@@ -364,14 +367,14 @@ mongoose
 
 // Start server (dùng HTTP server thay vì app.listen để hỗ trợ Socket.io)
 server.listen(port, () => {
-  console.log(`🚀 Server running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
 
 // =============================
 // ✅ GRACEFUL SHUTDOWN - Đóng connections đúng cách khi server tắt
 // =============================
 const gracefulShutdown = async (signal) => {
-  console.log(`\n🛑 ${signal} received. Shutting down gracefully...`);
+  console.log(`\n${signal} received. Shutting down gracefully...`);
   
   // Đóng Socket.IO connections
   io.close(() => {
