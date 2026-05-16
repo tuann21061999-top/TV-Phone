@@ -1,10 +1,10 @@
 const Product = require("../models/Product");
 const CompareSpec = require("../models/CompareSpec");
 
-// @desc    Smart Search products based on compare ratings
-// @route   POST /api/products/smart-search
+// @desc    Quick Search products based on compare ratings
+// @route   POST /api/products/quick-search
 // @access  Public
-exports.smartSearch = async (req, res) => {
+exports.quickSearch = async (req, res) => {
   try {
     // req.body.ratings = { groupId1: tierId1, groupId2: tierId2, ... }
     const { ratings } = req.body;
